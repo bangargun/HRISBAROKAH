@@ -63,9 +63,9 @@ class ApiService {
 
   // Attendance: Clock-In
   static Future<Map<String, dynamic>> clockIn({
-    required double lat,
-    required double lng,
-    required String photoUrl,
+    double? lat,
+    double? lng,
+    required String photoBase64,
     String? notes,
   }) async {
     final url = Uri.parse('$baseUrl/attendance/clock-in');
@@ -73,10 +73,10 @@ class ApiService {
       url,
       headers: await _headers(),
       body: jsonEncode({
-        'latitude': lat,
-        'longitude': lng,
-        'photoUrl': photoUrl,
-        'notes': notes,
+        'latitude': ?lat,
+        'longitude': ?lng,
+        'photoBase64': photoBase64,
+        'notes': ?notes,
       }),
     );
 
@@ -90,9 +90,9 @@ class ApiService {
 
   // Attendance: Clock-Out
   static Future<Map<String, dynamic>> clockOut({
-    required double lat,
-    required double lng,
-    required String photoUrl,
+    double? lat,
+    double? lng,
+    required String photoBase64,
     String? notes,
   }) async {
     final url = Uri.parse('$baseUrl/attendance/clock-out');
@@ -100,10 +100,10 @@ class ApiService {
       url,
       headers: await _headers(),
       body: jsonEncode({
-        'latitude': lat,
-        'longitude': lng,
-        'photoUrl': photoUrl,
-        'notes': notes,
+        'latitude': ?lat,
+        'longitude': ?lng,
+        'photoBase64': photoBase64,
+        'notes': ?notes,
       }),
     );
 

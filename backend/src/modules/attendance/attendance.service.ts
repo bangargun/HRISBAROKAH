@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ClockInDto, ClockOutDto } from './attendance.dto';
-import { validateFaceContour } from '../../common/utils/face-detection.util';
+import { saveAttendancePhoto } from '../../common/utils/attendance-photo.util';
 import { AttendanceStatus } from '@prisma/client';
 
 @Injectable()
@@ -66,21 +66,11 @@ export class AttendanceService {
       throw new BadRequestException('Anda sudah melakukan Clock In hari ini');
     }
 
-    // ============================================================
-    // VALIDASI BIOMETRIK KONTUR WAJAH (GEOFENCE GPS DIHAPUS)
-    // Apabila bukan kontur wajah yang dikirim, maka akan tertolak
-    // ============================================================
-    const faceCheck = await validateFaceContour(dto.photoUrl);
-    if (!faceCheck.isValid) {
-      throw new BadRequestException(
-        `Absensi Ditolak: ${faceCheck.reason || 'Foto yang dikirim tidak memuat kontur wajah manusia yang valid. Pastikan wajah terlihat jelas menghadap kamera.'}`,
-      );
-    }
+    // Wajah sudah dideteksi di aplikasi mobile; server menyimpan fotonya sebagai bukti
+    const photoUrl = await saveAttendancePhoto(dto.photoBase64);
 
     const now = new Date();
-    const biometricConfidence = Math.round((faceCheck.confidenceScore || 0.95) * 100);
-    const verificationNote = `[Biometrik Wajah: Lolos (${biometricConfidence}% Kontur Cocok)]`;
-    const finalNotes = dto.notes ? `${dto.notes} | ${verificationNote}` : verificationNote;
+    const finalNotes = dto.notes ?? null;
 
     if (existing) {
       return this.prisma.attendance.update({
@@ -89,7 +79,7 @@ export class AttendanceService {
           clockInTime: now,
           clockInLat: dto.latitude ?? 0,
           clockInLng: dto.longitude ?? 0,
-          clockInPhotoUrl: dto.photoUrl,
+          clockInPhotoUrl: photoUrl,
           clockInDistanceM: 0,
           status: AttendanceStatus.PRESENT,
           notes: finalNotes,
@@ -105,7 +95,7 @@ export class AttendanceService {
         clockInTime: now,
         clockInLat: dto.latitude ?? 0,
         clockInLng: dto.longitude ?? 0,
-        clockInPhotoUrl: dto.photoUrl,
+        clockInPhotoUrl: photoUrl,
         clockInDistanceM: 0,
         status: AttendanceStatus.PRESENT,
         notes: finalNotes,
@@ -144,22 +134,12 @@ export class AttendanceService {
       throw new BadRequestException('Anda masih dalam sesi istirahat. Harap selesaikan istirahat terlebih dahulu');
     }
 
-    // ============================================================
-    // VALIDASI BIOMETRIK KONTUR WAJAH SAAT KEPULANGAN (CLOCK OUT)
-    // ============================================================
-    const faceCheck = await validateFaceContour(dto.photoUrl);
-    if (!faceCheck.isValid) {
-      throw new BadRequestException(
-        `Clock-Out Ditolak: ${faceCheck.reason || 'Foto yang dikirim tidak memuat kontur wajah manusia yang valid.'}`,
-      );
-    }
+    const photoUrl = await saveAttendancePhoto(dto.photoBase64);
 
     const now = new Date();
-    const biometricConfidence = Math.round((faceCheck.confidenceScore || 0.95) * 100);
-    const outVerificationNote = `[Biometrik Pulang: Lolos (${biometricConfidence}% Kontur Cocok)]`;
     const finalOutNotes = dto.notes
-      ? `${attendance.notes || ''} | Out: ${dto.notes} (${outVerificationNote})`
-      : `${attendance.notes || ''} | ${outVerificationNote}`;
+      ? [attendance.notes, `Pulang: ${dto.notes}`].filter(Boolean).join(' | ')
+      : attendance.notes;
 
     return this.prisma.attendance.update({
       where: { id: attendance.id },
@@ -167,7 +147,7 @@ export class AttendanceService {
         clockOutTime: now,
         clockOutLat: dto.latitude ?? 0,
         clockOutLng: dto.longitude ?? 0,
-        clockOutPhotoUrl: dto.photoUrl,
+        clockOutPhotoUrl: photoUrl,
         clockOutDistanceM: 0,
         notes: finalOutNotes,
       },

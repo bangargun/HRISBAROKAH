@@ -1,4 +1,7 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
+
+// Base64 dari foto maksimal 2 MB (~2,7 juta karakter)
+const MAX_PHOTO_BASE64_LENGTH = 3_000_000;
 
 export class ClockInDto {
   @IsNumber()
@@ -10,8 +13,9 @@ export class ClockInDto {
   longitude?: number;
 
   @IsString()
-  @IsNotEmpty({ message: 'Foto selfie kontur wajah wajib disertakan untuk verifikasi biometrik' })
-  photoUrl: string;
+  @IsNotEmpty({ message: 'Foto selfie wajib disertakan untuk absen masuk' })
+  @MaxLength(MAX_PHOTO_BASE64_LENGTH, { message: 'Ukuran foto selfie maksimal 2 MB' })
+  photoBase64: string;
 
   @IsString()
   @IsOptional()
@@ -28,8 +32,9 @@ export class ClockOutDto {
   longitude?: number;
 
   @IsString()
-  @IsNotEmpty({ message: 'Foto selfie kontur wajah kepulangan wajib disertakan' })
-  photoUrl: string;
+  @IsNotEmpty({ message: 'Foto selfie wajib disertakan untuk absen pulang' })
+  @MaxLength(MAX_PHOTO_BASE64_LENGTH, { message: 'Ukuran foto selfie maksimal 2 MB' })
+  photoBase64: string;
 
   @IsString()
   @IsOptional()

@@ -13,3 +13,6 @@ web-admin/.next/
 
 # OS
 .DS_Store
+
+# Uploaded attendance selfies
+backend/uploads/

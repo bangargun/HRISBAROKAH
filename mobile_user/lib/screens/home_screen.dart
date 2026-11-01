@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import '../services/api_service.dart';
+import '../services/selfie_service.dart';
 import 'kasbon_screen.dart';
 import 'requests_screen.dart';
 import 'login_screen.dart';
@@ -63,50 +64,49 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<Position?> _determinePosition() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      throw 'Layanan lokasi (GPS) belum diaktifkan';
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
+  // Lokasi hanya dicatat sebagai info, absen tetap jalan tanpa GPS
+  Future<Position?> _tryGetPosition() async {
+    try {
+      if (!await Geolocator.isLocationServiceEnabled()) return null;
+      var permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
-        throw 'Izin lokasi ditolak';
+        permission = await Geolocator.requestPermission();
       }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        return null;
+      }
+      return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      ).timeout(const Duration(seconds: 10));
+    } catch (_) {
+      return null;
     }
-
-    if (permission == LocationPermission.deniedForever) {
-      throw 'Izin lokasi ditolak permanen';
-    }
-
-    return await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
   }
 
   Future<void> _handleClockIn() async {
     try {
       setState(() => _isLoading = true);
-      final pos = await _determinePosition();
-      if (pos == null) return;
+      final photo = await SelfieService.captureFaceSelfie();
+      final pos = await _tryGetPosition();
 
       await ApiService.clockIn(
-        lat: pos.latitude,
-        lng: pos.longitude,
-        photoUrl: 'https://placeholder.co/selfie.jpg',
+        lat: pos?.latitude,
+        lng: pos?.longitude,
+        photoBase64: photo,
       );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Berhasil Clock In! Verifikasi kontur wajah terkonfirmasi AI.'),
+            content: Text('Berhasil Clock In!'),
             backgroundColor: Colors.green,
           ),
         );
         _loadTodayAttendance();
       }
+    } on SelfieCancelled {
+      // Pengguna menutup kamera tanpa mengambil foto
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -124,24 +124,26 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _handleClockOut() async {
     try {
       setState(() => _isLoading = true);
-      final pos = await _determinePosition();
-      if (pos == null) return;
+      final photo = await SelfieService.captureFaceSelfie();
+      final pos = await _tryGetPosition();
 
       await ApiService.clockOut(
-        lat: pos.latitude,
-        lng: pos.longitude,
-        photoUrl: 'https://placeholder.co/selfie.jpg',
+        lat: pos?.latitude,
+        lng: pos?.longitude,
+        photoBase64: photo,
       );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Berhasil Clock Out! Verifikasi kontur wajah valid. Terima kasih!'),
+            content: Text('Berhasil Clock Out! Terima kasih!'),
             backgroundColor: Colors.green,
           ),
         );
         _loadTodayAttendance();
       }
+    } on SelfieCancelled {
+      // Pengguna menutup kamera tanpa mengambil foto
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

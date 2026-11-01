@@ -1,12 +1,17 @@
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { UPLOADS_ROOT } from './common/utils/attendance-photo.util';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.setGlobalPrefix('api/v1');
   app.enableCors();
+  // Foto selfie absensi dikirim sebagai base64 (maks 2 MB)
+  app.useBodyParser('json', { limit: '4mb' });
+  app.useStaticAssets(UPLOADS_ROOT, { prefix: '/uploads/' });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
