@@ -73,27 +73,27 @@ enum DiscType {
 // 1. MASTER RESTORAN & OUTLET
 // -------------------------------------------------------------
 model Outlet {
-  id              String            @id @default(uuid())
-  code            String            @unique
-  name            String
-  address         String
-  latitude        Float
-  longitude       Float
-  geofenceRadius  Int               @default(50)
-  wifiBssid       String?
-  isActive        Boolean           @default(true)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id             String   @id @default(uuid())
+  code           String   @unique
+  name           String
+  address        String
+  latitude       Float
+  longitude      Float
+  geofenceRadius Int      @default(50)
+  wifiBssid      String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  employees       EmployeeProfile[]
-  shifts          Shift[]
-  attendances     Attendance[]
+  employees   EmployeeProfile[]
+  shifts      Shift[]
+  attendances Attendance[]
 }
 
 model Department {
-  id          String      @id @default(uuid())
-  name        String
-  positions   Position[]
+  id        String     @id @default(uuid())
+  name      String
+  positions Position[]
 }
 
 model Position {
@@ -110,71 +110,76 @@ model Position {
 // 2. USER & EMPLOYEE PROFILE
 // -------------------------------------------------------------
 model User {
-  id            String           @id @default(uuid())
-  username      String           @unique
-  email         String?          @unique
-  passwordHash  String
-  role          UserRole         @default(EMPLOYEE)
-  isActive      Boolean          @default(true)
-  fcmToken      String?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
+  id           String   @id @default(uuid())
+  username     String   @unique
+  email        String?  @unique
+  passwordHash String
+  role         UserRole @default(EMPLOYEE)
+  isActive     Boolean  @default(true)
+  fcmToken     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  profile       EmployeeProfile?
+  profile EmployeeProfile?
 }
 
 model EmployeeProfile {
-  id                String           @id @default(uuid())
-  userId            String           @unique
-  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  nik               String           @unique
-  fullName          String
-  phone             String
-  birthDate         DateTime?
-  gender            String?
-  address           String?
-  
-  outletId          String
-  outlet            Outlet           @relation(fields: [outletId], references: [id])
-  
-  positionId        String
-  position          Position         @relation(fields: [positionId], references: [id])
-  
-  status            EmploymentStatus @default(PROBATION)
-  joinDate          DateTime
-  endDate           DateTime?
-  leaveBalance      Int              @default(12)
-  
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  nik       String    @unique
+  fullName  String
+  phone     String
+  birthDate DateTime?
+  gender    String?
+  address   String?
+
+  outletId String
+  outlet   Outlet @relation(fields: [outletId], references: [id])
+
+  positionId String
+  position   Position @relation(fields: [positionId], references: [id])
+
+  status       EmploymentStatus @default(PROBATION)
+  joinDate     DateTime
+  endDate      DateTime?
+  leaveBalance Int              @default(12)
+
+  // Persetujuan karyawan atas pemakaian data wajah (UU PDP)
+  faceConsentAt DateTime?
+
   // Rekening Penggajian
   bankName          String?
   bankAccountNumber String?
   bankAccountHolder String?
-  
+
   // Relasi Modul
-  shiftSchedules    ShiftSchedule[]
-  attendances       Attendance[]
-  requests          EmployeeRequest[]
-  kasbonLoans       KasbonLoan[]
-  payrolls          Payroll[]
-  sanctions         Sanction[]
-  discResults       DiscResult[]
-  trainingProgress  TrainingProgress[]
-  sopSignatures     SopSignature[]
+  shiftSchedules   ShiftSchedule[]
+  attendances      Attendance[]
+  requests         EmployeeRequest[]
+  kasbonLoans      KasbonLoan[]
+  payrolls         Payroll[]
+  sanctions        Sanction[]
+  discResults      DiscResult[]
+  trainingProgress TrainingProgress[]
+  sopSignatures    SopSignature[]
+  faceEnrollments  FaceEnrollment[]
+  faceChecks       FaceCheckLog[]
 }
 
 // -------------------------------------------------------------
 // 3. JADWAL SHIFT & ABSENSI (TERMASUK BREAK TIME)
 // -------------------------------------------------------------
 model Shift {
-  id               String          @id @default(uuid())
-  outletId         String
-  outlet           Outlet          @relation(fields: [outletId], references: [id])
-  name             String
-  startTime        String
-  endTime          String
-  breakLimitMins   Int             @default(60)
-  schedules        ShiftSchedule[]
+  id             String          @id @default(uuid())
+  outletId       String
+  outlet         Outlet          @relation(fields: [outletId], references: [id])
+  name           String
+  startTime      String
+  endTime        String
+  breakLimitMins Int             @default(60)
+  schedules      ShiftSchedule[]
 }
 
 model ShiftSchedule {
@@ -188,197 +193,234 @@ model ShiftSchedule {
 }
 
 model Attendance {
-  id               String           @id @default(uuid())
-  employeeId       String
-  employee         EmployeeProfile  @relation(fields: [employeeId], references: [id])
-  outletId         String
-  outlet           Outlet           @relation(fields: [outletId], references: [id])
-  scheduleId       String?
-  schedule         ShiftSchedule?   @relation(fields: [scheduleId], references: [id])
-  
-  date             DateTime         @db.Date
-  
+  id         String          @id @default(uuid())
+  employeeId String
+  employee   EmployeeProfile @relation(fields: [employeeId], references: [id])
+  outletId   String
+  outlet     Outlet          @relation(fields: [outletId], references: [id])
+  scheduleId String?
+  schedule   ShiftSchedule?  @relation(fields: [scheduleId], references: [id])
+
+  date DateTime @db.Date
+
   // Clock In
   clockInTime      DateTime?
   clockInLat       Float?
   clockInLng       Float?
   clockInPhotoUrl  String?
   clockInDistanceM Float?
-  
+
   // Clock Out
-  clockOutTime     DateTime?
-  clockOutLat      Float?
-  clockOutLng      Float?
-  clockOutPhotoUrl String?
+  clockOutTime      DateTime?
+  clockOutLat       Float?
+  clockOutLng       Float?
+  clockOutPhotoUrl  String?
   clockOutDistanceM Float?
-  
-  status           AttendanceStatus @default(PRESENT)
-  lateMinutes      Int              @default(0)
-  overtimeMinutes  Int              @default(0)
-  notes            String?
-  
-  breaks           AttendanceBreak[]
+
+  // Skor kemiripan wajah selfie dengan wajah terdaftar (0..1)
+  clockInFaceScore  Float?
+  clockOutFaceScore Float?
+
+  status          AttendanceStatus @default(PRESENT)
+  lateMinutes     Int              @default(0)
+  overtimeMinutes Int              @default(0)
+  notes           String?
+
+  breaks AttendanceBreak[]
 }
 
 model AttendanceBreak {
-  id            String      @id @default(uuid())
+  id            String     @id @default(uuid())
   attendanceId  String
-  attendance    Attendance  @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
+  attendance    Attendance @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
   startBreak    DateTime
   endBreak      DateTime?
   totalMinutes  Int?
-  isOverLimit   Boolean     @default(false)
-  overLimitMins Int         @default(0)
+  isOverLimit   Boolean    @default(false)
+  overLimitMins Int        @default(0)
+}
+
+enum FaceCheckKind {
+  CLOCK_IN
+  CLOCK_OUT
+}
+
+// Sidik wajah (embedding) hasil pendaftaran oleh HR / Store Manager
+model FaceEnrollment {
+  id           String          @id @default(uuid())
+  employeeId   String
+  employee     EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  embedding    Float[]
+  photoPath    String
+  enrolledById String
+  createdAt    DateTime        @default(now())
+
+  @@index([employeeId])
+}
+
+// Riwayat setiap pencocokan wajah saat absen, termasuk yang ditolak
+model FaceCheckLog {
+  id         String          @id @default(uuid())
+  employeeId String
+  employee   EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  kind       FaceCheckKind
+  score      Float?
+  accepted   Boolean
+  reason     String?
+  photoUrl   String?
+  createdAt  DateTime        @default(now())
+
+  @@index([employeeId, createdAt])
 }
 
 // -------------------------------------------------------------
 // 4. MODUL PENGAJUAN (KASBON, CUTI, SAKIT, TUKAR SHIFT)
 // -------------------------------------------------------------
 model EmployeeRequest {
-  id              String        @id @default(uuid())
-  employeeId      String
-  employee        EmployeeProfile @relation(fields: [employeeId], references: [id])
-  type            RequestType
-  status          RequestStatus @default(PENDING_STORE_MANAGER)
-  
-  startDate       DateTime?
-  endDate         DateTime?
-  totalDays       Int?
-  
-  reason          String
-  attachmentUrl   String?
-  
+  id         String          @id @default(uuid())
+  employeeId String
+  employee   EmployeeProfile @relation(fields: [employeeId], references: [id])
+  type       RequestType
+  status     RequestStatus   @default(PENDING_STORE_MANAGER)
+
+  startDate DateTime?
+  endDate   DateTime?
+  totalDays Int?
+
+  reason        String
+  attachmentUrl String?
+
   targetEmployeeId String?
   targetApproved   Boolean?
-  
-  managerNotes    String?
-  approvedBySmId  String?
-  approvedAtSm    DateTime?
-  
-  hrNotes         String?
-  approvedByHrId  String?
-  approvedAtHr    DateTime?
-  
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
 
-  kasbonLoan      KasbonLoan?
+  managerNotes   String?
+  approvedBySmId String?
+  approvedAtSm   DateTime?
+
+  hrNotes        String?
+  approvedByHrId String?
+  approvedAtHr   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  kasbonLoan KasbonLoan?
 }
 
 model KasbonLoan {
-  id                String          @id @default(uuid())
-  requestId         String          @unique
-  request           EmployeeRequest @relation(fields: [requestId], references: [id])
-  employeeId        String
-  employee          EmployeeProfile @relation(fields: [employeeId], references: [id])
-  
-  amount            Decimal         @db.Decimal(12, 2)
-  tenorMonths       Int             @default(1)
-  monthlyDeduction  Decimal         @db.Decimal(12, 2)
-  remainingAmount   Decimal         @db.Decimal(12, 2)
-  isFullyPaid       Boolean         @default(false)
-  disbursedAt       DateTime?
-  
-  deductions        KasbonDeductionHistory[]
-  createdAt         DateTime        @default(now())
+  id         String          @id @default(uuid())
+  requestId  String          @unique
+  request    EmployeeRequest @relation(fields: [requestId], references: [id])
+  employeeId String
+  employee   EmployeeProfile @relation(fields: [employeeId], references: [id])
+
+  amount           Decimal   @db.Decimal(12, 2)
+  tenorMonths      Int       @default(1)
+  monthlyDeduction Decimal   @db.Decimal(12, 2)
+  remainingAmount  Decimal   @db.Decimal(12, 2)
+  isFullyPaid      Boolean   @default(false)
+  disbursedAt      DateTime?
+
+  deductions KasbonDeductionHistory[]
+  createdAt  DateTime                 @default(now())
 }
 
 model KasbonDeductionHistory {
-  id            String      @id @default(uuid())
-  kasbonLoanId  String
-  kasbonLoan    KasbonLoan  @relation(fields: [kasbonLoanId], references: [id])
-  payrollId     String
-  payroll       Payroll     @relation(fields: [payrollId], references: [id])
+  id             String     @id @default(uuid())
+  kasbonLoanId   String
+  kasbonLoan     KasbonLoan @relation(fields: [kasbonLoanId], references: [id])
+  payrollId      String
+  payroll        Payroll    @relation(fields: [payrollId], references: [id])
   amountDeducted Decimal    @db.Decimal(12, 2)
-  deductedAt    DateTime    @default(now())
+  deductedAt     DateTime   @default(now())
 }
 
 // -------------------------------------------------------------
 // 5. PAYROLL (PENGGAJIAN TERINTEGRASI)
 // -------------------------------------------------------------
 model Payroll {
-  id                String          @id @default(uuid())
-  employeeId        String
-  employee          EmployeeProfile @relation(fields: [employeeId], references: [id])
-  periodMonth       Int
-  periodYear        Int
-  
+  id          String          @id @default(uuid())
+  employeeId  String
+  employee    EmployeeProfile @relation(fields: [employeeId], references: [id])
+  periodMonth Int
+  periodYear  Int
+
   // Pendapatan
-  basicSalary       Decimal         @db.Decimal(12, 2)
-  mealAllowance     Decimal         @default(0) @db.Decimal(12, 2)
-  serviceCharge     Decimal         @default(0) @db.Decimal(12, 2)
-  overtimePay       Decimal         @default(0) @db.Decimal(12, 2)
-  bonusIncentive    Decimal         @default(0) @db.Decimal(12, 2)
-  
+  basicSalary    Decimal @db.Decimal(12, 2)
+  mealAllowance  Decimal @default(0) @db.Decimal(12, 2)
+  serviceCharge  Decimal @default(0) @db.Decimal(12, 2)
+  overtimePay    Decimal @default(0) @db.Decimal(12, 2)
+  bonusIncentive Decimal @default(0) @db.Decimal(12, 2)
+
   // Potongan
-  latePenalty       Decimal         @default(0) @db.Decimal(12, 2)
-  kasbonDeduction   Decimal         @default(0) @db.Decimal(12, 2)
-  sanctionDeduction Decimal         @default(0) @db.Decimal(12, 2)
-  bpjsKesehatan     Decimal         @default(0) @db.Decimal(12, 2)
-  bpjsKetenagakerjaan Decimal       @default(0) @db.Decimal(12, 2)
-  
-  netSalary         Decimal         @db.Decimal(12, 2)
-  payslipPdfUrl     String?
-  isPaid            Boolean         @default(false)
-  paidAt            DateTime?
-  
-  kasbonHistories   KasbonDeductionHistory[]
-  createdAt         DateTime        @default(now())
+  latePenalty         Decimal @default(0) @db.Decimal(12, 2)
+  kasbonDeduction     Decimal @default(0) @db.Decimal(12, 2)
+  sanctionDeduction   Decimal @default(0) @db.Decimal(12, 2)
+  bpjsKesehatan       Decimal @default(0) @db.Decimal(12, 2)
+  bpjsKetenagakerjaan Decimal @default(0) @db.Decimal(12, 2)
+
+  netSalary     Decimal   @db.Decimal(12, 2)
+  payslipPdfUrl String?
+  isPaid        Boolean   @default(false)
+  paidAt        DateTime?
+
+  kasbonHistories KasbonDeductionHistory[]
+  createdAt       DateTime                 @default(now())
 }
 
 // -------------------------------------------------------------
 // 6. PERATURAN PERUSAHAAN, SOP & SANKSI (SP)
 // -------------------------------------------------------------
 model SopDocument {
-  id          String         @id @default(uuid())
-  title       String
-  category    String
-  contentUrl  String
-  version     Int            @default(1)
-  isActive    Boolean        @default(true)
-  signatures  SopSignature[]
-  createdAt   DateTime       @default(now())
+  id         String         @id @default(uuid())
+  title      String
+  category   String
+  contentUrl String
+  version    Int            @default(1)
+  isActive   Boolean        @default(true)
+  signatures SopSignature[]
+  createdAt  DateTime       @default(now())
 }
 
 model SopSignature {
-  id            String          @id @default(uuid())
-  sopId         String
-  sop           SopDocument     @relation(fields: [sopId], references: [id])
-  employeeId    String
-  employee      EmployeeProfile @relation(fields: [employeeId], references: [id])
-  acknowledgedAt DateTime       @default(now())
-  signatureUrl  String?
+  id             String          @id @default(uuid())
+  sopId          String
+  sop            SopDocument     @relation(fields: [sopId], references: [id])
+  employeeId     String
+  employee       EmployeeProfile @relation(fields: [employeeId], references: [id])
+  acknowledgedAt DateTime        @default(now())
+  signatureUrl   String?
 }
 
 model Sanction {
-  id            String          @id @default(uuid())
-  employeeId    String
-  employee      EmployeeProfile @relation(fields: [employeeId], references: [id])
-  type          SanctionType
-  letterNumber  String          @unique
-  incidentDate  DateTime
-  violationDesc String
-  actionTaken   String?
-  validUntil    DateTime
+  id             String          @id @default(uuid())
+  employeeId     String
+  employee       EmployeeProfile @relation(fields: [employeeId], references: [id])
+  type           SanctionType
+  letterNumber   String          @unique
+  incidentDate   DateTime
+  violationDesc  String
+  actionTaken    String?
+  validUntil     DateTime
   documentPdfUrl String?
-  issuedById    String
-  createdAt     DateTime        @default(now())
+  issuedById     String
+  createdAt      DateTime        @default(now())
 }
 
 // -------------------------------------------------------------
 // 7. PEOPLE DEVELOPMENT (DISC & TRAINING)
 // -------------------------------------------------------------
 model DiscResult {
-  id            String          @id @default(uuid())
-  employeeId    String
-  employee      EmployeeProfile @relation(fields: [employeeId], references: [id])
-  dominantType  DiscType
-  scoreD        Int
-  scoreI        Int
-  scoreS        Int
-  scoreC        Int
-  summary       String
-  testedAt      DateTime        @default(now())
+  id           String          @id @default(uuid())
+  employeeId   String
+  employee     EmployeeProfile @relation(fields: [employeeId], references: [id])
+  dominantType DiscType
+  scoreD       Int
+  scoreI       Int
+  scoreS       Int
+  scoreC       Int
+  summary      String
+  testedAt     DateTime        @default(now())
 }
 
 model TrainingCourse {

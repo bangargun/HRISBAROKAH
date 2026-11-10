@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import '../services/api_service.dart';
-import '../services/selfie_service.dart';
 import 'kasbon_screen.dart';
 import 'requests_screen.dart';
 import 'login_screen.dart';
+import 'face_camera_screen.dart';
+import 'face_enrollment_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,12 +21,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic>? _attendanceData;
   String _currentTime = '';
   Timer? _timer;
+  String? _role;
 
   @override
   void initState() {
     super.initState();
     _startClock();
     _loadTodayAttendance();
+    ApiService.getCurrentUser().then((user) {
+      if (mounted) setState(() => _role = user?['role'] as String?);
+    });
   }
 
   @override
@@ -87,7 +92,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _handleClockIn() async {
     try {
       setState(() => _isLoading = true);
-      final photo = await SelfieService.captureFaceSelfie();
+      final photo = await FaceCameraScreen.capture(context, title: 'Selfie Absen Masuk');
+      if (photo == null) return;
       final pos = await _tryGetPosition();
 
       await ApiService.clockIn(
@@ -105,8 +111,6 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         _loadTodayAttendance();
       }
-    } on SelfieCancelled {
-      // Pengguna menutup kamera tanpa mengambil foto
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -124,7 +128,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _handleClockOut() async {
     try {
       setState(() => _isLoading = true);
-      final photo = await SelfieService.captureFaceSelfie();
+      final photo = await FaceCameraScreen.capture(context, title: 'Selfie Absen Pulang');
+      if (photo == null) return;
       final pos = await _tryGetPosition();
 
       await ApiService.clockOut(
@@ -142,8 +147,6 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         _loadTodayAttendance();
       }
-    } on SelfieCancelled {
-      // Pengguna menutup kamera tanpa mengambil foto
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -545,6 +548,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                         ),
+                        if (canManageFaces(_role))
+                          _quickMenuCard(
+                            icon: Icons.face_retouching_natural,
+                            title: 'Daftar Wajah',
+                            color: Colors.teal,
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const FaceEnrollmentScreen()),
+                            ),
+                          ),
                         _quickMenuCard(
                           icon: Icons.psychology_rounded,
                           title: 'Asesmen SDM',

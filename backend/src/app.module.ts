@@ -6,6 +6,7 @@ import { OutletsModule } from './modules/outlets/outlets.module';
 import { EmployeesModule } from './modules/employees/employees.module';
 import { AttendanceModule } from './modules/attendance/attendance.module';
 import { RequestsModule } from './modules/requests/requests.module';
+import { FaceModule } from './modules/face/face.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { RequestsModule } from './modules/requests/requests.module';
     EmployeesModule,
     AttendanceModule,
     RequestsModule,
+    FaceModule,
   ],
   controllers: [],
   providers: [],

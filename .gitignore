@@ -16,3 +16,6 @@ web-admin/.next/
 
 # Uploaded attendance selfies
 backend/uploads/
+
+# Private face reference photos
+backend/storage/

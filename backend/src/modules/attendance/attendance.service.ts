@@ -1,12 +1,15 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ClockInDto, ClockOutDto } from './attendance.dto';
-import { saveAttendancePhoto } from '../../common/utils/attendance-photo.util';
-import { AttendanceStatus } from '@prisma/client';
+import { FaceEnrollmentService } from '../face/face-enrollment.service';
+import { AttendanceStatus, FaceCheckKind } from '@prisma/client';
 
 @Injectable()
 export class AttendanceService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private faceEnrollment: FaceEnrollmentService,
+  ) {}
 
   private getTodayDate(): Date {
     const today = new Date();
@@ -66,8 +69,12 @@ export class AttendanceService {
       throw new BadRequestException('Anda sudah melakukan Clock In hari ini');
     }
 
-    // Wajah sudah dideteksi di aplikasi mobile; server menyimpan fotonya sebagai bukti
-    const photoUrl = await saveAttendancePhoto(dto.photoBase64);
+    // Selfie dicocokkan dengan wajah terdaftar karyawan ini
+    const { photoUrl, score } = await this.faceEnrollment.verifyForAttendance(
+      profile.id,
+      dto.photoBase64,
+      FaceCheckKind.CLOCK_IN,
+    );
 
     const now = new Date();
     const finalNotes = dto.notes ?? null;
@@ -80,6 +87,7 @@ export class AttendanceService {
           clockInLat: dto.latitude ?? 0,
           clockInLng: dto.longitude ?? 0,
           clockInPhotoUrl: photoUrl,
+          clockInFaceScore: score,
           clockInDistanceM: 0,
           status: AttendanceStatus.PRESENT,
           notes: finalNotes,
@@ -96,6 +104,7 @@ export class AttendanceService {
         clockInLat: dto.latitude ?? 0,
         clockInLng: dto.longitude ?? 0,
         clockInPhotoUrl: photoUrl,
+        clockInFaceScore: score,
         clockInDistanceM: 0,
         status: AttendanceStatus.PRESENT,
         notes: finalNotes,
@@ -134,7 +143,11 @@ export class AttendanceService {
       throw new BadRequestException('Anda masih dalam sesi istirahat. Harap selesaikan istirahat terlebih dahulu');
     }
 
-    const photoUrl = await saveAttendancePhoto(dto.photoBase64);
+    const { photoUrl, score } = await this.faceEnrollment.verifyForAttendance(
+      profile.id,
+      dto.photoBase64,
+      FaceCheckKind.CLOCK_OUT,
+    );
 
     const now = new Date();
     const finalOutNotes = dto.notes
@@ -148,6 +161,7 @@ export class AttendanceService {
         clockOutLat: dto.latitude ?? 0,
         clockOutLng: dto.longitude ?? 0,
         clockOutPhotoUrl: photoUrl,
+        clockOutFaceScore: score,
         clockOutDistanceM: 0,
         notes: finalOutNotes,
       },
@@ -156,7 +170,9 @@ export class AttendanceService {
   }
 
   async startBreak(userId: string) {
-    const profile = await this.prisma.employeeProfile.findUnique({ where: { userId } });
+    const profile = await this.prisma.employeeProfile.findUnique({
+      where: { userId },
+    });
     if (!profile) throw new NotFoundException('Profil karyawan tidak ditemukan');
 
     const today = this.getTodayDate();
@@ -187,7 +203,9 @@ export class AttendanceService {
   }
 
   async endBreak(userId: string) {
-    const profile = await this.prisma.employeeProfile.findUnique({ where: { userId } });
+    const profile = await this.prisma.employeeProfile.findUnique({
+      where: { userId },
+    });
     if (!profile) throw new NotFoundException('Profil karyawan tidak ditemukan');
 
     const today = this.getTodayDate();
@@ -226,7 +244,9 @@ export class AttendanceService {
   }
 
   async getHistory(userId: string, month?: number, year?: number) {
-    const profile = await this.prisma.employeeProfile.findUnique({ where: { userId } });
+    const profile = await this.prisma.employeeProfile.findUnique({
+      where: { userId },
+    });
     if (!profile) throw new NotFoundException('Profil karyawan tidak ditemukan');
 
     const targetYear = year || new Date().getFullYear();

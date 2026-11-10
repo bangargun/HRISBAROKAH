@@ -3,18 +3,24 @@ import { randomUUID } from 'crypto';
 import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
 
+// Disajikan publik di /uploads (foto selfie absensi)
 export const UPLOADS_ROOT = join(process.cwd(), 'uploads');
+// Tidak disajikan publik (foto acuan wajah karyawan)
+export const PRIVATE_STORAGE_ROOT = join(process.cwd(), 'storage');
 
 const MIN_BYTES = 5 * 1024;
 const MAX_BYTES = 2 * 1024 * 1024;
 
+export interface DecodedPhoto {
+  buffer: Buffer;
+  ext: 'jpg' | 'png';
+}
+
 /**
- * Menyimpan foto selfie absensi (base64 JPEG/PNG) ke disk.
- * Deteksi wajah dilakukan di aplikasi mobile (ML Kit); server hanya memastikan
- * yang dikirim benar-benar file gambar, lalu menyimpannya sebagai bukti.
- * Mengembalikan path publik, misal /uploads/attendance/2026-11-01/<uuid>.jpg
+ * Mengubah foto base64 (boleh dengan awalan data URI) menjadi buffer,
+ * dan memastikan isinya benar-benar JPEG/PNG berukuran wajar.
  */
-export async function saveAttendancePhoto(photoBase64: string): Promise<string> {
+export function decodePhoto(photoBase64: string): DecodedPhoto {
   const data = photoBase64.includes('base64,') ? photoBase64.split('base64,')[1] : photoBase64;
   const buffer = Buffer.from(data, 'base64');
 
@@ -30,13 +36,26 @@ export async function saveAttendancePhoto(photoBase64: string): Promise<string> 
   if (buffer.length > MAX_BYTES) {
     throw new BadRequestException('Ukuran foto selfie maksimal 2 MB');
   }
+  return { buffer, ext: isJpeg ? 'jpg' : 'png' };
+}
 
+/** Simpan selfie absensi; mengembalikan path publik /uploads/attendance/<tanggal>/<uuid>.jpg */
+export async function saveAttendancePhoto(photo: DecodedPhoto): Promise<string> {
   const day = new Date().toISOString().slice(0, 10);
   const dir = join(UPLOADS_ROOT, 'attendance', day);
   await mkdir(dir, { recursive: true });
 
-  const fileName = `${randomUUID()}.${isJpeg ? 'jpg' : 'png'}`;
-  await writeFile(join(dir, fileName), buffer);
-
+  const fileName = `${randomUUID()}.${photo.ext}`;
+  await writeFile(join(dir, fileName), photo.buffer);
   return `/uploads/attendance/${day}/${fileName}`;
+}
+
+/** Simpan foto acuan wajah di folder privat; mengembalikan path relatif terhadap storage/ */
+export async function saveFaceReferencePhoto(employeeId: string, photo: DecodedPhoto): Promise<string> {
+  const relDir = join('faces', employeeId);
+  await mkdir(join(PRIVATE_STORAGE_ROOT, relDir), { recursive: true });
+
+  const relPath = join(relDir, `${randomUUID()}.${photo.ext}`);
+  await writeFile(join(PRIVATE_STORAGE_ROOT, relPath), photo.buffer);
+  return relPath;
 }
