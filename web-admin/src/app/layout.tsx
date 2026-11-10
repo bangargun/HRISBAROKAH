@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import AuthGuard from '@/components/AuthGuard';
 
 export const metadata: Metadata = {
   title: 'HRIS Barokah Group - Multi-Outlet Resto Portal',
@@ -14,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
-        {children}
+        <AuthGuard>{children}</AuthGuard>
       </body>
     </html>
   );

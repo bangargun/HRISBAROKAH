@@ -35,17 +35,14 @@ export class AuthService {
       },
     });
 
-    if (!user) {
-      throw new UnauthorizedException('Kredensial tidak valid');
+    // Pesan sama untuk user tidak ada dan password salah, agar username tidak bisa ditebak
+    const isPasswordValid = user ? await bcrypt.compare(password, user.passwordHash) : false;
+    if (!user || !isPasswordValid) {
+      throw new UnauthorizedException('Username atau password salah');
     }
 
     if (!user.isActive) {
       throw new UnauthorizedException('Akun Anda dinonaktifkan, silakan hubungi HR');
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Password salah');
     }
 
     if (fcmToken && fcmToken !== user.fcmToken) {
@@ -78,7 +75,7 @@ export class AuthService {
   }
 
   async getProfile(userId: string) {
-    return this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: {
         profile: {
@@ -91,6 +88,9 @@ export class AuthService {
         },
       },
     });
+    if (!user) return null;
+    const { passwordHash, fcmToken, ...safeUser } = user;
+    return safeUser;
   }
 
   async changePassword(userId: string, dto: ChangePasswordDto) {

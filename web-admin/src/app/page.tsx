@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { BACKEND_API, clearSession, getToken } from '@/lib/auth';
 import {
   ChefHat,
   Building2,
@@ -2492,27 +2493,14 @@ export default function AdminDashboard() {
   const initialEmployeesMaster: EmployeeMaster[] = [];
   const [employeesMasterList, setEmployeesMasterList] = useState<EmployeeMaster[]>(initialEmployeesMaster);
 
-  // Integrasi Backend API
-  const BACKEND_API = 'http://localhost:3000/api/v1';
+  // Integrasi Backend API (sesi dibuat di halaman login, dicek oleh AuthGuard)
   const [isBackendConnected, setIsBackendConnected] = useState<boolean>(false);
   const [backendToken, setBackendToken] = useState<string>('');
 
   useEffect(() => {
     const fetchBackendEmployees = async () => {
       try {
-        let token = localStorage.getItem('hris_backend_token') || '';
-        if (!token) {
-          const loginRes = await fetch(`${BACKEND_API}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: 'admin', password: 'admin123' }),
-          });
-          if (loginRes.ok) {
-            const loginData = await loginRes.json();
-            token = loginData.accessToken;
-            localStorage.setItem('hris_backend_token', token);
-          }
-        }
+        const token = getToken() || '';
         setBackendToken(token);
 
         if (token) {
@@ -6899,7 +6887,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               href="/login"
               onClick={() => {
                 setIsSidebarOpen(false);
-                showToast('Sesi Admin HR ditutup. Mengalihkan ke login...');
+                clearSession();
               }}
               className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition"
               title="Keluar ke Login"
