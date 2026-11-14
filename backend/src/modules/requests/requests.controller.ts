@@ -30,21 +30,22 @@ export class RequestsController {
   @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN, UserRole.FINANCE_ADMIN, UserRole.STORE_MANAGER, UserRole.AREA_MANAGER)
   @Get('admin')
   async getAdminRequests(
+    @CurrentUser() user,
     @Query('outletId') outletId?: string,
     @Query('status') status?: RequestStatus,
     @Query('type') type?: RequestType,
   ) {
-    return this.requestsService.getAdminRequests(outletId, status, type);
+    return this.requestsService.getAdminRequests(user, outletId, status, type);
   }
 
   @Roles(UserRole.SUPER_ADMIN, UserRole.STORE_MANAGER, UserRole.AREA_MANAGER)
   @Patch(':id/store-manager-review')
   async reviewByStoreManager(
     @Param('id') id: string,
-    @CurrentUser('id') reviewerId: string,
+    @CurrentUser() reviewer,
     @Body() dto: ApprovalActionDto,
   ) {
-    return this.requestsService.approveOrRejectByStoreManager(id, reviewerId, dto);
+    return this.requestsService.approveOrRejectByStoreManager(id, reviewer, dto);
   }
 
   @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN, UserRole.FINANCE_ADMIN)

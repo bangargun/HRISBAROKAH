@@ -1,5 +1,6 @@
 import {
   IsEnum,
+  IsIn,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -50,9 +51,8 @@ export class CreateGeneralRequestDto {
 }
 
 export class ApprovalActionDto {
-  @IsString()
-  @IsNotEmpty()
-  action: 'APPROVE' | 'REJECT'; // APPROVE atau REJECT
+  @IsIn(['APPROVE', 'REJECT'], { message: 'Aksi harus APPROVE atau REJECT' })
+  action: 'APPROVE' | 'REJECT';
 
   @IsString()
   @IsOptional()

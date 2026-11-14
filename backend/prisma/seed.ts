@@ -83,9 +83,13 @@ async function main() {
     },
   }).catch(() => null);
 
-  // 4. Akun Super Admin HR
-  const hashedAdminPassword = await bcrypt.hash('admin123', 10);
-  const adminUser = await prisma.user.upsert({
+  // 4. Akun Super Admin HR (password awal dari .env, tidak pernah ditulis di kode)
+  const adminPassword = process.env.ADMIN_INITIAL_PASSWORD;
+  if (!adminPassword || adminPassword.length < 10) {
+    throw new Error('Isi ADMIN_INITIAL_PASSWORD di backend/.env (minimal 10 karakter) sebelum menjalankan seed');
+  }
+  const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
+  await prisma.user.upsert({
     where: { username: 'admin' },
     update: {},
     create: {
@@ -96,7 +100,7 @@ async function main() {
     },
   });
 
-  console.log('Admin login: username=admin, password=admin123');
+  console.log('Akun admin siap: username=admin (password sesuai ADMIN_INITIAL_PASSWORD). Akun yang sudah ada tidak diubah.');
   console.log('Master data konfigurasi (Outlet, Departemen, Posisi, Shift) siap digunakan.');
 }
 

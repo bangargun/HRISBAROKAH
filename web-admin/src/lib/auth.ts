@@ -48,7 +48,7 @@ function toSessionUser(user: any): SessionUser {
   return { id: user.id, username: user.username, role: user.role, fullName: user.profile?.fullName };
 }
 
-function messageFrom(data: any, fallback: string): string {
+export function messageFrom(data: any, fallback: string): string {
   const message = data?.message;
   if (Array.isArray(message)) return message.join(', ');
   return typeof message === 'string' ? message : fallback;

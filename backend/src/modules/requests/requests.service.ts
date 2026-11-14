@@ -1,7 +1,15 @@
-import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateKasbonDto, CreateGeneralRequestDto, ApprovalActionDto } from './requests.dto';
-import { RequestStatus, RequestType, UserRole } from '@prisma/client';
+import { Prisma, RequestStatus, RequestType, User, UserRole } from '@prisma/client';
+
+type AuthUser = User & { profile?: { outletId: string } | null };
 
 @Injectable()
 export class RequestsService {
@@ -11,7 +19,12 @@ export class RequestsService {
     const profile = await this.prisma.employeeProfile.findUnique({
       where: { userId },
       include: {
-        kasbonLoans: { where: { isFullyPaid: false } },
+        kasbonLoans: {
+          where: {
+            isFullyPaid: false,
+            request: { status: { notIn: [RequestStatus.REJECTED, RequestStatus.CANCELLED] } },
+          },
+        },
       },
     });
 
@@ -102,7 +115,16 @@ export class RequestsService {
     });
   }
 
-  async getAdminRequests(outletId?: string, status?: RequestStatus, type?: RequestType) {
+  async getAdminRequests(
+    actor: AuthUser,
+    outletId?: string,
+    status?: RequestStatus,
+    type?: RequestType,
+  ) {
+    if (actor.role === UserRole.STORE_MANAGER) {
+      outletId = this.ownOutletId(actor);
+    }
+
     return this.prisma.employeeRequest.findMany({
       where: {
         ...(status && { status }),
@@ -122,83 +144,67 @@ export class RequestsService {
     });
   }
 
-  async approveOrRejectByStoreManager(requestId: string, reviewerId: string, dto: ApprovalActionDto) {
+  async approveOrRejectByStoreManager(requestId: string, reviewer: AuthUser, dto: ApprovalActionDto) {
     const request = await this.prisma.employeeRequest.findUnique({
       where: { id: requestId },
       include: { employee: true },
     });
 
     if (!request) throw new NotFoundException('Pengajuan tidak ditemukan');
-    if (request.status !== RequestStatus.PENDING_STORE_MANAGER) {
-      throw new BadRequestException('Status pengajuan ini sudah bukan menunggu Store Manager');
+    if (reviewer.role === UserRole.STORE_MANAGER && request.employee.outletId !== this.ownOutletId(reviewer)) {
+      throw new ForbiddenException('Anda hanya bisa memproses pengajuan karyawan di outlet Anda');
     }
+    this.requireRejectNote(dto);
 
-    if (dto.action === 'REJECT') {
-      return this.prisma.employeeRequest.update({
-        where: { id: requestId },
-        data: {
-          status: RequestStatus.REJECTED,
-          managerNotes: dto.notes,
-          approvedBySmId: reviewerId,
-          approvedAtSm: new Date(),
-        },
-      });
-    }
-
-    // Jika disetujui Store Manager -> Lanjut ke HR/Finance
-    return this.prisma.employeeRequest.update({
-      where: { id: requestId },
-      data: {
-        status: RequestStatus.PENDING_HR,
-        managerNotes: dto.notes,
-        approvedBySmId: reviewerId,
-        approvedAtSm: new Date(),
-      },
+    // Disetujui Store Manager -> lanjut ke HR/Finance
+    return this.transition(this.prisma, requestId, RequestStatus.PENDING_STORE_MANAGER, {
+      status: dto.action === 'REJECT' ? RequestStatus.REJECTED : RequestStatus.PENDING_HR,
+      managerNotes: dto.notes,
+      approvedBySmId: reviewer.id,
+      approvedAtSm: new Date(),
     });
   }
 
   async approveOrRejectByHr(requestId: string, hrUserId: string, dto: ApprovalActionDto) {
     const request = await this.prisma.employeeRequest.findUnique({
       where: { id: requestId },
-      include: { employee: true, kasbonLoan: true },
+      include: { employee: true },
     });
 
     if (!request) throw new NotFoundException('Pengajuan tidak ditemukan');
-    if (request.status !== RequestStatus.PENDING_HR) {
-      throw new BadRequestException('Status pengajuan ini harus berada di tahap PENDING_HR');
-    }
+    this.requireRejectNote(dto);
+
+    const review = {
+      hrNotes: dto.notes,
+      approvedByHrId: hrUserId,
+      approvedAtHr: new Date(),
+    };
 
     if (dto.action === 'REJECT') {
-      return this.prisma.employeeRequest.update({
-        where: { id: requestId },
-        data: {
-          status: RequestStatus.REJECTED,
-          hrNotes: dto.notes,
-          approvedByHrId: hrUserId,
-          approvedAtHr: new Date(),
-        },
+      return this.transition(this.prisma, requestId, RequestStatus.PENDING_HR, {
+        status: RequestStatus.REJECTED,
+        ...review,
       });
     }
 
     return this.prisma.$transaction(async (tx) => {
-      // Jika Cuti Tahunan, potong leaveBalance karyawan
+      // Status dikunci lebih dulu agar persetujuan ganda tidak memotong cuti dua kali
+      const updated = await this.transition(tx, requestId, RequestStatus.PENDING_HR, {
+        status: RequestStatus.APPROVED,
+        ...review,
+      });
+
       if (request.type === RequestType.CUTI_TAHUNAN && request.totalDays) {
-        await tx.employeeProfile.update({
-          where: { id: request.employeeId },
+        const deducted = await tx.employeeProfile.updateMany({
+          where: { id: request.employeeId, leaveBalance: { gte: request.totalDays } },
           data: { leaveBalance: { decrement: request.totalDays } },
         });
+        if (deducted.count === 0) {
+          throw new BadRequestException('Sisa kuota cuti karyawan sudah tidak mencukupi');
+        }
       }
 
-      // Khusus kasbon, status menjadi APPROVED (siap dicairkan / DISBURSED)
-      return tx.employeeRequest.update({
-        where: { id: requestId },
-        data: {
-          status: RequestStatus.APPROVED,
-          hrNotes: dto.notes,
-          approvedByHrId: hrUserId,
-          approvedAtHr: new Date(),
-        },
-      });
+      return updated;
     });
   }
 
@@ -212,22 +218,49 @@ export class RequestsService {
       throw new NotFoundException('Data pengajuan kasbon tidak ditemukan');
     }
 
-    if (request.status !== RequestStatus.APPROVED) {
-      throw new BadRequestException('Kasbon harus berstatus APPROVED oleh HR sebelum dicairkan');
-    }
-
     const now = new Date();
-    await this.prisma.$transaction([
-      this.prisma.employeeRequest.update({
-        where: { id: requestId },
-        data: { status: RequestStatus.DISBURSED },
-      }),
-      this.prisma.kasbonLoan.update({
-        where: { id: request.kasbonLoan.id },
+    await this.prisma.$transaction(async (tx) => {
+      await this.transition(tx, requestId, RequestStatus.APPROVED, { status: RequestStatus.DISBURSED });
+      await tx.kasbonLoan.update({
+        where: { id: request.kasbonLoan!.id },
         data: { disbursedAt: now },
-      }),
-    ]);
+      });
+    });
 
     return { message: 'Dana kasbon berhasil dicairkan', disbursedAt: now };
+  }
+
+  private ownOutletId(actor: AuthUser): string {
+    const outletId = actor.profile?.outletId;
+    if (!outletId) {
+      throw new ForbiddenException('Akun Store Manager belum terhubung ke outlet');
+    }
+    return outletId;
+  }
+
+  private requireRejectNote(dto: ApprovalActionDto) {
+    if (dto.action === 'REJECT' && !dto.notes?.trim()) {
+      throw new BadRequestException('Alasan penolakan wajib diisi');
+    }
+  }
+
+  /**
+   * Mengubah status hanya jika masih di tahap yang diharapkan,
+   * sehingga dua admin yang menekan tombol bersamaan tidak saling menimpa.
+   */
+  private async transition(
+    db: Prisma.TransactionClient,
+    requestId: string,
+    from: RequestStatus,
+    data: Prisma.EmployeeRequestUpdateManyMutationInput,
+  ) {
+    const result = await db.employeeRequest.updateMany({
+      where: { id: requestId, status: from },
+      data,
+    });
+    if (result.count === 0) {
+      throw new ConflictException('Pengajuan ini sudah diproses atau statusnya berubah. Muat ulang data.');
+    }
+    return db.employeeRequest.findUniqueOrThrow({ where: { id: requestId } });
   }
 }
