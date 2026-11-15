@@ -3,12 +3,14 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateEmployeeDto, UpdateEmployeeDto } from './employees.dto';
 import * as bcrypt from 'bcrypt';
 import { UserRole } from '@prisma/client';
+import { AuthUser, assertOutletAccess, scopedOutletId } from '../../common/utils/outlet-scope.util';
 
 @Injectable()
 export class EmployeesService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(outletId?: string, departmentId?: string) {
+  async findAll(actor: AuthUser, outletId?: string, departmentId?: string) {
+    outletId = scopedOutletId(actor, outletId);
     return this.prisma.employeeProfile.findMany({
       where: {
         ...(outletId && { outletId }),
@@ -29,7 +31,13 @@ export class EmployeesService {
     });
   }
 
-  async findOne(id: string) {
+  async findOne(actor: AuthUser, id: string) {
+    const employee = await this.getOrThrow(id);
+    assertOutletAccess(actor, employee.outletId, 'Anda hanya bisa melihat karyawan di outlet Anda');
+    return employee;
+  }
+
+  private async getOrThrow(id: string) {
     const employee = await this.prisma.employeeProfile.findUnique({
       where: { id },
       include: {
@@ -109,7 +117,7 @@ export class EmployeesService {
   }
 
   async update(id: string, dto: UpdateEmployeeDto) {
-    await this.findOne(id);
+    await this.getOrThrow(id);
     return this.prisma.employeeProfile.update({
       where: { id },
       data: dto,
@@ -122,7 +130,7 @@ export class EmployeesService {
   }
 
   async toggleActiveStatus(id: string) {
-    const employee = await this.findOne(id);
+    const employee = await this.getOrThrow(id);
     const updated = await this.prisma.user.update({
       where: { id: employee.userId },
       data: { isActive: !employee.user.isActive },

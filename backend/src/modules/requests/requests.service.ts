@@ -3,13 +3,11 @@ import {
   BadRequestException,
   ConflictException,
   NotFoundException,
-  ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateKasbonDto, CreateGeneralRequestDto, ApprovalActionDto } from './requests.dto';
-import { Prisma, RequestStatus, RequestType, User, UserRole } from '@prisma/client';
-
-type AuthUser = User & { profile?: { outletId: string } | null };
+import { Prisma, RequestStatus, RequestType } from '@prisma/client';
+import { AuthUser, assertOutletAccess, scopedOutletId } from '../../common/utils/outlet-scope.util';
 
 @Injectable()
 export class RequestsService {
@@ -121,9 +119,7 @@ export class RequestsService {
     status?: RequestStatus,
     type?: RequestType,
   ) {
-    if (actor.role === UserRole.STORE_MANAGER) {
-      outletId = this.ownOutletId(actor);
-    }
+    outletId = scopedOutletId(actor, outletId);
 
     return this.prisma.employeeRequest.findMany({
       where: {
@@ -151,9 +147,7 @@ export class RequestsService {
     });
 
     if (!request) throw new NotFoundException('Pengajuan tidak ditemukan');
-    if (reviewer.role === UserRole.STORE_MANAGER && request.employee.outletId !== this.ownOutletId(reviewer)) {
-      throw new ForbiddenException('Anda hanya bisa memproses pengajuan karyawan di outlet Anda');
-    }
+    assertOutletAccess(reviewer, request.employee.outletId, 'Anda hanya bisa memproses pengajuan karyawan di outlet Anda');
     this.requireRejectNote(dto);
 
     // Disetujui Store Manager -> lanjut ke HR/Finance
@@ -228,14 +222,6 @@ export class RequestsService {
     });
 
     return { message: 'Dana kasbon berhasil dicairkan', disbursedAt: now };
-  }
-
-  private ownOutletId(actor: AuthUser): string {
-    const outletId = actor.profile?.outletId;
-    if (!outletId) {
-      throw new ForbiddenException('Akun Store Manager belum terhubung ke outlet');
-    }
-    return outletId;
   }
 
   private requireRejectNote(dto: ApprovalActionDto) {

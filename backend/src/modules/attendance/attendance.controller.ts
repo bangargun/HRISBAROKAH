@@ -6,6 +6,7 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from '@prisma/client';
+import { scopedOutletId } from '../../common/utils/outlet-scope.util';
 
 @UseGuards(JwtAuthGuard)
 @Controller('attendance')
@@ -54,9 +55,10 @@ export class AttendanceController {
   @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN, UserRole.STORE_MANAGER, UserRole.AREA_MANAGER)
   @Get('admin/daily-report')
   async getDailyReport(
+    @CurrentUser() user,
     @Query('outletId') outletId?: string,
     @Query('date') date?: string,
   ) {
-    return this.attendanceService.getAdminDailyReport(outletId, date);
+    return this.attendanceService.getAdminDailyReport(scopedOutletId(user, outletId), date);
   }
 }

@@ -5,23 +5,28 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from '@prisma/client';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('employees')
 export class EmployeesController {
   constructor(private employeesService: EmployeesService) {}
 
+  // Data pribadi karyawan (NIK, alamat, rekening): bukan untuk akun kru
+  @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN, UserRole.FINANCE_ADMIN, UserRole.AREA_MANAGER, UserRole.STORE_MANAGER)
   @Get()
   async findAll(
+    @CurrentUser() user,
     @Query('outletId') outletId?: string,
     @Query('departmentId') departmentId?: string,
   ) {
-    return this.employeesService.findAll(outletId, departmentId);
+    return this.employeesService.findAll(user, outletId, departmentId);
   }
 
+  @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN, UserRole.FINANCE_ADMIN, UserRole.AREA_MANAGER, UserRole.STORE_MANAGER)
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.employeesService.findOne(id);
+  async findOne(@CurrentUser() user, @Param('id') id: string) {
+    return this.employeesService.findOne(user, id);
   }
 
   @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN)

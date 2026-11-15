@@ -1,5 +1,6 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { FaceCheckKind, User, UserRole } from '@prisma/client';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { FaceCheckKind } from '@prisma/client';
+import { AuthUser, assertOutletAccess, scopedOutletId } from '../../common/utils/outlet-scope.util';
 import { rm } from 'fs/promises';
 import { join } from 'path';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -12,7 +13,6 @@ import {
 import { FaceRecognitionService } from './face-recognition.service';
 import { EnrollFaceDto } from './face.dto';
 
-type AuthUser = User & { profile?: { outletId: string } | null };
 
 export interface FaceVerification {
   photoUrl: string;
@@ -34,9 +34,7 @@ export class FaceEnrollmentService {
       throw new NotFoundException('Karyawan tidak ditemukan');
     }
     // Store Manager hanya boleh mengelola wajah karyawan di outletnya sendiri
-    if (actor.role === UserRole.STORE_MANAGER && actor.profile?.outletId !== employee.outletId) {
-      throw new ForbiddenException('Anda hanya bisa mengelola wajah karyawan di outlet Anda');
-    }
+    assertOutletAccess(actor, employee.outletId, 'Anda hanya bisa mengelola wajah karyawan di outlet Anda');
     return employee;
   }
 
@@ -181,9 +179,8 @@ export class FaceEnrollmentService {
   }
 
   async getCheckLogs(actor: AuthUser, outletId?: string, dateStr?: string, onlyRejected?: boolean) {
-    if (actor.role === UserRole.STORE_MANAGER) {
-      outletId = actor.profile?.outletId;
-    }
+    // Store Manager tanpa outlet kini ditolak, bukan melihat semua outlet
+    outletId = scopedOutletId(actor, outletId);
     const day = dateStr ? new Date(dateStr) : new Date();
     day.setHours(0, 0, 0, 0);
     const nextDay = new Date(day);

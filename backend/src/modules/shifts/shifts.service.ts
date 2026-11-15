@@ -1,9 +1,7 @@
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { User, UserRole } from '@prisma/client';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { AuthUser, scopedOutletId } from '../../common/utils/outlet-scope.util';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateShiftDto, UpdateShiftDto } from './shifts.dto';
-
-type AuthUser = User & { profile?: { outletId: string } | null };
 
 const SHIFT_INCLUDE = {
   outlet: { select: { id: true, code: true, name: true } },
@@ -15,10 +13,7 @@ export class ShiftsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(actor: AuthUser, outletId?: string) {
-    if (actor.role === UserRole.STORE_MANAGER) {
-      outletId = actor.profile?.outletId;
-      if (!outletId) throw new ForbiddenException('Akun Store Manager belum terhubung ke outlet');
-    }
+    outletId = scopedOutletId(actor, outletId);
 
     return this.prisma.shift.findMany({
       where: outletId ? { outletId } : {},

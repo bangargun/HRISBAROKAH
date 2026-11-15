@@ -23,12 +23,14 @@ interface Props {
 }
 
 function initials(name: string) {
+  // Ambil huruf pertama dari dua kata pertama yang diawali huruf, abaikan tanda baca
   return name
     .split(/\s+/)
+    .map((w) => w.match(/[A-Za-zÀ-ÿ]/)?.[0])
     .filter(Boolean)
     .slice(0, 2)
-    .map((w) => w[0]!.toUpperCase())
-    .join('');
+    .join('')
+    .toUpperCase();
 }
 
 export default function AppShell({ activeId, onSelect, title, counts, headerActions, children }: Props) {
