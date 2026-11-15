@@ -75,7 +75,7 @@ export function monthDateRange(year: number, month: number): { first: Date; last
   };
 }
 
-/** Saat absolut dari tanggal kalender + jam (HH:mm) di zona waktu bisnis, mis. jam mulai shift. */
+/** Saat absolut dari tanggal kalender + jam (HH:mm) di zona waktu bisnis, mis. jam mulai kerja. */
 export function businessDateTime(ymd: string, hhmm: string): Date {
   const [h, m] = hhmm.split(':').map(Number);
   const localAsUtc = toDateOnly(ymd).getTime() + (h * 60 + m) * 60_000;

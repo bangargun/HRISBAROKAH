@@ -73,22 +73,47 @@ enum DiscType {
 // 1. MASTER RESTORAN & OUTLET
 // -------------------------------------------------------------
 model Outlet {
-  id               String   @id @default(uuid())
-  code             String   @unique
+  id               String  @id @default(uuid())
+  code             String  @unique
   name             String
+  // Merek usaha (mis. Ayam Pecak 2001 Seafood) dan kota/wilayah
+  brand            String?
+  city             String?
   address          String
   latitude         Float
   longitude        Float
-  geofenceRadius   Int      @default(50)
+  geofenceRadius   Int     @default(50)
   wifiBssid        String?
   // Tanggal tutup buku gaji (1-31; melebihi akhir bulan = hari terakhir bulan itu)
-  payrollCutoffDay Int      @default(31)
-  isActive         Boolean  @default(true)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  payrollCutoffDay Int     @default(31)
+  // Tanggal gaji dibayarkan (1-31), informasi untuk HR/Keuangan
+  paydayDay        Int     @default(1)
+
+  // Kepala Cabang: karyawan cabang ini yang berperan Store Manager
+  managerId String?          @unique
+  manager   EmployeeProfile? @relation("OutletManager", fields: [managerId], references: [id], onDelete: SetNull)
+
+  // Jam kerja kru per jenis hari (HH:mm); dipakai menghitung terlambat
+  weekdayWorkStart String  @default("09:00")
+  weekdayWorkEnd   String  @default("17:00")
+  weekendWorkStart String  @default("09:00")
+  weekendWorkEnd   String  @default("17:00")
+  holidayWorkStart String  @default("09:00")
+  holidayWorkEnd   String  @default("17:00")
+  // Jam buka-tutup untuk tamu per jenis hari (informasi saja)
+  weekdayOpen      String?
+  weekdayClose     String?
+  weekendOpen      String?
+  weekendClose     String?
+  holidayOpen      String?
+  holidayClose     String?
+  breakLimitMins   Int     @default(60)
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   employees   EmployeeProfile[]
-  shifts      Shift[]
   attendances Attendance[]
   payrolls    Payroll[]
 }
@@ -138,8 +163,9 @@ model EmployeeProfile {
   gender    String?
   address   String?
 
-  outletId String
-  outlet   Outlet @relation(fields: [outletId], references: [id])
+  outletId      String
+  outlet        Outlet  @relation(fields: [outletId], references: [id])
+  managedOutlet Outlet? @relation("OutletManager")
 
   positionId String
   position   Position @relation(fields: [positionId], references: [id])
@@ -174,27 +200,15 @@ model EmployeeProfile {
 // -------------------------------------------------------------
 // 3. JADWAL SHIFT & ABSENSI (TERMASUK BREAK TIME)
 // -------------------------------------------------------------
-model Shift {
-  id             String          @id @default(uuid())
-  outletId       String
-  outlet         Outlet          @relation(fields: [outletId], references: [id])
-  name           String
-  startTime      String
-  endTime        String
-  breakLimitMins Int             @default(60)
-  schedules      ShiftSchedule[]
-}
-
 model ShiftSchedule {
   id          String          @id @default(uuid())
   employeeId  String
   employee    EmployeeProfile @relation(fields: [employeeId], references: [id])
-  shiftId     String
-  shift       Shift           @relation(fields: [shiftId], references: [id])
   date        DateTime        @db.Date
   attendances Attendance[]
 
-  // Satu shift per karyawan per tanggal; tanggal tanpa jadwal berarti libur
+  // Ada baris = karyawan dijadwalkan masuk; jamnya dari jam kerja cabang sesuai jenis hari.
+  // Tanggal tanpa baris berarti libur.
   @@unique([employeeId, date])
   @@index([date])
 }
@@ -493,4 +507,12 @@ model TrainingProgress {
   isCompleted Boolean         @default(false)
   quizScore   Int?
   completedAt DateTime?
+}
+
+// Tanggal libur nasional; hari ini memakai jam kerja "Libur Nasional" di semua cabang
+model PublicHoliday {
+  id        String   @id @default(uuid())
+  date      DateTime @unique @db.Date
+  name      String
+  createdAt DateTime @default(now())
 }

@@ -4,6 +4,7 @@ import { ClockInDto, ClockOutDto } from './attendance.dto';
 import { FaceEnrollmentService } from '../face/face-enrollment.service';
 import { AttendanceStatus, FaceCheckKind } from '@prisma/client';
 import { calculateDistanceInMeters } from '../../common/utils/geofence.util';
+import { OutletHours, dayTypeFor, holidaysBetween, workWindow } from '../../common/utils/work-hours.util';
 import {
   businessDateString,
   businessDateTime,
@@ -13,7 +14,6 @@ import {
   toDateOnly,
 } from '../../common/utils/business-date.util';
 
-const DEFAULT_BREAK_LIMIT_MINS = 60;
 // Toleransi terlambat dalam menit (menit terlambat tetap dicatat apa adanya)
 const LATE_GRACE_MINUTES = Math.max(0, Number(process.env.LATE_GRACE_MINUTES ?? 0) || 0);
 
@@ -29,18 +29,20 @@ export class AttendanceService {
   }
 
   /**
-   * Jadwal hari ini menentukan keterlambatan: menit setelah jam mulai shift.
+   * Jadwal hari ini menentukan keterlambatan: menit setelah jam mulai kerja cabang
+   * untuk jenis hari itu (weekday, weekend atau libur nasional).
    * Tanpa jadwal, absen tetap diterima sebagai hadir dan tidak dihitung terlambat.
    */
-  private async punctuality(employeeId: string, today: Date, now: Date) {
+  private async punctuality(employeeId: string, outlet: OutletHours, today: Date, now: Date) {
     const schedule = await this.prisma.shiftSchedule.findUnique({
       where: { employeeId_date: { employeeId, date: today } },
-      include: { shift: true },
     });
     if (!schedule) {
       return { scheduleId: null, lateMinutes: 0, status: AttendanceStatus.PRESENT };
     }
-    const start = businessDateTime(today.toISOString().slice(0, 10), schedule.shift.startTime);
+    const ymd = today.toISOString().slice(0, 10);
+    const { start: startTime } = workWindow(outlet, dayTypeFor(ymd, await holidaysBetween(this.prisma, ymd, ymd)));
+    const start = businessDateTime(ymd, startTime);
     const lateMinutes = Math.max(0, Math.floor((now.getTime() - start.getTime()) / 60_000));
     return {
       scheduleId: schedule.id,
@@ -122,7 +124,7 @@ export class AttendanceService {
     const now = new Date();
     const finalNotes = dto.notes ?? null;
     const location = this.locate(profile.outlet, dto.latitude, dto.longitude);
-    const punctuality = await this.punctuality(profile.id, today, now);
+    const punctuality = await this.punctuality(profile.id, profile.outlet, today, now);
 
     if (existing) {
       return this.prisma.attendance.update({
@@ -258,7 +260,7 @@ export class AttendanceService {
     const today = this.getTodayDate();
     const attendance = await this.prisma.attendance.findFirst({
       where: { employeeId: profile.id, date: today },
-      include: { breaks: true, schedule: { include: { shift: true } } },
+      include: { breaks: true, outlet: { select: { breakLimitMins: true } } },
     });
 
     if (!attendance) {
@@ -274,8 +276,8 @@ export class AttendanceService {
     const diffMs = now.getTime() - new Date(activeBreak.startBreak).getTime();
     const totalMinutes = Math.round(diffMs / 60000);
 
-    // Batas istirahat mengikuti shift hari itu; tanpa jadwal pakai standar resto
-    const breakLimitMins = attendance.schedule?.shift.breakLimitMins ?? DEFAULT_BREAK_LIMIT_MINS;
+    // Batas istirahat mengikuti pengaturan cabang tempat absen hari itu
+    const breakLimitMins = attendance.outlet.breakLimitMins;
     const isOverLimit = totalMinutes > breakLimitMins;
     const overLimitMins = isOverLimit ? totalMinutes - breakLimitMins : 0;
 
@@ -318,7 +320,7 @@ export class AttendanceService {
   async getAdminDailyReport(outletId?: string, dateStr?: string) {
     const targetDate = dateStr ? toDateOnly(parseDateParam(dateStr)) : this.getTodayDate();
 
-    return this.prisma.attendance.findMany({
+    const rows = await this.prisma.attendance.findMany({
       where: {
         date: targetDate,
         ...(outletId && { outletId }),
@@ -330,13 +332,23 @@ export class AttendanceService {
             outlet: true,
           },
         },
-        outlet: { select: { id: true, name: true, geofenceRadius: true } },
-        schedule: {
-          include: { shift: { select: { id: true, name: true, startTime: true, endTime: true, breakLimitMins: true } } },
-        },
+        outlet: true,
         breaks: true,
       },
       orderBy: { clockInTime: 'asc' },
+    });
+
+    // Jam kerja yang berlaku hari itu, untuk menampilkan "mulai jam ..." dan batas istirahat
+    const ymd = targetDate.toISOString().slice(0, 10);
+    const dayType = dayTypeFor(ymd, await holidaysBetween(this.prisma, ymd, ymd));
+    return rows.map((r) => {
+      const hours = workWindow(r.outlet, dayType);
+      return {
+        ...r,
+        dayType,
+        expectedStart: r.scheduleId ? hours.start : null,
+        expectedEnd: r.scheduleId ? hours.end : null,
+      };
     });
   }
 }

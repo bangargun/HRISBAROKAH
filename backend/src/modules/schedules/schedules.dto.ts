@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsUUID, Matches, ValidateIf, ValidateNested } from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsUUID, Matches, ValidateNested } from 'class-validator';
 
 export class ScheduleEntryDto {
   @IsUUID('4', { message: 'Karyawan tidak valid' })
@@ -8,10 +8,9 @@ export class ScheduleEntryDto {
   @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'Tanggal harus berformat YYYY-MM-DD' })
   date: string;
 
-  /** null = libur (jadwal pada tanggal itu dihapus) */
-  @ValidateIf((o) => o.shiftId !== null)
-  @IsUUID('4', { message: 'Shift tidak valid' })
-  shiftId: string | null;
+  /** true = masuk (jam dari jam kerja cabang), false = libur */
+  @IsBoolean({ message: 'Isi working dengan true (masuk) atau false (libur)' })
+  working: boolean;
 }
 
 export class SaveSchedulesDto {

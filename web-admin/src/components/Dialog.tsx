@@ -10,10 +10,13 @@ export default function Dialog({
   title,
   onClose,
   children,
+  wide = false,
 }: {
   title: string;
   onClose: () => void;
   children: React.ReactNode;
+  /** Form panjang (mis. data cabang) memakai dialog lebih lebar */
+  wide?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const closeRef = useRef(onClose);
@@ -36,7 +39,7 @@ export default function Dialog({
         aria-modal="true"
         aria-label={title}
         onClick={(e) => e.stopPropagation()}
-        className="max-h-[90vh] w-full max-w-md space-y-3 overflow-y-auto rounded-lg bg-white p-5 text-sm shadow-xl"
+        className={`max-h-[90vh] w-full ${wide ? 'max-w-2xl' : 'max-w-md'} space-y-3 overflow-y-auto rounded-lg bg-white p-5 text-sm shadow-xl`}
       >
         <h2 className="text-base font-semibold text-slate-900">{title}</h2>
         {children}

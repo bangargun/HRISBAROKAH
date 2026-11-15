@@ -2,9 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import ShiftMasterModule from '@/components/ShiftMasterModule';
 import AppShell from '@/components/AppShell';
-import OutletMasterModule from '@/components/OutletMasterModule';
 import { getSessionUser } from '@/lib/auth';
 import { actionFor, useAdminRequests } from '@/lib/requests';
 import {
@@ -35,10 +33,10 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 
-type MasterSubTab = 'outlets' | 'departments' | 'shifts' | 'payroll' | 'leaves';
+type MasterSubTab = 'departments' | 'payroll' | 'leaves';
 
 export default function MasterDataPage() {
-  const [activeTab, setActiveTab] = useState<MasterSubTab>('outlets');
+  const [activeTab, setActiveTab] = useState<MasterSubTab>('departments');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Modal States
@@ -302,9 +300,7 @@ export default function MasterDataPage() {
           <nav className="-mb-px flex gap-1 overflow-x-auto" aria-label="Bagian master data">
             {(
               [
-                { id: 'outlets', label: 'Cabang & Geofence' },
                 { id: 'departments', label: 'Departemen & Stasiun' },
-                { id: 'shifts', label: 'Shift' },
                 { id: 'payroll', label: 'Komponen Gaji' },
                 { id: 'leaves', label: 'Jenis Cuti' },
               ] as { id: MasterSubTab; label: string }[]
@@ -331,7 +327,6 @@ export default function MasterDataPage() {
           {/* ========================================================= */}
           {/* SUB-TAB 1: MASTER OUTLET & GEOFENCE                      */}
           {/* ========================================================= */}
-          {activeTab === 'outlets' && <OutletMasterModule />}
 
           {/* ========================================================= */}
           {/* SUB-TAB 2: DEPARTEMEN & STATION POSISI                   */}
@@ -420,10 +415,6 @@ export default function MasterDataPage() {
             </div>
           )}
 
-          {/* ========================================================= */}
-          {/* SUB-TAB 3: JADWAL LONG SHIFT OUTLET                      */}
-          {/* ========================================================= */}
-          {activeTab === 'shifts' && <ShiftMasterModule />}
 
           {/* ========================================================= */}
           {/* SUB-TAB 4: KOMPONEN PAYROLL & SERVICE CHARGE              */}

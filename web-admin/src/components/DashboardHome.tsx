@@ -25,21 +25,23 @@ interface AttendanceRow {
   clockOutDistanceM: number | null;
   status: string;
   lateMinutes: number;
-  outlet: { name: string; geofenceRadius: number };
+  outlet: { name: string; geofenceRadius: number; breakLimitMins: number };
   employee: { fullName: string; outlet: { name: string } };
-  schedule: { shift: { name: string; startTime: string; breakLimitMins: number } } | null;
+  scheduleId: string | null;
+  /** Jam mulai kerja cabang yang berlaku hari itu (null bila tidak dijadwalkan) */
+  expectedStart: string | null;
   breaks: { startBreak: string; endBreak: string | null; isOverLimit: boolean }[];
 }
 
 interface ScheduleRow {
   employeeId: string;
-  shift: { name: string; startTime: string; endTime: string };
+  startTime: string;
+  endTime: string;
 }
 
 // Sama dengan @Roles laporan harian di attendance.controller.ts
 const ATTENDANCE_VIEWERS = ['SUPER_ADMIN', 'HR_ADMIN', 'STORE_MANAGER', 'AREA_MANAGER'];
 // Batas istirahat bila absen tidak terkait jadwal (sama dengan backend)
-const DEFAULT_BREAK_LIMIT_MINS = 60;
 
 const timeFmt = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' });
 const dateFmt = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short' });
@@ -139,7 +141,7 @@ export default function DashboardHome({ requests, onOpen }: Props) {
   const today = useMemo(() => {
     if (!employees) return null;
     const active = employees.filter((e) => e.user.isActive);
-    const shiftOf = new Map((schedules ?? []).map((s) => [s.employeeId, s.shift]));
+    const shiftOf = new Map((schedules ?? []).map((s) => [s.employeeId, s]));
     // Tanpa jadwal sama sekali hari ini, "belum absen" terpaksa memakai semua karyawan aktif
     const hasSchedule = shiftOf.size > 0;
     const expected = hasSchedule ? active.filter((e) => shiftOf.has(e.id)) : active;
@@ -153,7 +155,7 @@ export default function DashboardHome({ requests, onOpen }: Props) {
       .map(({ row, open }) => ({
         row,
         mins: minutesSince(open.startBreak),
-        limit: row.schedule?.shift.breakLimitMins ?? DEFAULT_BREAK_LIMIT_MINS,
+        limit: row.outlet.breakLimitMins,
       }))
       .sort((a, b) => b.mins - a.mins);
     const overLimit =
@@ -204,13 +206,13 @@ export default function DashboardHome({ requests, onOpen }: Props) {
           {
             label: 'Terlambat hari ini',
             value: today ? String(today.late.length) : '…',
-            hint: 'dari jam mulai shift',
+            hint: 'dari jam mulai kerja',
             tone: today?.late.length ? ('warn' as const) : undefined,
           },
           {
             label: 'Istirahat lewat batas',
             value: today ? String(today.overLimit) : '…',
-            hint: 'sesuai batas shift',
+            hint: 'sesuai batas cabang',
             onClick: () => onOpen('attendance', 'break-tracker'),
             tone: today?.overLimit ? ('warn' as const) : undefined,
           },
@@ -343,7 +345,7 @@ export default function DashboardHome({ requests, onOpen }: Props) {
               rows={(today?.late ?? []).map((a) => ({
                 key: a.id,
                 name: a.employee.fullName,
-                meta: `${a.outlet.name}${a.schedule ? ` · ${a.schedule.shift.name} mulai ${a.schedule.shift.startTime}` : ''}${
+                meta: `${a.outlet.name}${a.expectedStart ? ` · mulai ${a.expectedStart}` : ''}${
                   a.clockInTime ? ` · masuk ${timeFmt.format(new Date(a.clockInTime))}` : ''
                 }`,
                 aside: `${a.lateMinutes} menit`,
@@ -381,7 +383,7 @@ export default function DashboardHome({ requests, onOpen }: Props) {
                 return {
                   key: e.id,
                   name: e.fullName,
-                  meta: shift ? `${e.outlet.name} · ${shift.name} mulai ${shift.startTime}` : e.outlet.name,
+                  meta: shift ? `${e.outlet.name} · mulai ${shift.startTime}` : e.outlet.name,
                 };
               })}
               onMore={() => onOpen('attendance', 'work-schedule')}

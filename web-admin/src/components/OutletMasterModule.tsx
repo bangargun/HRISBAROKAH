@@ -5,31 +5,55 @@ import { Edit2, ExternalLink, Loader2, Plus, RefreshCw } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { getSessionUser } from '@/lib/auth';
 import Dialog from '@/components/Dialog';
+import HolidayList from '@/components/HolidayList';
+
+type DayKey = 'weekday' | 'weekend' | 'holiday';
 
 interface Outlet {
   id: string;
   code: string;
   name: string;
+  brand: string | null;
+  city: string | null;
   address: string;
   latitude: number;
   longitude: number;
   geofenceRadius: number;
   wifiBssid: string | null;
+  managerId: string | null;
+  manager: { id: string; fullName: string } | null;
+  weekdayWorkStart: string;
+  weekdayWorkEnd: string;
+  weekendWorkStart: string;
+  weekendWorkEnd: string;
+  holidayWorkStart: string;
+  holidayWorkEnd: string;
+  weekdayOpen: string | null;
+  weekdayClose: string | null;
+  weekendOpen: string | null;
+  weekendClose: string | null;
+  holidayOpen: string | null;
+  holidayClose: string | null;
+  breakLimitMins: number;
   payrollCutoffDay: number;
+  paydayDay: number;
   isActive: boolean;
-  _count: { employees: number; shifts: number };
+  _count: { employees: number };
 }
 
-interface OutletForm {
-  id?: string;
-  code: string;
-  name: string;
-  address: string;
-  latitude: string;
-  longitude: string;
-  geofenceRadius: string;
-  wifiBssid: string;
-  payrollCutoffDay: string;
+/** Isian form, urutannya sama dengan kolom di tabel. */
+type OutletForm = { id?: string } & Record<
+  | 'code' | 'name' | 'brand' | 'city' | 'address' | 'managerId'
+  | 'weekdayWorkStart' | 'weekdayWorkEnd' | 'weekendWorkStart' | 'weekendWorkEnd' | 'holidayWorkStart' | 'holidayWorkEnd'
+  | 'weekdayOpen' | 'weekdayClose' | 'weekendOpen' | 'weekendClose' | 'holidayOpen' | 'holidayClose'
+  | 'breakLimitMins' | 'latitude' | 'longitude' | 'geofenceRadius' | 'wifiBssid' | 'payrollCutoffDay' | 'paydayDay',
+  string
+>;
+
+interface ManagerOption {
+  id: string;
+  fullName: string;
+  user: { role: string; isActive: boolean };
 }
 
 // Sama dengan @Roles di backend outlets.controller.ts
@@ -37,16 +61,43 @@ const CREATORS = ['SUPER_ADMIN', 'HR_ADMIN'];
 const EDITORS = ['SUPER_ADMIN', 'HR_ADMIN', 'AREA_MANAGER'];
 const STATUS_CHANGERS = ['SUPER_ADMIN', 'HR_ADMIN'];
 
+const DAYS: { key: DayKey; label: string }[] = [
+  { key: 'weekday', label: 'Weekday (Sen–Jum)' },
+  { key: 'weekend', label: 'Weekend (Sab–Min)' },
+  { key: 'holiday', label: 'Libur nasional' },
+];
+
+const BRANDS = ['Ayam Pecak 2001 Seafood', 'Ayam Bakar Surabaya', 'Pecel Lele Pak Haji'];
+
 const EMPTY_FORM: OutletForm = {
-  code: '',
-  name: '',
-  address: '',
-  latitude: '',
-  longitude: '',
-  geofenceRadius: '50',
-  wifiBssid: '',
-  payrollCutoffDay: '31',
+  code: '', name: '', brand: '', city: '', address: '', managerId: '',
+  weekdayWorkStart: '09:00', weekdayWorkEnd: '22:00',
+  weekendWorkStart: '09:00', weekendWorkEnd: '23:00',
+  holidayWorkStart: '09:00', holidayWorkEnd: '23:00',
+  weekdayOpen: '10:00', weekdayClose: '22:00',
+  weekendOpen: '10:00', weekendClose: '23:00',
+  holidayOpen: '10:00', holidayClose: '23:00',
+  breakLimitMins: '60', latitude: '', longitude: '', geofenceRadius: '50', wifiBssid: '',
+  payrollCutoffDay: '31', paydayDay: '1',
 };
+
+function toForm(o: Outlet): OutletForm {
+  const s = (v: string | number | null) => (v === null ? '' : String(v));
+  return {
+    id: o.id, code: o.code, name: o.name, brand: s(o.brand), city: s(o.city), address: o.address, managerId: s(o.managerId),
+    weekdayWorkStart: o.weekdayWorkStart, weekdayWorkEnd: o.weekdayWorkEnd,
+    weekendWorkStart: o.weekendWorkStart, weekendWorkEnd: o.weekendWorkEnd,
+    holidayWorkStart: o.holidayWorkStart, holidayWorkEnd: o.holidayWorkEnd,
+    weekdayOpen: s(o.weekdayOpen), weekdayClose: s(o.weekdayClose),
+    weekendOpen: s(o.weekendOpen), weekendClose: s(o.weekendClose),
+    holidayOpen: s(o.holidayOpen), holidayClose: s(o.holidayClose),
+    breakLimitMins: s(o.breakLimitMins), latitude: s(o.latitude), longitude: s(o.longitude),
+    geofenceRadius: s(o.geofenceRadius), wifiBssid: s(o.wifiBssid),
+    payrollCutoffDay: s(o.payrollCutoffDay), paydayDay: s(o.paydayDay),
+  };
+}
+
+const dayOfMonth = (d: number) => (d === 31 ? 'akhir bulan' : `tgl ${d}`);
 
 export default function OutletMasterModule() {
   const role = getSessionUser()?.role ?? '';
@@ -78,22 +129,25 @@ export default function OutletMasterModule() {
   }, [load]);
 
   async function save(data: OutletForm) {
+    const { id, code, ...f } = data;
     const body = {
-      name: data.name,
-      address: data.address,
-      latitude: Number(data.latitude),
-      longitude: Number(data.longitude),
-      geofenceRadius: Number(data.geofenceRadius),
-      wifiBssid: data.wifiBssid,
-      payrollCutoffDay: Number(data.payrollCutoffDay),
+      ...f,
+      managerId: f.managerId || null,
+      latitude: Number(f.latitude),
+      longitude: Number(f.longitude),
+      geofenceRadius: Number(f.geofenceRadius),
+      breakLimitMins: Number(f.breakLimitMins),
+      payrollCutoffDay: Number(f.payrollCutoffDay),
+      paydayDay: Number(f.paydayDay),
     };
-    if (data.id) {
-      await apiFetch(`/outlets/${data.id}`, { method: 'PUT', body: JSON.stringify(body) });
+    if (id) {
+      await apiFetch(`/outlets/${id}`, { method: 'PUT', body: JSON.stringify(body) });
     } else {
-      await apiFetch('/outlets', { method: 'POST', body: JSON.stringify({ ...body, code: data.code }) });
+      const { managerId, ...createBody } = body;
+      await apiFetch('/outlets', { method: 'POST', body: JSON.stringify({ ...createBody, code }) });
     }
     setForm(null);
-    setNotice({ kind: 'ok', text: `Cabang "${data.name.trim()}" ${data.id ? 'diperbarui' : 'ditambahkan'}.` });
+    setNotice({ kind: 'ok', text: `Cabang "${data.name.trim()}" ${id ? 'diperbarui' : 'ditambahkan'}.` });
     await load();
   }
 
@@ -113,16 +167,13 @@ export default function OutletMasterModule() {
   }
 
   return (
-    <div className="space-y-4 text-sm">
-      <div className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-white p-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h3 className="font-semibold text-slate-900">Daftar Cabang</h3>
-          <p className="mt-0.5 max-w-2xl text-slate-600">
-            Lokasi dan radius disimpan untuk aturan lokasi absen. Saat ini absen diverifikasi dengan wajah; jarak ke
-            cabang belum diperiksa.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 self-start md:self-auto">
+    <div className="space-y-6 text-sm">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="max-w-3xl text-slate-600">
+          Jam kerja per jenis hari dipakai menghitung keterlambatan. Lokasi dan radius disimpan untuk aturan lokasi absen;
+          saat ini absen diverifikasi dengan wajah dan jarak hanya dicatat.
+        </p>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
           <button
             type="button"
             onClick={load}
@@ -151,9 +202,7 @@ export default function OutletMasterModule() {
         <p
           role={notice.kind === 'error' ? 'alert' : 'status'}
           className={`rounded-md border px-3 py-2 ${
-            notice.kind === 'error'
-              ? 'border-rose-200 bg-rose-50 text-rose-800'
-              : 'border-emerald-200 bg-emerald-50 text-emerald-800'
+            notice.kind === 'error' ? 'border-rose-200 bg-rose-50 text-rose-800' : 'border-emerald-200 bg-emerald-50 text-emerald-800'
           }`}
         >
           {notice.text}
@@ -164,11 +213,7 @@ export default function OutletMasterModule() {
         {loadError && outlets.length === 0 ? (
           <div role="alert" className="bg-rose-50 p-8 text-center text-rose-800">
             <p>{loadError}</p>
-            <button
-              type="button"
-              onClick={load}
-              className="mt-3 rounded-md border border-rose-300 px-3 py-1.5 font-medium hover:bg-rose-100"
-            >
+            <button type="button" onClick={load} className="mt-3 rounded-md border border-rose-300 px-3 py-1.5 font-medium hover:bg-rose-100">
               Coba lagi
             </button>
           </div>
@@ -179,7 +224,7 @@ export default function OutletMasterModule() {
         ) : outlets.length === 0 ? (
           <div className="p-10 text-center text-slate-600">
             <p className="font-medium text-slate-800">Belum ada cabang.</p>
-            {canCreate && <p className="mt-1">Tambahkan cabang pertama untuk mulai mencatat karyawan, shift dan presensi.</p>}
+            {canCreate && <p className="mt-1">Gunakan tombol &quot;Tambah Cabang&quot; untuk mendaftarkan cabang pertama.</p>}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -187,43 +232,56 @@ export default function OutletMasterModule() {
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase text-slate-600">
                   <th scope="col" className="px-4 py-3">Cabang</th>
-                  <th scope="col" className="px-4 py-3">Alamat</th>
                   <th scope="col" className="px-4 py-3">Lokasi</th>
+                  <th scope="col" className="px-4 py-3">Kepala cabang</th>
+                  <th scope="col" className="px-4 py-3">Jam kerja (buka tamu)</th>
+                  <th scope="col" className="px-4 py-3">Gaji</th>
                   <th scope="col" className="px-4 py-3 text-right">Karyawan</th>
-                  <th scope="col" className="px-4 py-3 text-right">Shift</th>
                   <th scope="col" className="px-4 py-3">Status</th>
                   {canEdit && <th scope="col" className="px-4 py-3 text-right">Aksi</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 align-top">
                 {outlets.map((o) => (
                   <tr key={o.id} className={o.isActive ? '' : 'bg-slate-50/60 text-slate-500'}>
                     <td className="px-4 py-3">
                       <p className="font-medium text-slate-900">{o.name}</p>
+                      {o.brand && <p className="text-xs text-slate-600">{o.brand}</p>}
                       <p className="font-mono text-xs text-slate-500">{o.code}</p>
                     </td>
                     <td className="max-w-xs px-4 py-3 text-slate-700">
-                      {o.address}
-                      <p className="text-xs text-slate-500">
-                        Tutup buku gaji {o.payrollCutoffDay === 31 ? 'akhir bulan' : `tgl ${o.payrollCutoffDay}`}
-                      </p>
-                    </td>
-                    <td className="px-4 py-3 text-slate-700">
+                      {o.city && <p className="font-medium text-slate-800">{o.city}</p>}
+                      <p>{o.address}</p>
                       <a
                         href={`https://www.google.com/maps?q=${o.latitude},${o.longitude}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1 font-mono text-xs text-amber-700 hover:underline"
+                        className="inline-flex items-center gap-1 text-xs text-amber-700 hover:underline"
                       >
-                        {o.latitude.toFixed(5)}, {o.longitude.toFixed(5)}
-                        <ExternalLink className="h-3 w-3" aria-label="(buka peta)" />
+                        Peta · radius {o.geofenceRadius} m
+                        <ExternalLink className="h-3 w-3" aria-hidden />
                       </a>
-                      <p className="text-xs text-slate-500">
-                        Radius {o.geofenceRadius} m{o.wifiBssid ? ` · Wi-Fi ${o.wifiBssid}` : ''}
-                      </p>
+                    </td>
+                    <td className="px-4 py-3 text-slate-700">{o.manager?.fullName ?? <span className="text-slate-400">Belum dipilih</span>}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-xs tabular-nums text-slate-700">
+                      {DAYS.map((d) => {
+                        const open = o[`${d.key}Open`];
+                        const close = o[`${d.key}Close`];
+                        return (
+                          <p key={d.key}>
+                            <span className="inline-block w-24 text-slate-500">{d.label.split(' (')[0]}</span>
+                            {o[`${d.key}WorkStart`]}–{o[`${d.key}WorkEnd`]}
+                            {open && close && <span className="text-slate-500"> ({open}–{close})</span>}
+                          </p>
+                        );
+                      })}
+                      <p className="text-slate-500">Istirahat maks. {o.breakLimitMins} menit</p>
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-700">
+                      <p>Tutup buku {dayOfMonth(o.payrollCutoffDay)}</p>
+                      <p>Gajian {dayOfMonth(o.paydayDay)}</p>
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums">{o._count.employees}</td>
-                    <td className="px-4 py-3 text-right tabular-nums">{o._count.shifts}</td>
                     <td className="px-4 py-3">
                       <span
                         className={`inline-block rounded-md px-2 py-0.5 text-xs font-medium ${
@@ -240,17 +298,7 @@ export default function OutletMasterModule() {
                             type="button"
                             onClick={() => {
                               setNotice(null);
-                              setForm({
-                                id: o.id,
-                                code: o.code,
-                                name: o.name,
-                                address: o.address,
-                                latitude: String(o.latitude),
-                                longitude: String(o.longitude),
-                                geofenceRadius: String(o.geofenceRadius),
-                                wifiBssid: o.wifiBssid ?? '',
-                                payrollCutoffDay: String(o.payrollCutoffDay),
-                              });
+                              setForm(toForm(o));
                             }}
                             className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 font-medium text-slate-700 hover:bg-slate-50"
                           >
@@ -261,9 +309,7 @@ export default function OutletMasterModule() {
                               type="button"
                               onClick={() => setToggling(o)}
                               className={`rounded-md border px-2.5 py-1.5 font-medium ${
-                                o.isActive
-                                  ? 'border-rose-200 text-rose-700 hover:bg-rose-50'
-                                  : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'
+                                o.isActive ? 'border-rose-200 text-rose-700 hover:bg-rose-50' : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'
                               }`}
                             >
                               {o.isActive ? 'Nonaktifkan' : 'Aktifkan'}
@@ -280,24 +326,19 @@ export default function OutletMasterModule() {
         )}
       </div>
 
+      <HolidayList />
+
       {form && <OutletFormDialog initial={form} onCancel={() => setForm(null)} onSave={save} />}
 
       {toggling && (
-        <Dialog
-          title={`${toggling.isActive ? 'Nonaktifkan' : 'Aktifkan kembali'} cabang "${toggling.name}"?`}
-          onClose={() => setToggling(null)}
-        >
+        <Dialog title={`${toggling.isActive ? 'Nonaktifkan' : 'Aktifkan kembali'} cabang "${toggling.name}"?`} onClose={() => setToggling(null)}>
           <p className="text-slate-600">
             {toggling.isActive
-              ? 'Cabang nonaktif tidak muncul di pilihan cabang. Riwayat absensi dan shift-nya tetap tersimpan. Cabang yang masih punya karyawan aktif tidak bisa dinonaktifkan.'
+              ? 'Cabang nonaktif tidak muncul di pilihan cabang. Riwayat absensi dan gajinya tetap tersimpan. Cabang yang masih punya karyawan aktif tidak bisa dinonaktifkan.'
               : 'Cabang akan muncul lagi di pilihan cabang.'}
           </p>
           <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
-            <button
-              type="button"
-              onClick={() => setToggling(null)}
-              className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100"
-            >
+            <button type="button" onClick={() => setToggling(null)} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">
               Batal
             </button>
             <button
@@ -328,9 +369,18 @@ function OutletFormDialog({
   const [data, setData] = useState(initial);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [managers, setManagers] = useState<ManagerOption[]>([]);
   const isEdit = Boolean(initial.id);
-  const set = (key: keyof OutletForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+  const set = (key: keyof OutletForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setData({ ...data, [key]: e.target.value });
+
+  // Kepala Cabang dipilih dari Store Manager aktif di cabang ini (hanya saat mengubah)
+  useEffect(() => {
+    if (!initial.id) return;
+    apiFetch<ManagerOption[]>(`/employees?outletId=${initial.id}`)
+      .then((list) => setManagers(list.filter((e) => e.user.role === 'STORE_MANAGER' && e.user.isActive)))
+      .catch(() => setManagers([]));
+  }, [initial.id]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -345,131 +395,181 @@ function OutletFormDialog({
   }
 
   const field = 'w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800 focus:border-amber-500 disabled:bg-slate-100 disabled:text-slate-500';
+  const time = 'w-full rounded-md border border-slate-300 px-2 py-1.5 tabular-nums text-slate-800 focus:border-amber-500';
+  const section = 'space-y-3 border-t border-slate-100 pt-4';
+  const heading = 'text-xs font-semibold uppercase text-slate-500';
 
   return (
-    <Dialog title={isEdit ? 'Ubah cabang' : 'Tambah cabang'} onClose={onCancel}>
-      <form onSubmit={submit} className="space-y-3">
-        <div className="grid grid-cols-3 gap-3">
-          <label className="col-span-1 block space-y-1">
-            <span className="font-medium text-slate-700">Kode</span>
-            <input
-              required
-              value={data.code}
-              onChange={set('code')}
-              disabled={isEdit}
-              pattern="[A-Za-z0-9\-]{2,30}"
-              title="2-30 karakter: huruf, angka atau tanda hubung"
-              placeholder="PIK-02"
-              className={`${field} font-mono uppercase`}
-            />
-          </label>
-          <label className="col-span-2 block space-y-1">
-            <span className="font-medium text-slate-700">Nama cabang</span>
-            <input required maxLength={100} value={data.name} onChange={set('name')} className={field} />
-          </label>
-        </div>
-        {isEdit && <p className="-mt-1 text-xs text-slate-500">Kode cabang tidak bisa diubah.</p>}
-        <label className="block space-y-1">
-          <span className="font-medium text-slate-700">Alamat</span>
-          <textarea required maxLength={300} rows={2} value={data.address} onChange={set('address')} className={field} />
-        </label>
-        <div className="grid grid-cols-2 gap-3">
-          <label className="block space-y-1">
-            <span className="font-medium text-slate-700">Latitude</span>
-            <input
-              required
-              type="number"
-              step="any"
-              min={-90}
-              max={90}
-              value={data.latitude}
-              onChange={set('latitude')}
-              placeholder="-6.10850"
-              className={field}
-            />
-          </label>
-          <label className="block space-y-1">
-            <span className="font-medium text-slate-700">Longitude</span>
-            <input
-              required
-              type="number"
-              step="any"
-              min={-180}
-              max={180}
-              value={data.longitude}
-              onChange={set('longitude')}
-              placeholder="106.74120"
-              className={field}
-            />
-          </label>
-        </div>
-        <p className="-mt-1 text-xs text-slate-500">
-          Di Google Maps, klik kanan titik lokasi cabang lalu klik angka koordinat untuk menyalinnya.
-        </p>
-        <div className="grid grid-cols-2 gap-3">
-          <label className="block space-y-1">
-            <span className="font-medium text-slate-700">Radius (meter)</span>
-            <input
-              required
-              type="number"
-              min={10}
-              max={1000}
-              step={1}
-              value={data.geofenceRadius}
-              onChange={set('geofenceRadius')}
-              className={field}
-            />
-          </label>
-          <label className="block space-y-1">
-            <span className="font-medium text-slate-700">BSSID Wi-Fi (opsional)</span>
-            <input
-              value={data.wifiBssid}
-              onChange={set('wifiBssid')}
-              pattern="([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}"
-              title="Format AA:BB:CC:DD:EE:FF"
-              placeholder="AA:BB:CC:DD:EE:FF"
-              className={`${field} font-mono`}
-            />
-          </label>
-        </div>
+    <Dialog wide title={isEdit ? `Ubah cabang ${initial.name}` : 'Tambah cabang'} onClose={onCancel}>
+        <form onSubmit={submit} className="space-y-4">
+          <div className="space-y-3">
+            <p className={heading}>Cabang</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block space-y-1 sm:col-span-2">
+                <span className="font-medium text-slate-700">Nama cabang</span>
+                <input required maxLength={100} value={data.name} onChange={set('name')} className={field} />
+              </label>
+              <label className="block space-y-1">
+                <span className="font-medium text-slate-700">Merek usaha</span>
+                <input list="outlet-brands" maxLength={60} value={data.brand} onChange={set('brand')} className={field} />
+                <datalist id="outlet-brands">
+                  {BRANDS.map((b) => (
+                    <option key={b} value={b} />
+                  ))}
+                </datalist>
+              </label>
+              <label className="block space-y-1">
+                <span className="font-medium text-slate-700">Kode</span>
+                <input
+                  required
+                  value={data.code}
+                  onChange={set('code')}
+                  disabled={isEdit}
+                  pattern="[A-Za-z0-9\-]{2,30}"
+                  title="2-30 karakter: huruf, angka atau tanda hubung"
+                  placeholder="APS-TEBING-01"
+                  className={`${field} font-mono uppercase`}
+                />
+              </label>
+            </div>
+          </div>
 
-        <label className="block space-y-1">
-          <span className="font-medium text-slate-700">Tanggal tutup buku gaji</span>
-          <input
-            required
-            type="number"
-            min={1}
-            max={31}
-            step={1}
-            value={data.payrollCutoffDay}
-            onChange={set('payrollCutoffDay')}
-            className={field}
-          />
-          <span className="text-xs text-slate-500">
-            Periode gaji berakhir di tanggal ini setiap bulan. Isi 31 untuk akhir bulan.
-          </span>
-        </label>
+          <div className={section}>
+            <p className={heading}>Lokasi</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block space-y-1">
+                <span className="font-medium text-slate-700">Kota / wilayah</span>
+                <input maxLength={60} value={data.city} onChange={set('city')} className={field} />
+              </label>
+              <label className="block space-y-1 sm:col-span-2">
+                <span className="font-medium text-slate-700">Alamat</span>
+                <textarea required maxLength={300} rows={2} value={data.address} onChange={set('address')} className={field} />
+              </label>
+              <label className="block space-y-1">
+                <span className="font-medium text-slate-700">Latitude</span>
+                <input required type="number" step="any" min={-90} max={90} value={data.latitude} onChange={set('latitude')} placeholder="3.32850" className={field} />
+              </label>
+              <label className="block space-y-1">
+                <span className="font-medium text-slate-700">Longitude</span>
+                <input required type="number" step="any" min={-180} max={180} value={data.longitude} onChange={set('longitude')} placeholder="99.16250" className={field} />
+              </label>
+              <label className="block space-y-1">
+                <span className="font-medium text-slate-700">Radius absen (meter)</span>
+                <input required type="number" min={10} max={1000} step={1} value={data.geofenceRadius} onChange={set('geofenceRadius')} className={field} />
+              </label>
+              <label className="block space-y-1">
+                <span className="font-medium text-slate-700">BSSID Wi-Fi (opsional)</span>
+                <input
+                  value={data.wifiBssid}
+                  onChange={set('wifiBssid')}
+                  pattern="([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}"
+                  title="Format AA:BB:CC:DD:EE:FF"
+                  placeholder="AA:BB:CC:DD:EE:FF"
+                  className={`${field} font-mono`}
+                />
+              </label>
+            </div>
+            <p className="text-xs text-slate-500">Koordinat: di Google Maps klik kanan titik lokasi cabang, lalu klik angkanya untuk menyalin.</p>
+          </div>
 
-        {error && (
-          <p role="alert" className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-rose-800">
-            {error}
-          </p>
-        )}
+          <div className={section}>
+            <p className={heading}>Kepala cabang</p>
+            {isEdit ? (
+              <label className="block space-y-1">
+                <span className="sr-only">Kepala cabang</span>
+                <select value={data.managerId} onChange={set('managerId')} className={field}>
+                  <option value="">Belum dipilih</option>
+                  {managers.map((m) => (
+                    <option key={m.id} value={m.id}>{m.fullName}</option>
+                  ))}
+                </select>
+                {managers.length === 0 && (
+                  <span className="text-xs text-slate-500">Belum ada karyawan cabang ini dengan peran Kepala Cabang (Store Manager).</span>
+                )}
+              </label>
+            ) : (
+              <p className="text-slate-600">Dipilih setelah karyawan cabang ini didaftarkan dengan peran Kepala Cabang.</p>
+            )}
+          </div>
 
-        <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
-          <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">
-            Batal
-          </button>
-          <button
-            type="submit"
-            disabled={saving}
-            className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800 disabled:opacity-50"
-          >
-            {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
-            Simpan cabang
-          </button>
-        </div>
-      </form>
+          <div className={section}>
+            <p className={heading}>Jam kerja kru dan jam buka tamu</p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="text-xs text-slate-500">
+                    <th scope="col" className="pb-1 pr-2 font-medium">Hari</th>
+                    <th scope="col" className="pb-1 pr-2 font-medium">Kerja mulai</th>
+                    <th scope="col" className="pb-1 pr-2 font-medium">Kerja selesai</th>
+                    <th scope="col" className="pb-1 pr-2 font-medium">Buka tamu</th>
+                    <th scope="col" className="pb-1 font-medium">Tutup</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {DAYS.map((d) => (
+                    <tr key={d.key}>
+                      <th scope="row" className="whitespace-nowrap py-1 pr-2 text-left font-medium text-slate-700">{d.label}</th>
+                      {(['WorkStart', 'WorkEnd', 'Open', 'Close'] as const).map((suffix) => {
+                        const key = `${d.key}${suffix}` as keyof OutletForm;
+                        const required = suffix.startsWith('Work');
+                        return (
+                          <td key={suffix} className="py-1 pr-2">
+                            <input
+                              type="time"
+                              required={required}
+                              aria-label={`${d.label} ${suffix === 'WorkStart' ? 'kerja mulai' : suffix === 'WorkEnd' ? 'kerja selesai' : suffix === 'Open' ? 'buka tamu' : 'tutup'}`}
+                              value={data[key] ?? ''}
+                              onChange={set(key)}
+                              className={time}
+                            />
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <label className="block max-w-xs space-y-1">
+              <span className="font-medium text-slate-700">Batas istirahat (menit)</span>
+              <input required type="number" min={0} max={240} value={data.breakLimitMins} onChange={set('breakLimitMins')} className={field} />
+            </label>
+            <p className="text-xs text-slate-500">Jam kerja dipakai menghitung terlambat. Jam buka tamu hanya informasi dan boleh dikosongkan.</p>
+          </div>
+
+          <div className={section}>
+            <p className={heading}>Gaji</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block space-y-1">
+                <span className="font-medium text-slate-700">Tanggal tutup buku</span>
+                <input required type="number" min={1} max={31} value={data.payrollCutoffDay} onChange={set('payrollCutoffDay')} className={field} />
+              </label>
+              <label className="block space-y-1">
+                <span className="font-medium text-slate-700">Tanggal gajian</span>
+                <input required type="number" min={1} max={31} value={data.paydayDay} onChange={set('paydayDay')} className={field} />
+              </label>
+            </div>
+            <p className="text-xs text-slate-500">Isi 31 untuk akhir bulan.</p>
+          </div>
+
+          {error && (
+            <p role="alert" className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-rose-800">{error}</p>
+          )}
+
+          <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
+            <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">
+              Batal
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+            >
+              {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+              Simpan cabang
+            </button>
+          </div>
+        </form>
     </Dialog>
   );
 }
