@@ -1,14 +1,14 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsLatitude, IsLongitude, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 // Base64 dari foto maksimal 2 MB (~2,7 juta karakter)
 const MAX_PHOTO_BASE64_LENGTH = 3_000_000;
 
 export class ClockInDto {
-  @IsNumber()
+  @IsLatitude({ message: 'Latitude harus antara -90 dan 90' })
   @IsOptional()
   latitude?: number;
 
-  @IsNumber()
+  @IsLongitude({ message: 'Longitude harus antara -180 dan 180' })
   @IsOptional()
   longitude?: number;
 
@@ -23,11 +23,11 @@ export class ClockInDto {
 }
 
 export class ClockOutDto {
-  @IsNumber()
+  @IsLatitude({ message: 'Latitude harus antara -90 dan 90' })
   @IsOptional()
   latitude?: number;
 
-  @IsNumber()
+  @IsLongitude({ message: 'Longitude harus antara -180 dan 180' })
   @IsOptional()
   longitude?: number;
 

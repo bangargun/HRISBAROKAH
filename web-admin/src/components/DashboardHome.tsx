@@ -19,6 +19,11 @@ interface AttendanceRow {
   employeeId: string;
   clockInTime: string | null;
   clockOutTime: string | null;
+  clockInLat: number | null;
+  clockInDistanceM: number | null;
+  clockOutLat: number | null;
+  clockOutDistanceM: number | null;
+  outlet: { name: string; geofenceRadius: number };
   employee: { fullName: string; outlet: { name: string } };
   breaks: { startBreak: string; endBreak: string | null; isOverLimit: boolean }[];
 }
@@ -34,6 +39,37 @@ const todayFmt = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numer
 const rupiah = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
 
 // Jam perangkat bisa sedikit berbeda dari server; durasi tidak boleh negatif
+function formatDistance(m: number) {
+  return m >= 1000 ? `${(m / 1000).toFixed(1).replace('.', ',')} km` : `${Math.round(m)} m`;
+}
+
+/** Absen masuk/pulang yang lokasinya tidak terkirim atau di luar radius cabang (dicatat, tidak ditolak). */
+function locationIssues(rows: AttendanceRow[]) {
+  const issues: { key: string; name: string; meta: string; aside: string; warn: boolean }[] = [];
+  for (const a of rows) {
+    const checks = [
+      { label: 'Masuk', at: a.clockInTime, lat: a.clockInLat, dist: a.clockInDistanceM },
+      { label: 'Pulang', at: a.clockOutTime, lat: a.clockOutLat, dist: a.clockOutDistanceM },
+    ];
+    for (const c of checks) {
+      if (!c.at) continue;
+      const time = timeFmt.format(new Date(c.at));
+      if (c.lat === null || c.dist === null) {
+        issues.push({ key: a.id + c.label, name: a.employee.fullName, meta: `${c.label} ${time} · ${a.outlet.name}`, aside: 'Lokasi tidak terkirim', warn: false });
+      } else if (c.dist > a.outlet.geofenceRadius) {
+        issues.push({
+          key: a.id + c.label,
+          name: a.employee.fullName,
+          meta: `${c.label} ${time} · ${a.outlet.name} (radius ${a.outlet.geofenceRadius} m)`,
+          aside: `${formatDistance(c.dist)} dari cabang`,
+          warn: true,
+        });
+      }
+    }
+  }
+  return issues;
+}
+
 function minutesSince(iso: string) {
   return Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 60000));
 }
@@ -191,57 +227,69 @@ export default function DashboardHome({ requests, onOpen }: Props) {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <section className="rounded-lg border border-slate-200 bg-white lg:col-span-2" aria-labelledby="dash-awaiting">
-          <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-            <h2 id="dash-awaiting" className="text-sm font-semibold text-slate-900">
-              Perlu tindakan Anda
-            </h2>
-            <button
-              type="button"
-              onClick={() => onOpen('requests')}
-              className="inline-flex items-center gap-1 text-sm font-medium text-amber-700 hover:underline"
-            >
-              Buka Persetujuan <ArrowRight className="h-4 w-4" aria-hidden />
-            </button>
-          </div>
-          {requests.loading && requests.requests.length === 0 ? (
-            <PanelLoading />
-          ) : requests.error && requests.requests.length === 0 ? (
-            <p role="alert" className="p-4 text-sm text-rose-800">{requests.error}</p>
-          ) : awaitingMe.length === 0 ? (
-            <p className="p-6 text-center text-sm text-slate-500">Tidak ada pengajuan yang menunggu keputusan Anda.</p>
-          ) : (
-            <table className="w-full text-left text-sm">
-              <thead className="sr-only">
-                <tr>
-                  <th>Karyawan</th>
-                  <th>Pengajuan</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {awaitingMe.slice(0, 6).map((r) => (
-                  <tr key={r.id}>
-                    <td className="px-4 py-3">
-                      <p className="font-medium text-slate-900">{r.employee.fullName}</p>
-                      <p className="text-xs text-slate-500">{r.employee.outlet.name}</p>
-                    </td>
-                    <td className="px-4 py-3">
-                      <p className="text-slate-800">{REQUEST_TYPE_LABEL[r.type]}</p>
-                      <p className="text-xs text-slate-500">{requestDetail(r)}</p>
-                    </td>
-                    <td className="hidden px-4 py-3 text-xs text-slate-600 sm:table-cell">{REQUEST_STATUS_LABEL[r.status]}</td>
+        <div className="space-y-6 lg:col-span-2">
+          <section className="rounded-lg border border-slate-200 bg-white" aria-labelledby="dash-awaiting">
+            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+              <h2 id="dash-awaiting" className="text-sm font-semibold text-slate-900">
+                Perlu tindakan Anda
+              </h2>
+              <button
+                type="button"
+                onClick={() => onOpen('requests')}
+                className="inline-flex items-center gap-1 text-sm font-medium text-amber-700 hover:underline"
+              >
+                Buka Persetujuan <ArrowRight className="h-4 w-4" aria-hidden />
+              </button>
+            </div>
+            {requests.loading && requests.requests.length === 0 ? (
+              <PanelLoading />
+            ) : requests.error && requests.requests.length === 0 ? (
+              <p role="alert" className="p-4 text-sm text-rose-800">{requests.error}</p>
+            ) : awaitingMe.length === 0 ? (
+              <p className="p-6 text-center text-sm text-slate-500">Tidak ada pengajuan yang menunggu keputusan Anda.</p>
+            ) : (
+              <table className="w-full text-left text-sm">
+                <thead className="sr-only">
+                  <tr>
+                    <th>Karyawan</th>
+                    <th>Pengajuan</th>
+                    <th>Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {awaitingMe.slice(0, 6).map((r) => (
+                    <tr key={r.id}>
+                      <td className="px-4 py-3">
+                        <p className="font-medium text-slate-900">{r.employee.fullName}</p>
+                        <p className="text-xs text-slate-500">{r.employee.outlet.name}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-slate-800">{REQUEST_TYPE_LABEL[r.type]}</p>
+                        <p className="text-xs text-slate-500">{requestDetail(r)}</p>
+                      </td>
+                      <td className="hidden px-4 py-3 text-xs text-slate-600 sm:table-cell">{REQUEST_STATUS_LABEL[r.status]}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {awaitingMe.length > 6 && (
+              <p className="border-t border-slate-100 px-4 py-2 text-xs text-slate-500">
+                dan {awaitingMe.length - 6} pengajuan lainnya
+              </p>
+            )}
+          </section>
+
+          {canSeeAttendance && (
+            <PeoplePanel
+              title="Lokasi absen perlu dicek"
+              note="Absen tetap diterima. Daftar ini memuat absen di luar radius cabang atau yang lokasinya tidak terkirim."
+              loading={!attendance && loading}
+              empty="Semua absen hari ini tercatat di dalam radius cabang."
+              rows={attendance ? locationIssues(attendance) : []}
+            />
           )}
-          {awaitingMe.length > 6 && (
-            <p className="border-t border-slate-100 px-4 py-2 text-xs text-slate-500">
-              dan {awaitingMe.length - 6} pengajuan lainnya
-            </p>
-          )}
-        </section>
+        </div>
 
         {canSeeAttendance ? (
           <div className="space-y-6">

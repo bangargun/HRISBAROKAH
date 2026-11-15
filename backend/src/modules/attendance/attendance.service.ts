@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ClockInDto, ClockOutDto } from './attendance.dto';
 import { FaceEnrollmentService } from '../face/face-enrollment.service';
 import { AttendanceStatus, FaceCheckKind } from '@prisma/client';
+import { calculateDistanceInMeters } from '../../common/utils/geofence.util';
 import {
   businessDateString,
   businessToday,
@@ -20,6 +21,17 @@ export class AttendanceService {
 
   private getTodayDate(): Date {
     return businessToday();
+  }
+
+  /**
+   * Lokasi absen beserta jaraknya ke cabang. Absen tidak ditolak karena jarak
+   * (kebijakan: dicatat saja); lokasi yang tidak terkirim disimpan kosong, bukan 0,0.
+   */
+  private locate(outlet: { latitude: number; longitude: number }, lat?: number, lng?: number) {
+    if (lat === undefined || lng === undefined) {
+      return { lat: null, lng: null, distanceM: null };
+    }
+    return { lat, lng, distanceM: calculateDistanceInMeters(lat, lng, outlet.latitude, outlet.longitude) };
   }
 
   async getTodayStatus(userId: string) {
@@ -83,17 +95,18 @@ export class AttendanceService {
 
     const now = new Date();
     const finalNotes = dto.notes ?? null;
+    const location = this.locate(profile.outlet, dto.latitude, dto.longitude);
 
     if (existing) {
       return this.prisma.attendance.update({
         where: { id: existing.id },
         data: {
           clockInTime: now,
-          clockInLat: dto.latitude ?? 0,
-          clockInLng: dto.longitude ?? 0,
+          clockInLat: location.lat,
+          clockInLng: location.lng,
           clockInPhotoUrl: photoUrl,
           clockInFaceScore: score,
-          clockInDistanceM: 0,
+          clockInDistanceM: location.distanceM,
           status: AttendanceStatus.PRESENT,
           notes: finalNotes,
         },
@@ -106,11 +119,11 @@ export class AttendanceService {
         outletId: profile.outletId,
         date: today,
         clockInTime: now,
-        clockInLat: dto.latitude ?? 0,
-        clockInLng: dto.longitude ?? 0,
+        clockInLat: location.lat,
+        clockInLng: location.lng,
         clockInPhotoUrl: photoUrl,
         clockInFaceScore: score,
-        clockInDistanceM: 0,
+        clockInDistanceM: location.distanceM,
         status: AttendanceStatus.PRESENT,
         notes: finalNotes,
       },
@@ -131,7 +144,7 @@ export class AttendanceService {
 
     const attendance = await this.prisma.attendance.findFirst({
       where: { employeeId: profile.id, date: today },
-      include: { breaks: true },
+      include: { breaks: true, outlet: true },
     });
 
     if (!attendance || !attendance.clockInTime) {
@@ -158,16 +171,18 @@ export class AttendanceService {
     const finalOutNotes = dto.notes
       ? [attendance.notes, `Pulang: ${dto.notes}`].filter(Boolean).join(' | ')
       : attendance.notes;
+    // Dibandingkan dengan cabang tempat absen masuk hari ini
+    const location = this.locate(attendance.outlet, dto.latitude, dto.longitude);
 
     return this.prisma.attendance.update({
       where: { id: attendance.id },
       data: {
         clockOutTime: now,
-        clockOutLat: dto.latitude ?? 0,
-        clockOutLng: dto.longitude ?? 0,
+        clockOutLat: location.lat,
+        clockOutLng: location.lng,
         clockOutPhotoUrl: photoUrl,
         clockOutFaceScore: score,
-        clockOutDistanceM: 0,
+        clockOutDistanceM: location.distanceM,
         notes: finalOutNotes,
       },
       include: { breaks: true },
@@ -288,6 +303,7 @@ export class AttendanceService {
             outlet: true,
           },
         },
+        outlet: { select: { id: true, name: true, geofenceRadius: true } },
         breaks: true,
       },
       orderBy: { clockInTime: 'asc' },
