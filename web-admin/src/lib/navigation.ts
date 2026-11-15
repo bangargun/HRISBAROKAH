@@ -1,7 +1,6 @@
 import {
   BadgeCheck,
   Briefcase,
-  Building2,
   ClipboardCheck,
   Clock,
   FileCheck2,
@@ -46,7 +45,6 @@ export const NAV_GROUPS: NavGroup[] = [
     label: 'Karyawan',
     items: [
       { id: 'employees', label: 'Data Karyawan', icon: Users },
-      { id: 'organization', label: 'Struktur Organisasi', icon: Building2 },
       { id: 'outlets', label: 'Cabang', icon: MapPin },
       { id: 'legal-docs', label: 'Surat & Kontrak', icon: FileText },
     ],

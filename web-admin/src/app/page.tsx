@@ -130,7 +130,6 @@ import {
 import {
   PendampinganView,
   CareerPathView,
-  OrganizationView,
   PerformanceView,
   INITIAL_COACHING_TASKS,
   CoachingTaskItem,
@@ -142,7 +141,6 @@ import {
 
 type MainMenuId =
   | 'hub'
-  | 'organization'
   | 'employees'
   | 'attendance'
   | 'payroll'
@@ -2816,13 +2814,6 @@ export default function AdminDashboard() {
       icon: LayoutGrid,
       subTabs: [
         { id: 'bento-cards', label: 'Ringkasan' },
-      ],
-    },
-    organization: {
-      title: 'Struktur Organisasi',
-      icon: Building2,
-      subTabs: [
-        { id: 'org-chart', label: 'Bagan Organisasi' },
       ],
     },
     employees: {
@@ -6600,7 +6591,6 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
           {/* ========================================================= */}
           {/* BERLIAN MODULE 1: ORGANIZATION                           */}
           {/* ========================================================= */}
-          {activeMenu === 'organization' && <OrganizationView employees={employeesMasterList} outlets={outletsConfigList} showToast={showToast} />}
 
           {/* ========================================================= */}
           {/* BERLIAN MODULE 2: PERFORMANCE & SPV MONITORING            */}
