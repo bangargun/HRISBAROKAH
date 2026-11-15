@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import ShiftMasterModule from '@/components/ShiftMasterModule';
 import AppShell from '@/components/AppShell';
+import OutletMasterModule from '@/components/OutletMasterModule';
 import { getSessionUser } from '@/lib/auth';
 import { actionFor, useAdminRequests } from '@/lib/requests';
 import {
@@ -44,7 +45,6 @@ export default function MasterDataPage() {
   const [reviewModalData, setReviewModalData] = useState<{ type: string; data: any } | null>(null);
   const [editModalData, setEditModalData] = useState<{ type: string; data: any } | null>(null);
   const [deleteModalData, setDeleteModalData] = useState<{ type: string; id: string; name: string } | null>(null);
-  const [showAddModal, setShowAddModal] = useState(false);
 
   // Angka di menu Persetujuan sama dengan di halaman utama
   const adminRequests = useAdminRequests();
@@ -56,9 +56,6 @@ export default function MasterDataPage() {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // 1. Data Outlet & Geofence (Zero Mock Policy: Persistent State)
-  const [outlets, setOutlets] = useState<any[]>([]);
-
   // 2. Data Departemen & Posisi / Station Resto (Zero Mock Policy: Persistent State)
   const [departments, setDepartments] = useState<any[]>([]);
 
@@ -66,9 +63,6 @@ export default function MasterDataPage() {
 
   useEffect(() => {
     try {
-      const savedOutlets = localStorage.getItem('hris_master_outlets');
-      if (savedOutlets) setOutlets(JSON.parse(savedOutlets));
-
       const savedDepts = localStorage.getItem('hris_master_departments');
       if (savedDepts) setDepartments(JSON.parse(savedDepts));
 
@@ -77,16 +71,6 @@ export default function MasterDataPage() {
     }
     hasLoadedMasterRef.current = true;
   }, []);
-
-  useEffect(() => {
-    if (hasLoadedMasterRef.current) {
-      try {
-        localStorage.setItem('hris_master_outlets', JSON.stringify(outlets));
-      } catch (e) {
-        console.error('Error saving outlets:', e);
-      }
-    }
-  }, [outlets]);
 
   useEffect(() => {
     if (hasLoadedMasterRef.current) {
@@ -273,10 +257,7 @@ export default function MasterDataPage() {
     if (!editModalData) return;
 
     const { type, data } = editModalData;
-    if (type === 'outlets') {
-      setOutlets(outlets.map((o) => (o.id === data.id ? data : o)));
-      showToast(`Data cabang ${data.name} berhasil diperbarui!`);
-    } else if (type === 'departments') {
+    if (type === 'departments') {
       setDepartments(departments.map((d) => (d.id === data.id ? data : d)));
       showToast(`Data station ${data.title} berhasil diperbarui!`);
     } else if (type === 'payroll') {
@@ -295,9 +276,7 @@ export default function MasterDataPage() {
     if (!deleteModalData) return;
     const { type, id, name } = deleteModalData;
 
-    if (type === 'outlets') {
-      setOutlets(outlets.filter((o) => o.id !== id));
-    } else if (type === 'departments') {
+    if (type === 'departments') {
       setDepartments(departments.filter((d) => d.id !== id));
     } else if (type === 'payroll') {
       setPayrollRules(payrollRules.filter((p) => p.id !== id));
@@ -320,21 +299,6 @@ export default function MasterDataPage() {
       )}
 
         <div className="shrink-0 border-b border-slate-200 bg-white px-4 sm:px-6">
-          {activeTab !== 'shifts' && (
-            <div className="flex justify-end pt-3">
-              <button
-                type="button"
-                onClick={() => setShowAddModal(true)}
-                className="inline-flex items-center gap-1.5 rounded-md bg-amber-500 px-3 py-1.5 text-sm font-medium text-slate-950 hover:bg-amber-400"
-              >
-                <Plus className="h-4 w-4" aria-hidden />
-                {activeTab === 'outlets' && 'Tambah Cabang'}
-                {activeTab === 'departments' && 'Tambah Stasiun'}
-                {activeTab === 'payroll' && 'Tambah Komponen'}
-                {activeTab === 'leaves' && 'Tambah Jenis Cuti'}
-              </button>
-            </div>
-          )}
           <nav className="-mb-px flex gap-1 overflow-x-auto" aria-label="Bagian master data">
             {(
               [
@@ -367,123 +331,7 @@ export default function MasterDataPage() {
           {/* ========================================================= */}
           {/* SUB-TAB 1: MASTER OUTLET & GEOFENCE                      */}
           {/* ========================================================= */}
-          {activeTab === 'outlets' && (
-            <div className="space-y-4">
-              <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-3.5 flex items-start space-x-3 text-xs text-amber-900">
-                <Info className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <span className="font-bold">Informasi Geofencing:</span> Karyawan hanya dapat melakukan presensi di aplikasi jika berada dalam radius meter cabang. Gunakan tombol <b>Review</b> untuk melihat detail koordinat, <b>Edit</b> untuk mengubah radius, atau <b>Delete</b> untuk menghapus cabang.
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold">
-                      <th className="py-3 px-4">Kode &amp; Nama Cabang</th>
-                      <th className="py-3 px-4">Jam Kerja &amp; Operasional</th>
-                      <th className="py-3 px-4">Siklus Cut-Off &amp; Gajian</th>
-                      <th className="py-3 px-4">Koordinat &amp; Geofence</th>
-                      <th className="py-3 px-4">Total Staf</th>
-                      <th className="py-3 px-4">Status</th>
-                      <th className="py-3 px-4 text-center">Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {outlets.length === 0 ? (
-                      <tr>
-                        <td colSpan={7} className="py-12 text-center text-slate-500">
-                          <div className="flex flex-col items-center justify-center space-y-3">
-                            <div className="p-3 bg-amber-50 rounded-full text-amber-600">
-                              <Building2 className="h-8 w-8" />
-                            </div>
-                            <div>
-                              <p className="font-bold text-slate-800 text-sm">Belum Ada Data Cabang Outlet</p>
-                              <p className="text-xs text-slate-500 max-w-sm mt-0.5">
-                                Belum ada cabang. Tambahkan cabang pertama untuk mulai mencatat presensi.
-                              </p>
-                            </div>
-                            <button
-                              onClick={() => setShowAddModal(true)}
-                              className="mt-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition"
-                            >
-                              + Tambah Cabang Outlet Baru
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ) : (
-                      outlets.map((o) => (
-                      <tr key={o.id} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3.5 px-4">
-                          <div className="font-bold text-slate-800 text-sm">{o.name}</div>
-                          <div className="text-[10px] font-mono text-slate-400">{o.code}</div>
-                          <div className="text-[10px] text-slate-500 truncate max-w-xs">{o.address}</div>
-                        </td>
-                        <td className="py-3.5 px-4 text-xs space-y-0.5">
-                          <div className="text-slate-700"><span className="text-slate-400 font-semibold">Buka:</span> <b className="text-slate-900">{o.operatingHoursWeekday || '11:00-22:00'}</b></div>
-                          <div className="text-slate-700"><span className="text-slate-400 font-semibold">Kerja:</span> <b className="text-amber-800">{o.workHours || '10:00-23:00'}</b></div>
-                          <div className="text-[10px] text-slate-500">Istirahat {o.breakHours || 2} Jam • Closing {o.closingHours || '23:00'}</div>
-                        </td>
-                        <td className="py-3.5 px-4 text-xs space-y-1 font-mono">
-                          <div><span className="text-[10px] bg-slate-100 text-slate-800 font-bold px-1.5 py-0.5 rounded border border-slate-200">Cut-Off: Tgl {o.cutoffDate || 5}</span></div>
-                          <div><span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded border border-emerald-300">Payday: Tgl {o.paydayDate || 10}</span></div>
-                        </td>
-                        <td className="py-3.5 px-4 font-mono text-slate-600 text-xs">
-                          <div>Lat: {o.lat} • Lng: {o.lng}</div>
-                          <span className="inline-block mt-0.5 bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold text-[10px]">
-                            Radius {o.radius}m
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-4 font-semibold text-slate-800">
-                          {o.totalStaff} Orang
-                        </td>
-                        <td className="py-3.5 px-4">
-                          <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                              o.status === 'AKTIF'
-                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                : 'bg-slate-100 text-slate-600'
-                            }`}
-                          >
-                            {o.status}
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-4">
-                          <div className="flex items-center justify-center space-x-1.5">
-                            {/* Tombol Review */}
-                            <button
-                              onClick={() => setReviewModalData({ type: 'outlets', data: o })}
-                              className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors title='Review / Detail'"
-                              title="Review / Detail"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </button>
-                            {/* Tombol Edit */}
-                            <button
-                              onClick={() => setEditModalData({ type: 'outlets', data: { ...o } })}
-                              className="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition-colors title='Edit Data'"
-                              title="Edit Data"
-                            >
-                              <Edit2 className="h-4 w-4" />
-                            </button>
-                            {/* Tombol Delete */}
-                            <button
-                              onClick={() => setDeleteModalData({ type: 'outlets', id: o.id, name: o.name })}
-                              className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors title='Hapus Cabang'"
-                              title="Hapus Cabang"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    )))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
+          {activeTab === 'outlets' && <OutletMasterModule />}
 
           {/* ========================================================= */}
           {/* SUB-TAB 2: DEPARTEMEN & STATION POSISI                   */}
@@ -515,12 +363,6 @@ export default function MasterDataPage() {
                               Belum ada departemen. Tambahkan departemen dan stasiun kerja pertama.
                             </p>
                           </div>
-                          <button
-                            onClick={() => setShowAddModal(true)}
-                            className="mt-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition"
-                          >
-                            + Tambah Departemen / Station Baru
-                          </button>
                         </div>
                       </td>
                     </tr>
@@ -831,238 +673,6 @@ export default function MasterDataPage() {
             </div>
 
             <div className="space-y-3 text-xs max-h-96 overflow-y-auto pr-1">
-              {/* 1. OUTLETS: SEMUA KOLOM TABEL ADA DI FORM EDIT */}
-              {editModalData.type === 'outlets' && (
-                <>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Kode Cabang</label>
-                      <input
-                        type="text"
-                        value={editModalData.data.code}
-                        onChange={(e) =>
-                          setEditModalData({
-                            ...editModalData,
-                            data: { ...editModalData.data, code: e.target.value },
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Status Operasional</label>
-                      <select
-                        value={editModalData.data.status}
-                        onChange={(e) =>
-                          setEditModalData({
-                            ...editModalData,
-                            data: { ...editModalData.data, status: e.target.value },
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold"
-                      >
-                        <option value="AKTIF">AKTIF</option>
-                        <option value="PERSIAPAN (OPENING)">PERSIAPAN (OPENING)</option>
-                        <option value="NON-AKTIF">NON-AKTIF</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Nama Restoran / Cabang</label>
-                    <input
-                      type="text"
-                      value={editModalData.data.name}
-                      onChange={(e) =>
-                        setEditModalData({
-                          ...editModalData,
-                          data: { ...editModalData.data, name: e.target.value },
-                        })
-                      }
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Alamat Lokasi</label>
-                    <textarea
-                      rows={2}
-                      value={editModalData.data.address}
-                      onChange={(e) =>
-                        setEditModalData({
-                          ...editModalData,
-                          data: { ...editModalData.data, address: e.target.value },
-                        })
-                      }
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500"
-                    />
-                  </div>
-
-                  {/* Pengaturan Manual Jam Operasional & Jam Kerja Outlet */}
-                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                    <p className="font-bold text-slate-800 text-xs">Profil Jam Operasional &amp; Jam Kerja (Input Manual):</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="block text-[10px] text-slate-600 font-semibold mb-0.5">Buka Weekday</label>
-                        <input
-                          type="text"
-                          value={editModalData.data.operatingHoursWeekday || '11:00 - 22:00 WIB'}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, operatingHoursWeekday: e.target.value },
-                            })
-                          }
-                          className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs bg-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] text-slate-600 font-semibold mb-0.5">Buka Weekend</label>
-                        <input
-                          type="text"
-                          value={editModalData.data.operatingHoursWeekend || '11:00 - 23:00 WIB'}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, operatingHoursWeekend: e.target.value },
-                            })
-                          }
-                          className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs bg-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] text-slate-600 font-semibold mb-0.5">Jam Kerja Kru</label>
-                        <input
-                          type="text"
-                          value={editModalData.data.workHours || '10:00 - 23:00 WIB'}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, workHours: e.target.value },
-                            })
-                          }
-                          className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs bg-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] text-slate-600 font-semibold mb-0.5">Selesai Closing</label>
-                        <input
-                          type="text"
-                          value={editModalData.data.closingHours || '23:00 WIB'}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, closingHours: e.target.value },
-                            })
-                          }
-                          className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs bg-white"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Pengaturan Manual Cut-Off & Tanggal Gajian */}
-                  <div className="p-3 bg-amber-50/80 rounded-xl border border-amber-200 space-y-2">
-                    <p className="font-bold text-amber-950 text-xs">Siklus Cut-Off &amp; Tanggal Gajian (Input Manual):</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="block text-[10px] text-slate-700 font-semibold mb-0.5">Tutup Buku (Cut-Off)</label>
-                        <input
-                          type="number"
-                          min="1"
-                          max="31"
-                          value={editModalData.data.cutoffDate || 5}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, cutoffDate: parseInt(e.target.value, 10) || 5 },
-                            })
-                          }
-                          className="w-full px-2.5 py-1.5 border border-amber-300 rounded-lg text-xs bg-white font-black"
-                        />
-                        <span className="text-[9px] text-slate-500">Tiap bulan (Rekap Absen)</span>
-                      </div>
-                      <div>
-                        <label className="block text-[10px] text-slate-700 font-semibold mb-0.5">Tanggal Gajian (Payday)</label>
-                        <input
-                          type="number"
-                          min="1"
-                          max="31"
-                          value={editModalData.data.paydayDate || 10}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, paydayDate: parseInt(e.target.value, 10) || 10 },
-                            })
-                          }
-                          className="w-full px-2.5 py-1.5 border border-amber-300 rounded-lg text-xs bg-white font-black text-emerald-700"
-                        />
-                        <span className="text-[9px] text-slate-500">Tiap bulan (Cair Rekening)</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Latitude</label>
-                      <input
-                        type="number"
-                        step="0.0001"
-                        value={editModalData.data.lat}
-                        onChange={(e) =>
-                          setEditModalData({
-                            ...editModalData,
-                            data: { ...editModalData.data, lat: parseFloat(e.target.value) },
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Longitude</label>
-                      <input
-                        type="number"
-                        step="0.0001"
-                        value={editModalData.data.lng}
-                        onChange={(e) =>
-                          setEditModalData({
-                            ...editModalData,
-                            data: { ...editModalData.data, lng: parseFloat(e.target.value) },
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Radius Geofence (Meter)</label>
-                      <input
-                        type="number"
-                        value={editModalData.data.radius}
-                        onChange={(e) =>
-                          setEditModalData({
-                            ...editModalData,
-                            data: { ...editModalData.data, radius: parseInt(e.target.value, 10) },
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-bold"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Total Staf Resto</label>
-                      <input
-                        type="number"
-                        value={editModalData.data.totalStaff}
-                        onChange={(e) =>
-                          setEditModalData({
-                            ...editModalData,
-                            data: { ...editModalData.data, totalStaff: parseInt(e.target.value, 10) },
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold"
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
 
               {/* 2. DEPARTMENTS & POSISI: SEMUA KOLOM TABEL ADA DI FORM EDIT */}
               {editModalData.type === 'departments' && (
@@ -1431,96 +1041,6 @@ export default function MasterDataPage() {
       {/* ========================================================= */}
       {/* 6. MODAL TAMBAH DATA (CREATE NEW)                         */}
       {/* ========================================================= */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
-              <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h3 className="font-bold text-slate-900 text-base">
-                  Tambah {activeTab === 'outlets' ? 'Cabang Baru' : 'Data Master'}
-                </h3>
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="text-slate-400 hover:text-slate-600 font-bold text-lg"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="space-y-3 text-xs">
-                <div>
-                  <label className="block text-slate-700 font-semibold mb-1">Kode Cabang</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. RESTO-SBY-04"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-700 font-semibold mb-1">Nama Restoran</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Resto Nusantara Tunjungan Surabaya"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-700 font-semibold mb-1">Alamat Lengkap</label>
-                  <textarea
-                    rows={2}
-                    placeholder="Jl. Tunjungan No. ..."
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Latitude</label>
-                    <input
-                      type="number"
-                      step="0.0001"
-                      placeholder="-7.2575"
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Longitude</label>
-                    <input
-                      type="number"
-                      step="0.0001"
-                      placeholder="112.7521"
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-slate-700 font-semibold mb-1">Radius Geofence GPS (Meter)</label>
-                  <input
-                    type="number"
-                    defaultValue={60}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-2 flex justify-end space-x-2">
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
-                >
-                  Batal
-                </button>
-                <button
-                  onClick={() => {
-                    setShowAddModal(false);
-                    showToast('Cabang baru berhasil disimpan ke sistem!');
-                  }}
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800"
-                >
-                  Simpan Data
-                </button>
-              </div>
-            </div>
-        </div>
-      )}
     </AppShell>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import Dialog from '@/components/Dialog';
 import { CheckCircle2, Loader2, Paperclip, RefreshCw, Wallet, XCircle } from 'lucide-react';
 import { getSessionUser } from '@/lib/auth';
 import {
@@ -353,60 +354,40 @@ function RejectDialog({
   onConfirm: (notes: string) => void;
 }) {
   const [notes, setNotes] = useState('');
-  const fieldRef = useRef<HTMLTextAreaElement>(null);
-  const cancelRef = useRef(onCancel);
-  cancelRef.current = onCancel;
-
-  // Fokus hanya saat dialog dibuka, bukan setiap render
-  useEffect(() => {
-    fieldRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && cancelRef.current();
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
-
   const trimmed = notes.trim();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4" onClick={onCancel}>
+    <Dialog title={`Tolak ${REQUEST_TYPE_LABEL[req.type].toLowerCase()} ${req.employee.fullName}`} onClose={onCancel}>
       <form
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="reject-title"
-        onClick={(e) => e.stopPropagation()}
         onSubmit={(e) => {
           e.preventDefault();
           if (trimmed) onConfirm(trimmed);
         }}
-        className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl text-xs space-y-3"
+        className="space-y-3"
       >
-        <h5 id="reject-title" className="text-sm font-extrabold text-slate-900">
-          Tolak {REQUEST_TYPE_LABEL[req.type].toLowerCase()} {req.employee.fullName}
-        </h5>
         <label className="block space-y-1">
-          <span className="font-bold text-slate-600">Alasan penolakan (dilihat oleh karyawan)</span>
+          <span className="font-medium text-slate-700">Alasan penolakan (dilihat oleh karyawan)</span>
           <textarea
-            ref={fieldRef}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
             required
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-slate-800 focus:outline-none focus:border-rose-500"
+            className="w-full rounded-md border border-slate-300 p-2.5 text-slate-800 focus:border-rose-500"
           />
         </label>
-        <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
-          <button type="button" onClick={onCancel} className="rounded-xl px-4 py-2 font-bold text-slate-600 hover:bg-slate-100">
+        <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
+          <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">
             Batal
           </button>
           <button
             type="submit"
             disabled={!trimmed}
-            className="rounded-xl bg-rose-600 px-4 py-2 font-bold text-white hover:bg-rose-500 disabled:opacity-50"
+            className="rounded-md bg-rose-600 px-4 py-2 font-medium text-white hover:bg-rose-500 disabled:opacity-50"
           >
             Tolak pengajuan
           </button>
         </div>
       </form>
-    </div>
+    </Dialog>
   );
 }

@@ -8,6 +8,7 @@ import AppShell from '@/components/AppShell';
 import DashboardHome from '@/components/DashboardHome';
 import RequestsApprovalModule from '@/components/RequestsApprovalModule';
 import ShiftMasterModule from '@/components/ShiftMasterModule';
+import OutletMasterModule from '@/components/OutletMasterModule';
 import {
   ChefHat,
   Building2,
@@ -2955,8 +2956,9 @@ export default function AdminDashboard() {
       title: 'Cabang',
       icon: Building2,
       subTabs: [
-        { id: 'outlet-list', label: 'Daftar Cabang' },
+        { id: 'outlet-master', label: 'Daftar Cabang' },
         { id: 'shift-master', label: 'Shift' },
+        { id: 'outlet-list', label: 'Siklus Gaji & Kasbon' },
       ],
     },
   };
@@ -24023,9 +24025,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
           {/* ========================================================= */}
           {/* TAB: PENGELOLAAN DATA OUTLET & SIKLUS PAYROLL/KASBON      */}
           {/* ========================================================= */}
+          {activeMenu === 'outlets' && activeSubTab === 'outlet-master' && <OutletMasterModule />}
           {activeMenu === 'outlets' && activeSubTab === 'shift-master' && <ShiftMasterModule />}
 
-          {activeMenu === 'outlets' && activeSubTab !== 'shift-master' && (
+          {activeMenu === 'outlets' && activeSubTab === 'outlet-list' && (
             <div className="space-y-6">
               {/* Header Hero Banner */}
               <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-slate-800 rounded-2xl p-5 text-white shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">

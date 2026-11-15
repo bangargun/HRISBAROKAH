@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import Dialog from '@/components/Dialog';
 import { Clock, Edit2, Loader2, Moon, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { getSessionUser } from '@/lib/auth';
@@ -302,7 +303,7 @@ export default function ShiftMasterModule() {
       {form && <ShiftFormDialog initial={form} outlets={outlets} onCancel={() => setForm(null)} onSave={save} />}
 
       {deleting && (
-        <Dialog title={`Hapus shift "${deleting.name}"?`} onCancel={() => setDeleting(null)}>
+        <Dialog title={`Hapus shift "${deleting.name}"?`} onClose={() => setDeleting(null)}>
           <p className="text-slate-600">
             Shift di {deleting.outlet.name} ini akan dihapus permanen. Shift yang belum pernah dipakai jadwal saja yang
             bisa dihapus.
@@ -359,7 +360,7 @@ function ShiftFormDialog({
   const field = 'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-800 focus:outline-none focus:border-amber-500 disabled:opacity-60';
 
   return (
-    <Dialog title={isEdit ? 'Ubah shift' : 'Tambah shift'} onCancel={onCancel}>
+    <Dialog title={isEdit ? 'Ubah shift' : 'Tambah shift'} onClose={onCancel}>
       <form onSubmit={submit} className="space-y-3">
         <label className="block space-y-1">
           <span className="font-bold text-slate-600">Outlet</span>
@@ -450,35 +451,5 @@ function ShiftFormDialog({
         </div>
       </form>
     </Dialog>
-  );
-}
-
-function Dialog({ title, onCancel, children }: { title: string; onCancel: () => void; children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const cancelRef = useRef(onCancel);
-  cancelRef.current = onCancel;
-
-  // Fokus hanya saat dialog dibuka, bukan setiap render
-  useEffect(() => {
-    ref.current?.querySelector<HTMLElement>('input:not([disabled]), select:not([disabled]), button')?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && cancelRef.current();
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4" onClick={onCancel}>
-      <div
-        ref={ref}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl text-xs space-y-3"
-      >
-        <h4 className="text-sm font-extrabold text-slate-900">{title}</h4>
-        {children}
-      </div>
-    </div>
   );
 }
