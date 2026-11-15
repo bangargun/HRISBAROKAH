@@ -7,6 +7,7 @@ import { EmployeesModule } from './modules/employees/employees.module';
 import { AttendanceModule } from './modules/attendance/attendance.module';
 import { RequestsModule } from './modules/requests/requests.module';
 import { FaceModule } from './modules/face/face.module';
+import { ShiftsModule } from './modules/shifts/shifts.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { FaceModule } from './modules/face/face.module';
     AttendanceModule,
     RequestsModule,
     FaceModule,
+    ShiftsModule,
   ],
   controllers: [],
   providers: [],

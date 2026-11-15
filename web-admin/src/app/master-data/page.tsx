@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import ShiftMasterModule from '@/components/ShiftMasterModule';
 import {
   ChefHat,
   Building2,
@@ -54,9 +55,6 @@ export default function MasterDataPage() {
   // 2. Data Departemen & Posisi / Station Resto (Zero Mock Policy: Persistent State)
   const [departments, setDepartments] = useState<any[]>([]);
 
-  // 3. Data Master Jadwal Long Shift Outlet F&B (Zero Mock Policy: Persistent State)
-  const [shifts, setShifts] = useState<any[]>([]);
-
   const hasLoadedMasterRef = useRef(false);
 
   useEffect(() => {
@@ -67,8 +65,6 @@ export default function MasterDataPage() {
       const savedDepts = localStorage.getItem('hris_master_departments');
       if (savedDepts) setDepartments(JSON.parse(savedDepts));
 
-      const savedShifts = localStorage.getItem('hris_master_shifts');
-      if (savedShifts) setShifts(JSON.parse(savedShifts));
     } catch (e) {
       console.error('Error loading master data from localStorage:', e);
     }
@@ -95,34 +91,6 @@ export default function MasterDataPage() {
     }
   }, [departments]);
 
-  useEffect(() => {
-    if (hasLoadedMasterRef.current) {
-      try {
-        localStorage.setItem('hris_master_shifts', JSON.stringify(shifts));
-      } catch (e) {
-        console.error('Error saving shifts:', e);
-      }
-    }
-  }, [shifts]);
-
-  // Form State untuk Tambah Jadwal Long Shift Baru
-  const [newShiftFormData, setNewShiftFormData] = useState({
-    id: '',
-    outletName: '',
-    name: '',
-    weekdayOpenTime: '10:00',
-    weekdayCloseTime: '22:00',
-    weekdayShiftStart: '09:00',
-    weekdayShiftEnd: '22:30',
-    weekdayBreak: '2 Jam (120 Menit)',
-    weekendOpenTime: '09:00',
-    weekendCloseTime: '23:00',
-    weekendShiftStart: '08:00',
-    weekendShiftEnd: '23:30',
-    weekendBreak: '3 Jam (180 Menit)',
-    status: 'AKTIF',
-    description: '',
-  });
 
   // 4. Data Master Komponen Payroll & Service Charge
   const [payrollRules, setPayrollRules] = useState([
@@ -292,18 +260,6 @@ export default function MasterDataPage() {
     },
   ]);
 
-  // Handle Save New Long Shift
-  const handleSaveNewShift = (e: React.FormEvent) => {
-    e.preventDefault();
-    const created = {
-      ...newShiftFormData,
-      id: newShiftFormData.id || `LS-0${shifts.length + 1}`,
-    };
-    setShifts([...shifts, created]);
-    showToast(`Jadwal Long Shift "${created.name}" untuk ${created.outletName} berhasil disimpan!`);
-    setShowAddModal(false);
-  };
-
   // Handle Edit Submit
   const handleSaveEdit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -316,9 +272,6 @@ export default function MasterDataPage() {
     } else if (type === 'departments') {
       setDepartments(departments.map((d) => (d.id === data.id ? data : d)));
       showToast(`Data station ${data.title} berhasil diperbarui!`);
-    } else if (type === 'shifts') {
-      setShifts(shifts.map((s) => (s.id === data.id ? data : s)));
-      showToast(`Jadwal shift ${data.name} berhasil diperbarui!`);
     } else if (type === 'payroll') {
       setPayrollRules(payrollRules.map((p) => (p.id === data.id ? data : p)));
       showToast(`Aturan ${data.componentName} berhasil diperbarui!`);
@@ -339,8 +292,6 @@ export default function MasterDataPage() {
       setOutlets(outlets.filter((o) => o.id !== id));
     } else if (type === 'departments') {
       setDepartments(departments.filter((d) => d.id !== id));
-    } else if (type === 'shifts') {
-      setShifts(shifts.filter((s) => s.id !== id));
     } else if (type === 'payroll') {
       setPayrollRules(payrollRules.filter((p) => p.id !== id));
     } else if (type === 'leaves') {
@@ -489,6 +440,7 @@ export default function MasterDataPage() {
               </p>
             </div>
 
+            {activeTab !== 'shifts' && (
             <button
               onClick={() => setShowAddModal(true)}
               className="bg-slate-900 hover:bg-slate-800 text-white text-xs px-4 py-2 rounded-xl font-bold flex items-center space-x-1.5 shadow-sm self-start sm:self-auto"
@@ -497,11 +449,11 @@ export default function MasterDataPage() {
               <span>
                 {activeTab === 'outlets' && 'Tambah Cabang Resto'}
                 {activeTab === 'departments' && 'Tambah Station Posisi'}
-                {activeTab === 'shifts' && 'Tambah Jadwal Shift'}
                 {activeTab === 'payroll' && 'Tambah Komponen Payroll'}
                 {activeTab === 'leaves' && 'Tambah Jenis Cuti'}
               </span>
             </button>
+            )}
           </div>
 
           {/* Sub-Tabs Navigation */}
@@ -542,7 +494,6 @@ export default function MasterDataPage() {
             >
               <Clock className="h-3.5 w-3.5" />
               <span>Jadwal Shift &amp; Istirahat Resto</span>
-              <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded font-bold">{shifts.length}</span>
             </button>
 
             <button
@@ -790,272 +741,7 @@ export default function MasterDataPage() {
           {/* ========================================================= */}
           {/* SUB-TAB 3: JADWAL LONG SHIFT OUTLET                      */}
           {/* ========================================================= */}
-          {activeTab === 'shifts' && (
-            <div className="space-y-4">
-              {/* Header Info & Quick Action */}
-              <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50/30 border border-amber-200/80 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
-                <div className="flex items-start space-x-3">
-                  <div className="p-2.5 bg-amber-500 text-slate-950 rounded-xl font-bold shadow-sm mt-0.5">
-                    <Clock className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                      Jadwal Long Shift Terintegrasi Outlet Resto
-                      <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-semibold border border-amber-300">
-                        Buka - Tutup Manual
-                      </span>
-                    </h3>
-                    <p className="text-xs text-slate-600 mt-0.5">
-                      Kelola jam buka-tutup outlet dan rentang jam kerja kru long shift secara manual untuk <strong>Hari Biasa (Senin - Jumat)</strong> serta <strong>Weekend (Sabtu - Minggu) &amp; Libur Nasional</strong>.
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setShowAddModal(true)}
-                  className="bg-slate-900 hover:bg-slate-800 text-white text-xs px-4 py-2.5 rounded-xl font-bold flex items-center space-x-2 shadow-sm whitespace-nowrap self-start md:self-auto transition-all"
-                >
-                  <Plus className="h-4 w-4 text-amber-400" />
-                  <span>Tambah Jadwal Long Shift</span>
-                </button>
-              </div>
-
-              {/* Tabel Jadwal Long Shift */}
-              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold">
-                      <th className="py-3 px-4">Outlet &amp; Nama Shift</th>
-                      <th className="py-3 px-4">Hari Biasa (Senin - Jumat)</th>
-                      <th className="py-3 px-4">Weekend &amp; Libur Nasional</th>
-                      <th className="py-3 px-4">Status</th>
-                      <th className="py-3 px-4">Catatan Operasional</th>
-                      <th className="py-3 px-4 text-center">Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {shifts.length === 0 ? (
-                      <tr>
-                        <td colSpan={6} className="py-12 text-center text-slate-500">
-                          <div className="flex flex-col items-center justify-center space-y-3">
-                            <div className="p-3 bg-amber-50 rounded-full text-amber-600">
-                              <Clock className="h-8 w-8" />
-                            </div>
-                            <div>
-                              <p className="font-bold text-slate-800 text-sm">Belum Ada Jadwal Long Shift</p>
-                              <p className="text-xs text-slate-500 max-w-sm mt-0.5">
-                                Seluruh mock data telah dibersihkan secara permanen. Tambahkan konfigurasi jam buka-tutup dan jam kerja shift riil.
-                              </p>
-                            </div>
-                            <button
-                              onClick={() => setShowAddModal(true)}
-                              className="mt-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition"
-                            >
-                              + Tambah Jadwal Long Shift Baru
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ) : (
-                      shifts.map((s) => (
-                      <tr key={s.id} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3.5 px-4">
-                          <div className="flex items-center space-x-1.5 mb-1">
-                            <Building2 className="h-3.5 w-3.5 text-amber-500" />
-                            <span className="font-bold text-slate-900 text-xs">{s.outletName}</span>
-                          </div>
-                          <div className="font-semibold text-slate-700 text-[11px]">{s.name}</div>
-                          <div className="text-[10px] font-mono text-slate-400">{s.id}</div>
-                        </td>
-
-                        {/* Hari Biasa */}
-                        <td className="py-3.5 px-4 font-mono text-[11px]">
-                          <div className="bg-amber-50/60 p-2.5 rounded-lg border border-amber-100 space-y-1">
-                            <div className="flex items-center justify-between text-slate-700">
-                              <span className="text-[10px] font-sans font-semibold text-amber-800">Buka - Tutup:</span>
-                              <span className="font-bold text-slate-900">{s.weekdayOpenTime} - {s.weekdayCloseTime} WIB</span>
-                            </div>
-                            <div className="flex items-center justify-between text-slate-700">
-                              <span className="text-[10px] font-sans font-semibold text-blue-700">Shift Kru:</span>
-                              <span className="font-bold text-blue-900">{s.weekdayShiftStart} - {s.weekdayShiftEnd} WIB</span>
-                            </div>
-                            <div className="flex items-center justify-between text-slate-700 border-t border-amber-100/80 pt-1 text-[10px]">
-                              <span className="font-sans font-semibold">Waktu Istirahat:</span>
-                              <span className="font-bold text-emerald-800 bg-emerald-100/80 px-1.5 py-0.5 rounded border border-emerald-300">
-                                {s.weekdayBreak}
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-
-                        {/* Weekend & Libur Nasional */}
-                        <td className="py-3.5 px-4 font-mono text-[11px]">
-                          <div className="bg-rose-50/50 p-2.5 rounded-lg border border-rose-100 space-y-1">
-                            <div className="flex items-center justify-between text-slate-700">
-                              <span className="text-[10px] font-sans font-semibold text-rose-800">Buka - Tutup:</span>
-                              <span className="font-bold text-slate-900">{s.weekendOpenTime} - {s.weekendCloseTime} WIB</span>
-                            </div>
-                            <div className="flex items-center justify-between text-slate-700">
-                              <span className="text-[10px] font-sans font-semibold text-purple-700">Shift Kru:</span>
-                              <span className="font-bold text-purple-900">{s.weekendShiftStart} - {s.weekendShiftEnd} WIB</span>
-                            </div>
-                            <div className="flex items-center justify-between text-slate-700 border-t border-rose-100/80 pt-1 text-[10px]">
-                              <span className="font-sans font-semibold">Waktu Istirahat:</span>
-                              <span className="font-bold text-purple-900 bg-purple-100/80 px-1.5 py-0.5 rounded border border-purple-300">
-                                {s.weekendBreak}
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-
-                        {/* Status */}
-                        <td className="py-3.5 px-4">
-                          <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                              s.status === 'AKTIF'
-                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                                : 'bg-amber-100 text-amber-800 border border-amber-200'
-                            }`}
-                          >
-                            {s.status}
-                          </span>
-                        </td>
-
-                        {/* Keterangan */}
-                        <td className="py-3.5 px-4 max-w-xs text-slate-600 text-[11px] leading-relaxed">
-                          {s.description}
-                        </td>
-
-                        {/* Aksi */}
-                        <td className="py-3.5 px-4">
-                          <div className="flex items-center justify-center space-x-1.5">
-                            <button
-                              onClick={() => setReviewModalData({ type: 'shifts', data: s })}
-                              className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-                              title="Review / Detail Shift"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </button>
-                            <button
-                              onClick={() => setEditModalData({ type: 'shifts', data: { ...s } })}
-                              className="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition-colors"
-                              title="Edit Jam Long Shift"
-                            >
-                              <Edit2 className="h-4 w-4" />
-                            </button>
-                            <button
-                              onClick={() => setDeleteModalData({ type: 'shifts', id: s.id, name: s.name })}
-                              className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors"
-                              title="Hapus Jadwal"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    )))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Card Ketentuan Durasi Istirahat 2 Jam vs 3 Jam & Rolling Break 12:00 - 18:00 WIB */}
-              <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 rounded-2xl p-5 text-white shadow-md space-y-4 border border-slate-700">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2">
-                      <span className="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">
-                        Kebijakan Master Data Resto
-                      </span>
-                      <span className="text-slate-400 text-xs font-mono">
-                        Window Istirahat 12:00 - 18:00 WIB
-                      </span>
-                    </div>
-                    <h4 className="font-bold text-sm text-white">
-                      Ketentuan Durasi Istirahat: 2 Jam atau 3 Jam (Tergantung Jam Kerja Outlet)
-                    </h4>
-                    <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-                      Waktu istirahat staf ditetapkan sebesar <strong>2 Jam atau 3 Jam</strong> berdasarkan total rentang jam buka operasional outlet. Seluruh jadwal dirotasi secara otomatis acak pada rentang pukul <strong>12:00 siang hingga 18:00 sore</strong>.
-                    </p>
-                  </div>
-
-                  <Link
-                    href="/"
-                    className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-4 py-2.5 rounded-xl font-bold flex items-center space-x-2 shadow whitespace-nowrap self-start sm:self-auto transition-all"
-                  >
-                    <span>Buka Monitor &amp; Generator Istirahat</span>
-                    <ChevronRight className="h-4 w-4" />
-                  </Link>
-                </div>
-
-                {/* Matriks Standar 2 Jam vs 3 Jam */}
-                <div className="bg-white/5 rounded-xl border border-white/10 p-4 space-y-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5" />
-                    Matriks Standar Durasi Istirahat Sesuai Jam Kerja Outlet
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                    <div className="bg-white/5 p-3 rounded-xl border border-white/10 space-y-1.5">
-                      <div className="flex justify-between items-center">
-                        <span className="font-bold text-white text-[12px]">Kategori A: Jam Buka Outlet ≤ 12 Jam</span>
-                        <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 font-extrabold rounded text-[11px] border border-emerald-500/30">
-                          Istirahat 2 Jam (120 Menit)
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-300 leading-relaxed">
-                        Berlaku umum untuk <strong>Hari Biasa (Weekday)</strong> dengan jam buka standar (misal 10:00 - 22:00 WIB atau 11:00 - 23:00 WIB). Istirahat dibagi dalam sesi rotasi siang dan sore.
-                      </p>
-                    </div>
-
-                    <div className="bg-white/5 p-3 rounded-xl border border-white/10 space-y-1.5">
-                      <div className="flex justify-between items-center">
-                        <span className="font-bold text-white text-[12px]">Kategori B: Jam Buka Outlet &gt; 12 Jam</span>
-                        <span className="px-2 py-0.5 bg-purple-500/20 text-purple-300 font-extrabold rounded text-[11px] border border-purple-500/30">
-                          Istirahat 3 Jam (180 Menit)
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-300 leading-relaxed">
-                        Berlaku untuk <strong>Weekend (Sabtu-Minggu) &amp; Libur Nasional</strong> atau outlet mall dengan jam buka panjang (misal 08:00 - 23:00 atau 08:00 - 00:00 WIB). Memastikan staf tetap bugar.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 3 Ketentuan Wajib per Kloter */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 text-xs">
-                  <div className="bg-white/5 p-3 rounded-xl border border-white/5 space-y-1">
-                    <p className="font-bold text-amber-400 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-                      1. Wajib Bagian Produksi
-                    </p>
-                    <p className="text-[11px] text-slate-300">
-                      Setiap kloter istirahat wajib memuat staf dapur (Cook / Prep / BOH) agar dapur tidak pernah kosong saat pesanan masuk.
-                    </p>
-                  </div>
-
-                  <div className="bg-white/5 p-3 rounded-xl border border-white/5 space-y-1">
-                    <p className="font-bold text-blue-400 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-blue-400"></span>
-                      2. Wajib Bagian Waiters
-                    </p>
-                    <p className="text-[11px] text-slate-300">
-                      Setiap kloter istirahat wajib memuat staf service (Waiters / FOH) agar pelayanan tamu meja makan tetap terjaga.
-                    </p>
-                  </div>
-
-                  <div className="bg-white/5 p-3 rounded-xl border border-white/5 space-y-1">
-                    <p className="font-bold text-pink-400 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-pink-400"></span>
-                      3. Wajib Kasir / Staf Perempuan
-                    </p>
-                    <p className="text-[11px] text-slate-300">
-                      Setiap kloter wajib memuat kasir atau staf perempuan demi kelancaran operasional POS transaksi dan rotasi yang proporsional.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          {activeTab === 'shifts' && <ShiftMasterModule />}
 
           {/* ========================================================= */}
           {/* SUB-TAB 4: KOMPONEN PAYROLL & SERVICE CHARGE              */}
@@ -1654,284 +1340,6 @@ export default function MasterDataPage() {
                 </>
               )}
 
-              {/* 3. SHIFTS: FORM EDIT JADWAL LONG SHIFT OUTLET */}
-              {editModalData.type === 'shifts' && (
-                <>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Pilih Cabang Outlet</label>
-                      <select
-                        value={editModalData.data.outletName}
-                        onChange={(e) =>
-                          setEditModalData({
-                            ...editModalData,
-                            data: { ...editModalData.data, outletName: e.target.value },
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-bold text-slate-800"
-                      >
-                        {outlets.length === 0 ? (
-                          <option value="">(Belum ada cabang - silakan tambah di tab Cabang)</option>
-                        ) : (
-                          outlets.map((o) => (
-                            <option key={o.id} value={o.name}>
-                              {o.name} ({o.code})
-                            </option>
-                          ))
-                        )}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Status Shift</label>
-                      <select
-                        value={editModalData.data.status || 'AKTIF'}
-                        onChange={(e) =>
-                          setEditModalData({
-                            ...editModalData,
-                            data: { ...editModalData.data, status: e.target.value },
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold"
-                      >
-                        <option value="AKTIF">AKTIF (Berjalan)</option>
-                        <option value="PERSIAPAN">PERSIAPAN (Opening)</option>
-                        <option value="NONAKTIF">NONAKTIF</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Kode Shift</label>
-                      <input
-                        type="text"
-                        value={editModalData.data.id}
-                        onChange={(e) =>
-                          setEditModalData({
-                            ...editModalData,
-                            data: { ...editModalData.data, id: e.target.value },
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Nama Jadwal Long Shift</label>
-                      <input
-                        type="text"
-                        value={editModalData.data.name}
-                        onChange={(e) =>
-                          setEditModalData({
-                            ...editModalData,
-                            data: { ...editModalData.data, name: e.target.value },
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-bold"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Group 1: Hari Biasa (Senin - Jumat) */}
-                  <div className="p-3 bg-amber-50/70 rounded-xl border border-amber-200/80 space-y-2.5">
-                    <div className="flex items-center justify-between border-b border-amber-200 pb-1.5">
-                      <span className="text-[11px] font-bold text-amber-900 uppercase tracking-wider flex items-center">
-                        📅 Jadwal Hari Biasa (Senin - Jumat)
-                      </span>
-                      <span className="text-[10px] text-amber-700 font-semibold">Weekday Operation</span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-slate-700 font-semibold mb-1 text-[11px]">Jam Buka Outlet Resto</label>
-                        <input
-                          type="text"
-                          value={editModalData.data.weekdayOpenTime}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, weekdayOpenTime: e.target.value },
-                            })
-                          }
-                          placeholder="e.g. 10:00"
-                          className="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 font-semibold mb-1 text-[11px]">Jam Tutup Outlet Resto</label>
-                        <input
-                          type="text"
-                          value={editModalData.data.weekdayCloseTime}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, weekdayCloseTime: e.target.value },
-                            })
-                          }
-                          placeholder="e.g. 22:00"
-                          className="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-semibold"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2 pt-1 border-t border-amber-200/50">
-                      <div>
-                        <label className="block text-slate-700 font-semibold mb-1 text-[10px]">Jam Masuk Kru (Prep)</label>
-                        <input
-                          type="text"
-                          value={editModalData.data.weekdayShiftStart}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, weekdayShiftStart: e.target.value },
-                            })
-                          }
-                          placeholder="e.g. 09:00"
-                          className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-bold text-blue-700 text-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 font-semibold mb-1 text-[10px]">Jam Pulang (Closing)</label>
-                        <input
-                          type="text"
-                          value={editModalData.data.weekdayShiftEnd}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, weekdayShiftEnd: e.target.value },
-                            })
-                          }
-                          placeholder="e.g. 22:30"
-                          className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-bold text-blue-700 text-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 font-semibold mb-1 text-[10px]">Durasi Istirahat</label>
-                        <select
-                          value={editModalData.data.weekdayBreak || '2 Jam (120 Menit)'}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, weekdayBreak: e.target.value },
-                            })
-                          }
-                          className="w-full px-2 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold text-xs bg-white text-slate-800"
-                        >
-                          <option value="2 Jam (120 Menit)">2 Jam (120 Menit) - Jam Kerja Outlet ≤ 12 Jam</option>
-                          <option value="3 Jam (180 Menit)">3 Jam (180 Menit) - Jam Kerja Outlet &gt; 12 Jam</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Group 2: Weekend & Libur Nasional */}
-                  <div className="p-3 bg-rose-50/70 rounded-xl border border-rose-200/80 space-y-2.5">
-                    <div className="flex items-center justify-between border-b border-rose-200 pb-1.5">
-                      <span className="text-[11px] font-bold text-rose-900 uppercase tracking-wider flex items-center">
-                        🎉 Weekend (Sabtu - Minggu) &amp; Libur Nasional
-                      </span>
-                      <span className="text-[10px] text-rose-700 font-semibold">Rush Hour / Holiday</span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-slate-700 font-semibold mb-1 text-[11px]">Jam Buka Outlet Resto</label>
-                        <input
-                          type="text"
-                          value={editModalData.data.weekendOpenTime}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, weekendOpenTime: e.target.value },
-                            })
-                          }
-                          placeholder="e.g. 09:00"
-                          className="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 font-semibold mb-1 text-[11px]">Jam Tutup Outlet Resto</label>
-                        <input
-                          type="text"
-                          value={editModalData.data.weekendCloseTime}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, weekendCloseTime: e.target.value },
-                            })
-                          }
-                          placeholder="e.g. 23:00"
-                          className="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-semibold"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2 pt-1 border-t border-rose-200/50">
-                      <div>
-                        <label className="block text-slate-700 font-semibold mb-1 text-[10px]">Jam Masuk Kru (Prep)</label>
-                        <input
-                          type="text"
-                          value={editModalData.data.weekendShiftStart}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, weekendShiftStart: e.target.value },
-                            })
-                          }
-                          placeholder="e.g. 08:00"
-                          className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-bold text-purple-700 text-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 font-semibold mb-1 text-[10px]">Jam Pulang (Closing)</label>
-                        <input
-                          type="text"
-                          value={editModalData.data.weekendShiftEnd}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, weekendShiftEnd: e.target.value },
-                            })
-                          }
-                          placeholder="e.g. 23:30"
-                          className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-bold text-purple-700 text-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 font-semibold mb-1 text-[10px]">Durasi Istirahat</label>
-                        <select
-                          value={editModalData.data.weekendBreak || '3 Jam (180 Menit)'}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, weekendBreak: e.target.value },
-                            })
-                          }
-                          className="w-full px-2 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold text-xs bg-white text-slate-800"
-                        >
-                          <option value="2 Jam (120 Menit)">2 Jam (120 Menit) - Jam Kerja Outlet ≤ 12 Jam</option>
-                          <option value="3 Jam (180 Menit)">3 Jam (180 Menit) - Jam Kerja Outlet &gt; 12 Jam</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Catatan &amp; Ketentuan Operasional</label>
-                    <textarea
-                      rows={2}
-                      value={editModalData.data.description}
-                      onChange={(e) =>
-                        setEditModalData({
-                          ...editModalData,
-                          data: { ...editModalData.data, description: e.target.value },
-                        })
-                      }
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 text-xs"
-                    />
-                  </div>
-                </>
-              )}
-
               {/* 4. PAYROLL: SEMUA KOLOM TABEL ADA DI FORM EDIT */}
               {editModalData.type === 'payroll' && (
                 <>
@@ -2186,278 +1594,6 @@ export default function MasterDataPage() {
       {/* ========================================================= */}
       {showAddModal && (
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in overflow-y-auto">
-          {activeTab === 'shifts' ? (
-            <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 my-8">
-              <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-                <div className="flex items-center space-x-2">
-                  <div className="p-2 bg-amber-50 text-amber-600 rounded-xl">
-                    <Clock className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900 text-base">Tambah Jadwal Long Shift Outlet</h3>
-                    <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
-                      Atur Buka-Tutup &amp; Jam Shift Manual
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-
-              <form onSubmit={handleSaveNewShift} className="space-y-3.5 text-xs">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Pilih Cabang Outlet Resto</label>
-                    <select
-                      value={newShiftFormData.outletName}
-                      onChange={(e) =>
-                        setNewShiftFormData({ ...newShiftFormData, outletName: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-bold text-slate-800"
-                    >
-                      {outlets.length === 0 ? (
-                        <option value="">(Belum ada cabang - silakan tambah di tab Cabang)</option>
-                      ) : (
-                        outlets.map((o) => (
-                          <option key={o.id} value={o.name}>
-                            {o.name} ({o.code})
-                          </option>
-                        ))
-                      )}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Status Shift</label>
-                    <select
-                      value={newShiftFormData.status}
-                      onChange={(e) =>
-                        setNewShiftFormData({ ...newShiftFormData, status: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold"
-                    >
-                      <option value="AKTIF">AKTIF (Berjalan)</option>
-                      <option value="PERSIAPAN">PERSIAPAN (Opening / Trial)</option>
-                      <option value="NONAKTIF">NONAKTIF</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Kode Shift</label>
-                    <input
-                      type="text"
-                      value={newShiftFormData.id}
-                      onChange={(e) =>
-                        setNewShiftFormData({ ...newShiftFormData, id: e.target.value })
-                      }
-                      placeholder="e.g. LS-04"
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Nama Jadwal Shift</label>
-                    <input
-                      type="text"
-                      value={newShiftFormData.name}
-                      onChange={(e) =>
-                        setNewShiftFormData({ ...newShiftFormData, name: e.target.value })
-                      }
-                      placeholder="e.g. Long Shift Full-Day PIK"
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-bold"
-                    />
-                  </div>
-                </div>
-
-                {/* Group 1: Hari Biasa (Senin - Jumat) */}
-                <div className="p-3 bg-amber-50/70 rounded-xl border border-amber-200/80 space-y-2.5">
-                  <div className="flex items-center justify-between border-b border-amber-200 pb-1.5">
-                    <span className="text-[11px] font-bold text-amber-900 uppercase tracking-wider flex items-center">
-                      📅 Jadwal Hari Biasa (Senin - Jumat)
-                    </span>
-                    <span className="text-[10px] text-amber-700 font-semibold">Weekday Hours</span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1 text-[11px]">Jam Buka Outlet</label>
-                      <input
-                        type="text"
-                        value={newShiftFormData.weekdayOpenTime}
-                        onChange={(e) =>
-                          setNewShiftFormData({ ...newShiftFormData, weekdayOpenTime: e.target.value })
-                        }
-                        placeholder="10:00"
-                        className="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-semibold"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1 text-[11px]">Jam Tutup Outlet</label>
-                      <input
-                        type="text"
-                        value={newShiftFormData.weekdayCloseTime}
-                        onChange={(e) =>
-                          setNewShiftFormData({ ...newShiftFormData, weekdayCloseTime: e.target.value })
-                        }
-                        placeholder="22:00"
-                        className="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-semibold"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2 pt-1 border-t border-amber-200/50">
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1 text-[10px]">Jam Masuk Kru (Prep)</label>
-                      <input
-                        type="text"
-                        value={newShiftFormData.weekdayShiftStart}
-                        onChange={(e) =>
-                          setNewShiftFormData({ ...newShiftFormData, weekdayShiftStart: e.target.value })
-                        }
-                        placeholder="09:00"
-                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-bold text-blue-700 text-xs"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1 text-[10px]">Jam Pulang (Closing)</label>
-                      <input
-                        type="text"
-                        value={newShiftFormData.weekdayShiftEnd}
-                        onChange={(e) =>
-                          setNewShiftFormData({ ...newShiftFormData, weekdayShiftEnd: e.target.value })
-                        }
-                        placeholder="22:30"
-                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-bold text-blue-700 text-xs"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1 text-[10px]">Durasi Istirahat</label>
-                      <select
-                        value={newShiftFormData.weekdayBreak}
-                        onChange={(e) =>
-                          setNewShiftFormData({ ...newShiftFormData, weekdayBreak: e.target.value })
-                        }
-                        className="w-full px-2 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold text-xs bg-white text-slate-800"
-                      >
-                        <option value="2 Jam (120 Menit)">2 Jam (120 Menit) - Jam Kerja Outlet ≤ 12 Jam</option>
-                        <option value="3 Jam (180 Menit)">3 Jam (180 Menit) - Jam Kerja Outlet &gt; 12 Jam</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Group 2: Weekend & Libur Nasional */}
-                <div className="p-3 bg-rose-50/70 rounded-xl border border-rose-200/80 space-y-2.5">
-                  <div className="flex items-center justify-between border-b border-rose-200 pb-1.5">
-                    <span className="text-[11px] font-bold text-rose-900 uppercase tracking-wider flex items-center">
-                      🎉 Weekend (Sabtu - Minggu) &amp; Libur Nasional
-                    </span>
-                    <span className="text-[10px] text-rose-700 font-semibold">Weekend / Holiday</span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1 text-[11px]">Jam Buka Outlet</label>
-                      <input
-                        type="text"
-                        value={newShiftFormData.weekendOpenTime}
-                        onChange={(e) =>
-                          setNewShiftFormData({ ...newShiftFormData, weekendOpenTime: e.target.value })
-                        }
-                        placeholder="09:00"
-                        className="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-semibold"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1 text-[11px]">Jam Tutup Outlet</label>
-                      <input
-                        type="text"
-                        value={newShiftFormData.weekendCloseTime}
-                        onChange={(e) =>
-                          setNewShiftFormData({ ...newShiftFormData, weekendCloseTime: e.target.value })
-                        }
-                        placeholder="23:00"
-                        className="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-semibold"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2 pt-1 border-t border-rose-200/50">
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1 text-[10px]">Jam Masuk Kru (Prep)</label>
-                      <input
-                        type="text"
-                        value={newShiftFormData.weekendShiftStart}
-                        onChange={(e) =>
-                          setNewShiftFormData({ ...newShiftFormData, weekendShiftStart: e.target.value })
-                        }
-                        placeholder="08:00"
-                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-bold text-purple-700 text-xs"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1 text-[10px]">Jam Pulang (Closing)</label>
-                      <input
-                        type="text"
-                        value={newShiftFormData.weekendShiftEnd}
-                        onChange={(e) =>
-                          setNewShiftFormData({ ...newShiftFormData, weekendShiftEnd: e.target.value })
-                        }
-                        placeholder="23:30"
-                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-bold text-purple-700 text-xs"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1 text-[10px]">Durasi Istirahat</label>
-                      <select
-                        value={newShiftFormData.weekendBreak}
-                        onChange={(e) =>
-                          setNewShiftFormData({ ...newShiftFormData, weekendBreak: e.target.value })
-                        }
-                        className="w-full px-2 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold text-xs bg-white text-slate-800"
-                      >
-                        <option value="2 Jam (120 Menit)">2 Jam (120 Menit) - Jam Kerja Outlet ≤ 12 Jam</option>
-                        <option value="3 Jam (180 Menit)">3 Jam (180 Menit) - Jam Kerja Outlet &gt; 12 Jam</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 font-semibold mb-1">Catatan &amp; Ketentuan Operasional</label>
-                  <textarea
-                    rows={2}
-                    value={newShiftFormData.description}
-                    onChange={(e) =>
-                      setNewShiftFormData({ ...newShiftFormData, description: e.target.value })
-                    }
-                    placeholder="e.g. Termasuk 2 sesi istirahat split siang dan sore."
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 text-xs"
-                  />
-                </div>
-
-                <div className="pt-2 flex justify-end space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowAddModal(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 shadow-md"
-                  >
-                    Simpan Jadwal Long Shift
-                  </button>
-                </div>
-              </form>
-            </div>
-          ) : (
             <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                 <h3 className="font-bold text-slate-900 text-base">
@@ -2544,7 +1680,6 @@ export default function MasterDataPage() {
                 </button>
               </div>
             </div>
-          )}
         </div>
       )}
     </div>

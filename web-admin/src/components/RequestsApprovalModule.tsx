@@ -354,13 +354,16 @@ function RejectDialog({
 }) {
   const [notes, setNotes] = useState('');
   const fieldRef = useRef<HTMLTextAreaElement>(null);
+  const cancelRef = useRef(onCancel);
+  cancelRef.current = onCancel;
 
+  // Fokus hanya saat dialog dibuka, bukan setiap render
   useEffect(() => {
     fieldRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onCancel();
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && cancelRef.current();
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [onCancel]);
+  }, []);
 
   const trimmed = notes.trim();
 

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { BACKEND_API, clearSession, getToken } from '@/lib/auth';
 import { LEAVE_TYPES, isPending, useAdminRequests } from '@/lib/requests';
 import RequestsApprovalModule from '@/components/RequestsApprovalModule';
+import ShiftMasterModule from '@/components/ShiftMasterModule';
 import {
   ChefHat,
   Building2,
@@ -26826,7 +26827,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
           {/* ========================================================= */}
           {/* TAB: PENGELOLAAN DATA OUTLET & SIKLUS PAYROLL/KASBON      */}
           {/* ========================================================= */}
-          {activeMenu === 'outlets' && (
+          {activeMenu === 'outlets' && activeSubTab === 'shift-master' && <ShiftMasterModule />}
+
+          {activeMenu === 'outlets' && activeSubTab !== 'shift-master' && (
             <div className="space-y-6">
               {/* Header Hero Banner */}
               <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-slate-800 rounded-2xl p-5 text-white shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
