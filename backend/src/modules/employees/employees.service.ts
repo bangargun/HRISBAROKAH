@@ -1,9 +1,12 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateEmployeeDto, UpdateEmployeeDto } from './employees.dto';
 import * as bcrypt from 'bcrypt';
 import { UserRole } from '@prisma/client';
 import { AuthUser, assertOutletAccess, scopedOutletId } from '../../common/utils/outlet-scope.util';
+import { parseDateParam, toDateOnly } from '../../common/utils/business-date.util';
+
+const ADMIN_ROLES: UserRole[] = [UserRole.SUPER_ADMIN, UserRole.HR_ADMIN, UserRole.FINANCE_ADMIN];
 
 @Injectable()
 export class EmployeesService {
@@ -55,7 +58,13 @@ export class EmployeesService {
     return employee;
   }
 
-  async create(dto: CreateEmployeeDto) {
+  async create(actor: AuthUser, dto: CreateEmployeeDto) {
+    // Akun admin (HR, Keuangan, Super Admin) hanya boleh dibuat Super Admin
+    const role = dto.role ?? UserRole.EMPLOYEE;
+    if (ADMIN_ROLES.includes(role) && actor.role !== UserRole.SUPER_ADMIN) {
+      throw new ForbiddenException('Hanya Super Admin yang bisa membuat akun admin');
+    }
+
     // Cek username atau email atau NIK
     const existingUser = await this.prisma.user.findFirst({
       where: {
@@ -75,6 +84,10 @@ export class EmployeesService {
     if (existingNik) {
       throw new ConflictException(`NIK ${dto.nik} sudah terdaftar`);
     }
+
+    await this.assertOutletAndPosition(dto.outletId, dto.positionId);
+    const joinDate = toDateOnly(parseDateParam(dto.joinDate.slice(0, 10)));
+    const birthDate = dto.birthDate ? toDateOnly(parseDateParam(dto.birthDate.slice(0, 10))) : undefined;
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
@@ -97,8 +110,8 @@ export class EmployeesService {
           outletId: dto.outletId,
           positionId: dto.positionId,
           status: dto.status,
-          joinDate: new Date(dto.joinDate),
-          birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
+          joinDate,
+          birthDate,
           gender: dto.gender,
           address: dto.address,
           bankName: dto.bankName,
@@ -118,6 +131,7 @@ export class EmployeesService {
 
   async update(id: string, dto: UpdateEmployeeDto) {
     await this.getOrThrow(id);
+    await this.assertOutletAndPosition(dto.outletId, dto.positionId);
     return this.prisma.employeeProfile.update({
       where: { id },
       data: dto,
@@ -142,5 +156,24 @@ export class EmployeesService {
       }`,
       isActive: updated.isActive,
     };
+  }
+
+  /** Daftar jabatan untuk pilihan di form karyawan. */
+  async listPositions() {
+    return this.prisma.position.findMany({
+      select: { id: true, title: true, department: { select: { id: true, name: true } } },
+      orderBy: [{ department: { name: 'asc' } }, { title: 'asc' }],
+    });
+  }
+
+  private async assertOutletAndPosition(outletId?: string, positionId?: string) {
+    if (outletId) {
+      const outlet = await this.prisma.outlet.findUnique({ where: { id: outletId } });
+      if (!outlet) throw new BadRequestException('Cabang tidak ditemukan');
+      if (!outlet.isActive) throw new BadRequestException(`Cabang ${outlet.name} sudah nonaktif`);
+    }
+    if (positionId && !(await this.prisma.position.findUnique({ where: { id: positionId } }))) {
+      throw new BadRequestException('Jabatan tidak ditemukan');
+    }
   }
 }

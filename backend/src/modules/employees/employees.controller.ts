@@ -23,6 +23,13 @@ export class EmployeesController {
     return this.employeesService.findAll(user, outletId, departmentId);
   }
 
+  // Harus sebelum ':id' agar tidak dianggap id karyawan
+  @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN, UserRole.FINANCE_ADMIN, UserRole.AREA_MANAGER, UserRole.STORE_MANAGER)
+  @Get('positions')
+  async listPositions() {
+    return this.employeesService.listPositions();
+  }
+
   @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN, UserRole.FINANCE_ADMIN, UserRole.AREA_MANAGER, UserRole.STORE_MANAGER)
   @Get(':id')
   async findOne(@CurrentUser() user, @Param('id') id: string) {
@@ -31,8 +38,8 @@ export class EmployeesController {
 
   @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN)
   @Post()
-  async create(@Body() dto: CreateEmployeeDto) {
-    return this.employeesService.create(dto);
+  async create(@CurrentUser() user, @Body() dto: CreateEmployeeDto) {
+    return this.employeesService.create(user, dto);
   }
 
   @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN, UserRole.AREA_MANAGER)

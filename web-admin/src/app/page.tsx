@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { BACKEND_API, clearSession, getSessionUser, getToken } from '@/lib/auth';
 import { LEAVE_TYPES, actionFor, isPending, useAdminRequests } from '@/lib/requests';
 import AppShell from '@/components/AppShell';
 import DashboardHome from '@/components/DashboardHome';
+import AddEmployeeDialog from '@/components/AddEmployeeDialog';
 import RequestsApprovalModule from '@/components/RequestsApprovalModule';
 import OutletMasterModule from '@/components/OutletMasterModule';
 import WorkScheduleModule from '@/components/WorkScheduleModule';
@@ -2510,105 +2511,61 @@ export default function AdminDashboard() {
   const [isBackendConnected, setIsBackendConnected] = useState<boolean>(false);
   const [backendToken, setBackendToken] = useState<string>('');
 
-  useEffect(() => {
-    const fetchBackendEmployees = async () => {
-      try {
-        const token = getToken() || '';
-        setBackendToken(token);
-
-        if (token) {
-          const empRes = await fetch(`${BACKEND_API}/employees`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (empRes.ok) {
-            const empData = await empRes.json();
-            setIsBackendConnected(true);
-            if (Array.isArray(empData) && empData.length > 0) {
-              const mapped: EmployeeMaster[] = empData.map((e: any) => ({
-                id: e.nik || e.id,
-                nikKtp: e.nik || '',
-                fullName: e.fullName || '',
-                nickname: (e.fullName || '').split(' ')[0],
-                birthPlace: 'Kota',
-                birthDate: e.birthDate ? new Date(e.birthDate).toISOString().split('T')[0] : '2000-01-01',
-                gender: (e.gender || 'Laki-laki') as any,
-                religion: 'Islam',
-                phone: e.phone || '',
-                addressKtp: e.address || '',
-                addressDomisili: e.address || '',
-                outlet: e.outlet?.name || 'Cabang Senopati, Jaksel',
-                department: (e.position?.department?.name || 'Produksi (Kitchen BOH)') as any,
-                positionKey: (e.position?.title?.toLowerCase().includes('cook') ? 'koki' : 'waiters') as any,
-                positionTitle: e.position?.title || 'Staf Resto',
-                stationKey: 'koki',
-                joinDate: e.joinDate ? new Date(e.joinDate).toISOString().split('T')[0] : '2026-01-01',
-                isMarried: false,
-                paymentMethod: 'BANK',
-                bankOrWalletProvider: e.bankName || 'BCA',
-                accountNumber: e.bankAccountNumber || '',
-                accountHolderName: e.bankAccountHolder || e.fullName || '',
-                emergencyName: 'Keluarga',
-                emergencyRelation: 'Orang Tua',
-                emergencyPhone: e.phone || '',
-                avatar: (e.fullName || 'ST').slice(0, 2).toUpperCase(),
-                hasKtpFile: true,
-                hasKkFile: false,
-                hasContractFile: true,
-                faceEnrolled: true,
-                source: 'WEB_ADMIN',
-              }));
-              setEmployeesMasterList(mapped);
-            } else {
-              const savedEmp = localStorage.getItem('hris_employees_master');
-              if (savedEmp) {
-                try {
-                  setEmployeesMasterList(JSON.parse(savedEmp));
-                } catch (e) {
-                  setEmployeesMasterList([]);
-                }
-              } else {
-                setEmployeesMasterList([]);
-              }
-            }
-          }
-        } else {
-          const savedEmp = localStorage.getItem('hris_employees_master');
-          if (savedEmp) {
-            try {
-              setEmployeesMasterList(JSON.parse(savedEmp));
-            } catch (e) {
-              setEmployeesMasterList([]);
-            }
-          }
-        }
-      } catch (err) {
-        console.warn('Backend PostgreSQL offline atau belum terhubung:', err);
-        const savedEmp = localStorage.getItem('hris_employees_master');
-        if (savedEmp) {
-          try {
-            setEmployeesMasterList(JSON.parse(savedEmp));
-          } catch (e) {}
-        }
-      }
-    };
-
-    fetchBackendEmployees();
-  }, []);
-
-  const hasLoadedEmployeesRef = useRef(false);
-  useEffect(() => {
-    hasLoadedEmployeesRef.current = true;
-  }, []);
-
-  useEffect(() => {
-    if (hasLoadedEmployeesRef.current) {
-      try {
-        localStorage.setItem('hris_employees_master', JSON.stringify(employeesMasterList));
-      } catch (e) {
-        console.error('Error saving employees:', e);
-      }
+  // Data karyawan hanya dari backend (tidak lagi disimpan di browser)
+  const reloadEmployees = useCallback(async () => {
+    const token = getToken() || '';
+    setBackendToken(token);
+    if (!token) return;
+    try {
+      const empRes = await fetch(`${BACKEND_API}/employees`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!empRes.ok) return;
+      const empData = await empRes.json();
+      setIsBackendConnected(true);
+      // Karyawan nonaktif tidak ditampilkan di daftar aktif
+      const mapped: EmployeeMaster[] = empData.filter((e: any) => e.user?.isActive !== false).map((e: any) => ({
+        id: e.nik || e.id,
+        nikKtp: e.nik || '',
+        fullName: e.fullName || '',
+        nickname: (e.fullName || '').split(' ')[0],
+        birthPlace: 'Kota',
+        birthDate: e.birthDate ? new Date(e.birthDate).toISOString().split('T')[0] : '2000-01-01',
+        gender: (e.gender || 'Laki-laki') as any,
+        religion: 'Islam',
+        phone: e.phone || '',
+        addressKtp: e.address || '',
+        addressDomisili: e.address || '',
+        outlet: e.outlet?.name || '-',
+        department: (e.position?.department?.name || 'Produksi (Kitchen BOH)') as any,
+        positionKey: (e.position?.title?.toLowerCase().includes('cook') ? 'koki' : 'waiters') as any,
+        positionTitle: e.position?.title || 'Staf Resto',
+        stationKey: 'koki',
+        joinDate: e.joinDate ? new Date(e.joinDate).toISOString().split('T')[0] : '2026-01-01',
+        isMarried: false,
+        paymentMethod: 'BANK',
+        bankOrWalletProvider: e.bankName || 'BCA',
+        accountNumber: e.bankAccountNumber || '',
+        accountHolderName: e.bankAccountHolder || e.fullName || '',
+        emergencyName: 'Keluarga',
+        emergencyRelation: 'Orang Tua',
+        emergencyPhone: e.phone || '',
+        avatar: (e.fullName || 'ST').slice(0, 2).toUpperCase(),
+        hasKtpFile: true,
+        hasKkFile: false,
+        hasContractFile: true,
+        faceEnrolled: true,
+        source: 'WEB_ADMIN',
+      }));
+      setEmployeesMasterList(mapped);
+    } catch (err) {
+      console.warn('Backend tidak bisa dihubungi:', err);
     }
-  }, [employeesMasterList]);
+  }, []);
+
+  useEffect(() => {
+    reloadEmployees();
+  }, [reloadEmployees]);
 
   // Kru Directory yang Diturunkan Secara Dinamis dari Data Riil Karyawan
   const kruStaffDirectory: KruDirectoryStaffItem[] = employeesMasterList.map((emp) => ({
@@ -5800,33 +5757,6 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
     setIsDocViewModalOpen(true);
   };
 
-  // State Form Tambah Karyawan Baru
-  const [newEmployeeForm, setNewEmployeeForm] = useState({
-    fullName: '',
-    nickname: '',
-    nikKtp: '',
-    birthPlace: 'Medan',
-    birthDate: '2001-05-20',
-    gender: 'Laki-laki' as 'Laki-laki' | 'Perempuan',
-    religion: 'Islam',
-    phone: '',
-    addressKtp: '',
-    addressDomisili: '',
-    outlet: 'Cabang Senopati, Jaksel',
-    department: 'Produksi (Kitchen BOH)' as 'Produksi (Kitchen BOH)' | 'Layanan (Service FOH)' | 'Kasir & Billing',
-    positionKey: 'koki' as 'koki' | 'kasir' | 'waiters' | 'helper' | 'kepalaProduksi' | 'kepalaCabang',
-    positionTitle: 'Koki (Cook Station)',
-    stationKey: 'koki' as 'koki' | 'kasir' | 'waiters' | 'pic',
-    joinDate: '2026-10-01',
-    isMarried: false,
-    paymentMethod: 'BANK' as 'BANK' | 'E_WALLET',
-    bankOrWalletProvider: 'BCA',
-    accountNumber: '',
-    accountHolderName: '',
-    emergencyName: '',
-    emergencyRelation: 'Orang Tua' as 'Orang Tua' | 'Pasangan' | 'Saudara Kandung' | 'Lainnya',
-    emergencyPhone: '',
-  });
 
   // =========================================================
   // STATE PENERAPAN SOP-HR-001 (001/V/2025/ADM-APS)
@@ -27763,540 +27693,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       )}
 
       {isAddEmployeeModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-2xl space-y-5 my-8 max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
-            <div className="flex justify-between items-start border-b border-slate-100 pb-3">
-              <div className="flex items-center space-x-2.5">
-                <div className="p-2.5 bg-amber-500 text-slate-950 rounded-xl font-bold">
-                  <UserPlus className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-slate-900 text-base">
-                    Tambah Karyawan Resto Baru
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Sistem otomatis menghitung Usia, Masa Kerja, dan Kategori Gaji 2026 secara live.
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsAddEmployeeModalOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            {/* Live Calculation Indicator Card */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200">
-              <div className="space-y-0.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800">
-                  🎂 Usia Terhitung Otomatis:
-                </span>
-                <p className="text-sm font-black text-slate-900">
-                  {calculateAge(newEmployeeForm.birthDate).text}
-                </p>
-                <p className="text-[10px] text-slate-500">
-                  Berdasarkan Tanggal Lahir: {newEmployeeForm.birthDate || '-'}
-                </p>
-              </div>
-
-              <div className="space-y-0.5 border-t sm:border-t-0 sm:border-l border-amber-200 sm:pl-3 pt-2 sm:pt-0">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800">
-                  ⏳ Masa Kerja &amp; Kategori Gaji:
-                </span>
-                <p className="text-sm font-black text-slate-900">
-                  {calculateTenure(newEmployeeForm.joinDate).text}
-                </p>
-                <span className="inline-block text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-200 text-amber-950">
-                  {calculateTenure(newEmployeeForm.joinDate).categoryLabel}
-                </span>
-              </div>
-            </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!newEmployeeForm.fullName || !newEmployeeForm.nikKtp) {
-                  showToast('Mohon lengkapi Nama Lengkap dan NIK KTP!');
-                  return;
-                }
-
-                const newId = `EMP-0${employeesMasterList.length + 1}`;
-                const initials = newEmployeeForm.fullName
-                  .split(' ')
-                  .map((n) => n[0])
-                  .join('')
-                  .toUpperCase()
-                  .slice(0, 2);
-
-                const newEmp: EmployeeMaster = {
-                  id: newId,
-                  nikKtp: newEmployeeForm.nikKtp,
-                  fullName: newEmployeeForm.fullName,
-                  nickname: newEmployeeForm.nickname || newEmployeeForm.fullName.split(' ')[0],
-                  birthPlace: newEmployeeForm.birthPlace,
-                  birthDate: newEmployeeForm.birthDate,
-                  gender: newEmployeeForm.gender,
-                  religion: newEmployeeForm.religion,
-                  phone: newEmployeeForm.phone || '0812-0000-0000',
-                  addressKtp: newEmployeeForm.addressKtp || 'Kota Tebing Tinggi, Sumut',
-                  addressDomisili: newEmployeeForm.addressDomisili || newEmployeeForm.addressKtp,
-                  outlet: newEmployeeForm.outlet,
-                  department: newEmployeeForm.department,
-                  positionKey: newEmployeeForm.positionKey,
-                  positionTitle: newEmployeeForm.positionTitle,
-                  stationKey: newEmployeeForm.stationKey,
-                  joinDate: newEmployeeForm.joinDate,
-                  isMarried: newEmployeeForm.isMarried,
-                  paymentMethod: newEmployeeForm.paymentMethod,
-                  bankOrWalletProvider: newEmployeeForm.bankOrWalletProvider,
-                  accountNumber: newEmployeeForm.accountNumber || '0812-9988-7766',
-                  accountHolderName: newEmployeeForm.accountHolderName || newEmployeeForm.fullName,
-                  emergencyName: newEmployeeForm.emergencyName || 'Keluarga Staf',
-                  emergencyRelation: newEmployeeForm.emergencyRelation,
-                  emergencyPhone: newEmployeeForm.emergencyPhone || '0812-3333-4444',
-                  avatar: initials,
-                  hasKtpFile: true,
-                  hasKkFile: newEmployeeForm.isMarried,
-                  hasContractFile: true,
-                  faceEnrolled: true,
-                  source: 'WEB_ADMIN',
-                };
-
-                setEmployeesMasterList([newEmp, ...employeesMasterList]);
-
-                // Sinkronkan ke Backend PostgreSQL
-                const outletMapping: Record<string, string> = {
-                  'senopati': '4ba0194c-d0b0-4b08-bb3d-64f9cb5a6ff0',
-                  'pik': 'a2c04958-3e60-4342-a763-7751c514e5a5',
-                  'tebing': '0a742386-35ae-4d5b-9513-f2844b7dad2a',
-                  'bsd': 'b5bc7603-3c7a-4115-a4ff-b70a8695e3f8',
-                };
-                const positionMapping: Record<string, string> = {
-                  'koki': '88d5c37e-1963-4fe8-8df0-1ccf3fbf9fdc',
-                  'waiters': '7e380573-72e5-4ff0-82b3-3d77d94c923a',
-                  'kasir': '4d6cf7eb-a69e-4ee1-b3c4-7285e218e857',
-                  'barista': '9b7b3af6-d1e1-4eb4-b47f-c0b81c7f39b7',
-                  'helper': '3e4fdd66-0624-4ce2-ae33-34f8381e2983',
-                };
-                let targetOutletId = '4ba0194c-d0b0-4b08-bb3d-64f9cb5a6ff0';
-                for (const [k, v] of Object.entries(outletMapping)) {
-                  if (newEmployeeForm.outlet.toLowerCase().includes(k)) {
-                    targetOutletId = v;
-                    break;
-                  }
-                }
-                const targetPositionId = positionMapping[newEmployeeForm.positionKey] || '88d5c37e-1963-4fe8-8df0-1ccf3fbf9fdc';
-
-                if (backendToken) {
-                  fetch(`${BACKEND_API}/employees`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      Authorization: `Bearer ${backendToken}`,
-                    },
-                    body: JSON.stringify({
-                      username: newEmployeeForm.fullName.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(100 + Math.random() * 900),
-                      password: 'password123',
-                      nik: newEmployeeForm.nikKtp,
-                      fullName: newEmployeeForm.fullName,
-                      phone: newEmployeeForm.phone || '081200000000',
-                      outletId: targetOutletId,
-                      positionId: targetPositionId,
-                      joinDate: new Date(newEmployeeForm.joinDate || Date.now()).toISOString(),
-                      birthDate: newEmployeeForm.birthDate ? new Date(newEmployeeForm.birthDate).toISOString() : undefined,
-                      gender: newEmployeeForm.gender || 'Laki-laki',
-                      address: newEmployeeForm.addressKtp || '',
-                      bankName: newEmployeeForm.bankOrWalletProvider || 'BCA',
-                      bankAccountNumber: newEmployeeForm.accountNumber || '',
-                      bankAccountHolder: newEmployeeForm.accountHolderName || newEmployeeForm.fullName,
-                    }),
-                  })
-                    .then((res) => {
-                      if (res.ok) {
-                        showToast(`✓ Karyawan ${newEmp.fullName} berhasil tersimpan permanen di database!`);
-                      }
-                    })
-                    .catch((err) => console.warn('Sync backend employee gagal:', err));
-                }
-
-                showToast(`Karyawan ${newEmp.fullName} (${newEmp.id}) berhasil didaftarkan ke sistem!`);
-                setIsAddEmployeeModalOpen(false);
-              }}
-              className="space-y-4 text-xs"
-            >
-              {/* Bagian 1: Identitas Pribadi */}
-              <div className="space-y-3">
-                <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px] pb-1 border-b border-slate-100 flex items-center gap-1.5">
-                  <Users className="h-3.5 w-3.5 text-amber-600" />
-                  1. Identitas Pribadi Karyawan
-                </h4>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Nama Lengkap (KTP) *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Contoh: Muhammad Rizky"
-                      value={newEmployeeForm.fullName}
-                      onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, fullName: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none focus:border-amber-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Nama Panggilan *</label>
-                    <input
-                      type="text"
-                      placeholder="Contoh: Rizky"
-                      value={newEmployeeForm.nickname}
-                      onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, nickname: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none focus:border-amber-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">NIK KTP (16 Digit) *</label>
-                    <input
-                      type="text"
-                      required
-                      maxLength={16}
-                      placeholder="1271012345670001"
-                      value={newEmployeeForm.nikKtp}
-                      onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, nikKtp: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-mono text-slate-900 focus:outline-none focus:border-amber-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Tempat Lahir</label>
-                    <input
-                      type="text"
-                      value={newEmployeeForm.birthPlace}
-                      onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, birthPlace: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Tanggal Lahir *</label>
-                    <input
-                      type="date"
-                      required
-                      value={newEmployeeForm.birthDate}
-                      onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, birthDate: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none focus:border-amber-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Jenis Kelamin *</label>
-                    <select
-                      value={newEmployeeForm.gender}
-                      onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, gender: e.target.value as any })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none"
-                    >
-                      <option value="Laki-laki">Laki-laki</option>
-                      <option value="Perempuan">Perempuan</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Nomor WhatsApp *</label>
-                    <input
-                      type="text"
-                      placeholder="0812-xxxx-xxxx"
-                      value={newEmployeeForm.phone}
-                      onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, phone: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none focus:border-amber-500"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Bagian 2: Penempatan & Pekerjaan Resto */}
-              <div className="space-y-3 pt-2">
-                <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px] pb-1 border-b border-slate-100 flex items-center gap-1.5">
-                  <ChefHat className="h-3.5 w-3.5 text-amber-600" />
-                  2. Penempatan Kerja &amp; Jabatan Restoran
-                </h4>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Cabang Outlet Penempatan *</label>
-                    <select
-                      value={newEmployeeForm.outlet}
-                      onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, outlet: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none"
-                    >
-                      <option value="Cabang Senopati, Jaksel">Cabang Senopati, Jaksel</option>
-                      <option value="Cabang PIK Pantjoran, Jakut">Cabang PIK Pantjoran, Jakut</option>
-                      <option value="Cabang Tebing Tinggi, Sumut">Cabang Tebing Tinggi, Sumut</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Jabatan Baku *</label>
-                    <select
-                      value={newEmployeeForm.positionKey}
-                      onChange={(e) => {
-                        const val = e.target.value as any;
-                        let dept: any = 'Produksi (Kitchen BOH)';
-                        let station: any = 'koki';
-                        let title = 'Koki (Cook Station)';
-
-                        if (val === 'kasir') {
-                          dept = 'Kasir & Billing';
-                          station = 'kasir';
-                          title = 'Kasir Utama & Billing';
-                        } else if (val === 'waiters') {
-                          dept = 'Layanan (Service FOH)';
-                          station = 'waiters';
-                          title = 'Waiters / Service Floor';
-                        } else if (val === 'helper') {
-                          dept = 'Produksi (Kitchen BOH)';
-                          station = 'koki';
-                          title = 'Helper Dapur & Prep';
-                        } else if (val === 'kepalaProduksi') {
-                          dept = 'Produksi (Kitchen BOH)';
-                          station = 'pic';
-                          title = 'Kepala Produksi (Head Kitchen)';
-                        } else if (val === 'kepalaCabang') {
-                          dept = 'Layanan (Service FOH)';
-                          station = 'pic';
-                          title = 'Kepala Cabang (Branch Manager)';
-                        }
-
-                        setNewEmployeeForm({
-                          ...newEmployeeForm,
-                          positionKey: val,
-                          department: dept,
-                          stationKey: station,
-                          positionTitle: title,
-                        });
-                      }}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none"
-                    >
-                      <option value="koki">KOKI (Cook Kitchen Station)</option>
-                      <option value="kasir">KASIR (POS &amp; Kasir Utama)</option>
-                      <option value="waiters">WAITERS (Service &amp; Floor)</option>
-                      <option value="helper">HELPER (Prep &amp; Steward)</option>
-                      <option value="kepalaProduksi">KEPALA PRODUKSI (Head Kitchen)</option>
-                      <option value="kepalaCabang">KEPALA CABANG (Branch Manager Resto)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Tanggal Mulai Bekerja *</label>
-                    <input
-                      type="date"
-                      required
-                      value={newEmployeeForm.joinDate}
-                      onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, joinDate: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none focus:border-amber-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <span className="font-bold text-slate-800">Status Pernikahan (Tunjangan Keluarga)</span>
-                    <p className="text-[10px] text-slate-500">
-                      Jika Menikah, sistem otomatis menambahkan Tunjangan Keluarga <strong>+Rp 200.000/bln</strong> ke slip gaji.
-                    </p>
-                  </div>
-                  <label className="flex items-center space-x-2 cursor-pointer font-bold text-xs">
-                    <input
-                      type="checkbox"
-                      checked={newEmployeeForm.isMarried}
-                      onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, isMarried: e.target.checked })}
-                      className="rounded text-amber-600 focus:ring-amber-500 h-4 w-4"
-                    />
-                    <span>{newEmployeeForm.isMarried ? 'Menikah (+Rp 200k)' : 'Belum Menikah'}</span>
-                  </label>
-                </div>
-              </div>
-
-              {/* Bagian 3: Rekening Bank / E-Wallet */}
-              <div className="space-y-3 pt-2">
-                <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px] pb-1 border-b border-slate-100 flex items-center gap-1.5">
-                  <CreditCard className="h-3.5 w-3.5 text-amber-600" />
-                  3. Metode Pencairan Gaji (Bank &amp; E-Wallet)
-                </h4>
-
-                <div className="flex space-x-4 p-2 bg-slate-50 rounded-xl border border-slate-200">
-                  <label className="flex items-center space-x-2 cursor-pointer text-xs font-bold">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      checked={newEmployeeForm.paymentMethod === 'BANK'}
-                      onChange={() =>
-                        setNewEmployeeForm({
-                          ...newEmployeeForm,
-                          paymentMethod: 'BANK',
-                          bankOrWalletProvider: 'BCA',
-                        })
-                      }
-                      className="text-amber-600 focus:ring-amber-500"
-                    />
-                    <span>🏛️ Transfer Bank Konvensional</span>
-                  </label>
-
-                  <label className="flex items-center space-x-2 cursor-pointer text-xs font-bold">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      checked={newEmployeeForm.paymentMethod === 'E_WALLET'}
-                      onChange={() =>
-                        setNewEmployeeForm({
-                          ...newEmployeeForm,
-                          paymentMethod: 'E_WALLET',
-                          bankOrWalletProvider: 'DANA',
-                        })
-                      }
-                      className="text-amber-600 focus:ring-amber-500"
-                    />
-                    <span>📱 E-Wallet (GoPay / OVO / DANA / ShopeePay / LinkAja)</span>
-                  </label>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">
-                      {newEmployeeForm.paymentMethod === 'BANK' ? 'Pilihan Bank' : 'Provider E-Wallet'} *
-                    </label>
-                    {newEmployeeForm.paymentMethod === 'BANK' ? (
-                      <select
-                        value={newEmployeeForm.bankOrWalletProvider}
-                        onChange={(e) =>
-                          setNewEmployeeForm({ ...newEmployeeForm, bankOrWalletProvider: e.target.value })
-                        }
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none"
-                      >
-                        <option value="BCA">BCA (Bank Central Asia)</option>
-                        <option value="Bank Mandiri">Bank Mandiri</option>
-                        <option value="BRI">BRI (Bank Rakyat Indonesia)</option>
-                        <option value="BNI">BNI (Bank Negara Indonesia)</option>
-                        <option value="BSI">BSI (Bank Syariah Indonesia)</option>
-                        <option value="Bank Sumut">Bank Sumut</option>
-                      </select>
-                    ) : (
-                      <select
-                        value={newEmployeeForm.bankOrWalletProvider}
-                        onChange={(e) =>
-                          setNewEmployeeForm({ ...newEmployeeForm, bankOrWalletProvider: e.target.value })
-                        }
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none font-bold"
-                      >
-                        <option value="DANA">DANA</option>
-                        <option value="GoPay">GoPay</option>
-                        <option value="OVO">OVO</option>
-                        <option value="ShopeePay">ShopeePay</option>
-                        <option value="LinkAja">LinkAja</option>
-                      </select>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">
-                      {newEmployeeForm.paymentMethod === 'BANK' ? 'Nomor Rekening Bank' : 'Nomor HP E-Wallet'} *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder={newEmployeeForm.paymentMethod === 'BANK' ? 'Contoh: 8001234567' : 'Contoh: 081298431120'}
-                      value={newEmployeeForm.accountNumber}
-                      onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, accountNumber: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-mono text-slate-900 focus:outline-none focus:border-amber-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Nama Pemilik Akun *</label>
-                    <input
-                      type="text"
-                      placeholder="Sesuai nama terdaftar"
-                      value={newEmployeeForm.accountHolderName}
-                      onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, accountHolderName: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Bagian 4: Kontak Darurat */}
-              <div className="space-y-3 pt-2">
-                <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px] pb-1 border-b border-slate-100 flex items-center gap-1.5">
-                  <ShieldAlert className="h-3.5 w-3.5 text-rose-600" />
-                  4. Kontak Darurat Keluarga (Emergency Contact)
-                </h4>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Nama Kontak Darurat *</label>
-                    <input
-                      type="text"
-                      placeholder="Nama orang tua/istri"
-                      value={newEmployeeForm.emergencyName}
-                      onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, emergencyName: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Hubungan Keluarga</label>
-                    <select
-                      value={newEmployeeForm.emergencyRelation}
-                      onChange={(e) =>
-                        setNewEmployeeForm({ ...newEmployeeForm, emergencyRelation: e.target.value as any })
-                      }
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none"
-                    >
-                      <option value="Orang Tua">Orang Tua (Ayah/Ibu)</option>
-                      <option value="Pasangan">Pasangan (Suami/Istri)</option>
-                      <option value="Saudara Kandung">Saudara Kandung</option>
-                      <option value="Lainnya">Lainnya / Wali</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Nomor Telepon Darurat *</label>
-                    <input
-                      type="text"
-                      placeholder="0812-xxxx-xxxx"
-                      value={newEmployeeForm.emergencyPhone}
-                      onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, emergencyPhone: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal Actions */}
-              <div className="pt-4 border-t border-slate-100 flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setIsAddEmployeeModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md transition flex items-center space-x-1.5"
-                >
-                  <UserPlus className="h-4 w-4" />
-                  <span>Daftarkan Karyawan ke Database</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <AddEmployeeDialog
+          onClose={() => setIsAddEmployeeModalOpen(false)}
+          onSaved={(fullName) => {
+            setIsAddEmployeeModalOpen(false);
+            showToast(`Karyawan ${fullName} tersimpan.`);
+            reloadEmployees();
+          }}
+        />
       )}
 
       {/* ========================================================= */}

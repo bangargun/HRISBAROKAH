@@ -8,6 +8,9 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateKasbonDto, CreateGeneralRequestDto, ApprovalActionDto } from './requests.dto';
 import { Prisma, RequestStatus, RequestType } from '@prisma/client';
 import { AuthUser, assertOutletAccess, scopedOutletId } from '../../common/utils/outlet-scope.util';
+import { businessDateTime, daysBetween, parseDateParam } from '../../common/utils/business-date.util';
+
+const MAX_REQUEST_DAYS = 366;
 
 @Injectable()
 export class RequestsService {
@@ -70,12 +73,22 @@ export class RequestsService {
     let startDate: Date | undefined;
     let endDate: Date | undefined;
 
+    if (!dto.startDate && dto.endDate) {
+      throw new BadRequestException('Tanggal mulai wajib diisi bila tanggal selesai diisi');
+    }
     if (dto.startDate) {
-      startDate = new Date(dto.startDate);
-      endDate = dto.endDate ? new Date(dto.endDate) : startDate;
-
-      const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-      totalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+      // Tanggal kalender di zona bisnis; jam dari perangkat diabaikan
+      const startYmd = parseDateParam(dto.startDate.slice(0, 10));
+      const endYmd = dto.endDate ? parseDateParam(dto.endDate.slice(0, 10)) : startYmd;
+      totalDays = daysBetween(startYmd, endYmd) + 1;
+      if (totalDays < 1) {
+        throw new BadRequestException('Tanggal selesai tidak boleh sebelum tanggal mulai');
+      }
+      if (totalDays > MAX_REQUEST_DAYS) {
+        throw new BadRequestException(`Satu pengajuan maksimal ${MAX_REQUEST_DAYS} hari`);
+      }
+      startDate = businessDateTime(startYmd, '00:00');
+      endDate = businessDateTime(endYmd, '00:00');
     }
 
     // Jika cuti tahunan, validasi sisa kuota cuti

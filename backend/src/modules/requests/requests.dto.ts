@@ -4,19 +4,28 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  IsInt,
   IsPositive,
+  Matches,
+  Max,
   IsString,
   Min,
 } from 'class-validator';
 import { RequestType } from '@prisma/client';
 
+// Batas teknis agar nominal tidak melampaui kolom database; batas kebijakan diatur lewat persetujuan
+const MAX_KASBON_AMOUNT = 100_000_000;
+const DATE_PREFIX = /^\d{4}-\d{2}-\d{2}(T.*)?$/;
+
 export class CreateKasbonDto {
   @IsNumber()
   @IsPositive({ message: 'Nominal kasbon harus lebih dari 0' })
+  @Max(MAX_KASBON_AMOUNT, { message: 'Nominal kasbon maksimal Rp 100.000.000' })
   amount: number;
 
-  @IsNumber()
+  @IsInt({ message: 'Tenor cicilan harus bilangan bulat (bulan)' })
   @Min(1, { message: 'Tenor cicilan minimal 1 bulan' })
+  @Max(24, { message: 'Tenor cicilan maksimal 24 bulan' })
   @IsOptional()
   tenorMonths?: number;
 
@@ -29,11 +38,12 @@ export class CreateGeneralRequestDto {
   @IsEnum(RequestType)
   type: RequestType;
 
-  @IsString()
+  // YYYY-MM-DD atau ISO datetime; yang dipakai hanya bagian tanggalnya
+  @Matches(DATE_PREFIX, { message: 'Tanggal mulai harus berformat YYYY-MM-DD' })
   @IsOptional()
   startDate?: string;
 
-  @IsString()
+  @Matches(DATE_PREFIX, { message: 'Tanggal selesai harus berformat YYYY-MM-DD' })
   @IsOptional()
   endDate?: string;
 
