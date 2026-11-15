@@ -68,6 +68,7 @@ export class OutletsService {
         longitude: dto.longitude,
         geofenceRadius: dto.geofenceRadius ?? 50,
         wifiBssid: dto.wifiBssid,
+        payrollCutoffDay: dto.payrollCutoffDay ?? 31,
       },
     });
   }

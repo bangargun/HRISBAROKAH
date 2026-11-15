@@ -15,6 +15,7 @@ interface Outlet {
   longitude: number;
   geofenceRadius: number;
   wifiBssid: string | null;
+  payrollCutoffDay: number;
   isActive: boolean;
   _count: { employees: number; shifts: number };
 }
@@ -28,6 +29,7 @@ interface OutletForm {
   longitude: string;
   geofenceRadius: string;
   wifiBssid: string;
+  payrollCutoffDay: string;
 }
 
 // Sama dengan @Roles di backend outlets.controller.ts
@@ -43,6 +45,7 @@ const EMPTY_FORM: OutletForm = {
   longitude: '',
   geofenceRadius: '50',
   wifiBssid: '',
+  payrollCutoffDay: '31',
 };
 
 export default function OutletMasterModule() {
@@ -82,6 +85,7 @@ export default function OutletMasterModule() {
       longitude: Number(data.longitude),
       geofenceRadius: Number(data.geofenceRadius),
       wifiBssid: data.wifiBssid,
+      payrollCutoffDay: Number(data.payrollCutoffDay),
     };
     if (data.id) {
       await apiFetch(`/outlets/${data.id}`, { method: 'PUT', body: JSON.stringify(body) });
@@ -198,7 +202,12 @@ export default function OutletMasterModule() {
                       <p className="font-medium text-slate-900">{o.name}</p>
                       <p className="font-mono text-xs text-slate-500">{o.code}</p>
                     </td>
-                    <td className="max-w-xs px-4 py-3 text-slate-700">{o.address}</td>
+                    <td className="max-w-xs px-4 py-3 text-slate-700">
+                      {o.address}
+                      <p className="text-xs text-slate-500">
+                        Tutup buku gaji {o.payrollCutoffDay === 31 ? 'akhir bulan' : `tgl ${o.payrollCutoffDay}`}
+                      </p>
+                    </td>
                     <td className="px-4 py-3 text-slate-700">
                       <a
                         href={`https://www.google.com/maps?q=${o.latitude},${o.longitude}`}
@@ -240,6 +249,7 @@ export default function OutletMasterModule() {
                                 longitude: String(o.longitude),
                                 geofenceRadius: String(o.geofenceRadius),
                                 wifiBssid: o.wifiBssid ?? '',
+                                payrollCutoffDay: String(o.payrollCutoffDay),
                               });
                             }}
                             className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 font-medium text-slate-700 hover:bg-slate-50"
@@ -422,6 +432,23 @@ function OutletFormDialog({
             />
           </label>
         </div>
+
+        <label className="block space-y-1">
+          <span className="font-medium text-slate-700">Tanggal tutup buku gaji</span>
+          <input
+            required
+            type="number"
+            min={1}
+            max={31}
+            step={1}
+            value={data.payrollCutoffDay}
+            onChange={set('payrollCutoffDay')}
+            className={field}
+          />
+          <span className="text-xs text-slate-500">
+            Periode gaji berakhir di tanggal ini setiap bulan. Isi 31 untuk akhir bulan.
+          </span>
+        </label>
 
         {error && (
           <p role="alert" className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-rose-800">

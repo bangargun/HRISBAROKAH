@@ -56,6 +56,12 @@ export class CreateOutletDto {
   @Matches(BSSID, { message: BSSID_MESSAGE })
   @IsOptional()
   wifiBssid?: string | null;
+
+  @IsInt()
+  @Min(1, { message: 'Tanggal tutup buku 1-31' })
+  @Max(31, { message: 'Tanggal tutup buku 1-31' })
+  @IsOptional()
+  payrollCutoffDay?: number;
 }
 
 // Kode cabang tidak bisa diubah karena dipakai sebagai acuan di laporan
@@ -97,4 +103,10 @@ export class UpdateOutletDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+
+  @IsInt()
+  @Min(1, { message: 'Tanggal tutup buku 1-31' })
+  @Max(31, { message: 'Tanggal tutup buku 1-31' })
+  @IsOptional()
+  payrollCutoffDay?: number;
 }

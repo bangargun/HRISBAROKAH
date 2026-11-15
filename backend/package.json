@@ -14,7 +14,8 @@
     "start:prod": "node dist/main",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "prisma db seed"
+    "prisma:seed": "prisma db seed",
+    "test": "nest build && node --test \"test/**/*.test.js\""
   },
   "dependencies": {
     "@nestjs/common": "^10.3.0",

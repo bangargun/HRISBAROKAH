@@ -9,6 +9,7 @@ import { RequestsModule } from './modules/requests/requests.module';
 import { FaceModule } from './modules/face/face.module';
 import { ShiftsModule } from './modules/shifts/shifts.module';
 import { SchedulesModule } from './modules/schedules/schedules.module';
+import { PayrollModule } from './modules/payroll/payroll.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SchedulesModule } from './modules/schedules/schedules.module';
     FaceModule,
     ShiftsModule,
     SchedulesModule,
+    PayrollModule,
   ],
   controllers: [],
   providers: [],
