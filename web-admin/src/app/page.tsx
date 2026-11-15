@@ -9,6 +9,7 @@ import DashboardHome from '@/components/DashboardHome';
 import RequestsApprovalModule from '@/components/RequestsApprovalModule';
 import ShiftMasterModule from '@/components/ShiftMasterModule';
 import OutletMasterModule from '@/components/OutletMasterModule';
+import WorkScheduleModule from '@/components/WorkScheduleModule';
 import {
   ChefHat,
   Building2,
@@ -2836,6 +2837,7 @@ export default function AdminDashboard() {
       icon: Clock,
       subTabs: [
         { id: 'daily-timesheet', label: 'Presensi Harian' },
+        { id: 'work-schedule', label: 'Jadwal Kerja' },
         { id: 'attendance-corrections', label: 'Koreksi Absen' },
         { id: 'leave-requests', label: 'Pengajuan Cuti' },
         { id: 'approved-leave', label: 'Cuti Disetujui' },
@@ -7393,6 +7395,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     </div>
                   </div>
                 </div>
+              ) : activeSubTab === 'work-schedule' ? (
+                <WorkScheduleModule />
               ) : activeSubTab === 'daily-timesheet' ? (
                 /* ========================================================= */
                 /* SUB-TAB: REKAP KEHADIRAN HARI PER HARI (DAILY TIMESHEET)  */

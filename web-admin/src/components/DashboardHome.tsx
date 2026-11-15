@@ -23,22 +23,29 @@ interface AttendanceRow {
   clockInDistanceM: number | null;
   clockOutLat: number | null;
   clockOutDistanceM: number | null;
+  status: string;
+  lateMinutes: number;
   outlet: { name: string; geofenceRadius: number };
   employee: { fullName: string; outlet: { name: string } };
+  schedule: { shift: { name: string; startTime: string; breakLimitMins: number } } | null;
   breaks: { startBreak: string; endBreak: string | null; isOverLimit: boolean }[];
+}
+
+interface ScheduleRow {
+  employeeId: string;
+  shift: { name: string; startTime: string; endTime: string };
 }
 
 // Sama dengan @Roles laporan harian di attendance.controller.ts
 const ATTENDANCE_VIEWERS = ['SUPER_ADMIN', 'HR_ADMIN', 'STORE_MANAGER', 'AREA_MANAGER'];
-// Batas istirahat di backend saat ini (attendance.service.ts endBreak)
-const BREAK_LIMIT_MINS = 60;
+// Batas istirahat bila absen tidak terkait jadwal (sama dengan backend)
+const DEFAULT_BREAK_LIMIT_MINS = 60;
 
 const timeFmt = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' });
 const dateFmt = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short' });
 const todayFmt = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 const rupiah = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
 
-// Jam perangkat bisa sedikit berbeda dari server; durasi tidak boleh negatif
 function formatDistance(m: number) {
   return m >= 1000 ? `${(m / 1000).toFixed(1).replace('.', ',')} km` : `${Math.round(m)} m`;
 }
@@ -70,8 +77,14 @@ function locationIssues(rows: AttendanceRow[]) {
   return issues;
 }
 
+// Jam perangkat bisa sedikit berbeda dari server; durasi tidak boleh negatif
 function minutesSince(iso: string) {
   return Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 60000));
+}
+
+function localToday() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 }
 
 function requestDetail(r: AdminRequest) {
@@ -93,18 +106,22 @@ export default function DashboardHome({ requests, onOpen }: Props) {
 
   const [employees, setEmployees] = useState<Employee[] | null>(null);
   const [attendance, setAttendance] = useState<AttendanceRow[] | null>(null);
+  const [schedules, setSchedules] = useState<ScheduleRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [emp, att] = await Promise.all([
+      const ymd = localToday();
+      const [emp, att, sched] = await Promise.all([
         apiFetch<Employee[]>('/employees'),
         canSeeAttendance ? apiFetch<AttendanceRow[]>('/attendance/admin/daily-report') : Promise.resolve(null),
+        canSeeAttendance ? apiFetch<ScheduleRow[]>(`/schedules?from=${ymd}&to=${ymd}`) : Promise.resolve(null),
       ]);
       setEmployees(emp);
       setAttendance(att);
+      setSchedules(sched);
       setError(null);
     } catch (e) {
       setError((e as Error).message);
@@ -122,24 +139,41 @@ export default function DashboardHome({ requests, onOpen }: Props) {
   const today = useMemo(() => {
     if (!employees) return null;
     const active = employees.filter((e) => e.user.isActive);
-    if (!attendance) return { active, present: [], absent: [], onBreak: [], overLimit: 0 };
+    const shiftOf = new Map((schedules ?? []).map((s) => [s.employeeId, s.shift]));
+    // Tanpa jadwal sama sekali hari ini, "belum absen" terpaksa memakai semua karyawan aktif
+    const hasSchedule = shiftOf.size > 0;
+    const expected = hasSchedule ? active.filter((e) => shiftOf.has(e.id)) : active;
+    if (!attendance) {
+      return { active, hasSchedule, shiftOf, expected, offToday: 0, present: [], unscheduled: 0, absent: [], late: [], onBreak: [], overLimit: 0 };
+    }
     const clockedIn = new Set(attendance.filter((a) => a.clockInTime).map((a) => a.employeeId));
     const onBreak = attendance
       .map((a) => ({ row: a, open: a.breaks.find((b) => !b.endBreak) }))
       .filter((x): x is { row: AttendanceRow; open: AttendanceRow['breaks'][number] } => !!x.open)
-      .map(({ row, open }) => ({ row, mins: minutesSince(open.startBreak) }))
+      .map(({ row, open }) => ({
+        row,
+        mins: minutesSince(open.startBreak),
+        limit: row.schedule?.shift.breakLimitMins ?? DEFAULT_BREAK_LIMIT_MINS,
+      }))
       .sort((a, b) => b.mins - a.mins);
     const overLimit =
       attendance.reduce((n, a) => n + a.breaks.filter((b) => b.isOverLimit).length, 0) +
-      onBreak.filter((b) => b.mins > BREAK_LIMIT_MINS).length;
+      onBreak.filter((b) => b.mins > b.limit).length;
     return {
       active,
-      present: active.filter((e) => clockedIn.has(e.id)),
-      absent: active.filter((e) => !clockedIn.has(e.id)),
+      hasSchedule,
+      shiftOf,
+      expected,
+      offToday: hasSchedule ? active.length - expected.length : 0,
+      present: expected.filter((e) => clockedIn.has(e.id)),
+      // Absen tanpa jadwal hari ini (tetap diterima), ditampilkan terpisah agar angka tidak melebihi yang dijadwalkan
+      unscheduled: hasSchedule ? active.filter((e) => clockedIn.has(e.id) && !shiftOf.has(e.id)).length : 0,
+      absent: expected.filter((e) => !clockedIn.has(e.id)),
+      late: attendance.filter((a) => a.status === 'LATE').sort((a, b) => b.lateMinutes - a.lateMinutes),
       onBreak,
       overLimit,
     };
-  }, [employees, attendance]);
+  }, [employees, attendance, schedules]);
 
   const stats: { label: string; value: string; hint?: string; onClick?: () => void; tone?: 'warn' }[] = [
     {
@@ -154,18 +188,29 @@ export default function DashboardHome({ requests, onOpen }: Props) {
           {
             label: 'Sudah absen hari ini',
             value: today ? String(today.present.length) : '…',
-            hint: today ? `dari ${today.active.length} karyawan aktif` : undefined,
+            hint: today
+              ? today.hasSchedule
+                ? `dari ${today.expected.length} yang dijadwalkan${today.unscheduled ? `, +${today.unscheduled} di luar jadwal` : ''}`
+                : `dari ${today.active.length} karyawan aktif`
+              : undefined,
             onClick: () => onOpen('attendance', 'daily-timesheet'),
           },
           {
             label: 'Belum absen',
             value: today ? String(today.absent.length) : '…',
-            hint: 'termasuk yang libur',
+            hint: today?.hasSchedule ? `${today.offToday} orang libur hari ini` : 'jadwal hari ini belum dibuat',
+            onClick: () => onOpen('attendance', 'work-schedule'),
+          },
+          {
+            label: 'Terlambat hari ini',
+            value: today ? String(today.late.length) : '…',
+            hint: 'dari jam mulai shift',
+            tone: today?.late.length ? ('warn' as const) : undefined,
           },
           {
             label: 'Istirahat lewat batas',
             value: today ? String(today.overLimit) : '…',
-            hint: `batas ${BREAK_LIMIT_MINS} menit`,
+            hint: 'sesuai batas shift',
             onClick: () => onOpen('attendance', 'break-tracker'),
             tone: today?.overLimit ? ('warn' as const) : undefined,
           },
@@ -202,7 +247,7 @@ export default function DashboardHome({ requests, onOpen }: Props) {
         </p>
       )}
 
-      <div className={`grid grid-cols-2 gap-3 ${stats.length > 2 ? 'lg:grid-cols-4' : ''}`}>
+      <div className={`grid grid-cols-2 gap-3 ${stats.length > 2 ? 'sm:grid-cols-3 lg:grid-cols-5' : ''}`}>
         {stats.map((s) => {
           const body = (
             <>
@@ -289,6 +334,23 @@ export default function DashboardHome({ requests, onOpen }: Props) {
               rows={attendance ? locationIssues(attendance) : []}
             />
           )}
+
+          {canSeeAttendance && (
+            <PeoplePanel
+              title="Terlambat hari ini"
+              loading={!today}
+              empty={today?.hasSchedule ? 'Tidak ada yang terlambat hari ini.' : 'Keterlambatan dihitung setelah jadwal kerja dibuat.'}
+              rows={(today?.late ?? []).map((a) => ({
+                key: a.id,
+                name: a.employee.fullName,
+                meta: `${a.outlet.name}${a.schedule ? ` · ${a.schedule.shift.name} mulai ${a.schedule.shift.startTime}` : ''}${
+                  a.clockInTime ? ` · masuk ${timeFmt.format(new Date(a.clockInTime))}` : ''
+                }`,
+                aside: `${a.lateMinutes} menit`,
+                warn: true,
+              }))}
+            />
+          )}
         </div>
 
         {canSeeAttendance ? (
@@ -297,21 +359,32 @@ export default function DashboardHome({ requests, onOpen }: Props) {
               title="Sedang istirahat"
               loading={!today}
               empty="Tidak ada yang sedang istirahat."
-              rows={(today?.onBreak ?? []).map(({ row, mins }) => ({
+              rows={(today?.onBreak ?? []).map(({ row, mins, limit }) => ({
                 key: row.id,
                 name: row.employee.fullName,
-                meta: row.employee.outlet.name,
+                meta: `${row.employee.outlet.name} · batas ${limit} menit`,
                 aside: `${mins} menit`,
-                warn: mins > BREAK_LIMIT_MINS,
+                warn: mins > limit,
               }))}
             />
             <PeoplePanel
               title="Belum absen hari ini"
-              note="Jadwal kerja belum tercatat di sistem, jadi daftar ini ikut memuat karyawan yang libur."
+              note={
+                today?.hasSchedule
+                  ? 'Karyawan yang dijadwalkan masuk hari ini.'
+                  : 'Jadwal hari ini belum dibuat, jadi daftar ini ikut memuat karyawan yang libur. Susun di Presensi & Shift → Jadwal Kerja.'
+              }
               loading={!today}
-              empty="Semua karyawan aktif sudah absen."
-              rows={(today?.absent ?? []).map((e) => ({ key: e.id, name: e.fullName, meta: e.outlet.name }))}
-              onMore={() => onOpen('attendance', 'daily-timesheet')}
+              empty={today?.hasSchedule ? 'Semua yang dijadwalkan sudah absen.' : 'Semua karyawan aktif sudah absen.'}
+              rows={(today?.absent ?? []).map((e) => {
+                const shift = today?.shiftOf.get(e.id);
+                return {
+                  key: e.id,
+                  name: e.fullName,
+                  meta: shift ? `${e.outlet.name} · ${shift.name} mulai ${shift.startTime}` : e.outlet.name,
+                };
+              })}
+              onMore={() => onOpen('attendance', 'work-schedule')}
             />
           </div>
         ) : (

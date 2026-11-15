@@ -6,11 +6,16 @@ import { AttendanceStatus, FaceCheckKind } from '@prisma/client';
 import { calculateDistanceInMeters } from '../../common/utils/geofence.util';
 import {
   businessDateString,
+  businessDateTime,
   businessToday,
   monthDateRange,
   parseDateParam,
   toDateOnly,
 } from '../../common/utils/business-date.util';
+
+const DEFAULT_BREAK_LIMIT_MINS = 60;
+// Toleransi terlambat dalam menit (menit terlambat tetap dicatat apa adanya)
+const LATE_GRACE_MINUTES = Math.max(0, Number(process.env.LATE_GRACE_MINUTES ?? 0) || 0);
 
 @Injectable()
 export class AttendanceService {
@@ -21,6 +26,27 @@ export class AttendanceService {
 
   private getTodayDate(): Date {
     return businessToday();
+  }
+
+  /**
+   * Jadwal hari ini menentukan keterlambatan: menit setelah jam mulai shift.
+   * Tanpa jadwal, absen tetap diterima sebagai hadir dan tidak dihitung terlambat.
+   */
+  private async punctuality(employeeId: string, today: Date, now: Date) {
+    const schedule = await this.prisma.shiftSchedule.findUnique({
+      where: { employeeId_date: { employeeId, date: today } },
+      include: { shift: true },
+    });
+    if (!schedule) {
+      return { scheduleId: null, lateMinutes: 0, status: AttendanceStatus.PRESENT };
+    }
+    const start = businessDateTime(today.toISOString().slice(0, 10), schedule.shift.startTime);
+    const lateMinutes = Math.max(0, Math.floor((now.getTime() - start.getTime()) / 60_000));
+    return {
+      scheduleId: schedule.id,
+      lateMinutes,
+      status: lateMinutes > LATE_GRACE_MINUTES ? AttendanceStatus.LATE : AttendanceStatus.PRESENT,
+    };
   }
 
   /**
@@ -96,6 +122,7 @@ export class AttendanceService {
     const now = new Date();
     const finalNotes = dto.notes ?? null;
     const location = this.locate(profile.outlet, dto.latitude, dto.longitude);
+    const punctuality = await this.punctuality(profile.id, today, now);
 
     if (existing) {
       return this.prisma.attendance.update({
@@ -107,7 +134,7 @@ export class AttendanceService {
           clockInPhotoUrl: photoUrl,
           clockInFaceScore: score,
           clockInDistanceM: location.distanceM,
-          status: AttendanceStatus.PRESENT,
+          ...punctuality,
           notes: finalNotes,
         },
       });
@@ -124,7 +151,7 @@ export class AttendanceService {
         clockInPhotoUrl: photoUrl,
         clockInFaceScore: score,
         clockInDistanceM: location.distanceM,
-        status: AttendanceStatus.PRESENT,
+        ...punctuality,
         notes: finalNotes,
       },
       include: { breaks: true },
@@ -231,7 +258,7 @@ export class AttendanceService {
     const today = this.getTodayDate();
     const attendance = await this.prisma.attendance.findFirst({
       where: { employeeId: profile.id, date: today },
-      include: { breaks: true, outlet: { include: { shifts: true } } },
+      include: { breaks: true, schedule: { include: { shift: true } } },
     });
 
     if (!attendance) {
@@ -247,8 +274,8 @@ export class AttendanceService {
     const diffMs = now.getTime() - new Date(activeBreak.startBreak).getTime();
     const totalMinutes = Math.round(diffMs / 60000);
 
-    // Standar istirahat restoran = 60 menit (atau sesuai shift)
-    const breakLimitMins = 60;
+    // Batas istirahat mengikuti shift hari itu; tanpa jadwal pakai standar resto
+    const breakLimitMins = attendance.schedule?.shift.breakLimitMins ?? DEFAULT_BREAK_LIMIT_MINS;
     const isOverLimit = totalMinutes > breakLimitMins;
     const overLimitMins = isOverLimit ? totalMinutes - breakLimitMins : 0;
 
@@ -304,6 +331,9 @@ export class AttendanceService {
           },
         },
         outlet: { select: { id: true, name: true, geofenceRadius: true } },
+        schedule: {
+          include: { shift: { select: { id: true, name: true, startTime: true, endTime: true, breakLimitMins: true } } },
+        },
         breaks: true,
       },
       orderBy: { clockInTime: 'asc' },

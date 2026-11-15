@@ -190,6 +190,10 @@ model ShiftSchedule {
   shift       Shift           @relation(fields: [shiftId], references: [id])
   date        DateTime        @db.Date
   attendances Attendance[]
+
+  // Satu shift per karyawan per tanggal; tanggal tanpa jadwal berarti libur
+  @@unique([employeeId, date])
+  @@index([date])
 }
 
 model Attendance {

@@ -74,3 +74,15 @@ export function monthDateRange(year: number, month: number): { first: Date; last
     last: new Date(Date.UTC(year, month, 0)),
   };
 }
+
+/** Saat absolut dari tanggal kalender + jam (HH:mm) di zona waktu bisnis, mis. jam mulai shift. */
+export function businessDateTime(ymd: string, hhmm: string): Date {
+  const [h, m] = hhmm.split(':').map(Number);
+  const localAsUtc = toDateOnly(ymd).getTime() + (h * 60 + m) * 60_000;
+  return new Date(localAsUtc - offsetMinutes(new Date(localAsUtc)) * 60_000);
+}
+
+/** Selisih hari kalender antara dua tanggal YYYY-MM-DD (to - from). */
+export function daysBetween(from: string, to: string): number {
+  return Math.round((toDateOnly(to).getTime() - toDateOnly(from).getTime()) / 86_400_000);
+}

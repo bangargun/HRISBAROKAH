@@ -50,7 +50,11 @@ function toSessionUser(user: any): SessionUser {
 
 export function messageFrom(data: any, fallback: string): string {
   const message = data?.message;
-  if (Array.isArray(message)) return message.join(', ');
+  if (Array.isArray(message)) {
+    // Validasi bertingkat diawali path teknis seperti "entries.0."; pengguna cukup melihat pesannya
+    const clean = message.map((m) => String(m).replace(/^(?:[A-Za-z]+\.\d+\.)+/, ''));
+    return Array.from(new Set(clean)).join(', ');
+  }
   return typeof message === 'string' ? message : fallback;
 }
 
