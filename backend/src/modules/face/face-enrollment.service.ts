@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { FaceCheckKind } from '@prisma/client';
 import { AuthUser, assertOutletAccess, scopedOutletId } from '../../common/utils/outlet-scope.util';
+import { businessDateString, businessDayRange, parseDateParam } from '../../common/utils/business-date.util';
 import { rm } from 'fs/promises';
 import { join } from 'path';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -181,10 +182,7 @@ export class FaceEnrollmentService {
   async getCheckLogs(actor: AuthUser, outletId?: string, dateStr?: string, onlyRejected?: boolean) {
     // Store Manager tanpa outlet kini ditolak, bukan melihat semua outlet
     outletId = scopedOutletId(actor, outletId);
-    const day = dateStr ? new Date(dateStr) : new Date();
-    day.setHours(0, 0, 0, 0);
-    const nextDay = new Date(day);
-    nextDay.setDate(nextDay.getDate() + 1);
+    const { start: day, end: nextDay } = businessDayRange(dateStr ? parseDateParam(dateStr) : businessDateString());
 
     return this.prisma.faceCheckLog.findMany({
       where: {

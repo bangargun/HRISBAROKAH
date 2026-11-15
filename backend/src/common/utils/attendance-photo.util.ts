@@ -2,6 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
+import { businessDateString } from './business-date.util';
 
 // Disajikan publik di /uploads (foto selfie absensi)
 export const UPLOADS_ROOT = join(process.cwd(), 'uploads');
@@ -41,7 +42,7 @@ export function decodePhoto(photoBase64: string): DecodedPhoto {
 
 /** Simpan selfie absensi; mengembalikan path publik /uploads/attendance/<tanggal>/<uuid>.jpg */
 export async function saveAttendancePhoto(photo: DecodedPhoto): Promise<string> {
-  const day = new Date().toISOString().slice(0, 10);
+  const day = businessDateString();
   const dir = join(UPLOADS_ROOT, 'attendance', day);
   await mkdir(dir, { recursive: true });
 

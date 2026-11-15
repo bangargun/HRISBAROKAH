@@ -3,6 +3,13 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ClockInDto, ClockOutDto } from './attendance.dto';
 import { FaceEnrollmentService } from '../face/face-enrollment.service';
 import { AttendanceStatus, FaceCheckKind } from '@prisma/client';
+import {
+  businessDateString,
+  businessToday,
+  monthDateRange,
+  parseDateParam,
+  toDateOnly,
+} from '../../common/utils/business-date.util';
 
 @Injectable()
 export class AttendanceService {
@@ -12,9 +19,7 @@ export class AttendanceService {
   ) {}
 
   private getTodayDate(): Date {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return today;
+    return businessToday();
   }
 
   async getTodayStatus(userId: string) {
@@ -249,11 +254,14 @@ export class AttendanceService {
     });
     if (!profile) throw new NotFoundException('Profil karyawan tidak ditemukan');
 
-    const targetYear = year || new Date().getFullYear();
-    const targetMonth = month ? month - 1 : new Date().getMonth();
+    const [thisYear, thisMonth] = businessDateString().split('-').map(Number);
+    const targetYear = year ?? thisYear;
+    const targetMonth = month ?? thisMonth;
+    if (!Number.isInteger(targetMonth) || targetMonth < 1 || targetMonth > 12 || !Number.isInteger(targetYear)) {
+      throw new BadRequestException('Bulan harus 1-12 dan tahun berupa angka');
+    }
 
-    const startDate = new Date(targetYear, targetMonth, 1);
-    const endDate = new Date(targetYear, targetMonth + 1, 0, 23, 59, 59);
+    const { first: startDate, last: endDate } = monthDateRange(targetYear, targetMonth);
 
     return this.prisma.attendance.findMany({
       where: {
@@ -266,8 +274,7 @@ export class AttendanceService {
   }
 
   async getAdminDailyReport(outletId?: string, dateStr?: string) {
-    const targetDate = dateStr ? new Date(dateStr) : this.getTodayDate();
-    targetDate.setHours(0, 0, 0, 0);
+    const targetDate = dateStr ? toDateOnly(parseDateParam(dateStr)) : this.getTodayDate();
 
     return this.prisma.attendance.findMany({
       where: {
