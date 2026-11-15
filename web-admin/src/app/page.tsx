@@ -2831,7 +2831,6 @@ export default function AdminDashboard() {
       subTabs: [
         { id: 'employee-list', label: 'Karyawan Aktif' },
         { id: 'resignation-exit', label: 'Pengunduran Diri' },
-        { id: 'import-excel', label: 'Impor & Arsip' },
       ],
     },
     attendance: {
@@ -21396,568 +21395,122 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
           {/* TAB: DATA KARYAWAN RESTO (MASTER SDM BAROKAH GRUP)        */}
           {/* ========================================================= */}
           {activeMenu === 'employees' && (
-            <div className="space-y-5">
-              {/* Top Banner Master SDM */}
-              <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-slate-800 rounded-2xl p-5 text-white shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950 px-2 py-0.5 rounded">
-                      SINGLE SOURCE OF TRUTH
-                    </span>
-                    <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                      <ShieldCheck className="h-3.5 w-3.5" />
-                      Master Database Karyawan Multi-Outlet (Ayam Pecak 2001 Seafood)
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-black text-white tracking-tight">
-                    DIREKTORI &amp; ADMINISTRASI KARYAWAN RESTORAN
-                  </h3>
-                  <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-                    Sistem menghitung otomatis <strong>Usia Karyawan</strong> dari tanggal lahir dan <strong>Masa Kerja</strong> dari tanggal bergabung untuk menentukan kategori gaji pokok &amp; tunjangan. Mendukung pencairan via Rekening Bank &amp; E-Wallet (GoPay, OVO, DANA, ShopeePay, LinkAja).
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2 shrink-0">
-                  <button
-                    onClick={() => setIsAddEmployeeModalOpen(true)}
-                    className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-3.5 py-2.5 rounded-xl font-extrabold flex items-center space-x-1.5 shadow transition-all"
-                  >
-                    <UserPlus className="h-4 w-4" />
-                    <span>+ Tambah Karyawan</span>
-                  </button>
-                  <button
-                    onClick={() => setIsImportExcelModalOpen(true)}
-                    className="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/40 text-xs px-3 py-2.5 rounded-xl font-bold flex items-center space-x-1.5 shadow-sm transition"
-                  >
-                    <FileSpreadsheet className="h-4 w-4" />
-                    <span>Upload Excel</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveSubTab('resignation-exit')}
-                    className="bg-rose-600 hover:bg-rose-500 text-white text-xs px-3.5 py-2.5 rounded-xl font-bold flex items-center space-x-1.5 shadow transition-all"
-                  >
-                    <UserX className="h-4 w-4" />
-                    <span>Lapor Resign &amp; Exit Interview</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Sub-Tab Navigation Bar */}
-              <div className="flex border-b border-slate-200 bg-white rounded-t-xl px-4 pt-3 space-x-2">
-                {[
-                  { id: 'employee-list', label: 'Profil Karyawan Aktif', icon: Users, count: employeesMasterList.length },
-                  { id: 'resignation-exit', label: 'Pengunduran Diri & Exit Interview', icon: UserX },
-                  { id: 'import-excel', label: 'Import Excel & Arsip Berkas', icon: FileSpreadsheet },
-                ].map((tab) => {
-                  const Icon = tab.icon;
-                  const isActive = (activeSubTab === tab.id) || (tab.id === 'employee-list' && activeSubTab !== 'import-excel' && activeSubTab !== 'resignation-exit');
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveSubTab(tab.id)}
-                      className={`flex items-center space-x-2 pb-3 px-3 text-xs font-bold border-b-2 transition-all ${
-                        isActive
-                          ? 'border-amber-500 text-amber-700'
-                          : 'border-transparent text-slate-500 hover:text-slate-800'
-                      }`}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span>{tab.label}</span>
-                      {tab.count !== undefined && (
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
-                          isActive ? 'bg-amber-100 text-amber-900' : 'bg-slate-100 text-slate-600'
-                        }`}>
-                          {tab.count}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Subtab Routing View */}
-              {activeSubTab === 'resignation-exit' ? (
-                <ResignationExitModule
-                  employees={employeesMasterList}
-                  outlets={outletsConfigList}
-                  showToast={showToast}
-                  onEmployeeUpdate={setEmployeesMasterList}
-                />
-              ) : activeSubTab === 'import-excel' ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Excel Import Card */}
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
-                          <FileSpreadsheet className="h-6 w-6" />
+            activeSubTab === 'resignation-exit' ? (
+              <ResignationExitModule
+                employees={employeesMasterList}
+                outlets={outletsConfigList}
+                showToast={showToast}
+                onEmployeeUpdate={setEmployeesMasterList}
+              />
+            ) : (
+              (() => {
+                // Pilihan cabang diambil dari data karyawan yang ada, bukan daftar tetap
+                const outletOptions = Array.from(new Set(employeesMasterList.map((e) => e.outlet))).sort();
+                const keyword = empSearchKeyword.trim().toLowerCase();
+                const visibleEmployees = employeesMasterList.filter((emp) => {
+                  if (empFilterOutlet !== 'ALL' && emp.outlet !== empFilterOutlet) return false;
+                  if (!keyword) return true;
+                  return [emp.fullName, emp.nikKtp, emp.positionTitle].some((v) => (v || '').toLowerCase().includes(keyword));
+                });
+                return (
+                  <div className="space-y-4 text-sm">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className="relative">
+                          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden />
+                          <label className="sr-only" htmlFor="emp-search">Cari karyawan</label>
+                          <input
+                            id="emp-search"
+                            type="search"
+                            value={empSearchKeyword}
+                            onChange={(e) => setEmpSearchKeyword(e.target.value)}
+                            placeholder="Cari nama, NIK, atau posisi"
+                            className="w-64 rounded-md border border-slate-300 bg-white py-2 pl-9 pr-3 text-slate-800 placeholder-slate-400 focus:border-amber-500"
+                          />
                         </div>
-                        <div>
-                          <h4 className="text-sm font-extrabold text-slate-900">
-                            Import Massal Karyawan via Excel (.xlsx / .csv)
-                          </h4>
-                          <p className="text-xs text-slate-500">
-                            Solusi cepat saat perekrutan batch atau pembukaan cabang baru.
-                          </p>
-                        </div>
+                        <label className="sr-only" htmlFor="emp-outlet">Cabang</label>
+                        <select
+                          id="emp-outlet"
+                          value={empFilterOutlet}
+                          onChange={(e) => setEmpFilterOutlet(e.target.value)}
+                          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-800"
+                        >
+                          <option value="ALL">Semua cabang</option>
+                          {outletOptions.map((o) => (
+                            <option key={o} value={o}>{o}</option>
+                          ))}
+                        </select>
                       </div>
-
-                      <div className="p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300 text-center space-y-3">
-                        <Upload className="h-8 w-8 text-slate-400 mx-auto" />
-                        <div>
-                          <p className="text-xs font-bold text-slate-800">
-                            Pilih file spreadsheet Excel karyawan Anda
-                          </p>
-                          <p className="text-[11px] text-slate-500">
-                            Mendukung format .xlsx dan .csv (Maksimal 50 baris per upload)
-                          </p>
-                        </div>
-                        <div className="flex justify-center gap-2 pt-1">
-                          <button
-                            onClick={() => setIsImportExcelModalOpen(true)}
-                            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-sm"
-                          >
-                            Buka Tool Import Excel
-                          </button>
-                          <button
-                            onClick={() => showToast('Template resmi Excel Barokah Grup berhasil diunduh!')}
-                            className="px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold transition"
-                          >
-                            Unduh Template Resmi
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="text-[11px] text-slate-600 space-y-1 bg-amber-50/70 p-3 rounded-xl border border-amber-200">
-                        <span className="font-bold text-amber-900 block">Catatan Otomatisasi Import:</span>
-                        <p>• Kolom <strong>Usia</strong> dan <strong>Lama Bekerja</strong> tidak perlu diisi di Excel karena dihitung otomatis dari Tanggal Lahir &amp; Tanggal Masuk.</p>
-                        <p>• Mendukung kolom metode transfer: <code>BANK</code> atau <code>E_WALLET</code> (GoPay/OVO/DANA/ShopeePay/LinkAja).</p>
-                      </div>
-                    </div>
-
-                    {/* PDF Repository Card */}
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
-                          <FileText className="h-6 w-6" />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-extrabold text-slate-900">
-                            Arsip Digital Berkas &amp; Dokumen Karyawan (PDF)
-                          </h4>
-                          <p className="text-xs text-slate-500">
-                            Pengelolaan paperless berkas KTP, Kartu Keluarga, dan Surat Kontrak Kerja.
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2 text-xs">
-                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
-                          <div>
-                            <span className="font-bold text-slate-800">Scan KTP Digital Staf</span>
-                            <p className="text-[10px] text-slate-400">Tersedia pada 8/8 profil karyawan aktif</p>
-                          </div>
-                          <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">
-                            Lengkap 100%
-                          </span>
-                        </div>
-
-                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
-                          <div>
-                            <span className="font-bold text-slate-800">Kartu Keluarga (KK) Staf Menikah</span>
-                            <p className="text-[10px] text-slate-400">Verifikasi klaim Tunjangan Keluarga (+Rp 200k)</p>
-                          </div>
-                          <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">
-                            3 Terverifikasi
-                          </span>
-                        </div>
-
-                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
-                          <div>
-                            <span className="font-bold text-slate-800">Perjanjian Kerja Barokah Grup (PKWT)</span>
-                            <p className="text-[10px] text-slate-400">Kontrak resmi ditandatangani staf &amp; manajemen</p>
-                          </div>
-                          <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">
-                            Arsip Aktif
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                /* Main Table View */
-                <div className="space-y-4">
-                  {/* Summary Stats Cards */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <div className="bg-white rounded-xl border border-slate-200 p-3.5 shadow-sm space-y-1">
-                      <span className="text-[10px] uppercase font-bold text-slate-500">Total Karyawan</span>
-                      <p className="text-xl font-black text-slate-900">{employeesMasterList.length}</p>
-                      <span className="text-[10px] text-slate-400">Terdaftar Multi-Cabang</span>
-                    </div>
-
-                    <div className="bg-white rounded-xl border border-amber-200 p-3.5 shadow-sm space-y-1 bg-amber-50/20">
-                      <span className="text-[10px] uppercase font-bold text-amber-700">Dapur (Kitchen BOH)</span>
-                      <p className="text-xl font-black text-amber-600">
-                        {employeesMasterList.filter((e) => e.department.includes('Kitchen')).length}
+                      <p className="text-slate-600">
+                        {visibleEmployees.length === employeesMasterList.length
+                          ? `${employeesMasterList.length} karyawan`
+                          : `${visibleEmployees.length} dari ${employeesMasterList.length} karyawan`}
                       </p>
-                      <span className="text-[10px] text-amber-600 font-semibold">Koki &amp; Prep Helper</span>
                     </div>
 
-                    <div className="bg-white rounded-xl border border-blue-200 p-3.5 shadow-sm space-y-1 bg-blue-50/20">
-                      <span className="text-[10px] uppercase font-bold text-blue-700">Layanan (Service &amp; Kasir)</span>
-                      <p className="text-xl font-black text-blue-600">
-                        {employeesMasterList.filter((e) => e.department.includes('Service') || e.department.includes('Kasir')).length}
-                      </p>
-                      <span className="text-[10px] text-blue-600 font-semibold">Front of House</span>
-                    </div>
-
-                    <div className="bg-white rounded-xl border border-emerald-200 p-3.5 shadow-sm space-y-1 bg-emerald-50/20">
-                      <span className="text-[10px] uppercase font-bold text-emerald-700">Pencairan E-Wallet</span>
-                      <p className="text-xl font-black text-emerald-600">
-                        {employeesMasterList.filter((e) => e.paymentMethod === 'E_WALLET').length}
-                      </p>
-                      <span className="text-[10px] text-emerald-600 font-semibold">DANA, GoPay, OVO, ShopeePay</span>
-                    </div>
-                  </div>
-
-                  {/* Filter and Search Bar */}
-                  <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
-                    <div className="flex flex-wrap items-center gap-2.5">
-                      {/* Search Input */}
-                      <div className="relative">
-                        <Search className="h-3.5 w-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="text"
-                          value={empSearchKeyword}
-                          onChange={(e) => setEmpSearchKeyword(e.target.value)}
-                          placeholder="Cari nama, NIK, atau posisi..."
-                          className="bg-slate-50 border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500 w-56"
-                        />
-                      </div>
-
-                      {/* Filter Outlet */}
-                      <select
-                        value={empFilterOutlet}
-                        onChange={(e) => setEmpFilterOutlet(e.target.value)}
-                        className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-700 focus:outline-none"
-                      >
-                        <option value="ALL">Semua Cabang Outlet</option>
-                        <option value="Cabang Senopati, Jaksel">Cabang Senopati</option>
-                        <option value="Cabang PIK Pantjoran, Jakut">Cabang PIK Pantjoran</option>
-                        <option value="Cabang Tebing Tinggi, Sumut">Cabang Tebing Tinggi</option>
-                      </select>
-
-                      {/* Filter Payment Method */}
-                      <select
-                        value={empFilterPayment}
-                        onChange={(e) => setEmpFilterPayment(e.target.value)}
-                        className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-700 focus:outline-none"
-                      >
-                        <option value="ALL">Semua Jalur Pembayaran</option>
-                        <option value="BANK">Transfer Bank (BCA, Mandiri, BRI)</option>
-                        <option value="E_WALLET">E-Wallet (GoPay, OVO, DANA, ShopeePay)</option>
-                      </select>
-                    </div>
-
-                    <div className="text-xs text-slate-500">
-                      Menampilkan <strong className="text-slate-900">{
-                        employeesMasterList.filter((emp) => {
-                          if (activeSubTab === 'kitchen-staff' && !emp.department.includes('Kitchen')) return false;
-                          if (activeSubTab === 'service-staff' && !emp.department.includes('Service') && !emp.department.includes('Kasir')) return false;
-                          if (empFilterOutlet !== 'ALL' && emp.outlet !== empFilterOutlet) return false;
-                          if (empFilterPayment !== 'ALL' && emp.paymentMethod !== empFilterPayment) return false;
-                          if (empSearchKeyword && !emp.fullName.toLowerCase().includes(empSearchKeyword.toLowerCase()) && !emp.id.toLowerCase().includes(empSearchKeyword.toLowerCase())) return false;
-                          return true;
-                        }).length
-                      }</strong> dari {employeesMasterList.length} karyawan
-                    </div>
-                  </div>
-
-                  {/* Main Employees Table */}
-                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs">
-                        <thead>
-                          <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold text-[11px]">
-                            <th className="py-3 px-3">Karyawan &amp; NIK</th>
-                            <th className="py-3 px-3">Usia (Otomatis)</th>
-                            <th className="py-3 px-3">Cabang &amp; Posisi Resto</th>
-                            <th className="py-3 px-3">Masa Kerja &amp; Gaji 2026</th>
-                            <th className="py-3 px-3">Rekening / E-Wallet</th>
-                            <th className="py-3 px-2 text-center">Status Keluarga</th>
-                            <th className="py-3 px-3 text-center">Rapor Karyawan</th>
-                            <th className="py-3 px-2 text-center">Berkas PDF</th>
-                            <th className="py-3 px-3 text-center">Aksi</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                          {employeesMasterList
-                            .filter((emp) => {
-                              if (activeSubTab === 'kitchen-staff' && !emp.department.includes('Kitchen')) return false;
-                              if (activeSubTab === 'service-staff' && !emp.department.includes('Service') && !emp.department.includes('Kasir')) return false;
-                              if (empFilterOutlet !== 'ALL' && emp.outlet !== empFilterOutlet) return false;
-                              if (empFilterPayment !== 'ALL' && emp.paymentMethod !== empFilterPayment) return false;
-                              if (empSearchKeyword && !emp.fullName.toLowerCase().includes(empSearchKeyword.toLowerCase()) && !emp.id.toLowerCase().includes(empSearchKeyword.toLowerCase())) return false;
-                              return true;
-                            })
-                            .map((emp) => {
-                              const ageData = calculateAge(emp.birthDate);
-                              const tenureData = calculateTenure(emp.joinDate);
-
-                              return (
-                                <tr key={emp.id} className="hover:bg-slate-50/80 transition-colors">
-                                  {/* Column 1: Karyawan & NIK */}
-                                  <td className="py-3.5 px-3">
-                                    <div className="flex items-center space-x-2.5">
-                                      <div className="w-8 h-8 rounded-full bg-slate-900 text-amber-400 font-extrabold text-xs flex items-center justify-center shrink-0">
-                                        {emp.avatar}
-                                      </div>
-                                      <div>
-                                        <div className="font-extrabold text-slate-900 text-xs">
-                                          {emp.fullName}
-                                          <span className="ml-1 text-[10px] text-slate-400 font-normal">({emp.nickname})</span>
-                                        </div>
-                                        <div className="flex items-center gap-1.5 mt-0.5">
-                                          <span className="font-mono text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">
-                                            {emp.id}
-                                          </span>
-                                          <span className="text-[10px] text-slate-400 font-mono">
-                                            KTP: {emp.nikKtp}
-                                          </span>
-                                        </div>
-                                      </div>
-                                    </div>
+                    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+                      {employeesMasterList.length === 0 ? (
+                        <div className="p-10 text-center text-slate-600">
+                          <p className="font-medium text-slate-800">Belum ada karyawan.</p>
+                          <p className="mt-1">Gunakan tombol &quot;Tambah Karyawan&quot; di kanan atas untuk mendaftarkan karyawan pertama.</p>
+                        </div>
+                      ) : visibleEmployees.length === 0 ? (
+                        <p className="p-10 text-center text-slate-600">Tidak ada karyawan yang cocok dengan pencarian ini.</p>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full border-collapse text-left">
+                            <thead>
+                              <tr className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase text-slate-600">
+                                <th scope="col" className="px-4 py-3">Karyawan</th>
+                                <th scope="col" className="px-4 py-3">Cabang &amp; posisi</th>
+                                <th scope="col" className="px-4 py-3">Masa kerja</th>
+                                <th scope="col" className="px-4 py-3 text-right">Aksi</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {visibleEmployees.map((emp) => (
+                                <tr key={emp.id} className="hover:bg-slate-50">
+                                  <td className="px-4 py-3">
+                                    <p className="font-medium text-slate-900">{emp.fullName}</p>
+                                    <p className="font-mono text-xs text-slate-500">NIK {emp.nikKtp || '-'}</p>
                                   </td>
-
-                                  {/* Column 2: Usia (Otomatis) */}
-                                  <td className="py-3.5 px-3">
-                                    <div className="font-extrabold text-slate-800 text-xs">
-                                      🎂 {ageData.text}
-                                    </div>
-                                    <div className="text-[10px] text-slate-400 mt-0.5">
-                                      {emp.gender} • {emp.birthDate}
-                                    </div>
+                                  <td className="px-4 py-3">
+                                    <p className="text-slate-800">{emp.positionTitle}</p>
+                                    <p className="text-xs text-slate-500">{emp.outlet}</p>
                                   </td>
-
-                                  {/* Column 3: Cabang & Posisi Resto */}
-                                  <td className="py-3.5 px-3">
-                                    <div className="font-bold text-slate-900">{emp.positionTitle}</div>
-                                    <div className="text-[10px] text-slate-500">{emp.outlet}</div>
-                                    <div className="flex flex-wrap items-center gap-1 mt-0.5">
-                                      <span className="inline-block text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 uppercase">
-                                        Station: {emp.stationKey}
-                                      </span>
-                                      {emp.mutationHistory && emp.mutationHistory.length > 0 && (
-                                        <span
-                                          className="inline-flex items-center gap-0.5 text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-200"
-                                          title={`Mutasi ${emp.mutationHistory.length}x: Terakhir dari ${emp.mutationHistory[0].fromOutlet.split(',')[0]} ke ${emp.mutationHistory[0].toOutlet.split(',')[0]}`}
-                                        >
-                                          <ArrowLeftRight className="h-2.5 w-2.5" />
-                                          <span>Mutasi ({emp.mutationHistory.length}x)</span>
-                                        </span>
-                                      )}
-                                    </div>
+                                  <td className="px-4 py-3 text-slate-700">
+                                    {calculateTenure(emp.joinDate).text}
+                                    <p className="text-xs text-slate-500">sejak {emp.joinDate}</p>
                                   </td>
-
-                                  {/* Column 4: Masa Kerja & Gaji 2026 */}
-                                  <td className="py-3.5 px-3">
-                                    <div className="font-extrabold text-slate-800 text-xs">
-                                      ⏳ {tenureData.text}
-                                    </div>
-                                    <div className="flex flex-col gap-0.5 mt-0.5">
-                                      <span
-                                        className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded w-fit ${
-                                          tenureData.category === 'SENIOR_6_MONTHS'
-                                            ? 'bg-emerald-100 text-emerald-800'
-                                            : tenureData.category === 'OVER_3_MONTHS'
-                                            ? 'bg-blue-100 text-blue-800'
-                                            : 'bg-amber-100 text-amber-800'
-                                        }`}
-                                      >
-                                        {tenureData.categoryLabel}
-                                      </span>
-                                      <span className="text-[9px] font-black text-amber-900 bg-amber-50 border border-amber-200 px-1 py-0.5 rounded w-fit">
-                                        🎁 {tenureData.tenureAllowanceLabel}
-                                      </span>
-                                    </div>
-                                  </td>
-
-                                  {/* Column 5: Rekening Bank / E-Wallet */}
-                                  <td className="py-3.5 px-3">
-                                    <div className="flex items-center gap-1.5">
-                                      {emp.paymentMethod === 'E_WALLET' ? (
-                                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950">
-                                          E-WALLET
-                                        </span>
-                                      ) : (
-                                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-blue-100 text-blue-800">
-                                          BANK
-                                        </span>
-                                      )}
-                                      <span className="font-extrabold text-slate-900 text-xs">
-                                        {emp.bankOrWalletProvider}
-                                      </span>
-                                    </div>
-                                    <p className="font-mono text-[11px] text-slate-700 mt-0.5">
-                                      {emp.accountNumber}
-                                    </p>
-                                    <p className="text-[10px] text-slate-400">
-                                      a.n {emp.accountHolderName}
-                                    </p>
-                                  </td>
-
-                                  {/* Column 6: Status Keluarga */}
-                                  <td className="py-3.5 px-2 text-center">
-                                    {emp.isMarried ? (
-                                      <span className="inline-block bg-purple-100 text-purple-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full" title="Mendapat Tunjangan Keluarga +Rp 200.000/bln">
-                                        💍 Menikah (+200k)
-                                      </span>
-                                    ) : (
-                                      <span className="inline-block bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                                        Belum Menikah
-                                      </span>
-                                    )}
-                                  </td>
-
-                                  {/* Column: Rapor Karyawan */}
-                                  <td className="py-3.5 px-3 text-center">
-                                    {(() => {
-                                      const report = getEmployeeReportCard(emp);
-                                      const isGradeA = report.grade === 'A';
-                                      const isGradeB = report.grade === 'B+' || report.grade === 'B';
-                                      return (
-                                        <div className="flex flex-col items-center gap-1">
-                                          <span
-                                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
-                                              isGradeA
-                                                ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                                                : isGradeB
-                                                ? 'bg-blue-50 text-blue-800 border-blue-300'
-                                                : 'bg-amber-50 text-amber-800 border-amber-300'
-                                            }`}
-                                          >
-                                            <Award className="h-3 w-3" />
-                                            <span>Grade {report.grade} ({report.totalScore})</span>
-                                          </span>
-                                          <button
-                                            type="button"
-                                            onClick={() => setSelectedReportCardEmp(emp)}
-                                            className="text-[10px] font-extrabold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-0.5"
-                                          >
-                                            <span>Lihat Rapor</span>
-                                            <ArrowRight className="h-2.5 w-2.5" />
-                                          </button>
-                                        </div>
-                                      );
-                                    })()}
-                                  </td>
-
-                                  {/* Column 7: Berkas PDF */}
-                                  <td className="py-3.5 px-2 text-center">
-                                    <div className="flex items-center justify-center space-x-1">
+                                  <td className="px-4 py-3">
+                                    <div className="flex justify-end gap-1.5">
                                       <button
-                                        onClick={() =>
-                                          setViewingDocModal({
-                                            title: `Arsip KTP - ${emp.fullName}`,
-                                            docType: 'KTP',
-                                            employee: emp,
-                                          })
-                                        }
-                                        className="p-1 text-slate-600 hover:text-amber-700 hover:bg-amber-50 rounded"
-                                        title="Buka Scan KTP"
-                                      >
-                                        <FileText className="h-3.5 w-3.5" />
-                                      </button>
-                                      {emp.isMarried && (
-                                        <button
-                                          onClick={() =>
-                                            setViewingDocModal({
-                                              title: `Kartu Keluarga - ${emp.fullName}`,
-                                              docType: 'KK',
-                                              employee: emp,
-                                            })
-                                          }
-                                          className="p-1 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded"
-                                          title="Buka Kartu Keluarga"
-                                        >
-                                          <Users className="h-3.5 w-3.5" />
-                                        </button>
-                                      )}
-                                      <button
-                                        onClick={() =>
-                                          setViewingDocModal({
-                                            title: `Perjanjian Kontrak Kerja - ${emp.fullName}`,
-                                            docType: 'KONTRAK',
-                                            employee: emp,
-                                          })
-                                        }
-                                        className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded"
-                                        title="Buka Kontrak Kerja PKWT"
-                                      >
-                                        <FileCheck2 className="h-3.5 w-3.5" />
-                                      </button>
-                                    </div>
-                                  </td>
-
-                                  {/* Column 8: Aksi */}
-                                  <td className="py-3.5 px-3 text-center">
-                                    <div className="flex items-center justify-center space-x-1.5">
-                                      <button
-                                        onClick={() => setSelectedReportCardEmp(emp)}
-                                        className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition"
-                                        title="Buka Rapor &amp; Lembar Penilaian Karyawan"
-                                      >
-                                        <Award className="h-4 w-4" />
-                                      </button>
-                                      <button
+                                        type="button"
                                         onClick={() => setSelectedEmployeeDetail(emp)}
-                                        className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition"
-                                        title="Buka Dossier Lengkap Profil Karyawan"
+                                        className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 font-medium text-slate-700 hover:bg-slate-50"
                                       >
-                                        <Eye className="h-4 w-4" />
+                                        <Eye className="h-4 w-4" aria-hidden /> Detail
                                       </button>
                                       <button
-                                        onClick={() => openQuickMutationModal(emp)}
-                                        className="p-1.5 text-blue-700 hover:text-blue-900 hover:bg-blue-100 rounded-lg transition"
-                                        title="Mutasi Cabang / Pindah Outlet Restoran"
+                                        type="button"
+                                        onClick={() => setSelectedReportCardEmp(emp)}
+                                        className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 font-medium text-slate-700 hover:bg-slate-50"
                                       >
-                                        <ArrowLeftRight className="h-4 w-4" />
-                                      </button>
-                                      <button
-                                        onClick={() => {
-                                          showToast(`Membuka form penyesuaian untuk staf ${emp.fullName}...`);
-                                        }}
-                                        className="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition"
-                                        title="Edit Data Karyawan"
-                                      >
-                                        <Edit2 className="h-4 w-4" />
-                                      </button>
-                                      <button
-                                        onClick={() =>
-                                          setDeleteModalData({
-                                            type: 'attendance',
-                                            id: emp.id,
-                                            name: `Karyawan ${emp.fullName} (${emp.id})`,
-                                          })
-                                        }
-                                        className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition"
-                                        title="Hapus / Nonaktifkan Karyawan"
-                                      >
-                                        <Trash2 className="h-4 w-4" />
+                                        <Award className="h-4 w-4" aria-hidden /> Rapor
                                       </button>
                                     </div>
                                   </td>
                                 </tr>
-                              );
-                            })}
-                        </tbody>
-                      </table>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
+                );
+              })()
+            )
           )}
 
           {/* ========================================================= */}
@@ -29061,169 +28614,6 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {/* 2. MODAL IMPORT EXCEL KARYAWAN (.XLSX / .CSV)              */}
       {/* ========================================================= */}
-      {isImportExcelModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-              <div className="flex items-center space-x-2.5">
-                <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
-                  <FileSpreadsheet className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm">
-                    Import Massal Data Karyawan (.xlsx / .csv)
-                  </h3>
-                  <p className="text-[10px] text-slate-400 uppercase font-semibold">
-                    Template Resmi Barokah Grup &amp; Ayam Pecak 2001
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsImportExcelModalOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div className="p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300 text-center space-y-2">
-              <Upload className="h-8 w-8 text-emerald-600 mx-auto" />
-              <p className="text-xs font-bold text-slate-800">
-                File Siap Di-import: <span className="text-emerald-700 font-mono">Template_Karyawan_Barokah_2026.xlsx</span>
-              </p>
-              <p className="text-[11px] text-slate-500">
-                Terdeteksi <strong>3 baris data karyawan baru</strong> siap divalidasi dan dihitung otomatis.
-              </p>
-            </div>
-
-            {/* Preview of Parsed Rows */}
-            <div className="space-y-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                Preview Baris Data yang Akan Di-import:
-              </span>
-              <div className="border border-slate-200 rounded-xl overflow-hidden text-[11px]">
-                <table className="w-full text-left">
-                  <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold">
-                    <tr>
-                      <th className="p-2">Nama</th>
-                      <th className="p-2">Posisi</th>
-                      <th className="p-2">Tgl Lahir (Usia Auto)</th>
-                      <th className="p-2">Tgl Masuk (Masa Kerja Auto)</th>
-                      <th className="p-2">Metode Gaji</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    <tr>
-                      <td colSpan={5} className="p-6 text-center text-slate-400">
-                        Pilih file template (.xlsx / .csv) untuk memuat preview data karyawan baru.
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center pt-2 border-t border-slate-100">
-              <button
-                onClick={() => showToast('Template kosong Excel berhasil diunduh!')}
-                className="text-xs text-slate-600 hover:text-slate-900 font-bold flex items-center gap-1"
-              >
-                <Download className="h-3.5 w-3.5" />
-                <span>Unduh File Template</span>
-              </button>
-
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setIsImportExcelModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100"
-                >
-                  Batal
-                </button>
-                <label className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm flex items-center gap-1 cursor-pointer">
-                  <FileSpreadsheet className="h-3.5 w-3.5" />
-                  <span>Pilih &amp; Eksekusi File Excel (.csv / .xlsx)</span>
-                  <input
-                    type="file"
-                    accept=".csv,.xlsx,.xls"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) {
-                        showToast('Pilih file data Excel (.xlsx / .csv) riil terlebih dahulu.');
-                        return;
-                      }
-                      const reader = new FileReader();
-                      reader.onload = (event) => {
-                        const text = event.target?.result as string;
-                        if (!text) {
-                          showToast('File Excel kosong atau tidak terbaca.');
-                          return;
-                        }
-                        const lines = text.split('\n').filter((l) => l.trim().length > 0);
-                        if (lines.length <= 1) {
-                          showToast('File tidak memiliki baris data karyawan untuk di-import.');
-                          return;
-                        }
-                        const newImported: EmployeeMaster[] = [];
-                        for (let i = 1; i < lines.length; i++) {
-                          const cols = lines[i].split(',').map((c) => c.trim().replace(/^["']|["']$/g, ''));
-                          if (cols.length >= 2 && cols[0]) {
-                            const empName = cols[0];
-                            const empNik = cols[1] || `127100000000000${employeesMasterList.length + i}`;
-                            const empOutlet = cols[2] || 'Cabang Resto';
-                            const empRole = cols[3] || 'Cook Station';
-                            newImported.push({
-                              id: `EMP-0${employeesMasterList.length + newImported.length + 1}`,
-                              nikKtp: empNik,
-                              fullName: empName,
-                              nickname: empName.split(' ')[0],
-                              birthPlace: 'Medan',
-                              birthDate: '2000-01-01',
-                              gender: 'Laki-laki',
-                              religion: 'Islam',
-                              phone: cols[4] || '',
-                              addressKtp: 'Alamat KTP',
-                              addressDomisili: 'Alamat Domisili',
-                              outlet: empOutlet,
-                              department: 'Produksi (Kitchen BOH)',
-                              positionKey: 'koki',
-                              positionTitle: empRole,
-                              stationKey: 'koki',
-                              joinDate: new Date().toISOString().split('T')[0],
-                              isMarried: false,
-                              paymentMethod: 'BANK',
-                              bankOrWalletProvider: 'BCA',
-                              accountNumber: '',
-                              accountHolderName: empName,
-                              emergencyName: 'Keluarga',
-                              emergencyRelation: 'Orang Tua',
-                              emergencyPhone: '',
-                              avatar: empName.slice(0, 2).toUpperCase(),
-                              hasKtpFile: false,
-                              hasKkFile: false,
-                              hasContractFile: false,
-                              faceEnrolled: false,
-                              source: 'EXCEL_IMPORT',
-                            });
-                          }
-                        }
-                        if (newImported.length > 0) {
-                          setEmployeesMasterList([...newImported, ...employeesMasterList]);
-                          showToast(`Sukses! ${newImported.length} data karyawan dari file berhasil di-import.`);
-                          setIsImportExcelModalOpen(false);
-                        } else {
-                          showToast('Format baris file tidak valid. Pastikan format CSV/Excel sesuai kolom.');
-                        }
-                      };
-                      reader.readAsText(file);
-                    }}
-                  />
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ========================================================= */}
       {/* 3. MODAL DOSSIER LENGKAP PROFIL KARYAWAN                   */}
