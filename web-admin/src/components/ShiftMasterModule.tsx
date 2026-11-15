@@ -128,9 +128,9 @@ export default function ShiftMasterModule() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50/30 border border-amber-200/80 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
         <div className="flex items-start space-x-3">
-          <div className="p-2.5 bg-amber-500 text-slate-950 rounded-xl shadow-sm mt-0.5">
+          <div className="p-2 bg-slate-100 text-slate-600 rounded-md mt-0.5">
             <Clock className="h-5 w-5" aria-hidden />
           </div>
           <div>
@@ -376,7 +376,7 @@ function ShiftFormDialog({
               </option>
             ))}
           </select>
-          {isEdit && <span className="text-[10px] text-slate-400">Outlet shift tidak bisa dipindah.</span>}
+          {isEdit && <span className="text-[10px] text-slate-500">Outlet shift tidak bisa dipindah.</span>}
         </label>
         <label className="block space-y-1">
           <span className="font-bold text-slate-600">Nama shift</span>

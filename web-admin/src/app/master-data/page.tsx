@@ -3,6 +3,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import ShiftMasterModule from '@/components/ShiftMasterModule';
+import AppShell from '@/components/AppShell';
+import { getSessionUser } from '@/lib/auth';
+import { actionFor, useAdminRequests } from '@/lib/requests';
 import {
   ChefHat,
   Building2,
@@ -35,7 +38,6 @@ type MasterSubTab = 'outlets' | 'departments' | 'shifts' | 'payroll' | 'leaves';
 
 export default function MasterDataPage() {
   const [activeTab, setActiveTab] = useState<MasterSubTab>('outlets');
-  const [searchQuery, setSearchQuery] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Modal States
@@ -43,6 +45,11 @@ export default function MasterDataPage() {
   const [editModalData, setEditModalData] = useState<{ type: string; data: any } | null>(null);
   const [deleteModalData, setDeleteModalData] = useState<{ type: string; id: string; name: string } | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+
+  // Angka di menu Persetujuan sama dengan di halaman utama
+  const adminRequests = useAdminRequests();
+  const sessionRole = getSessionUser()?.role;
+  const requestsAwaitingMe = adminRequests.requests.filter((r) => actionFor(r, sessionRole)).length;
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -303,223 +310,56 @@ export default function MasterDataPage() {
   };
 
   return (
-    <div className="flex h-screen bg-slate-100 font-sans antialiased overflow-hidden">
+    <AppShell activeId="master-data" title="Master Data" counts={{ requests: requestsAwaitingMe }}>
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 text-xs border border-slate-700 animate-in fade-in slide-in-from-top-3">
+        <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 text-xs border border-slate-700">
           <CheckCircle2 className="h-4 w-4 text-emerald-400" />
           <span className="font-medium">{toastMessage}</span>
         </div>
       )}
 
-      {/* ========================================================= */}
-      {/* 1. LEFT SIDEBAR                                           */}
-      {/* ========================================================= */}
-      <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0 border-r border-slate-800 z-20">
-        <div className="h-16 flex items-center px-5 border-b border-slate-800/80 bg-slate-950/40">
-          <div className="bg-amber-500 p-2 rounded-xl text-slate-950 mr-3 shadow-md shadow-amber-500/20">
-            <ChefHat className="h-5 w-5" />
-          </div>
-          <div>
-            <h1 className="text-sm font-bold tracking-tight text-white leading-tight">HRIS RESTORAN</h1>
-            <p className="text-[11px] text-amber-400/90 font-medium">Multi-Outlet Culinary</p>
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1.5">
-          <div className="px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-            Navigasi Utama
-          </div>
-
-          <Link
-            href="/"
-            className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
-          >
-            <Clock className="h-4 w-4 text-slate-400" />
-            <span>Dashboard Operasional</span>
-          </Link>
-
-          <button
-            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 shadow-md transition-all"
-          >
-            <div className="flex items-center space-x-2.5">
-              <SlidersHorizontal className="h-4 w-4 text-slate-950" />
-              <span>Master Data Pusat</span>
-            </div>
-            <span className="text-[10px] px-1.5 py-0.5 rounded-md font-bold uppercase bg-slate-950 text-amber-400">
-              Aktif
-            </span>
-          </button>
-
-          <div className="pt-4 px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-            Modul Terkait
-          </div>
-
-          <Link
-            href="/"
-            className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
-          >
-            <Users className="h-4 w-4" />
-            <span>Karyawan &amp; Divisi</span>
-          </Link>
-          <Link
-            href="/"
-            className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
-          >
-            <Wallet className="h-4 w-4" />
-            <span>Payroll &amp; Kasbon</span>
-          </Link>
-          <Link
-            href="/"
-            className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
-          >
-            <FileCheck2 className="h-4 w-4" />
-            <span>Pustaka SOP Resto</span>
-          </Link>
-          <Link
-            href="/"
-            className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
-          >
-            <ShieldAlert className="h-4 w-4" />
-            <span>Sanksi &amp; Disiplin (SP)</span>
-          </Link>
-        </div>
-
-        <div className="p-3.5 border-t border-slate-800/80 bg-slate-950/60">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-amber-400 text-xs">
-              HR
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-white truncate">Admin HR Pusat</p>
-              <p className="text-[10px] text-slate-400">Master Data Administrator</p>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      {/* ========================================================= */}
-      {/* 2. MAIN CONTENT AREA                                      */}
-      {/* ========================================================= */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Header */}
-        <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between z-10">
-          <div className="flex items-center space-x-2 text-xs">
-            <Link href="/" className="text-slate-400 hover:text-slate-700 flex items-center font-medium">
-              <ArrowLeft className="h-3.5 w-3.5 mr-1" />
-              Kembali ke Dashboard
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
-            <span className="font-semibold text-slate-800">Master Data &amp; Konfigurasi Restoran</span>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <Search className="h-3.5 w-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Cari master data..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 w-48"
-              />
-            </div>
-          </div>
-        </header>
-
-        {/* Sub-Tabs Bar */}
-        <div className="bg-white border-b border-slate-200 px-6 pt-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 gap-2">
-            <div>
-              <h2 className="text-lg font-bold text-slate-900 flex items-center">
-                <SlidersHorizontal className="h-5 w-5 text-amber-500 mr-2" />
-                Manajemen Master Data Restoran
-              </h2>
-              <p className="text-xs text-slate-500">
-                Pusat konfigurasi outlet cabang, geofencing GPS, struktur station dapur/service, shift kerja, dan aturan payroll.
-              </p>
-            </div>
-
-            {activeTab !== 'shifts' && (
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="bg-slate-900 hover:bg-slate-800 text-white text-xs px-4 py-2 rounded-xl font-bold flex items-center space-x-1.5 shadow-sm self-start sm:self-auto"
-            >
-              <Plus className="h-4 w-4" />
-              <span>
-                {activeTab === 'outlets' && 'Tambah Cabang Resto'}
-                {activeTab === 'departments' && 'Tambah Station Posisi'}
-                {activeTab === 'payroll' && 'Tambah Komponen Payroll'}
+        <div className="shrink-0 border-b border-slate-200 bg-white px-4 sm:px-6">
+          {activeTab !== 'shifts' && (
+            <div className="flex justify-end pt-3">
+              <button
+                type="button"
+                onClick={() => setShowAddModal(true)}
+                className="inline-flex items-center gap-1.5 rounded-md bg-amber-500 px-3 py-1.5 text-sm font-medium text-slate-950 hover:bg-amber-400"
+              >
+                <Plus className="h-4 w-4" aria-hidden />
+                {activeTab === 'outlets' && 'Tambah Cabang'}
+                {activeTab === 'departments' && 'Tambah Stasiun'}
+                {activeTab === 'payroll' && 'Tambah Komponen'}
                 {activeTab === 'leaves' && 'Tambah Jenis Cuti'}
-              </span>
-            </button>
-            )}
-          </div>
-
-          {/* Sub-Tabs Navigation */}
-          <div className="flex space-x-1 border-t border-slate-100 pt-2 -mb-px overflow-x-auto">
-            <button
-              onClick={() => setActiveTab('outlets')}
-              className={`px-4 py-2.5 text-xs font-semibold rounded-t-lg transition-all border-b-2 whitespace-nowrap flex items-center space-x-2 ${
-                activeTab === 'outlets'
-                  ? 'border-amber-500 text-amber-600 bg-amber-50/50'
-                  : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-              }`}
-            >
-              <Building2 className="h-3.5 w-3.5" />
-              <span>Master Outlet &amp; GPS Geofence</span>
-              <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded font-bold">{outlets.length}</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('departments')}
-              className={`px-4 py-2.5 text-xs font-semibold rounded-t-lg transition-all border-b-2 whitespace-nowrap flex items-center space-x-2 ${
-                activeTab === 'departments'
-                  ? 'border-amber-500 text-amber-600 bg-amber-50/50'
-                  : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-              }`}
-            >
-              <UtensilsCrossed className="h-3.5 w-3.5" />
-              <span>Departemen &amp; Station Dapur/Service</span>
-              <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded font-bold">{departments.length}</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('shifts')}
-              className={`px-4 py-2.5 text-xs font-semibold rounded-t-lg transition-all border-b-2 whitespace-nowrap flex items-center space-x-2 ${
-                activeTab === 'shifts'
-                  ? 'border-amber-500 text-amber-600 bg-amber-50/50'
-                  : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-              }`}
-            >
-              <Clock className="h-3.5 w-3.5" />
-              <span>Jadwal Shift &amp; Istirahat Resto</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('payroll')}
-              className={`px-4 py-2.5 text-xs font-semibold rounded-t-lg transition-all border-b-2 whitespace-nowrap flex items-center space-x-2 ${
-                activeTab === 'payroll'
-                  ? 'border-amber-500 text-amber-600 bg-amber-50/50'
-                  : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-              }`}
-            >
-              <Coins className="h-3.5 w-3.5" />
-              <span>Komponen Payroll &amp; Service Charge</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('leaves')}
-              className={`px-4 py-2.5 text-xs font-semibold rounded-t-lg transition-all border-b-2 whitespace-nowrap flex items-center space-x-2 ${
-                activeTab === 'leaves'
-                  ? 'border-amber-500 text-amber-600 bg-amber-50/50'
-                  : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-              }`}
-            >
-              <CalendarDays className="h-3.5 w-3.5" />
-              <span>Jenis Cuti &amp; Izin Dokter</span>
-            </button>
-          </div>
+              </button>
+            </div>
+          )}
+          <nav className="-mb-px flex gap-1 overflow-x-auto" aria-label="Bagian master data">
+            {(
+              [
+                { id: 'outlets', label: 'Cabang & Geofence' },
+                { id: 'departments', label: 'Departemen & Stasiun' },
+                { id: 'shifts', label: 'Shift' },
+                { id: 'payroll', label: 'Komponen Gaji' },
+                { id: 'leaves', label: 'Jenis Cuti' },
+              ] as { id: MasterSubTab; label: string }[]
+            ).map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                aria-current={activeTab === tab.id ? 'page' : undefined}
+                className={`shrink-0 whitespace-nowrap border-b-2 px-3 py-3 text-sm transition-colors ${
+                  activeTab === tab.id
+                    ? 'border-amber-500 font-medium text-slate-900'
+                    : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
         </div>
 
         {/* Content Body */}
@@ -560,7 +400,7 @@ export default function MasterDataPage() {
                             <div>
                               <p className="font-bold text-slate-800 text-sm">Belum Ada Data Cabang Outlet</p>
                               <p className="text-xs text-slate-500 max-w-sm mt-0.5">
-                                Seluruh mock data telah dibersihkan secara permanen. Tambahkan cabang outlet restoran riil pertama Anda.
+                                Belum ada cabang. Tambahkan cabang pertama untuk mulai mencatat presensi.
                               </p>
                             </div>
                             <button
@@ -591,7 +431,7 @@ export default function MasterDataPage() {
                         </td>
                         <td className="py-3.5 px-4 font-mono text-slate-600 text-xs">
                           <div>Lat: {o.lat} • Lng: {o.lng}</div>
-                          <span className="inline-block mt-0.5 bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded font-bold text-[10px]">
+                          <span className="inline-block mt-0.5 bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold text-[10px]">
                             Radius {o.radius}m
                           </span>
                         </td>
@@ -672,7 +512,7 @@ export default function MasterDataPage() {
                           <div>
                             <p className="font-bold text-slate-800 text-sm">Belum Ada Data Departemen / Posisi</p>
                             <p className="text-xs text-slate-500 max-w-sm mt-0.5">
-                              Seluruh mock data telah dibersihkan secara permanen. Tambahkan departemen dan standar gaji station riil Anda.
+                              Belum ada departemen. Tambahkan departemen dan stasiun kerja pertama.
                             </p>
                           </div>
                           <button
@@ -867,13 +707,12 @@ export default function MasterDataPage() {
             </div>
           )}
         </main>
-      </div>
 
       {/* ========================================================= */}
       {/* 3. MODAL REVIEW / DETAIL                                  */}
       {/* ========================================================= */}
       {reviewModalData && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2">
@@ -965,7 +804,7 @@ export default function MasterDataPage() {
       {/* 4. MODAL EDIT DATA MASTER                                 */}
       {/* ========================================================= */}
       {editModalData && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <form
             onSubmit={handleSaveEdit}
             className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4"
@@ -1558,7 +1397,7 @@ export default function MasterDataPage() {
       {/* 5. MODAL KONFIRMASI DELETE                                */}
       {/* ========================================================= */}
       {deleteModalData && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
             <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
               <AlertTriangle className="h-6 w-6" />
@@ -1593,7 +1432,7 @@ export default function MasterDataPage() {
       {/* 6. MODAL TAMBAH DATA (CREATE NEW)                         */}
       {/* ========================================================= */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
             <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                 <h3 className="font-bold text-slate-900 text-base">
@@ -1682,6 +1521,6 @@ export default function MasterDataPage() {
             </div>
         </div>
       )}
-    </div>
+    </AppShell>
   );
 }

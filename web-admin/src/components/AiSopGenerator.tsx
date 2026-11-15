@@ -1136,7 +1136,7 @@ export function AiSopModal({ isOpen, onClose, onSaveSop, showToast, employeesCou
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 animate-in fade-in">
+    <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
       <div className="bg-white rounded-3xl max-w-6xl w-full p-6 shadow-2xl space-y-5 max-h-[94vh] overflow-y-auto border border-slate-200">
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
           <div className="flex items-center space-x-2.5">
@@ -1217,7 +1217,7 @@ DISETUJUI OLEH:
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 animate-in fade-in">
+    <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
       <div className="bg-white rounded-2xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
         {/* Header / Kop Surat Resmi Barokah Grup */}
         <div className="relative mb-3">

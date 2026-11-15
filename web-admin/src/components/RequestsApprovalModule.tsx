@@ -257,11 +257,11 @@ function RequestRow({
         <div className="text-[11px] text-slate-500">
           {req.employee.position.title} · {req.employee.outlet.name}
         </div>
-        <div className="text-[10px] text-slate-400 font-mono">NIK {req.employee.nik}</div>
+        <div className="text-[10px] text-slate-500 font-mono">NIK {req.employee.nik}</div>
       </td>
       <td className="py-3 px-3">
         <div className="font-semibold text-slate-800">{REQUEST_TYPE_LABEL[req.type]}</div>
-        <div className="text-[10px] text-slate-400">Diajukan {formatDate(req.createdAt)}</div>
+        <div className="text-[10px] text-slate-500">Diajukan {formatDate(req.createdAt)}</div>
         {req.type === 'CUTI_TAHUNAN' && (
           <div className="text-[10px] text-slate-500">Sisa cuti: {req.employee.leaveBalance} hari</div>
         )}
@@ -335,7 +335,7 @@ function RequestRow({
               </button>
             </>
           ) : (
-            <span className="text-[10px] text-slate-400">—</span>
+            <span className="text-[10px] text-slate-500">-</span>
           )}
         </div>
       </td>

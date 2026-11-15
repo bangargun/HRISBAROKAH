@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { BACKEND_API, clearSession, getToken } from '@/lib/auth';
-import { LEAVE_TYPES, isPending, useAdminRequests } from '@/lib/requests';
+import { BACKEND_API, clearSession, getSessionUser, getToken } from '@/lib/auth';
+import { LEAVE_TYPES, actionFor, isPending, useAdminRequests } from '@/lib/requests';
+import AppShell from '@/components/AppShell';
 import RequestsApprovalModule from '@/components/RequestsApprovalModule';
 import ShiftMasterModule from '@/components/ShiftMasterModule';
 import {
@@ -1791,7 +1792,14 @@ export default function AdminDashboard() {
   const [kasbonSimulatedDay, setKasbonSimulatedDay] = useState<number>(10);
   const [kruKasbonAgreementChecked, setKruKasbonAgreementChecked] = useState<boolean>(true);
   const [kruKasbonClearedOverride, setKruKasbonClearedOverride] = useState<boolean>(false);
-  const [activeAdminRole, setActiveAdminRole] = useState<'SUPER_ADMIN' | 'ADMIN' | 'SUPERVISOR' | 'KEPALA_CABANG' | 'KEPALA_BAGIAN'>('SUPER_ADMIN');
+  // Tampilan per peran mengikuti akun yang login (bukan pilihan bebas di layar)
+  const [activeAdminRole] = useState<'SUPER_ADMIN' | 'ADMIN' | 'SUPERVISOR' | 'KEPALA_CABANG' | 'KEPALA_BAGIAN'>(() => {
+    const role = getSessionUser()?.role;
+    if (role === 'HR_ADMIN' || role === 'FINANCE_ADMIN') return 'ADMIN';
+    if (role === 'AREA_MANAGER') return 'SUPERVISOR';
+    if (role === 'STORE_MANAGER') return 'KEPALA_CABANG';
+    return 'SUPER_ADMIN';
+  });
 
   // Interactive States untuk Dominasi Grafik di Card Hub
   const [chartAttendanceRange, setChartAttendanceRange] = useState<'7D' | '14D' | '30D'>('30D');
@@ -2799,168 +2807,155 @@ export default function AdminDashboard() {
     }
   > = {
     hub: {
-      title: 'Pusat Dasbor Eksekutif',
+      title: 'Dasbor',
       icon: LayoutGrid,
-      badge: 'Ringkasan Resto',
       subTabs: [
-        { id: 'bento-cards', label: 'Tinjauan Modul Eksekutif' },
+        { id: 'bento-cards', label: 'Ringkasan' },
       ],
     },
     organization: {
-      title: 'Struktur Organisasi & Cabang',
+      title: 'Struktur Organisasi',
       icon: Building2,
-      badge: 'Struktur Resto',
       subTabs: [
-        { id: 'org-chart', label: 'Bagan Struktur Organisasi & Cabang' },
+        { id: 'org-chart', label: 'Bagan Organisasi' },
       ],
     },
     employees: {
-      title: 'Master Data Karyawan',
+      title: 'Data Karyawan',
       icon: Users,
-      badge: 'Master SDM',
       subTabs: [
-        { id: 'employee-list', label: 'Profil Karyawan Aktif' },
-        { id: 'resignation-exit', label: 'Pengunduran Diri & Exit Interview' },
-        { id: 'import-excel', label: 'Import Excel & Arsip Berkas' },
+        { id: 'employee-list', label: 'Karyawan Aktif' },
+        { id: 'resignation-exit', label: 'Pengunduran Diri' },
+        { id: 'import-excel', label: 'Impor & Arsip' },
       ],
     },
     attendance: {
-      title: 'Presensi & Kehadiran Kru',
+      title: 'Presensi & Shift',
       icon: Clock,
-      badge: 'Shift Real-Time',
       subTabs: [
         { id: 'daily-timesheet', label: 'Presensi Harian' },
-        { id: 'attendance-corrections', label: 'Koreksi Lupa Absen (SOP-008)' },
-        { id: 'leave-requests', label: 'Pengajuan Libur & Cuti' },
+        { id: 'attendance-corrections', label: 'Koreksi Absen' },
+        { id: 'leave-requests', label: 'Pengajuan Cuti' },
         { id: 'approved-leave', label: 'Cuti Disetujui' },
-        { id: 'break-tracker', label: 'Monitoring Istirahat (Break 60m)' },
+        { id: 'break-tracker', label: 'Istirahat' },
       ],
     },
     payroll: {
-      title: 'Penggajian (Payroll)',
+      title: 'Penggajian',
       icon: Wallet,
-      badge: 'Struktur Gaji 2026',
       subTabs: [
-        { id: 'salary-structure', label: 'Struktur Gaji 2026 (Bisa Di-edit)' },
-        { id: 'payroll-calc', label: 'Kalkulasi Gaji Karyawan Cabang' },
-        { id: 'monthly-recap', label: 'Rekap Gaji Bulan ke Bulan' },
-        { id: 'kasbon-approval', label: 'Approval Kasbon Darurat' },
-        { id: 'deductions', label: 'Histori Potongan & Denda' },
+        { id: 'salary-structure', label: 'Struktur Gaji' },
+        { id: 'payroll-calc', label: 'Hitung Gaji' },
+        { id: 'monthly-recap', label: 'Rekap Bulanan' },
+        { id: 'kasbon-approval', label: 'Kasbon' },
+        { id: 'deductions', label: 'Potongan & Denda' },
       ],
     },
     performance: {
-      title: 'Penilaian Kinerja & Monitoring SPV',
+      title: 'Penilaian Kinerja',
       icon: TrendingUp,
-      badge: 'KPI & Sidak SPV',
       subTabs: [
-        { id: 'kpi-matrix', label: 'Penilaian KPI & Rapor Kinerja Kru' },
-        { id: 'spv-inspections', label: 'Jadwal & Lembar Penilaian Sidak SPV' },
-        { id: 'spv-cockpit', label: 'Cockpit Monitoring Target Cabang' },
+        { id: 'kpi-matrix', label: 'KPI Kru' },
+        { id: 'spv-inspections', label: 'Sidak SPV' },
+        { id: 'spv-cockpit', label: 'Target Cabang' },
       ],
     },
     development: {
-      title: 'Pelatihan & Pengembangan LMS',
+      title: 'Pelatihan',
       icon: GraduationCap,
-      badge: 'Pusat Materi',
       subTabs: [
-        { id: 'training-lms', label: 'Pustaka Modul & Editor Materi' },
-        { id: 'training-schedules', label: 'Jadwal Training Cabang' },
-        { id: 'weekly-quizzes', label: '⚡ Kuis Mingguan Wajib (10 Soal)' },
-        { id: 'rapor-karyawan', label: 'Rapor Penilaian Karyawan' },
-        { id: 'curriculum-path', label: 'Kurikulum Onboarding Kru' },
-        { id: 'certification-tracker', label: 'Sertifikasi & Unduh PDF' },
-        { id: 'leadership-articles', label: 'Artikel Kepemimpinan (Leader Hub)' },
-        { id: 'disc-matrix', label: 'Hasil Tes DISC Kepribadian' },
-        { id: 'survey-360', label: 'Evaluasi Review 360°' },
+        { id: 'training-lms', label: 'Materi' },
+        { id: 'training-schedules', label: 'Jadwal Pelatihan' },
+        { id: 'weekly-quizzes', label: 'Kuis Mingguan' },
+        { id: 'rapor-karyawan', label: 'Rapor' },
+        { id: 'curriculum-path', label: 'Kurikulum Onboarding' },
+        { id: 'certification-tracker', label: 'Sertifikasi' },
+        { id: 'leadership-articles', label: 'Artikel Kepemimpinan' },
+        { id: 'disc-matrix', label: 'Tes DISC' },
+        { id: 'survey-360', label: 'Evaluasi 360°' },
       ],
     },
     career: {
-      title: 'Jenjang Karir & Promosi',
+      title: 'Jenjang Karier',
       icon: Briefcase,
-      badge: 'Promosi Kru',
       subTabs: [
-        { id: 'career-ladder', label: 'Jenjang Karir (Kitchen & Service)' },
+        { id: 'career-ladder', label: 'Jenjang Karier' },
       ],
     },
     coaching: {
-      title: 'Pendampingan & Coaching Lapangan',
+      title: 'Pendampingan',
       icon: Sparkles,
-      badge: 'Coaching Lapangan',
       subTabs: [
-        { id: 'coaching-list', label: 'Sesi Pendampingan Lapangan' },
+        { id: 'coaching-list', label: 'Sesi Pendampingan' },
       ],
     },
     sops: {
-      title: 'Standar Operasional Prosedur (SOP)',
+      title: 'SOP',
       icon: FileCheck2,
       subTabs: [
-        { id: 'ai-sop-generator', label: '✨ AI SOP Studio & Generator' },
-        { id: 'sop-library', label: 'Pustaka Resep & Standar Menu' },
-        { id: 'daily-store-reports', label: '📸 Laporan Rutin Harian (Routine Daily Report) Kepala Cabang ke SPV' },
-        { id: 'hygiene-rules', label: 'Standar Hygiene & Sanitasi' },
-        { id: 'signatures', label: 'Kepatuhan Tanda Tangan Karyawan' },
+        { id: 'ai-sop-generator', label: 'Template SOP' },
+        { id: 'sop-library', label: 'Resep & Standar Menu' },
+        { id: 'daily-store-reports', label: 'Laporan Harian Cabang' },
+        { id: 'hygiene-rules', label: 'Higiene & Sanitasi' },
+        { id: 'signatures', label: 'Tanda Tangan SOP' },
       ],
     },
     sanctions: {
-      title: 'Kedisiplinan & Surat Peringatan (SP)',
+      title: 'Kedisiplinan & SP',
       icon: ShieldAlert,
       subTabs: [
         { id: 'active-sp', label: 'Daftar SP Aktif' },
-        { id: 'bap-reports', label: 'Berita Acara Pelanggaran (BAP)' },
-        { id: 'create-sp', label: 'Terbitkan SP Baru' },
+        { id: 'bap-reports', label: 'Berita Acara (BAP)' },
+        { id: 'create-sp', label: 'Terbitkan SP' },
       ],
     },
     requests: {
-      title: 'Cuti, Roster & Approval SOP',
+      title: 'Persetujuan',
       icon: CalendarDays,
-      badge: 'SOP-001 Aktif',
       subTabs: [
-        { id: 'leave-requests', label: 'Approval Pengajuan Libur (SOP 001)' },
-        { id: 'branch-crew-monitor', label: '👁️ Monitoring Kru Cabang (Visibilitas Kepala Cabang)' },
-        { id: 'smart-roster', label: 'Kalender Roster Cerdas (Smart Quota)' },
-        { id: 'whatsapp-bot', label: 'Broadcast Bot WhatsApp (Insentif & Reminder)' },
-        { id: 'sick-notes', label: 'Verifikasi Surat Dokter' },
-        { id: 'shift-swap', label: 'Persetujuan Tukar Jadwal Istirahat (Break)' },
+        { id: 'leave-requests', label: 'Pengajuan Kru' },
+        { id: 'branch-crew-monitor', label: 'Kru Cabang' },
+        { id: 'smart-roster', label: 'Kalender Roster' },
+        { id: 'whatsapp-bot', label: 'Pesan WhatsApp' },
+        { id: 'sick-notes', label: 'Surat Dokter' },
+        { id: 'shift-swap', label: 'Tukar Jam Istirahat' },
       ],
     },
     'kru-portal': {
-      title: 'Aplikasi Kru Resto (Portal Mobile)',
+      title: 'Aplikasi Kru',
       icon: Smartphone,
-      badge: 'APK LIVE',
       subTabs: [
-        { id: 'kru-full', label: 'Portal Kru (Layar Penuh / Tablet)' },
-        { id: 'kru-mobile', label: 'Simulasi HP Android (Kru Smartphone)' },
-        { id: 'kru-workflow', label: 'Alur Data Lapangan ke HQ' },
+        { id: 'kru-full', label: 'Portal Kru' },
+        { id: 'kru-mobile', label: 'Pratinjau Aplikasi HP' },
+        { id: 'kru-workflow', label: 'Alur Data' },
       ],
     },
     permissions: {
-      title: 'Matriks Permission Aplikasi',
+      title: 'Hak Akses',
       icon: ShieldCheck,
-      badge: 'RBAC Security',
       subTabs: [
-        { id: 'matrix-roles', label: 'Matriks Hak Akses Berjenjang' },
-        { id: 'user-assignment', label: 'Penugasan Role Karyawan' },
-        { id: 'audit-log', label: 'Audit Log Perizinan' },
+        { id: 'matrix-roles', label: 'Matriks Peran' },
+        { id: 'user-assignment', label: 'Penugasan Peran' },
+        { id: 'audit-log', label: 'Log Audit' },
       ],
     },
     'legal-docs': {
-      title: 'Surat Keputusan & Kontrak',
+      title: 'Surat & Kontrak',
       icon: FileText,
-      badge: 'SK, PKWT & SE',
       subTabs: [
-        { id: 'sk-list', label: 'Surat Keputusan (SK) Karyawan' },
-        { id: 'contract-list', label: 'Surat Kontrak Kerja (PKWT/PKWTT)' },
-        { id: 'edaran-list', label: 'Surat Edaran & Himbauan Resmi' },
-        { id: 'generate-doc', label: 'Generator & Live Editor Surat' },
-        { id: 'template-library', label: 'Klausul Baku & Peraturan Legal' },
+        { id: 'sk-list', label: 'Surat Keputusan' },
+        { id: 'contract-list', label: 'Kontrak Kerja' },
+        { id: 'edaran-list', label: 'Surat Edaran' },
+        { id: 'generate-doc', label: 'Buat Surat' },
+        { id: 'template-library', label: 'Klausul Baku' },
       ],
     },
     outlets: {
-      title: 'Pengaturan Outlet',
+      title: 'Cabang',
       icon: Building2,
       subTabs: [
-        { id: 'outlet-list', label: 'Daftar Cabang Restoran' },
-        { id: 'shift-master', label: 'Master Shift (Pagi, Siang, Split)' },
+        { id: 'outlet-list', label: 'Daftar Cabang' },
+        { id: 'shift-master', label: 'Shift' },
       ],
     },
   };
@@ -2969,6 +2964,16 @@ export default function AdminDashboard() {
     setActiveMenu(menuId);
     setActiveSubTab(menuConfig[menuId].subTabs[0].id);
   };
+
+  // Menu samping di halaman lain membuka /?menu=<id>
+  useEffect(() => {
+    const menu = new URLSearchParams(window.location.search).get('menu');
+    if (menu && menu in menuConfig) {
+      handleMenuChange(menu as MainMenuId);
+      window.history.replaceState(null, '', '/');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 1. State Data: Attendance (Verifikasi Biometrik Kontur Wajah - Tanpa Geofence)
   interface AttendanceRecord {
@@ -6489,593 +6494,87 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
     },
   ];
 
+  // Peran tampilan mengikuti akun yang login; hak akses sebenarnya tetap dicek backend
+  const sessionRole = getSessionUser()?.role;
+  const requestsAwaitingMe = adminRequests.requests.filter((r) => actionFor(r, sessionRole)).length;
+
+  const btnPrimary =
+    'inline-flex items-center gap-1.5 rounded-md bg-amber-500 px-3 py-1.5 text-sm font-medium text-slate-950 hover:bg-amber-400';
+  const btnSecondary =
+    'inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50';
+
+  const moduleActions =
+    activeMenu === 'attendance' ? (
+      <button type="button" onClick={() => setActiveSubTab('daily-timesheet')} className={btnSecondary}>
+        <CalendarDays className="h-4 w-4" aria-hidden /> Rekap Bulanan
+      </button>
+    ) : activeMenu === 'payroll' ? (
+      <button type="button" onClick={() => setActiveSubTab('monthly-recap')} className={btnSecondary}>
+        <TrendingUp className="h-4 w-4" aria-hidden /> Rekap per Bulan
+      </button>
+    ) : activeMenu === 'employees' ? (
+      <button type="button" onClick={() => setIsAddEmployeeModalOpen(true)} className={btnPrimary}>
+        <UserPlus className="h-4 w-4" aria-hidden /> Tambah Karyawan
+      </button>
+    ) : activeMenu === 'sanctions' ? (
+      <button type="button" onClick={() => setActiveSubTab('create-sp')} className={btnPrimary}>
+        <Plus className="h-4 w-4" aria-hidden /> Terbitkan SP
+      </button>
+    ) : activeMenu === 'performance' ? (
+      <button type="button" onClick={() => setActiveSubTab('spv-inspections')} className={btnSecondary}>
+        <Calendar className="h-4 w-4" aria-hidden /> Jadwal Sidak
+      </button>
+    ) : activeMenu === 'requests' ? (
+      <button type="button" onClick={() => setViewingOfficialSopDoc(true)} className={btnSecondary}>
+        <FileText className="h-4 w-4" aria-hidden /> Naskah SK Libur
+      </button>
+    ) : activeMenu === 'sops' ? (
+      <button type="button" onClick={() => setIsAiSopModalOpen(true)} className={btnPrimary}>
+        <Plus className="h-4 w-4" aria-hidden /> Buat dari Template
+      </button>
+    ) : null;
+
   return (
-    <div className="flex h-screen bg-slate-100 font-sans antialiased overflow-hidden">
+    <AppShell
+      activeId={activeMenu}
+      onSelect={(id) => handleMenuChange(id as MainMenuId)}
+      title={menuConfig[activeMenu].title}
+      counts={{ requests: requestsAwaitingMe }}
+    >
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 text-xs border border-slate-700 animate-in fade-in slide-in-from-top-3">
+        <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 text-xs border border-slate-700">
           <CheckCircle2 className="h-4 w-4 text-emerald-400" />
           <span className="font-medium">{toastMessage}</span>
         </div>
       )}
 
-      {/* ========================================================= */}
-      {/* 1. ENTERPRISE SIDEBAR NAVIGATION (DESKTOP + MOBILE DRAWER) */}
-      {/* ========================================================= */}
-      {/* Mobile Backdrop */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-40 lg:hidden transition-opacity"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
 
-      {/* Main Enterprise Sidebar */}
-      <aside
-        className={`fixed inset-y-0 left-0 w-72 bg-[#0b172c] text-slate-300 flex flex-col border-r border-[#15243d] z-50 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 lg:z-30 shrink-0 h-screen ${
-          isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
-        }`}
-      >
-        {/* Brand Header */}
-        <div className="h-16 px-5 flex items-center justify-between border-b border-[#15243d]/80 bg-[#081220]/60 shrink-0">
-          <div
-            onClick={() => {
-              handleMenuChange('hub');
-              setIsSidebarOpen(false);
-            }}
-            className="flex items-center gap-3 cursor-pointer group"
-          >
-            <img
-              src="/logo-barokah.jpg"
-              alt="Barokah Group"
-              className="h-9 w-auto rounded-xl object-contain bg-black px-2 py-1 border border-amber-500/40 shadow-lg shadow-black/50 ring-1 ring-amber-400/20 shrink-0 group-hover:scale-105 transition-transform"
-            />
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-white text-base tracking-wider">BAROKAH</span>
-                <span className="text-[9px] font-black bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/30">
-                  ENTERPRISE
-                </span>
-              </div>
-              <p className="text-[10px] text-amber-400/90 font-bold tracking-wide uppercase">
-                HRIS Restoran Multi-Outlet
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => setIsSidebarOpen(false)}
-            className="lg:hidden p-1.5 text-slate-400 hover:text-white hover:bg-[#12233f] rounded-lg transition-colors"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        {/* Scrollable Navigation Groups */}
-        <div className="flex-1 overflow-y-auto px-3.5 py-4 space-y-5 scrollbar-thin scrollbar-thumb-slate-800">
-          {/* GRUP 1: UTAMA */}
-          <div className="space-y-1">
-            <div className="px-3 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-              Ringkasan Utama
-            </div>
-            <button
-              onClick={() => {
-                handleMenuChange('hub');
-                setIsSidebarOpen(false);
-              }}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                activeMenu === 'hub'
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 font-black shadow-md shadow-amber-500/20'
-                  : 'text-slate-300 hover:text-white hover:bg-[#12233f]'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <LayoutGrid className={`h-4 w-4 ${activeMenu === 'hub' ? 'text-slate-950' : 'text-amber-400'}`} />
-                <span>Dasbor Eksekutif</span>
-              </div>
-              <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
-                activeMenu === 'hub' ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-800 text-slate-400'
-              }`}>
-                Live
-              </span>
-            </button>
-          </div>
-
-          {/* GRUP 2: SDM & STRUKTUR */}
-          <div className="space-y-1">
-            <div className="px-3 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-              Karyawan &amp; Tim
-            </div>
-            {[
-              { id: 'employees', label: 'Master Karyawan', icon: Users, badge: employeesMasterList.length > 0 ? `${employeesMasterList.length}` : undefined },
-              { id: 'organization', label: 'Struktur Organisasi', icon: Building2 },
-              { id: 'outlets', label: 'Cabang Restoran', icon: MapPin, badge: `${outletsConfigList.length}` },
-              { id: 'legal-docs', label: 'Surat & Kontrak', icon: FileText },
-            ].map((item) => {
-              const Icon = item.icon;
-              const isActive = activeMenu === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    handleMenuChange(item.id as MainMenuId);
-                    setIsSidebarOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                    isActive
-                      ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/20'
-                      : 'text-slate-300 hover:text-white hover:bg-[#12233f]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`h-4 w-4 ${isActive ? 'text-slate-950' : 'text-amber-400'}`} />
-                    <span>{item.label}</span>
-                  </div>
-                  {item.badge && (
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
-                      isActive ? 'bg-slate-950/20 text-slate-950' : 'bg-[#12233f] text-amber-400'
-                    }`}>
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* GRUP 3: OPERASIONAL & WAKTU */}
-          <div className="space-y-1">
-            <div className="px-3 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-              Operasional &amp; Presensi
-            </div>
-            {[
-              { id: 'attendance', label: 'Presensi & Shift', icon: Clock },
-              { id: 'sanctions', label: 'Kedisiplinan & SP', icon: ShieldAlert },
-              { id: 'sops', label: 'Standar SOP Resto', icon: FileCheck2 },
-            ].map((item) => {
-              const Icon = item.icon;
-              const isActive = activeMenu === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    handleMenuChange(item.id as MainMenuId);
-                    setIsSidebarOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                    isActive
-                      ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/20'
-                      : 'text-slate-300 hover:text-white hover:bg-[#12233f]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`h-4 w-4 ${isActive ? 'text-slate-950' : 'text-amber-400'}`} />
-                    <span>{item.label}</span>
-                  </div>
-                  {isActive && <span className="text-[10px] font-black uppercase">Aktif</span>}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* GRUP 4: KOMPENSASI */}
-          <div className="space-y-1">
-            <div className="px-3 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-              Kompensasi &amp; Benefit
-            </div>
-            {[
-              { id: 'payroll', label: 'Penggajian (Payroll)', icon: Wallet },
-            ].map((item) => {
-              const Icon = item.icon;
-              const isActive = activeMenu === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    handleMenuChange(item.id as MainMenuId);
-                    setIsSidebarOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                    isActive
-                      ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/20'
-                      : 'text-slate-300 hover:text-white hover:bg-[#12233f]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`h-4 w-4 ${isActive ? 'text-slate-950' : 'text-amber-400'}`} />
-                    <span>{item.label}</span>
-                  </div>
-                  {isActive && <span className="text-[10px] font-black uppercase">Aktif</span>}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* GRUP 5: PERFORMA & PENGEMBANGAN */}
-          <div className="space-y-1">
-            <div className="px-3 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-              Kinerja &amp; Karir
-            </div>
-            {[
-              { id: 'performance', label: 'Penilaian KPI', icon: TrendingUp },
-              { id: 'development', label: 'Pelatihan & LMS', icon: GraduationCap },
-              { id: 'career', label: 'Jenjang Karir', icon: Briefcase },
-              { id: 'coaching', label: 'Pendampingan Kru', icon: Sparkles },
-            ].map((item) => {
-              const Icon = item.icon;
-              const isActive = activeMenu === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    handleMenuChange(item.id as MainMenuId);
-                    setIsSidebarOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                    isActive
-                      ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/20'
-                      : 'text-slate-300 hover:text-white hover:bg-[#12233f]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`h-4 w-4 ${isActive ? 'text-slate-950' : 'text-amber-400'}`} />
-                    <span>{item.label}</span>
-                  </div>
-                  {isActive && <span className="text-[10px] font-black uppercase">Aktif</span>}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* GRUP 6: PORTAL KRU */}
-          <div className="space-y-1">
-            <div className="px-3 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-              Aplikasi Lapangan
-            </div>
-            <button
-              onClick={() => {
-                handleMenuChange('kru-portal');
-                setIsSidebarOpen(false);
-              }}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                activeMenu === 'kru-portal'
-                  ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/20'
-                  : 'text-slate-300 hover:text-white hover:bg-[#12233f]'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <Smartphone className={`h-4 w-4 ${activeMenu === 'kru-portal' ? 'text-slate-950' : 'text-amber-400'}`} />
-                <span>Portal Kru (Mobile)</span>
-              </div>
-            </button>
-          </div>
-
-          {/* GRUP 7: PENGATURAN */}
-          <div className="space-y-1 pt-3 border-t border-[#15243d]/80">
-            <div className="px-3 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-              Konfigurasi Sistem
-            </div>
-            <Link
-              href="/master-data"
-              onClick={() => setIsSidebarOpen(false)}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-[#12233f] transition"
-            >
-              <div className="flex items-center gap-3">
-                <SlidersHorizontal className="h-4 w-4 text-slate-400" />
-                <span>Master Data Restoran</span>
-              </div>
-              <ArrowRight className="h-3 w-3 text-slate-500" />
-            </Link>
-            <button
-              onClick={() => {
-                handleMenuChange('permissions');
-                setIsSidebarOpen(false);
-              }}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition ${
-                activeMenu === 'permissions' ? 'text-amber-400 bg-[#12233f] font-bold' : 'text-slate-400 hover:text-white hover:bg-[#12233f]'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <ShieldCheck className="h-4 w-4 text-slate-400" />
-                <span>Matriks Hak Akses</span>
-              </div>
-            </button>
-          </div>
-        </div>
-
-        {/* Sidebar Footer: Profile */}
-        <div className="p-3 border-t border-[#15243d] bg-[#081220]/90 shrink-0">
-          <div className="bg-[#0e1d35] rounded-xl p-2.5 border border-[#1b3154] flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="relative shrink-0">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 font-black text-xs flex items-center justify-center shadow-md shadow-amber-500/20">
-                  MF
-                </div>
-                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-[#0b172c] rounded-full" title="Online" />
-              </div>
-              <div className="min-w-0">
-                <h4 className="text-xs font-extrabold text-white truncate leading-tight">M. Fantala</h4>
-                <select
-                  value={activeAdminRole}
-                  onChange={(e) => {
-                    const newRole = e.target.value as any;
-                    setActiveAdminRole(newRole);
-                    showToast(
-                      `Role aktif diubah menjadi: ${
-                        newRole === 'SUPER_ADMIN'
-                          ? '👑 Super Admin (HQ)'
-                          : newRole === 'ADMIN'
-                          ? '🛡️ Admin (HR Pusat)'
-                          : newRole === 'SUPERVISOR'
-                          ? '👁️ Supervisor (SPV Area)'
-                          : newRole === 'KEPALA_CABANG'
-                          ? '🏪 Kepala Cabang'
-                          : '👨‍🍳 Kepala Bagian'
-                      }`
-                    );
-                  }}
-                  className="bg-transparent text-[10px] text-amber-400 font-bold outline-none cursor-pointer hover:text-amber-300"
-                >
-                  <option value="SUPER_ADMIN" className="bg-[#0a1526] text-white">Super Admin (HQ)</option>
-                  <option value="ADMIN" className="bg-[#0a1526] text-white">Admin (HR Pusat)</option>
-                  <option value="SUPERVISOR" className="bg-[#0a1526] text-white">Supervisor (SPV)</option>
-                  <option value="KEPALA_CABANG" className="bg-[#0a1526] text-white">Kepala Cabang</option>
-                  <option value="KEPALA_BAGIAN" className="bg-[#0a1526] text-white">Kepala Bagian</option>
-                </select>
-              </div>
-            </div>
-            <Link
-              href="/login"
-              onClick={() => {
-                setIsSidebarOpen(false);
-                clearSession();
-              }}
-              className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition"
-              title="Keluar ke Login"
-            >
-              <LogOut className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </aside>
-
-      {/* ========================================================= */}
-      {/* 2. FULL-WIDTH WORKSPACE WITH MODERN SINGLE-TIER TOP APP BAR */}
-      {/* ========================================================= */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        {/* Top Executive Header Bar (Resto Dark Navy - Single Tier) */}
-        <header className="h-16 px-4 sm:px-6 flex items-center justify-between gap-4 bg-[#0b172c] border-b border-[#15243d] z-30 shrink-0 shadow-sm">
-          {/* Sisi Kiri: Hamburger Mobile + Breadcrumb Modul Aktif */}
-          <div className="flex items-center gap-3 shrink-0">
-            <button
-              onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-[#12233f] rounded-xl transition-colors border border-[#1e3456] flex items-center space-x-1.5 text-xs font-semibold shrink-0"
-              title="Buka Navigasi Menu"
-            >
-              <Menu className="h-4 w-4 text-amber-400" />
-            </button>
-
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center font-bold shrink-0">
-                {React.createElement(menuConfig[activeMenu].icon, { className: 'h-4 w-4' })}
-              </div>
-              <div>
-                <h2 className="text-sm font-extrabold text-white leading-tight">
-                  {menuConfig[activeMenu].title}
-                </h2>
-                <p className="text-[10px] text-slate-400 font-medium">
-                  {selectedOutlet === 'ALL' ? 'Semua Cabang (3 Outlet)' : selectedOutlet} • Periode Okt 2026
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Sisi Tengah: Pencarian Cepat Global */}
-          <div className="relative flex-1 max-w-md hidden md:block">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input
-              type="text"
-              value={globalSearchKeyword}
-              onChange={(e) => setGlobalSearchKeyword(e.target.value)}
-              placeholder="Cari karyawan, jabatan, SOP, atau fitur..."
-              className="w-full bg-[#081220]/90 border border-[#1e3456] rounded-xl pl-9 pr-14 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition shadow-inner"
-            />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold text-slate-500 bg-slate-800/80 px-1.5 py-0.5 rounded border border-slate-700">
-              ⌘K
-            </span>
-          </div>
-
-          {/* Sisi Kanan: Pilihan Cabang, Quick Action, Siaran, Notifikasi */}
-          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
-            {/* Outlet Selector Dropdown */}
-            <div className="hidden sm:flex items-center bg-[#081220]/80 border border-[#1e3456] rounded-xl px-2.5 py-1.5 text-xs shadow-inner">
-              <Building2 className="h-3.5 w-3.5 text-amber-400 mr-1.5 shrink-0" />
-              <select
-                value={selectedOutlet}
-                onChange={(e) => setSelectedOutlet(e.target.value)}
-                className="bg-transparent text-slate-200 font-bold outline-none cursor-pointer text-xs"
-              >
-                {outlets.map((o) => (
-                  <option key={o.id} value={o.id} className="bg-[#0a1526] text-white">
-                    {o.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Quick Action Button: Input Karyawan */}
-            <button
-              onClick={() => setIsAddEmployeeModalOpen(true)}
-              className="hidden md:inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs px-3 py-1.5 rounded-xl shadow-md shadow-amber-500/20 transition hover:scale-102"
-              title="Tambah Karyawan Baru"
-            >
-              <UserPlus className="h-3.5 w-3.5" />
-              <span>+ Karyawan</span>
-            </button>
-
-            {/* Resto Broadcast / Megaphone */}
-            <button
-              onClick={() => showToast('Pengumuman Resto: Notifikasi SOP & Promo Aktif')}
-              className="p-2 text-slate-300 hover:text-white hover:bg-[#12233f] rounded-xl relative border border-[#1e3456] transition"
-              title="Pengumuman & Siaran Resto"
-            >
-              <Megaphone className="h-4 w-4" />
-            </button>
-
-            {/* Chat & Tim Messages */}
-            <button
-              onClick={() => showToast('Pusat Pesan Tim: Sinkronisasi aktif')}
-              className="p-2 text-slate-300 hover:text-white hover:bg-[#12233f] rounded-xl relative border border-[#1e3456] transition"
-              title="Pesan & Komunikasi Tim"
-            >
-              <MessageCircle className="h-4 w-4" />
-            </button>
-
-            {/* Notification Bell with Badge 26 */}
-            <button
-              onClick={() => showToast('26 Notifikasi: Sinkronisasi Presensi, Cuti & Roster Lengkap')}
-              className="p-2 text-slate-300 hover:text-white hover:bg-[#12233f] rounded-xl relative border border-[#1e3456] transition"
-              title="26 Notifikasi Operasional"
-            >
-              <Bell className="h-4 w-4" />
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-rose-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-[#0b172c] shadow-sm">
-                26
-              </span>
-            </button>
-          </div>
-        </header>
-
-        {/* Sub-Tabs Bar (Shown only when in specific modules, hidden or minimal on Card Hub) */}
-        {activeMenu !== 'hub' ? (
-          <div className="bg-white border-b border-slate-200 px-4 sm:px-6 pt-3 shrink-0">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3">
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={() => {
-                    setActiveMenu('hub');
-                    setActiveSubTab('bento-cards');
-                  }}
-                  className="inline-flex items-center space-x-1.5 text-xs font-bold text-slate-600 hover:text-amber-600 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-amber-300 hover:bg-amber-50/50 transition-all shadow-xs"
-                >
-                  <ArrowRight className="h-3.5 w-3.5 rotate-180" />
-                  <span>Pusat Dasbor</span>
-                </button>
-                <div className="h-5 w-px bg-slate-200"></div>
-                <div>
-                  <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center space-x-2">
-                    <span>{menuConfig[activeMenu].title}</span>
-                    {menuConfig[activeMenu].badge && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-md font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                        {menuConfig[activeMenu].badge}
-                      </span>
-                    )}
-                  </h2>
-                </div>
-              </div>
-
-              {/* Module-Specific Actions */}
-              <div className="flex items-center space-x-2">
-                {activeMenu === 'attendance' && (
-                  <button
-                    onClick={() => setActiveSubTab('daily-timesheet')}
-                    className="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs px-3.5 py-1.5 rounded-xl font-bold flex items-center space-x-1.5 shadow-sm"
-                  >
-                    <CalendarDays className="h-3.5 w-3.5" />
-                    <span>Rekap 31 Hari</span>
-                  </button>
-                )}
-                {activeMenu === 'payroll' && (
-                  <>
-                    <button
-                      onClick={() => setActiveSubTab('monthly-recap')}
-                      className="bg-slate-900 hover:bg-slate-800 text-white text-xs px-3 py-1.5 rounded-xl font-bold flex items-center space-x-1.5 shadow-sm"
-                    >
-                      <TrendingUp className="h-3.5 w-3.5 text-amber-400" />
-                      <span>Rekap Multi-Bulan</span>
-                    </button>
-                    <button
-                      onClick={() => showToast('Slip gaji periode Oktober 2026 berhasil digenerate')}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-xl font-bold flex items-center space-x-1.5 shadow-sm"
-                    >
-                      <Receipt className="h-3.5 w-3.5" />
-                      <span className="hidden sm:inline">Generate Slip Gaji</span>
-                    </button>
-                  </>
-                )}
-                {activeMenu === 'employees' && (
-                  <button
-                    onClick={() => setIsAddEmployeeModalOpen(true)}
-                    className="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs px-3.5 py-1.5 rounded-xl font-bold flex items-center space-x-1.5 shadow-sm"
-                  >
-                    <UserPlus className="h-3.5 w-3.5" />
-                    <span>Tambah Karyawan</span>
-                  </button>
-                )}
-                {activeMenu === 'sanctions' && (
-                  <button
-                    onClick={() => {
-                      setActiveSubTab('create-sp');
-                      showToast('Silakan isi formulir penerbitan Surat Peringatan (SP) & BAP');
-                    }}
-                    className="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3.5 py-1.5 rounded-xl font-bold flex items-center space-x-1.5 shadow-sm transition hover:scale-102"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    <span>Terbitkan SP Baru</span>
-                  </button>
-                )}
-                {activeMenu === 'performance' && (
-                  <button
-                    onClick={() => {
-                      setActiveSubTab('spv-inspections');
-                      showToast('Beralih ke Jadwal & Lembar Penilaian Sidak SPV');
-                    }}
-                    className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-3.5 py-1.5 rounded-xl font-black flex items-center space-x-1.5 shadow-sm transition hover:scale-102"
-                  >
-                    <Calendar className="h-3.5 w-3.5" />
-                    <span>Jadwal Sidak SPV</span>
-                  </button>
-                )}
-                {activeMenu === 'sops' && (
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => setIsAiSopModalOpen(true)}
-                      className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-3.5 py-1.5 rounded-xl font-extrabold flex items-center space-x-1.5 shadow-sm transition hover:scale-102"
-                    >
-                      <Sparkles className="h-3.5 w-3.5 fill-slate-950" />
-                      <span>✨ Buat SOP dengan AI</span>
-                    </button>
-                    <button
-                      onClick={() => showToast('Formulir Unggah SOP siap digunakan')}
-                      className="bg-slate-900 hover:bg-slate-800 text-white text-xs px-3 py-1.5 rounded-xl font-bold flex items-center space-x-1.5 shadow-sm"
-                    >
-                      <Plus className="h-3.5 w-3.5" />
-                      <span>Unggah Dokumen</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Sub-Tab Navigation Pills */}
-            <div className="flex space-x-1.5 border-t border-slate-100 pt-2 pb-2 overflow-x-auto scrollbar-none">
+        {activeMenu !== 'hub' && (
+          <div className="shrink-0 border-b border-slate-200 bg-white px-4 sm:px-6">
+            {moduleActions && <div className="flex flex-wrap items-center justify-end gap-2 pt-3">{moduleActions}</div>}
+            <nav className="-mb-px flex gap-1 overflow-x-auto" aria-label={`Bagian ${menuConfig[activeMenu].title}`}>
               {menuConfig[activeMenu].subTabs.map((sub) => {
                 const isSubActive = activeSubTab === sub.id;
                 return (
                   <button
                     key={sub.id}
+                    type="button"
                     onClick={() => setActiveSubTab(sub.id)}
-                    className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all shrink-0 ${
+                    aria-current={isSubActive ? 'page' : undefined}
+                    className={`shrink-0 whitespace-nowrap border-b-2 px-3 py-3 text-sm transition-colors ${
                       isSubActive
-                        ? 'bg-amber-500 text-slate-950 shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                        ? 'border-amber-500 font-medium text-slate-900'
+                        : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800'
                     }`}
                   >
                     {sub.label}
                   </button>
                 );
               })}
-            </div>
+            </nav>
           </div>
-        ) : null}
+        )}
 
         {/* Content Body */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
@@ -7108,7 +6607,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         setActiveMenu('attendance');
                         setActiveSubTab('daily-timesheet');
                       }}
-                      className="bg-amber-500 hover:bg-amber-400 text-slate-950 px-4 py-2.5 rounded-xl font-bold text-xs flex items-center space-x-2 shadow-lg shadow-amber-500/20 transition-all hover:scale-102 whitespace-nowrap"
+                      className="bg-amber-500 hover:bg-amber-400 text-slate-950 px-4 py-2.5 rounded-xl font-bold text-xs flex items-center space-x-2 shadow-lg shadow-amber-500/20 transition-all whitespace-nowrap"
                     >
                       <CalendarDays className="h-4 w-4" />
                       <span>Rekap Kehadiran 31 Hari</span>
@@ -7118,7 +6617,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         setActiveMenu('payroll');
                         setActiveSubTab('monthly-recap');
                       }}
-                      className="bg-slate-800/90 hover:bg-slate-700 text-white border border-slate-700 px-4 py-2.5 rounded-xl font-bold text-xs flex items-center space-x-2 transition-all hover:scale-102 whitespace-nowrap"
+                      className="bg-slate-800/90 hover:bg-slate-700 text-white border border-slate-700 px-4 py-2.5 rounded-xl font-bold text-xs flex items-center space-x-2 transition-all whitespace-nowrap"
                     >
                       <TrendingUp className="h-4 w-4 text-amber-400" />
                       <span>Rekap Gaji Multi-Bulan</span>
@@ -7478,12 +6977,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             <div className="flex items-center gap-2">
                               <span className="text-amber-400 font-extrabold">📅 {hoveredData.date} ({hoveredData.dayName})</span>
                               {hoveredData.isWeekend && (
-                                <span className="text-[9px] bg-rose-500/20 text-rose-300 font-bold px-1.5 py-0.2 rounded border border-rose-500/30">
+                                <span className="text-[9px] bg-rose-500/20 text-rose-300 font-bold px-1.5 py-0.5 rounded border border-rose-500/30">
                                   Weekend Peak
                                 </span>
                               )}
                               {hoveredData.isToday && (
-                                <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-extrabold px-1.5 py-0.2 rounded border border-emerald-500/30 animate-pulse">
+                                <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-extrabold px-1.5 py-0.5 rounded border border-emerald-500/30 animate-pulse">
                                   Hari Ini
                                 </span>
                               )}
@@ -7666,7 +7165,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
                                   <span className="text-2xl font-black text-slate-900 tracking-tight leading-none">{totalCrew}</span>
                                   <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">Total Kru</span>
-                                  <span className="text-[8px] font-extrabold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200 mt-1">
+                                  <span className="text-[8px] font-extrabold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 mt-1">
                                     {outletsConfigList.length} Outlet
                                   </span>
                                 </div>
@@ -9638,7 +9137,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                 Kru Ditugaskan ({staffInSlot.length})
                               </span>
                               {isCompliant && (
-                                <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.2 rounded">
+                                <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded">
                                   Kepatuhan 100%
                                 </span>
                               )}
@@ -9669,22 +9168,22 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                                   <div className="flex flex-wrap gap-1 pt-0.5">
                                     {staff.department.includes('Produksi') && (
-                                      <span className="text-[9px] bg-orange-50 text-orange-700 font-bold px-1.5 py-0.2 rounded border border-orange-200">
+                                      <span className="text-[9px] bg-orange-50 text-orange-700 font-bold px-1.5 py-0.5 rounded border border-orange-200">
                                         🍳 Produksi
                                       </span>
                                     )}
                                     {staff.department.includes('Waiters') && (
-                                      <span className="text-[9px] bg-blue-50 text-blue-700 font-bold px-1.5 py-0.2 rounded border border-blue-200">
+                                      <span className="text-[9px] bg-blue-50 text-blue-700 font-bold px-1.5 py-0.5 rounded border border-blue-200">
                                         🍽️ Waiters
                                       </span>
                                     )}
                                     {staff.gender === 'Perempuan' && (
-                                      <span className="text-[9px] bg-pink-50 text-pink-700 font-bold px-1.5 py-0.2 rounded border border-pink-200">
+                                      <span className="text-[9px] bg-pink-50 text-pink-700 font-bold px-1.5 py-0.5 rounded border border-pink-200">
                                         👩 Perempuan
                                       </span>
                                     )}
                                     {staff.isCashier && (
-                                      <span className="text-[9px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.2 rounded border border-emerald-200">
+                                      <span className="text-[9px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded border border-emerald-200">
                                         💳 Kasir
                                       </span>
                                     )}
@@ -10059,7 +9558,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                       {/* Hasil Analisis Deteksi */}
                       {simScanStatus && (
-                        <div className={`p-4 rounded-xl border space-y-2 animate-in fade-in slide-in-from-top-2 ${
+                        <div className={`p-4 rounded-xl border space-y-2 ${
                           simScanStatus.isValid
                             ? 'bg-emerald-50 border-emerald-300 text-emerald-950'
                             : 'bg-rose-50 border-rose-300 text-rose-950'
@@ -13652,7 +13151,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                   </button>
                                 </div>
                               ) : schedule.isPastDeadline ? (
-                                <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-50 via-amber-50 to-rose-50 border-2 border-rose-400 text-rose-950 flex items-start space-x-3 shadow-xs animate-in fade-in">
+                                <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-50 via-amber-50 to-rose-50 border-2 border-rose-400 text-rose-950 flex items-start space-x-3 shadow-xs">
                                   <div className="p-2.5 rounded-xl bg-rose-600 text-white shrink-0 mt-0.5">
                                     <Lock className="h-5 w-5" />
                                   </div>
@@ -14434,7 +13933,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                           {msg.categoryLabel}
                                         </span>
                                         {!msg.isRead && (
-                                          <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded-full bg-rose-500 text-white animate-pulse">
+                                          <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-rose-500 text-white animate-pulse">
                                             BARU
                                           </span>
                                         )}
@@ -14631,7 +14130,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                       <div className="text-[11px]">
                                         <span className="font-mono">{recap.breakDuration} menit</span>
                                         {recap.isOverBreak && (
-                                          <span className="ml-1.5 font-bold text-rose-700 bg-rose-50 px-1.5 py-0.2 rounded text-[10px]">
+                                          <span className="ml-1.5 font-bold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded text-[10px]">
                                             Over {recap.overBreakMinutes}m
                                           </span>
                                         )}
@@ -15273,7 +14772,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                   </div>
                                   <div className="flex-1 space-y-1">
                                     <div className="flex items-center justify-between">
-                                      <span className="text-[8px] font-black uppercase px-1.5 py-0.2 rounded bg-rose-500/10 text-rose-600 border border-rose-200">
+                                      <span className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-600 border border-rose-200">
                                         WAJIB H-3 CUT-OFF
                                       </span>
                                       <span className="text-[8px] text-slate-600 font-medium">1 hari lalu</span>
@@ -15303,7 +14802,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                   </div>
                                   <div className="flex-1 space-y-1">
                                     <div className="flex items-center justify-between">
-                                      <span className="text-[8px] font-black uppercase px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-700 border border-amber-200">
+                                      <span className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-700 border border-amber-200">
                                         OPERASIONAL RESTO
                                       </span>
                                       <span className="text-[8px] text-slate-600 font-medium">3 hari lalu</span>
@@ -15417,7 +14916,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                         >
                                           <span className="text-[8px] font-black">{item.name}</span>
                                           <span className="text-[9px] font-mono font-bold text-white my-0.5">{item.time}</span>
-                                          <span className={`text-[6.5px] font-bold px-1 py-0.2 rounded leading-none ${
+                                          <span className={`text-[6.5px] font-bold px-1 py-0.5 rounded leading-none ${
                                             item.isRush ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-800 text-slate-400'
                                           }`}>
                                             {item.type}
@@ -15439,7 +14938,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                     <div>
                                       <p className="text-[10px] font-black uppercase text-amber-300 tracking-tight flex items-center gap-1">
                                         <span>Laporan Harian Leader</span>
-                                        <span className="text-[7.5px] px-1.5 py-0.2 rounded bg-amber-500 text-slate-950 font-black">LEADER ONLY</span>
+                                        <span className="text-[7.5px] px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 font-black">LEADER ONLY</span>
                                       </p>
                                       <p className="text-[8px] text-slate-300">14 Titik Foto Ber-Timestamp (Ayam, Stelling, Closing)</p>
                                     </div>
@@ -18387,7 +17886,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                           </div>
                                         ) : (
                                           /* Mode Hasil & Review Pembahasan Kuis Mingguan */
-                                          <div className="space-y-3 animate-in fade-in">
+                                          <div className="space-y-3">
                                             <div className={`p-4 rounded-xl border text-center space-y-1.5 ${
                                               isPassed
                                                 ? 'bg-emerald-950/60 border-emerald-500/50 text-emerald-300'
@@ -18582,7 +18081,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-1.5">
                                     <h5 className="font-extrabold text-xs text-white truncate">{currentKruStaff.name}</h5>
-                                    <span className="text-[8px] font-black px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                                    <span className="text-[8px] font-black px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                                       PKWT Sah
                                     </span>
                                   </div>
@@ -19050,7 +18549,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                     >
                                       <div className="flex items-start justify-between gap-1 mb-1">
                                         <div className="flex items-center gap-1.5">
-                                          <span className="text-[7.5px] font-mono font-black px-1.5 py-0.2 rounded bg-slate-900 text-amber-400">
+                                          <span className="text-[7.5px] font-mono font-black px-1.5 py-0.5 rounded bg-slate-900 text-amber-400">
                                             {msg.categoryLabel}
                                           </span>
                                           {!msg.isRead && (
@@ -19429,7 +18928,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           >
                             <div className="relative">
                               <ClipboardCheck className={`h-4.5 w-4.5 ${kruMobileView === 'module' && kruActiveModule === 'cuti' ? 'stroke-[2.5]' : 'stroke-2'}`} />
-                              <span className="absolute -top-1 -right-2 px-1 py-0.2 bg-amber-500 text-slate-950 font-mono font-black text-[7.5px] rounded-full leading-none shadow-xs">
+                              <span className="absolute -top-1 -right-2 px-1 py-0.5 bg-amber-500 text-slate-950 font-mono font-black text-[7.5px] rounded-full leading-none shadow-xs">
                                 Admin
                               </span>
                             </div>
@@ -20904,7 +20403,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     <div className="flex flex-wrap items-center gap-2 shrink-0">
                       <button
                         onClick={() => setActiveSubTab('ai-sop-generator')}
-                        className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-3.5 py-2.5 rounded-xl font-extrabold flex items-center space-x-1.5 shadow-md transition-all ring-2 ring-amber-300 hover:scale-102"
+                        className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-3.5 py-2.5 rounded-xl font-extrabold flex items-center space-x-1.5 shadow-md transition-all ring-2 ring-amber-300"
                       >
                         <Sparkles className="h-4 w-4 fill-slate-950" />
                         <span>✨ AI SOP Studio</span>
@@ -21372,7 +20871,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                       <button
                         type="submit"
-                        className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black shadow-md shadow-rose-600/20 flex items-center justify-center space-x-2 transition hover:scale-102"
+                        className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black shadow-md shadow-rose-600/20 flex items-center justify-center space-x-2 transition"
                       >
                         <ShieldAlert className="h-4 w-4" />
                         <span>Sahkan &amp; Terbitkan Surat Peringatan (SP)</span>
@@ -21568,7 +21067,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                     <button
                       onClick={() => setActiveSubTab('create-sp')}
-                      className="w-full sm:w-auto bg-rose-600 hover:bg-rose-700 text-white text-xs px-4 py-2 rounded-xl font-black flex items-center justify-center space-x-1.5 shadow-sm transition hover:scale-102"
+                      className="w-full sm:w-auto bg-rose-600 hover:bg-rose-700 text-white text-xs px-4 py-2 rounded-xl font-black flex items-center justify-center space-x-1.5 shadow-sm transition"
                     >
                       <Plus className="h-4 w-4" />
                       <span>+ Terbitkan Surat Peringatan (SP)</span>
@@ -21591,7 +21090,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       </div>
                       <button
                         onClick={() => setActiveSubTab('create-sp')}
-                        className="bg-rose-600 hover:bg-rose-700 text-white text-xs px-5 py-2.5 rounded-xl font-black shadow-md shadow-rose-600/20 transition hover:scale-102"
+                        className="bg-rose-600 hover:bg-rose-700 text-white text-xs px-5 py-2.5 rounded-xl font-black shadow-md shadow-rose-600/20 transition"
                       >
                         + Terbitkan Surat Peringatan (SP) Baru
                       </button>
@@ -23549,8 +23048,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     {selectedSurvey360DetailStaff && (() => {
                       const { emp, res } = selectedSurvey360DetailStaff;
                       return (
-                        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-                          <div className="bg-white rounded-3xl max-w-2xl w-full border border-slate-200 p-6 space-y-5 shadow-2xl animate-in fade-in zoom-in-95">
+                        <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-4 overflow-y-auto">
+                          <div className="bg-white rounded-3xl max-w-2xl w-full border border-slate-200 p-6 space-y-5 shadow-2xl">
                             {/* Modal Header */}
                             <div className="flex items-start justify-between border-b border-slate-100 pb-3">
                               <div className="flex items-center space-x-3">
@@ -23696,7 +23195,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     }`}
                   >
                     <div className="flex justify-between items-center mb-1">
-                      <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${r.badgeColor}`}>
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${r.badgeColor}`}>
                         {r.badge}
                       </span>
                       <span className="text-[10px] font-bold text-slate-400">{r.assignedUsersCount} Akun</span>
@@ -23864,47 +23363,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
           {/* ========================================================= */}
           {activeMenu === 'requests' && (
             <div className="space-y-5">
-              {/* Top Banner SOP Integration */}
-              <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-slate-800 rounded-2xl p-5 text-white shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950 px-2 py-0.5 rounded">
-                      PENGAWASAN OPERASIONAL &amp; SOP 001
-                    </span>
-                    <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                      <ShieldCheck className="h-3.5 w-3.5" />
-                      SK No: 001/V/2025/ADM-APS (Ayam Pecak 2001 Seafood)
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-black text-white tracking-tight">
-                    MANAJEMEN LIBUR, ROSTER CERDAS &amp; NOTIFIKASI BOT
-                  </h3>
-                  <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-                    Sistem otomatisasi penegakan jatah libur 2 hari/bulan, kunci akhir pekan (Jumat-Minggu), proteksi bentrok stasiun, kompensasi insentif Rp 75k/hari, dan notifikasi WhatsApp resmi ke seluruh karyawan.
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2 shrink-0">
-                  <button
-                    onClick={() => setViewingOfficialSopDoc(true)}
-                    className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-3.5 py-2 rounded-xl font-extrabold flex items-center space-x-1.5 shadow transition-all"
-                  >
-                    <FileText className="h-4 w-4" />
-                    <span>Naskah SK Resmi</span>
-                  </button>
-                </div>
-              </div>
-
               {/* =================================================== */}
               {/* SUB-TAB 1: APPROVAL PENGAJUAN LIBUR (SOP 001)       */}
               {/* =================================================== */}
               {activeSubTab === 'leave-requests' && (
                 <RequestsApprovalModule
-                    key="requests-leave"
+                    key="requests-all"
                   store={adminRequests}
-                  types={LEAVE_TYPES}
-                  title="Persetujuan Cuti, Izin, Sakit & Lembur"
-                  description="Pengajuan dari aplikasi HP kru. Kepala Cabang menyetujui lebih dulu, lalu HR memberi keputusan akhir. Cuti tahunan yang disetujui HR otomatis memotong sisa cuti karyawan."
+                  title="Semua Pengajuan Kru"
+                  description="Cuti, izin, sakit, lembur, tukar shift dan kasbon dari aplikasi HP kru. Kepala Cabang menyetujui lebih dulu, lalu HR atau Finance memberi keputusan akhir."
                 />
               )}
 
@@ -24823,7 +24290,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       <Icon className="h-4 w-4" />
                       <span>{tab.label}</span>
                       {tab.count !== undefined && (
-                        <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
                           isActive ? 'bg-amber-100 text-amber-900' : 'bg-slate-100 text-slate-600'
                         }`}>
                           {tab.count}
@@ -25078,7 +24545,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                           <span className="ml-1 text-[10px] text-slate-400 font-normal">({emp.nickname})</span>
                                         </div>
                                         <div className="flex items-center gap-1.5 mt-0.5">
-                                          <span className="font-mono text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.2 rounded">
+                                          <span className="font-mono text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">
                                             {emp.id}
                                           </span>
                                           <span className="text-[10px] text-slate-400 font-mono">
@@ -25104,12 +24571,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                     <div className="font-bold text-slate-900">{emp.positionTitle}</div>
                                     <div className="text-[10px] text-slate-500">{emp.outlet}</div>
                                     <div className="flex flex-wrap items-center gap-1 mt-0.5">
-                                      <span className="inline-block text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 uppercase">
+                                      <span className="inline-block text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 uppercase">
                                         Station: {emp.stationKey}
                                       </span>
                                       {emp.mutationHistory && emp.mutationHistory.length > 0 && (
                                         <span
-                                          className="inline-flex items-center gap-0.5 text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-blue-100 text-blue-800 border border-blue-200"
+                                          className="inline-flex items-center gap-0.5 text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-200"
                                           title={`Mutasi ${emp.mutationHistory.length}x: Terakhir dari ${emp.mutationHistory[0].fromOutlet.split(',')[0]} ke ${emp.mutationHistory[0].toOutlet.split(',')[0]}`}
                                         >
                                           <ArrowLeftRight className="h-2.5 w-2.5" />
@@ -25126,7 +24593,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                     </div>
                                     <div className="flex flex-col gap-0.5 mt-0.5">
                                       <span
-                                        className={`inline-block text-[9px] font-bold px-1.5 py-0.2 rounded w-fit ${
+                                        className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded w-fit ${
                                           tenureData.category === 'SENIOR_6_MONTHS'
                                             ? 'bg-emerald-100 text-emerald-800'
                                             : tenureData.category === 'OVER_3_MONTHS'
@@ -25136,7 +24603,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                       >
                                         {tenureData.categoryLabel}
                                       </span>
-                                      <span className="text-[9px] font-black text-amber-900 bg-amber-50 border border-amber-200 px-1 py-0.2 rounded w-fit">
+                                      <span className="text-[9px] font-black text-amber-900 bg-amber-50 border border-amber-200 px-1 py-0.5 rounded w-fit">
                                         🎁 {tenureData.tenureAllowanceLabel}
                                       </span>
                                     </div>
@@ -25468,7 +24935,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       <Icon className="h-4 w-4" />
                       <span>{tab.label}</span>
                       {tab.count !== undefined && (
-                        <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
                           isActive ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-600'
                         }`}>
                           {tab.count}
@@ -27000,7 +26467,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block flex items-center justify-between">
                             <span>Jam Kerja &amp; Operasional Outlet:</span>
-                            <span className="text-[8.5px] bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded font-bold">Data Profil</span>
+                            <span className="text-[8.5px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-bold">Data Profil</span>
                           </span>
                           <div className="flex justify-between items-center text-slate-700 text-xs">
                             <span className="text-slate-500">Buka Weekday:</span>
@@ -27042,7 +26509,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         <div className="p-3 bg-amber-50/70 rounded-xl border border-amber-200 space-y-1.5">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-amber-950 block flex items-center justify-between">
                             <span>Siklus Cut-Off &amp; Gajian (Rujukan Manual):</span>
-                            <span className="text-[9px] bg-amber-200 text-amber-950 px-1.5 py-0.2 rounded font-mono font-bold">Tersinkronisasi</span>
+                            <span className="text-[9px] bg-amber-200 text-amber-950 px-1.5 py-0.5 rounded font-mono font-bold">Tersinkronisasi</span>
                           </span>
                           <div className="flex justify-between items-center text-slate-700">
                             <span className="text-xs">Tutup Buku (Cut-off):</span>
@@ -27128,13 +26595,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             </div>
           )}
         </main>
-      </div>
 
       {/* ========================================================= */}
       {/* 3. MODAL REVIEW / DETAIL                                  */}
       {/* ========================================================= */}
       {reviewModalData && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2">
@@ -27179,7 +26645,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* 4. MODAL EDIT RECORD                                      */}
       {/* ========================================================= */}
       {editModalData && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <form onSubmit={handleSaveEdit} className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2">
@@ -27558,7 +27024,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* 5. MODAL KONFIRMASI DELETE                                */}
       {/* ========================================================= */}
       {deleteModalData && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
             <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
               <AlertTriangle className="h-6 w-6" />
@@ -27593,7 +27059,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL 6: EDIT STRUKTUR UPAH POSISI (BAROKAH 2026)         */}
       {/* ========================================================= */}
       {editingMatrixPosition && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2">
@@ -27823,7 +27289,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL 7: EDIT PAYROLL KARYAWAN SPESIFIK CABANG           */}
       {/* ========================================================= */}
       {editingStaffPayroll && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div>
@@ -28543,7 +28009,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL 8: DOKUMEN RESMI SOP 001/V/2025 (BAROKAH GRUP)      */}
       {/* ========================================================= */}
       {viewingOfficialSopDoc && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
           <div className="bg-white rounded-2xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
             {/* Header / Kop Surat Resmi Barokah Grup */}
             <div className="relative mb-3">
@@ -28776,7 +28242,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* BERLAKU 01 APRIL 2026 - BAROKAH GRUP (8 HALAMAN LENGKAP)  */}
       {/* ========================================================= */}
       {viewingOfficialSop2026Doc && (
-        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
           <div className="bg-white rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
             {/* Header / Kop Surat Resmi Barokah Grup */}
             <div className="relative mb-3">
@@ -29140,7 +28606,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* SK: 004/HR-PAY/2026/BAROKAH - BERLAKU 21 OKTOBER 2026     */}
       {/* ========================================================= */}
       {viewingOfficialSopOnboardingDoc && (
-        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
           <div className="bg-white rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
             {/* Header / Kop Surat Resmi Barokah Grup */}
             <div className="relative mb-3">
@@ -29487,7 +28953,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   <div className="p-3 bg-white rounded-xl border-2 border-amber-300 text-center space-y-2 relative overflow-hidden bg-amber-50/20">
-                    <span className="absolute top-1 right-1 text-[8px] font-black bg-amber-500 text-slate-950 px-1.5 py-0.2 rounded uppercase">
+                    <span className="absolute top-1 right-1 text-[8px] font-black bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded uppercase">
                       TERVERIFIKASI
                     </span>
                     <p className="text-[10px] font-bold text-slate-500 uppercase">Disetujui &amp; Disahkan,</p>
@@ -29545,7 +29011,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* KERJA (TENURE ALLOWANCE) - SK: 005/HR-PAY/2026/BAROKAH    */}
       {/* ========================================================= */}
       {viewingOfficialSopTenureDoc && (
-        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
           <div className="bg-white rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
             {/* Header / Kop Surat Resmi Barokah Grup */}
             <div className="relative mb-3">
@@ -29897,7 +29363,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   <div className="p-3 bg-white rounded-xl border-2 border-amber-300 text-center space-y-2 relative overflow-hidden bg-amber-50/20">
-                    <span className="absolute top-1 right-1 text-[8px] font-black bg-amber-500 text-slate-950 px-1.5 py-0.2 rounded uppercase">
+                    <span className="absolute top-1 right-1 text-[8px] font-black bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded uppercase">
                       TERVERIFIKASI
                     </span>
                     <p className="text-[10px] font-bold text-slate-500 uppercase">Disetujui &amp; Disahkan,</p>
@@ -29954,7 +29420,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL NASKAH RESMI: SOP-HR-007 (CUTI TAHUNAN BERJENJANG)   */}
       {/* ========================================================= */}
       {viewingOfficialSopAnnualLeaveDoc && (
-        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
           <div className="bg-white rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
             {/* Header / Kop Surat Resmi Barokah Grup */}
             <div className="relative mb-3">
@@ -30230,7 +29696,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   <div className="p-3 bg-white rounded-xl border-2 border-teal-400 text-center space-y-2 relative overflow-hidden bg-teal-50/20">
-                    <span className="absolute top-1 right-1 text-[8px] font-black bg-teal-600 text-white px-1.5 py-0.2 rounded uppercase">
+                    <span className="absolute top-1 right-1 text-[8px] font-black bg-teal-600 text-white px-1.5 py-0.5 rounded uppercase">
                       TERVERIFIKASI
                     </span>
                     <p className="text-[10px] font-bold text-slate-500 uppercase">Disetujui &amp; Disahkan,</p>
@@ -30287,7 +29753,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL NASKAH RESMI: SOP-HR-006 (LIBUR, CUTI KHUSUS & UPAH) */}
       {/* ========================================================= */}
       {viewingOfficialSopUnpaidDoc && (
-        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
           <div className="bg-white rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
             {/* Header / Kop Surat Resmi Barokah Grup */}
             <div className="relative mb-3">
@@ -30550,7 +30016,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   <div className="p-3 bg-white rounded-xl border-2 border-sky-400 text-center space-y-2 relative overflow-hidden bg-sky-50/20">
-                    <span className="absolute top-1 right-1 text-[8px] font-black bg-sky-600 text-white px-1.5 py-0.2 rounded uppercase">
+                    <span className="absolute top-1 right-1 text-[8px] font-black bg-sky-600 text-white px-1.5 py-0.5 rounded uppercase">
                       TERVERIFIKASI
                     </span>
                     <p className="text-[10px] font-bold text-slate-500 uppercase">Disetujui &amp; Disahkan,</p>
@@ -30639,7 +30105,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL 1: FORM PENERBITAN BERITA ACARA KOREKSI (ADMIN)     */}
       {/* ========================================================= */}
       {isAdminCreateCorrectionModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 my-8 border border-slate-200">
             {/* Header Modal */}
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -30916,7 +30382,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL 1: CETAK DOKUMEN RESMI SURAT PERINGATAN (SP)        */}
       {/* ========================================================= */}
       {viewingSanctionDoc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-xs overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-3xl w-full p-6 space-y-6 shadow-2xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
               <span className="text-[10px] font-black uppercase tracking-wider text-rose-800 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full">
@@ -31062,7 +30528,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL 2: CETAK BERITA ACARA PELANGGARAN (BAP)              */}
       {/* ========================================================= */}
       {viewingBapDoc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-xs overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-3xl w-full p-6 space-y-6 shadow-2xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
               <span className="text-[10px] font-black uppercase tracking-wider text-indigo-800 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full">
@@ -31189,7 +30655,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       )}
 
       {viewingCorrectionDoc && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-5 my-8 border border-slate-200">
             {/* Header Dialog Controls */}
             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
@@ -31387,7 +30853,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL 3: NASKAH RESMI SK DIREKSI SOP-HR-008                */}
       {/* ========================================================= */}
       {viewingOfficialSop008Doc && (
-        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
           <div className="bg-white rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
             {/* Header / Kop Surat Resmi Barokah Grup */}
             <div className="relative mb-3">
@@ -31526,7 +30992,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL: KIRIM KUDOS / APRESIASI REKAN KERJA                */}
       {/* ========================================================= */}
       {isKudosModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="flex justify-between items-start border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2.5">
@@ -31605,7 +31071,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL: JADWALKAN PERTEMUAN 1-ON-1 COACHING                */}
       {/* ========================================================= */}
       {is1to1ModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="flex justify-between items-start border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2.5">
@@ -31714,7 +31180,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL UNDUH PDF LAPORAN PAYROLL PER OUTLET & FILTER BULAN */}
       {/* ========================================================= */}
       {isExportPdfModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-5 my-8 max-h-[92vh] overflow-y-auto border border-slate-200">
             {/* Header */}
             <div className="flex justify-between items-start border-b border-slate-100 pb-3">
@@ -31881,7 +31347,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       )}
 
       {isAddEmployeeModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-2xl space-y-5 my-8 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex justify-between items-start border-b border-slate-100 pb-3">
@@ -31927,7 +31393,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <p className="text-sm font-black text-slate-900">
                   {calculateTenure(newEmployeeForm.joinDate).text}
                 </p>
-                <span className="inline-block text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-amber-200 text-amber-950">
+                <span className="inline-block text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-200 text-amber-950">
                   {calculateTenure(newEmployeeForm.joinDate).categoryLabel}
                 </span>
               </div>
@@ -32421,7 +31887,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* 2. MODAL IMPORT EXCEL KARYAWAN (.XLSX / .CSV)              */}
       {/* ========================================================= */}
       {isImportExcelModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2.5">
@@ -32588,7 +32054,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* 3. MODAL DOSSIER LENGKAP PROFIL KARYAWAN                   */}
       {/* ========================================================= */}
       {selectedEmployeeDetail && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-3">
@@ -32634,10 +32100,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   ⏳ {calculateTenure(selectedEmployeeDetail.joinDate).text}
                 </p>
                 <div className="flex flex-wrap gap-1 items-center pt-0.5">
-                  <span className="inline-block text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800">
+                  <span className="inline-block text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
                     {calculateTenure(selectedEmployeeDetail.joinDate).categoryLabel}
                   </span>
-                  <span className="inline-block text-[9px] font-black px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 border border-amber-300">
+                  <span className="inline-block text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
                     🎁 {calculateTenure(selectedEmployeeDetail.joinDate).tenureAllowanceLabel}
                   </span>
                 </div>
@@ -32684,7 +32150,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             <span className="text-blue-500 font-bold">➜</span>
                             <span className="text-blue-700 font-black">{m.toOutlet.split(',')[0]}</span>
                           </span>
-                          <span className="text-blue-800 font-mono font-bold bg-blue-50 px-1.5 py-0.2 rounded">
+                          <span className="text-blue-800 font-mono font-bold bg-blue-50 px-1.5 py-0.5 rounded">
                             {m.date}
                           </span>
                         </div>
@@ -32752,7 +32218,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           Rapor Kinerja: {report.period.split('(')[0].trim()}
                         </span>
                         <span
-                          className={`text-[9px] font-black px-1.5 py-0.2 rounded ${
+                          className={`text-[9px] font-black px-1.5 py-0.5 rounded ${
                             isGradeA
                               ? 'bg-emerald-100 text-emerald-800'
                               : isGradeB
@@ -32802,7 +32268,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL MUTASI CEPAT ANTAR-OUTLET RESTORAN BAROKAH GROUP   */}
       {/* ========================================================= */}
       {isQuickMutationModalOpen && mutationTargetEmp && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto border border-blue-100">
             {/* Modal Header */}
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -32839,7 +32305,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               </div>
               <div className="pt-1 border-t border-slate-200/60 flex items-center justify-between text-[10px]">
                 <span className="text-slate-500">Masa Kerja (Akumulatif): <strong>{calculateTenure(mutationTargetEmp.joinDate).text}</strong></span>
-                <span className="text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded">
+                <span className="text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
                   ✓ Hak SOP-HR-005 Tidak Reset
                 </span>
               </div>
@@ -32963,7 +32429,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* 4. MODAL PENAMPIL BERKAS DOKUMEN DIGITAL (PDF/SCAN)        */}
       {/* ========================================================= */}
       {viewingDocModal && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2.5">
@@ -33028,8 +32494,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
       {/* MODAL DETAIL LOG PRESENSI HARIAN (TIMESHEET DRILL-DOWN) */}
       {selectedTimesheetCell && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
-          <div className="bg-white rounded-2xl max-w-lg w-full border border-slate-200 shadow-2xl p-6 space-y-5 animate-in zoom-in-95 duration-150 font-sans">
+        <div className="fixed inset-0 bg-slate-950/60 flex items-center justify-center p-4 z-50 duration-150">
+          <div className="bg-white rounded-2xl max-w-lg w-full border border-slate-200 shadow-2xl p-6 space-y-5 duration-150 font-sans">
             {/* Header */}
             <div className="flex items-start justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center space-x-3">
@@ -33182,8 +32648,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
       {/* MODAL HISTORI SLIP GAJI DIGITAL MULTI-BULAN (SELECTED SLIP STAFF) */}
       {selectedSlipStaff && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
-          <div className="bg-white rounded-2xl max-w-2xl w-full border border-slate-200 shadow-2xl p-6 space-y-5 animate-in zoom-in-95 duration-150 font-sans max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-950/60 flex items-center justify-center p-4 z-50 duration-150">
+          <div className="bg-white rounded-2xl max-w-2xl w-full border border-slate-200 shadow-2xl p-6 space-y-5 duration-150 font-sans max-h-[90vh] overflow-y-auto">
             {/* Header Profil Karyawan */}
             <div className="flex items-start justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center space-x-3.5">
@@ -33347,7 +32813,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL MATRIKS PERMISSION APLIKASI (RBAC POP-UP MODAL)     */}
       {/* ========================================================= */}
       {isPermissionModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 animate-in fade-in overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-5xl w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] flex flex-col border border-slate-200">
             {/* Modal Header */}
             <div className="flex justify-between items-start border-b border-slate-100 pb-3 shrink-0">
@@ -33535,7 +33001,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL SIMULASI KUIS EVALUASI TRAINING RESTORAN            */}
       {/* ========================================================= */}
       {isTrainingQuizModalOpen && selectedTrainingModule && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-5 my-auto border border-slate-200">
             {/* Header */}
             <div className="flex justify-between items-start border-b border-slate-100 pb-3">
@@ -33782,7 +33248,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* 1. MODAL EDITOR MODUL PELATIHAN & BANK SOAL KUIS          */}
       {/* ========================================================= */}
       {isModuleEditorOpen && editingModuleData && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-4xl w-full p-6 shadow-2xl space-y-6 my-auto border border-slate-200 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex justify-between items-start border-b border-slate-100 pb-4">
@@ -34130,7 +33596,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* 2. MODAL AUTO-GENERATE MODUL TRAINING (PRESET PICKER)     */}
       {/* ========================================================= */}
       {isGenerateModuleModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-5 my-auto border border-slate-200">
             <div className="flex justify-between items-start border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-3">
@@ -34219,7 +33685,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* 3. MODAL KONFIRMASI HAPUS MODUL                           */}
       {/* ========================================================= */}
       {isDeleteModuleModalOpen && moduleToDelete && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 my-auto border border-slate-200 text-center">
             <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
               <Trash2 className="h-6 w-6" />
@@ -34257,7 +33723,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL JADWAL TRAINING BARU (WEB ADMIN)                    */}
       {/* ========================================================= */}
       {isAddScheduleModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-in fade-in overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 my-auto border border-slate-200 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3 sticky top-0 bg-white z-10">
               <div className="flex items-center space-x-2">
@@ -34641,7 +34107,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   });
 
                   return (
-                    <div className="space-y-2 pt-1 border-t border-slate-200 animate-in fade-in">
+                    <div className="space-y-2 pt-1 border-t border-slate-200">
                       <div className="flex items-center justify-between text-[11px]">
                         <span className="text-slate-600 font-bold">
                           Daftar Karyawan di {newScheduleFormData.outlet} ({eligibleStaff.length} Staf Relevan):
@@ -34788,7 +34254,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL DAFTAR STAF KONFIRMASI HADIR TRAINING               */}
       {/* ========================================================= */}
       {selectedScheduleAttendees && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-in fade-in overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 my-auto border border-slate-200">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div>
@@ -34929,7 +34395,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL BUAT KUIS MINGGUAN WAJIB (AUTO-GENERATE 10 SOAL)    */}
       {/* ========================================================= */}
       {isCreateWeeklyQuizModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-in fade-in overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 my-auto border border-slate-200 max-h-[92vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3 sticky top-0 bg-white z-10">
               <div className="flex items-center space-x-2">
@@ -35162,7 +34628,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL DETAIL INSPEKSI FOTO WATERMARK KEHADIRAN (ADMIN)     */}
       {/* ========================================================= */}
       {selectedAttendeeDetailPhoto && (
-        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4 my-auto border border-slate-200">
             <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
               <div className="flex items-center gap-2">
@@ -35192,7 +34658,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               />
 
               {/* Watermark Security Overlay Banner */}
-              <div className="absolute bottom-0 inset-x-0 bg-slate-950/90 text-white p-3 border-t border-amber-500/60 backdrop-blur-xs font-mono space-y-1">
+              <div className="absolute bottom-0 inset-x-0 bg-slate-950/90 text-white p-3 border-t border-amber-500/60 font-mono space-y-1">
                 <div className="flex items-center justify-between text-[9px] text-amber-400 font-extrabold uppercase tracking-wider border-b border-slate-800 pb-0.5">
                   <span>🛡️ BAROKAH GRUP HRIS • SECURITY ATTENDANCE STAMP</span>
                   <span>VERIFIED</span>
@@ -35242,7 +34708,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL KAMERA POPUP WATERMARK OTOMATIS (OPSI 1)             */}
       {/* ========================================================= */}
       {attendanceCameraModal && (
-        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl max-w-md w-full p-5 shadow-2xl space-y-4 my-auto border border-slate-200 max-h-[92vh] overflow-y-auto">
             {/* Header Modal Kamera */}
             <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
@@ -35323,7 +34789,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   {/* HUD Overlay Kamera */}
-                  <div className="absolute top-2 inset-x-3 flex items-center justify-between z-10 text-[9px] text-white font-mono bg-slate-950/70 backdrop-blur-xs px-2.5 py-1 rounded-lg">
+                  <div className="absolute top-2 inset-x-3 flex items-center justify-between z-10 text-[9px] text-white font-mono bg-slate-950/70 px-2.5 py-1 rounded-lg">
                     <span className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                       LIVE FRONT CAM
@@ -35332,7 +34798,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   {/* Watermark Live Bar */}
-                  <div className="absolute bottom-2 inset-x-3 z-10 text-[9px] text-amber-300 font-mono bg-slate-950/85 backdrop-blur-xs px-2.5 py-1 rounded-lg truncate border border-slate-800">
+                  <div className="absolute bottom-2 inset-x-3 z-10 text-[9px] text-amber-300 font-mono bg-slate-950/85 px-2.5 py-1 rounded-lg truncate border border-slate-800">
                     📍 {attendanceCameraModal.outletName} • 🕒 {new Date().toLocaleTimeString('id-ID')} WIB
                   </div>
                 </div>
@@ -35431,7 +34897,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               </div>
             ) : (
               /* 2. HASIL PRATINJAU FOTO DENGAN WATERMARK PERMANEN */
-              <div className="space-y-3 animate-in zoom-in-95">
+              <div className="space-y-3">
                 <div className="relative rounded-2xl overflow-hidden aspect-[4/3] bg-slate-950 border-2 border-emerald-500 shadow-xl">
                   <img
                     src={capturedPhotoPreview.photoUrl}
@@ -35440,7 +34906,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   />
 
                   {/* Watermark Security Banner Permanen */}
-                  <div className="absolute bottom-0 inset-x-0 bg-slate-950/92 text-white p-3 border-t border-amber-500/60 backdrop-blur-xs font-mono space-y-1">
+                  <div className="absolute bottom-0 inset-x-0 bg-slate-950/92 text-white p-3 border-t border-amber-500/60 font-mono space-y-1">
                     <div className="flex items-center justify-between text-[9px] text-amber-400 font-extrabold uppercase tracking-wider border-b border-slate-800 pb-0.5">
                       <span>🛡️ BAROKAH GRUP • OFFICIAL ATTENDANCE STAMP</span>
                       <span>SECURE</span>
@@ -35648,7 +35114,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL ALARM PENGINGAT WAKTU SHOLAT & ADZAN OTOMATIS OUTLET */}
       {/* ========================================================= */}
       {prayerAlarmState && prayerAlarmState.active && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border-2 border-amber-500/80 rounded-3xl max-w-md w-full p-6 text-white shadow-2xl relative overflow-hidden space-y-4">
             {/* Background glowing circle */}
             <div className="absolute -top-12 -right-12 w-40 h-40 bg-amber-500/20 rounded-full blur-2xl pointer-events-none"></div>
@@ -35731,7 +35197,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* 4. MODAL SERTIFIKAT KELULUSAN & GENERATE PDF              */}
       {/* ========================================================= */}
       {isCertificateModalOpen && certificateData && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in overflow-y-auto print:p-0 print:bg-white">
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto print:p-0 print:bg-white">
           <div className="bg-white rounded-2xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl space-y-6 my-auto border border-amber-200 relative print:shadow-none print:border-none print:m-0 print:p-4">
             {/* Top Toolbar (Hidden on Print) */}
             <div className="flex justify-between items-center border-b border-slate-100 pb-3 print:hidden">
@@ -35879,7 +35345,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* 5. MODAL TRANSKRIP RAPOR PENILAIAN LENGKAP KARYAWAN       */}
       {/* ========================================================= */}
       {isReportCardModalOpen && selectedReportCardStaff && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-2xl space-y-5 my-auto border border-slate-200 max-h-[92vh] overflow-y-auto">
             {/* Header */}
             <div className="flex justify-between items-start border-b border-slate-100 pb-3">
@@ -36149,7 +35615,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* 1. MODAL: BACA ARTIKEL KEPEMIMPINAN (ARTICLE READER)     */}
       {/* ========================================================= */}
       {selectedArticleForReading && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
             {/* Modal Header */}
             <div className="p-6 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white flex justify-between items-start">
@@ -36266,7 +35732,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* 2. MODAL: EDITOR ARTIKEL KEPEMIMPINAN & 10 SOAL KUIS       */}
       {/* ========================================================= */}
       {isArticleEditorOpen && editingArticleData && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
             {/* Header */}
             <div className="p-5 bg-gradient-to-r from-slate-900 to-indigo-950 text-white flex justify-between items-center">
@@ -36564,7 +36030,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* 3. MODAL: KONFIRMASI HAPUS ARTIKEL KEPEMIMPINAN          */}
       {/* ========================================================= */}
       {isDeleteArticleModalOpen && articleToDelete && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center">
               <Trash2 className="h-6 w-6" />
@@ -36609,7 +36075,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* 4. MODAL: KUIS EVALUASI 10 SOAL LEADER & SIMPAN KE RAPOR  */}
       {/* ========================================================= */}
       {isArticleQuizModalOpen && activeArticleForQuiz && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
             {/* Header */}
             <div className="p-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex justify-between items-center">
@@ -37054,7 +36520,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL INTERAKTIF ASESMEN DISC KEPRIBADIAN (20 SOAL RESTORAN) */}
       {/* ========================================================= */}
       {isDiscTestModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm duration-200">
           <div className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden max-h-[92vh] flex flex-col">
             {/* Header Modal */}
             <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-purple-50 via-indigo-50 to-white">
@@ -38416,8 +37882,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
       {/* MODAL: KEBERATAN KLAUSUL & PERMINTAAN DIALOG BIPARTIT DENGAN MANAJEMEN */}
       {kruContractDisagreementModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden duration-150">
             {/* Modal Header */}
             <div className="p-5 bg-gradient-to-r from-rose-900 via-slate-900 to-rose-950 text-white flex items-center justify-between">
               <div className="flex items-center space-x-2.5">
@@ -38563,8 +38029,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
         };
 
         return (
-          <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 overflow-y-auto print:p-0 print:bg-white print:static">
-            <div className="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col my-auto max-h-[92vh] print:max-h-none print:border-none print:shadow-none animate-in fade-in zoom-in-95 duration-150">
+          <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-3 sm:p-5 overflow-y-auto print:p-0 print:bg-white print:static">
+            <div className="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col my-auto max-h-[92vh] print:max-h-none print:border-none print:shadow-none duration-150">
               
               {/* Header Modal Bar (Non-Printable) */}
               <div className="p-4 bg-slate-900 text-white flex items-center justify-between print:hidden border-b border-slate-800">
@@ -39138,8 +38604,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL 2: FORM EDIT / PENYESUAIAN NILAI RAPOR KARYAWAN      */}
       {/* ========================================================= */}
       {isEditReportCardModalOpen && editingReportCardData && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col my-auto max-h-[90vh] animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col my-auto max-h-[90vh] duration-150">
             {/* Header */}
             <div className="p-5 bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white flex items-center justify-between">
               <div className="flex items-center space-x-2.5">
@@ -39481,8 +38947,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL: TAMBAH & EDIT MASTER DATA OUTLET CABANG            */}
       {/* ========================================================= */}
       {isEditOutletModalOpen && selectedOutletForEdit && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] flex flex-col">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden duration-150 max-h-[92vh] flex flex-col">
             {/* Modal Header */}
             <div className="p-5 bg-gradient-to-r from-amber-600 via-slate-900 to-amber-700 text-white flex items-center justify-between shrink-0">
               <div className="flex items-center space-x-2.5">
@@ -40135,6 +39601,6 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
           </div>
         </div>
       )}
-    </div>
+    </AppShell>
   );
 }

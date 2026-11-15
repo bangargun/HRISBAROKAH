@@ -285,7 +285,7 @@ export function PendampinganView({ tasks, onUpdateStatus, showToast }: Pendampin
 
       {/* Modal Schedule */}
       {isScheduleModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[#0b1728] border border-[#1b2f4f] rounded-2xl max-w-md w-full p-6 text-white space-y-4 shadow-2xl">
             <h4 className="font-black text-sm text-white flex items-center gap-2">
               <Plus className="h-4 w-4 text-blue-400" />
@@ -679,7 +679,7 @@ export function OrganizationView({ employees = [], outlets = [], showToast }: Or
           </button>
           <button
             onClick={() => handleOpenEditModal()}
-            className="bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 text-xs px-4 py-2 rounded-xl font-black flex items-center space-x-1.5 shadow-md shadow-amber-500/20 transition hover:scale-102"
+            className="bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 text-xs px-4 py-2 rounded-xl font-black flex items-center space-x-1.5 shadow-md shadow-amber-500/20 transition"
             title="Edit Direksi, Operations Manager, atau Pimpinan Cabang"
           >
             <Edit2 className="h-3.5 w-3.5 text-slate-950" />
@@ -692,7 +692,7 @@ export function OrganizationView({ employees = [], outlets = [], showToast }: Or
       <div className="bg-[#0b1728] border border-[#162744] rounded-2xl p-6 sm:p-8 text-white space-y-6 shadow-md">
         {/* TIER 1: DIREKTUR UTAMA & OWNER HQ */}
         <div className="flex justify-center">
-          <div className="relative group p-4 sm:p-5 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 rounded-2xl text-slate-950 font-black text-center shadow-xl border-2 border-amber-300 w-80 transition hover:scale-102">
+          <div className="relative group p-4 sm:p-5 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 rounded-2xl text-slate-950 font-black text-center shadow-xl border-2 border-amber-300 w-80 transition">
             <button
               onClick={() => handleOpenEditModal()}
               className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/10 hover:bg-black/20 text-slate-950 transition opacity-0 group-hover:opacity-100"
@@ -720,7 +720,7 @@ export function OrganizationView({ employees = [], outlets = [], showToast }: Or
 
         {/* TIER 2: OPERATIONS MANAGER (MULTI-OUTLET) */}
         <div className="flex justify-center">
-          <div className="relative group p-4 bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-900 rounded-2xl text-white font-bold text-center shadow-lg border border-blue-600 w-72 transition hover:scale-102">
+          <div className="relative group p-4 bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-900 rounded-2xl text-white font-bold text-center shadow-lg border border-blue-600 w-72 transition">
             <button
               onClick={() => handleOpenEditModal()}
               className="absolute top-2 right-2 p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-blue-300 transition opacity-0 group-hover:opacity-100"
@@ -864,7 +864,7 @@ export function OrganizationView({ employees = [], outlets = [], showToast }: Or
       {/* MODAL INTERAKTIF: EDIT STRUKTUR ORGANISASI RESTORAN       */}
       {/* ========================================================= */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 overflow-y-auto">
           <div className="bg-[#0b172c] border border-[#1b3154] rounded-2xl max-w-2xl w-full p-5 sm:p-6 text-white shadow-2xl space-y-5 my-8 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-3 border-b border-[#1b3154]">
@@ -1106,7 +1106,7 @@ export function OrganizationView({ employees = [], outlets = [], showToast }: Or
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 shadow-md shadow-amber-500/20 transition hover:scale-102 flex items-center gap-1.5"
+                  className="px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 shadow-md shadow-amber-500/20 transition flex items-center gap-1.5"
                 >
                   <Check className="h-4 w-4" />
                   <span>Simpan Struktur Organisasi</span>
@@ -1623,7 +1623,7 @@ export function PerformanceView({ showToast }: { showToast?: (msg: string) => vo
                             <div className="font-bold text-white text-xs">{emp.name}</div>
                             <div className="text-[10px] text-slate-400 font-mono">{emp.nik}</div>
                             <div className="flex items-center gap-1.5 mt-0.5">
-                              <span className="text-[9px] font-bold bg-[#142642] text-amber-300 px-1.5 py-0.2 rounded border border-[#1f3a63]">
+                              <span className="text-[9px] font-bold bg-[#142642] text-amber-300 px-1.5 py-0.5 rounded border border-[#1f3a63]">
                                 {emp.station}
                               </span>
                               <span className="text-[9px] text-slate-400">• {emp.outlet}</span>
@@ -1766,8 +1766,8 @@ export function PerformanceView({ showToast }: { showToast?: (msg: string) => vo
 
       {/* 5. Detail & Evaluation Modal */}
       {selectedKpi && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs">
-          <div className="bg-[#0b1728] border border-[#1b2f4f] rounded-2xl w-full max-w-xl text-white shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80">
+          <div className="bg-[#0b1728] border border-[#1b2f4f] rounded-2xl w-full max-w-xl text-white shadow-2xl overflow-hidden duration-200">
             {/* Modal Header */}
             <div className="p-5 border-b border-[#162744] bg-[#070e1a]/80 flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -1982,8 +1982,8 @@ export function PerformanceView({ showToast }: { showToast?: (msg: string) => vo
 
       {/* 6. Modal Tambah Evaluasi KPI Karyawan Baru */}
       {isAddKpiModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs">
-          <div className="bg-[#0b1728] border border-[#1b2f4f] rounded-2xl w-full max-w-xl text-white shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80">
+          <div className="bg-[#0b1728] border border-[#1b2f4f] rounded-2xl w-full max-w-xl text-white shadow-2xl overflow-hidden duration-200">
             <div className="p-5 border-b border-[#162744] bg-[#070e1a]/80 flex items-center justify-between">
               <div className="flex items-center space-x-2.5">
                 <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">

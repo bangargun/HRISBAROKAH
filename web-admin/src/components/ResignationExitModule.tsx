@@ -381,7 +381,7 @@ export const ResignationExitModule: React.FC<ResignationExitModuleProps> = ({
           <button
             type="button"
             onClick={() => setIsAddResignModalOpen(true)}
-            className="bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-md flex items-center space-x-1.5 transition-all hover:scale-102"
+            className="bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-md flex items-center space-x-1.5 transition-all"
           >
             <Plus className="h-4 w-4" />
             <span>+ Lapor Resign Kru (Wajib Admin)</span>
@@ -396,7 +396,7 @@ export const ResignationExitModule: React.FC<ResignationExitModuleProps> = ({
               setCrewFormRecordId(resignationList[0].id);
               setIsCrewExitModalOpen(true);
             }}
-            className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-md flex items-center space-x-1.5 transition-all hover:scale-102"
+            className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-md flex items-center space-x-1.5 transition-all"
           >
             <Star className="h-4 w-4 fill-slate-950" />
             <span>📝 Input Exit Interview Kru</span>

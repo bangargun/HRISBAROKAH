@@ -396,7 +396,7 @@ export function SpvInspectionScheduleView({
         <div className="flex flex-wrap items-center gap-2 shrink-0">
           <button
             onClick={() => setIsScheduleModalOpen(true)}
-            className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-4 py-2.5 rounded-xl font-black flex items-center space-x-1.5 shadow-md shadow-amber-500/20 transition-all hover:scale-102"
+            className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-4 py-2.5 rounded-xl font-black flex items-center space-x-1.5 shadow-md shadow-amber-500/20 transition-all"
           >
             <Plus className="h-4 w-4" />
             <span>+ Jadwalkan Sidak Baru</span>
@@ -499,7 +499,7 @@ export function SpvInspectionScheduleView({
 
         <button
           onClick={() => setIsScheduleModalOpen(true)}
-          className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-4 py-2 rounded-xl font-bold flex items-center justify-center space-x-1.5 shadow-sm transition hover:scale-102 shrink-0"
+          className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-4 py-2 rounded-xl font-bold flex items-center justify-center space-x-1.5 shadow-sm transition shrink-0"
         >
           <Plus className="h-4 w-4" />
           <span>+ Jadwal Baru</span>
@@ -522,7 +522,7 @@ export function SpvInspectionScheduleView({
           </div>
           <button
             onClick={() => setIsScheduleModalOpen(true)}
-            className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-5 py-2.5 rounded-xl font-black shadow-md shadow-amber-500/20 transition hover:scale-102"
+            className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-5 py-2.5 rounded-xl font-black shadow-md shadow-amber-500/20 transition"
           >
             + Jadwalkan Kunjungan Sidak SPV Pertama
           </button>
@@ -692,7 +692,7 @@ export function SpvInspectionScheduleView({
 
       {/* 5. Modal Form Penjadwalan Sidak Baru */}
       {isScheduleModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-xs overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-xl w-full p-6 space-y-5 shadow-2xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
               <div className="flex items-center space-x-2">
@@ -833,7 +833,7 @@ export function SpvInspectionScheduleView({
 
       {/* 6. TAHAP 2: MODAL LEMBAR PENILAIAN CHECKLIST DIGITAL SIDAK FISIK SPV */}
       {evaluatingInspection && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 p-3 sm:p-4 backdrop-blur-xs overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 p-3 sm:p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-4xl w-full p-6 space-y-6 shadow-2xl border border-slate-200 my-6 max-h-[92vh] overflow-y-auto">
             {/* Header Modal */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
@@ -1306,7 +1306,7 @@ export function SpvInspectionScheduleView({
 
       {/* 7. TAHAP 2: MODAL BERITA ACARA AUDIT MUTU & SIDAK FISIK (PRINTABLE DOCUMENT) */}
       {viewingDossierDoc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 p-3 sm:p-4 backdrop-blur-xs overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 p-3 sm:p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-3xl w-full p-6 space-y-6 shadow-2xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
               <span className="text-[10px] font-black uppercase tracking-wider text-indigo-900 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full">
@@ -1502,7 +1502,7 @@ export function SpvInspectionScheduleView({
 
       {/* 8. Modal Detail Jadwal Singkat */}
       {viewingSchedule && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-xs overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
               <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
@@ -1776,7 +1776,7 @@ export function SpvTargetCockpitView({
                     Peringkat #{idx + 1}
                   </span>
                   {idx === 0 && (
-                    <span className="text-[9px] font-black bg-amber-500 text-slate-950 px-1.5 py-0.2 rounded uppercase">
+                    <span className="text-[9px] font-black bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded uppercase">
                       👑 Terunggul
                     </span>
                   )}
@@ -1925,7 +1925,7 @@ export function SpvTargetCockpitView({
 
       {/* 4. MODAL PRINT DOKUMEN LAPORAN KOMPARASI KINERJA MULTI-CABANG */}
       {isPrintSummaryModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 p-3 sm:p-4 backdrop-blur-xs overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 p-3 sm:p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-3xl w-full p-6 space-y-6 shadow-2xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
               <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
@@ -2062,7 +2062,7 @@ export function SpvTargetCockpitView({
 
       {/* 5. MODAL LIHAT BERITA ACARA SIDAK (JIKA DIKLIK DARI COCKPIT) */}
       {viewingDossierDoc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 p-3 sm:p-4 backdrop-blur-xs overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 p-3 sm:p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-3xl w-full p-6 space-y-6 shadow-2xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
               <span className="text-[10px] font-black uppercase tracking-wider text-indigo-900 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full">

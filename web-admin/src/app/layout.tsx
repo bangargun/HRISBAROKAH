@@ -3,8 +3,8 @@ import './globals.css';
 import AuthGuard from '@/components/AuthGuard';
 
 export const metadata: Metadata = {
-  title: 'HRIS Barokah Group - Multi-Outlet Resto Portal',
-  description: 'Sistem Informasi SDM & Operasional Multi-Outlet Restoran Barokah Group',
+  title: 'HRIS Barokah Grup',
+  description: 'Sistem SDM dan operasional outlet Barokah Grup',
 };
 
 export default function RootLayout({
@@ -14,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
+      <body className="min-h-screen">
         <AuthGuard>{children}</AuthGuard>
       </body>
     </html>

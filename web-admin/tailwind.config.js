@@ -8,14 +8,20 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        brand: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          800: '#1e293b',
-          900: '#0f172a',
+        // Latar sidebar & aksen gelap aplikasi
+        navy: {
+          DEFAULT: '#0b172c',
+          800: '#15243d',
+          700: '#1e3150',
         },
+        slate: {
+          850: '#172033',
+        },
+      },
+      boxShadow: {
+        xs: '0 1px 2px 0 rgb(15 23 42 / 0.05)',
       },
     },
   },
   plugins: [],
-}
+};
