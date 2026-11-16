@@ -70,13 +70,10 @@ export class RequestsService {
     if (!profile) throw new NotFoundException('Profil karyawan tidak ditemukan');
 
     let totalDays = 1;
-    let startDate: Date | undefined;
-    let endDate: Date | undefined;
+    let startDate: Date;
+    let endDate: Date;
 
-    if (!dto.startDate && dto.endDate) {
-      throw new BadRequestException('Tanggal mulai wajib diisi bila tanggal selesai diisi');
-    }
-    if (dto.startDate) {
+    {
       // Tanggal kalender di zona bisnis; jam dari perangkat diabaikan
       const startYmd = parseDateParam(dto.startDate.slice(0, 10));
       const endYmd = dto.endDate ? parseDateParam(dto.endDate.slice(0, 10)) : startYmd;

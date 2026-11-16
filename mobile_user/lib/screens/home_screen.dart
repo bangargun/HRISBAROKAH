@@ -235,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
         title: const Text(
-          'Resto Nusantara Staff',
+          'Barokah Grup',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         backgroundColor: const Color(0xFF0F172A),
@@ -354,7 +354,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               _timeBadge(
                                 'Masuk',
                                 hasClockedIn
-                                    ? DateFormat('HH:mm').format(DateTime.parse(att['clockInTime']))
+                                    ? DateFormat('HH:mm').format(DateTime.parse(att['clockInTime']).toLocal())
                                     : '--:--',
                                 hasClockedIn ? Colors.green : Colors.grey,
                               ),
@@ -362,7 +362,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               _timeBadge(
                                 'Pulang',
                                 hasClockedOut
-                                    ? DateFormat('HH:mm').format(DateTime.parse(att['clockOutTime']))
+                                    ? DateFormat('HH:mm').format(DateTime.parse(att['clockOutTime']).toLocal())
                                     : '--:--',
                                 hasClockedOut ? Colors.green : Colors.grey,
                               ),
@@ -520,33 +520,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         _quickMenuCard(
-                          icon: Icons.swap_horiz_rounded,
-                          title: 'Tukar Shift',
+                          icon: Icons.history_rounded,
+                          title: 'Riwayat',
                           color: Colors.purple,
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const RequestsScreen(initialTab: 1)),
                           ),
-                        ),
-                        _quickMenuCard(
-                          icon: Icons.receipt_long_rounded,
-                          title: 'Slip Gaji',
-                          color: Colors.indigo,
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Slip Gaji periode aktif akan dirilis tanggal 25')),
-                            );
-                          },
-                        ),
-                        _quickMenuCard(
-                          icon: Icons.menu_book_rounded,
-                          title: 'SOP Resto',
-                          color: Colors.orange,
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Pustaka SOP Restoran siap diakses')),
-                            );
-                          },
                         ),
                         if (canManageFaces(_role))
                           _quickMenuCard(
@@ -558,16 +538,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               MaterialPageRoute(builder: (_) => const FaceEnrollmentScreen()),
                             ),
                           ),
-                        _quickMenuCard(
-                          icon: Icons.psychology_rounded,
-                          title: 'Asesmen SDM',
-                          color: Colors.pink,
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Modul DISC & Survey 360 segera hadir')),
-                            );
-                          },
-                        ),
                       ],
                     ),
                   ],

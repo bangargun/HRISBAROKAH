@@ -253,7 +253,7 @@ class _KasbonScreenState extends State<KasbonScreen> {
                 final status = item['status'] as String;
                 final kasbon = item['kasbonLoan'];
                 final amount = kasbon != null ? double.parse(kasbon['amount'].toString()) : 0.0;
-                final createdAt = DateTime.parse(item['createdAt']);
+                final createdAt = DateTime.parse(item['createdAt']).toLocal();
 
                 Color badgeColor = Colors.orange;
                 String statusLabel = 'Menunggu SM';

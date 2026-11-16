@@ -21,7 +21,7 @@ class HrisMobileApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Resto HRIS Mobile',
+      title: 'Barokah Grup Kru',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(

@@ -38,10 +38,10 @@ export class CreateGeneralRequestDto {
   @IsEnum(RequestType)
   type: RequestType;
 
-  // YYYY-MM-DD atau ISO datetime; yang dipakai hanya bagian tanggalnya
+  // YYYY-MM-DD atau ISO datetime; yang dipakai hanya bagian tanggalnya.
+  // Wajib: cuti, izin, sakit, lembur dan tukar shift selalu untuk tanggal tertentu.
   @Matches(DATE_PREFIX, { message: 'Tanggal mulai harus berformat YYYY-MM-DD' })
-  @IsOptional()
-  startDate?: string;
+  startDate: string;
 
   @Matches(DATE_PREFIX, { message: 'Tanggal selesai harus berformat YYYY-MM-DD' })
   @IsOptional()

@@ -11,6 +11,21 @@ class RequestsScreen extends StatefulWidget {
 }
 
 class _RequestsScreenState extends State<RequestsScreen> with SingleTickerProviderStateMixin {
+  static const _statusInfo = {
+    'PENDING_STORE_MANAGER': ('Menunggu kepala cabang', Colors.orange),
+    'PENDING_HR': ('Menunggu HR', Colors.blue),
+    'APPROVED': ('Disetujui', Colors.green),
+    'REJECTED': ('Ditolak', Colors.red),
+    'CANCELLED': ('Dibatalkan', Colors.grey),
+  };
+  static const _typeLabels = {
+    'CUTI_TAHUNAN': 'Cuti Tahunan',
+    'CUTI_KHUSUS': 'Cuti Khusus',
+    'SAKIT': 'Sakit',
+    'IZIN': 'Izin',
+    'TUKAR_SHIFT': 'Tukar Jadwal',
+    'LEMBUR': 'Lembur',
+  };
   late TabController _tabController;
   final _reasonController = TextEditingController();
   String _selectedType = 'CUTI_TAHUNAN';
@@ -35,11 +50,19 @@ class _RequestsScreenState extends State<RequestsScreen> with SingleTickerProvid
     } catch (_) {}
   }
 
+  // Sakit, izin dan lembur boleh diajukan setelah kejadian (maks. 30 hari ke belakang)
+  static const _backdatable = {'SAKIT', 'IZIN', 'LEMBUR'};
+
   Future<void> _pickDateRange() async {
+    final today = DateUtils.dateOnly(DateTime.now());
+    final firstDate = _backdatable.contains(_selectedType) ? today.subtract(const Duration(days: 30)) : today;
     final picked = await showDateRangePicker(
       context: context,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 90)),
+      firstDate: firstDate,
+      lastDate: today.add(const Duration(days: 90)),
+      initialDateRange: _startDate != null && _endDate != null && !_startDate!.isBefore(firstDate)
+          ? DateTimeRange(start: _startDate!, end: _endDate!)
+          : null,
     );
     if (picked != null) {
       setState(() {
@@ -50,6 +73,12 @@ class _RequestsScreenState extends State<RequestsScreen> with SingleTickerProvid
   }
 
   Future<void> _handleSubmit() async {
+    if (_startDate == null || _endDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Pilih tanggal pengajuan terlebih dahulu')),
+      );
+      return;
+    }
     if (_reasonController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Harap masukkan keterangan/alasan pengajuan')),
@@ -61,8 +90,8 @@ class _RequestsScreenState extends State<RequestsScreen> with SingleTickerProvid
     try {
       await ApiService.submitGeneralRequest(
         type: _selectedType,
-        startDate: _startDate?.toIso8601String(),
-        endDate: _endDate?.toIso8601String(),
+        startDate: DateFormat('yyyy-MM-dd').format(_startDate!),
+        endDate: DateFormat('yyyy-MM-dd').format(_endDate!),
         reason: _reasonController.text.trim(),
       );
 
@@ -143,7 +172,14 @@ class _RequestsScreenState extends State<RequestsScreen> with SingleTickerProvid
                         DropdownMenuItem(value: 'LEMBUR', child: Text('Pengajuan Lembur')),
                       ],
                       onChanged: (val) {
-                        if (val != null) setState(() => _selectedType = val);
+                        // Rentang tanggal yang boleh dipilih bergantung jenisnya, jadi pilih ulang
+                        if (val != null) {
+                          setState(() {
+                            _selectedType = val;
+                            _startDate = null;
+                            _endDate = null;
+                          });
+                        }
                       },
                     ),
                     const SizedBox(height: 16),
@@ -209,28 +245,37 @@ class _RequestsScreenState extends State<RequestsScreen> with SingleTickerProvid
                   itemBuilder: (context, idx) {
                     final item = _historyList[idx];
                     final status = item['status'] as String;
+                    final (label, color) = _statusInfo[status] ?? (status, Colors.grey);
+                    final start = item['startDate'] != null ? DateTime.parse(item['startDate']).toLocal() : null;
+                    final end = item['endDate'] != null ? DateTime.parse(item['endDate']).toLocal() : null;
+                    final period = start == null
+                        ? null
+                        : end == null || DateUtils.isSameDay(start, end)
+                            ? DateFormat('d MMM yyyy').format(start)
+                            : '${DateFormat('d MMM').format(start)} – ${DateFormat('d MMM yyyy').format(end)}';
+                    // Alasan penolakan / catatan atasan agar kru tahu kenapa
+                    final note = item['hrNotes'] ?? item['managerNotes'];
                     return Card(
                       margin: const EdgeInsets.only(bottom: 10),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       child: ListTile(
                         title: Text(
-                          item['type'].toString().replaceAll('_', ' '),
+                          _typeLabels[item['type']] ?? item['type'].toString().replaceAll('_', ' '),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        subtitle: Text(item['reason'] ?? ''),
+                        subtitle: Text(
+                          [?period, item['reason'] ?? '', if (note != null) 'Catatan: $note'].join('\n'),
+                        ),
+                        isThreeLine: note != null,
                         trailing: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: status.contains('APPROVED') ? Colors.green.shade50 : Colors.orange.shade50,
+                            color: color.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            status,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: status.contains('APPROVED') ? Colors.green : Colors.orange.shade800,
-                            ),
+                            label,
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color),
                           ),
                         ),
                       ),

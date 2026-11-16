@@ -1,10 +1,17 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  // Gunakan 10.0.2.2 untuk Android emulator, localhost untuk desktop/web, atau IP LAN fisik
-  static const String baseUrl = 'http://10.0.2.2:3000/api/v1';
+  // Alamat backend: --dart-define=API_URL=http://192.168.x.x:3000/api/v1 untuk HP fisik.
+  // Tanpa itu: emulator Android memakai 10.0.2.2 (= komputer ini), lainnya localhost.
+  static const String _configuredUrl = String.fromEnvironment('API_URL');
+  static String get baseUrl {
+    if (_configuredUrl.isNotEmpty) return _configuredUrl;
+    final isAndroid = !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+    return isAndroid ? 'http://10.0.2.2:3000/api/v1' : 'http://localhost:3000/api/v1';
+  }
 
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();

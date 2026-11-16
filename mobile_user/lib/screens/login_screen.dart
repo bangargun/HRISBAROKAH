@@ -16,14 +16,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   String? _errorMessage;
 
-  @override
-  void initState() {
-    super.initState();
-    // Default demo helper
-    _usernameController.text = 'budi.santoso';
-    _passwordController.text = 'karyawan123';
-  }
-
   Future<void> _handleLogin() async {
     setState(() {
       _isLoading = true;
@@ -82,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 24),
                 const Text(
-                  'HRIS RESTORAN',
+                  'BAROKAH GRUP',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 24,
