@@ -4717,6 +4717,21 @@ Libur pada hari Sabtu dan Minggu (Weekend) dilarang keras karena merupakan jam s
 
   const [staffReportCards, setStaffReportCards] = useState<StaffReportCardItem[]>(initialStaffReportCards);
 
+  // Ringkasan nilai pelatihan dari rapor yang ada; null bila belum ada data (tampil "—", bukan NaN)
+  const trainingResults = staffReportCards.flatMap((c) => c.moduleResults);
+  const trainingAvgScore = staffReportCards.length
+    ? Math.round((staffReportCards.reduce((acc, c) => acc + c.gpaScore, 0) / staffReportCards.length) * 10) / 10
+    : null;
+  const trainingPassRate = trainingResults.length
+    ? Math.round((trainingResults.filter((m) => m.passed).length / trainingResults.length) * 1000) / 10
+    : null;
+  const trainingCertCount = trainingResults.filter((m) => m.passed && m.certNumber).length;
+  const trainingPredicate =
+    trainingAvgScore === null ? 'Belum ada nilai'
+    : trainingAvgScore >= 85 ? 'Sangat baik'
+    : trainingAvgScore >= 70 ? 'Baik'
+    : 'Perlu pembinaan';
+
   // Helper AI / Smart Generator untuk Modul Training & Soal Evaluasi
   const generate10LeadershipQuiz = (title: string, content?: string) => [
     {
@@ -7380,14 +7395,16 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       }
                     });
 
-                    const attRate = ((totalHadirAll / (totalPastShifts - totalLiburAll)) * 100).toFixed(1);
+                    // Belum ada shift terjadwal = belum ada tingkat kehadiran (hindari NaN dari pembagian nol)
+                    const scheduledShifts = totalPastShifts - totalLiburAll;
+                    const attRate = scheduledShifts > 0 ? ((totalHadirAll / scheduledShifts) * 100).toFixed(1) : null;
                     const totalMealAll = totalHadirAll * 20000;
 
                     return (
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
                           <p className="text-[11px] font-bold text-slate-500 uppercase">Tingkat Kehadiran Shift</p>
-                          <h4 className="text-xl font-extrabold text-slate-900 mt-1">{attRate}%</h4>
+                          <h4 className="text-xl font-extrabold text-slate-900 mt-1">{attRate === null ? '—' : `${attRate}%`}</h4>
                           <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1 mt-0.5">
                             <CheckCircle2 className="h-3.5 w-3.5" />
                             {totalHadirAll} dari {totalPastShifts - totalLiburAll} shift terlaksana
@@ -11682,7 +11699,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               {dailyAttendanceRecapList.filter((r) => r.status === 'TEPAT_WAKTU').length} Staf
                             </span>
                             <span className="text-[10px] text-emerald-800 font-bold block">
-                              {Math.round((dailyAttendanceRecapList.filter((r) => r.status === 'TEPAT_WAKTU').length / dailyAttendanceRecapList.length) * 100)}% On-Time Rate
+                              {dailyAttendanceRecapList.length === 0
+                                ? 'Belum ada data'
+                                : `${Math.round((dailyAttendanceRecapList.filter((r) => r.status === 'TEPAT_WAKTU').length / dailyAttendanceRecapList.length) * 100)}% On-Time Rate`}
                             </span>
                           </div>
                           <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 space-y-1">
@@ -18374,17 +18393,17 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
                   <p className="text-[11px] font-semibold text-slate-500 uppercase">Total Kru Mengikuti</p>
                   <h4 className="text-xl font-bold text-slate-900 mt-0.5">{employeesMasterList.length} Karyawan</h4>
-                  <span className="text-[11px] text-emerald-600 font-medium">100% Terdaftar di LMS</span>
+                  <span className="text-[11px] text-slate-500">Karyawan aktif</span>
                 </div>
                 <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
                   <p className="text-[11px] font-semibold text-slate-500 uppercase">Tingkat Kelulusan</p>
-                  <h4 className="text-xl font-bold text-emerald-600 mt-0.5">93.5%</h4>
-                  <span className="text-[11px] text-slate-500">{employeesMasterList.length} Kru Lulus Bersertifikat</span>
+                  <h4 className="text-xl font-bold text-emerald-600 mt-0.5">{trainingPassRate === null ? '—' : `${trainingPassRate}%`}</h4>
+                  <span className="text-[11px] text-slate-500">{trainingCertCount} sertifikat diterbitkan</span>
                 </div>
                 <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
                   <p className="text-[11px] font-semibold text-slate-500 uppercase">Rata-Rata Nilai Kuis</p>
-                  <h4 className="text-xl font-bold text-indigo-600 mt-0.5">94.8 / 100</h4>
-                  <span className="text-[11px] text-amber-600 font-semibold">Predikat Sangat Baik</span>
+                  <h4 className="text-xl font-bold text-indigo-600 mt-0.5">{trainingAvgScore === null ? '—' : `${trainingAvgScore} / 100`}</h4>
+                  <span className="text-[11px] text-amber-600 font-semibold">{trainingPredicate}</span>
                 </div>
               </div>
 
@@ -19296,23 +19315,23 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
                         <span className="text-[10px] font-bold text-slate-500 uppercase">Total Kru Dinilai</span>
                         <h5 className="text-lg font-black text-slate-900 mt-0.5">{staffReportCards.length} Staf</h5>
-                        <p className="text-[10px] text-emerald-600 font-semibold">100% Aktif Terdaftar</p>
+                        <p className="text-[10px] text-slate-500">Punya rapor pelatihan</p>
                       </div>
                       <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
                         <span className="text-[10px] font-bold text-slate-500 uppercase">Rata-Rata IPK Training</span>
                         <h5 className="text-lg font-black text-indigo-600 mt-0.5">
-                          {Math.round((staffReportCards.reduce((acc, c) => acc + c.gpaScore, 0) / staffReportCards.length) * 10) / 10} / 100
+                          {trainingAvgScore === null ? '—' : `${trainingAvgScore} / 100`}
                         </h5>
-                        <p className="text-[10px] text-indigo-700 font-semibold">Predikat Sangat Memuaskan</p>
+                        <p className="text-[10px] text-indigo-700 font-semibold">{trainingPredicate}</p>
                       </div>
                       <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
                         <span className="text-[10px] font-bold text-slate-500 uppercase">Kelulusan Modul KKM</span>
-                        <h5 className="text-lg font-black text-emerald-600 mt-0.5">93.5%</h5>
+                        <h5 className="text-lg font-black text-emerald-600 mt-0.5">{trainingPassRate === null ? '—' : `${trainingPassRate}%`}</h5>
                         <p className="text-[10px] text-slate-500">Memenuhi Syarat Insentif</p>
                       </div>
                       <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
                         <span className="text-[10px] font-bold text-slate-500 uppercase">Sertifikat Kelulusan</span>
-                        <h5 className="text-lg font-black text-amber-600 mt-0.5">14 Diterbitkan</h5>
+                        <h5 className="text-lg font-black text-amber-600 mt-0.5">{trainingCertCount} Diterbitkan</h5>
                         <p className="text-[10px] text-amber-700 font-semibold">Siap Unduh &amp; Cetak PDF</p>
                       </div>
                     </div>
