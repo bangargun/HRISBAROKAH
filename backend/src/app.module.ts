@@ -11,6 +11,7 @@ import { SchedulesModule } from './modules/schedules/schedules.module';
 import { PayrollModule } from './modules/payroll/payroll.module';
 import { HolidaysModule } from './modules/holidays/holidays.module';
 import { DepartmentsModule } from './modules/departments/departments.module';
+import { SanctionsModule } from './modules/sanctions/sanctions.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { DepartmentsModule } from './modules/departments/departments.module';
     PayrollModule,
     HolidaysModule,
     DepartmentsModule,
+    SanctionsModule,
   ],
   controllers: [],
   providers: [],

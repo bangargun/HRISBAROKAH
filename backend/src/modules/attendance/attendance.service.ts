@@ -33,7 +33,7 @@ export class AttendanceService {
    * untuk jenis hari itu (weekday, weekend atau libur nasional).
    * Tanpa jadwal, absen tetap diterima sebagai hadir dan tidak dihitung terlambat.
    */
-  private async punctuality(employeeId: string, outlet: OutletHours, today: Date, now: Date) {
+  async punctuality(employeeId: string, outlet: OutletHours, today: Date, now: Date) {
     const schedule = await this.prisma.shiftSchedule.findUnique({
       where: { employeeId_date: { employeeId, date: today } },
     });

@@ -149,6 +149,10 @@ model User {
   updatedAt    DateTime @updatedAt
 
   profile EmployeeProfile?
+
+  sanctionsIssued    Sanction[]             @relation("SanctionIssuedBy")
+  correctionsCreated AttendanceCorrection[] @relation("CorrectionCreatedBy")
+  correctionsDecided AttendanceCorrection[] @relation("CorrectionDecidedBy")
 }
 
 model EmployeeProfile {
@@ -190,6 +194,7 @@ model EmployeeProfile {
   kasbonLoans      KasbonLoan[]
   payrolls         Payroll[]
   sanctions        Sanction[]
+  corrections      AttendanceCorrection[]
   discResults      DiscResult[]
   trainingProgress TrainingProgress[]
   sopSignatures    SopSignature[]
@@ -463,14 +468,60 @@ model Sanction {
   employeeId     String
   employee       EmployeeProfile @relation(fields: [employeeId], references: [id])
   type           SanctionType
+  // Nomor surat dibuat otomatis oleh sistem, mis. SP1/TST1/XI/2026/003
   letterNumber   String          @unique
-  incidentDate   DateTime
+  incidentDate   DateTime        @db.Date
+  // Kategori pelanggaran, mis. Kedisiplinan & Presensi
+  category       String?
   violationDesc  String
   actionTaken    String?
-  validUntil     DateTime
+  witness        String?
+  // Masa berlaku (paling lama 6 bulan sejak diterbitkan)
+  validUntil     DateTime        @db.Date
   documentPdfUrl String?
   issuedById     String
+  issuedBy       User            @relation("SanctionIssuedBy", fields: [issuedById], references: [id])
   createdAt      DateTime        @default(now())
+
+  @@index([employeeId])
+}
+
+enum CorrectionType {
+  // Sudah absen masuk, lupa absen pulang
+  CLOCK_OUT
+  // Tidak ada absen sama sekali hari itu, padahal masuk kerja
+  BOTH
+}
+
+enum CorrectionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Koreksi presensi (lupa absen, SOP-HR-008). Disetujui = absen hari itu dilengkapi.
+model AttendanceCorrection {
+  id           String           @id @default(uuid())
+  employeeId   String
+  employee     EmployeeProfile  @relation(fields: [employeeId], references: [id])
+  date         DateTime         @db.Date
+  type         CorrectionType
+  // Jam HH:mm waktu bisnis; jam pulang lebih kecil dari jam masuk = lewat tengah malam
+  clockIn      String?
+  clockOut     String
+  witness      String?
+  reason       String
+  status       CorrectionStatus @default(PENDING)
+  decisionNote String?
+  createdById  String
+  createdBy    User             @relation("CorrectionCreatedBy", fields: [createdById], references: [id])
+  decidedById  String?
+  decidedBy    User?            @relation("CorrectionDecidedBy", fields: [decidedById], references: [id])
+  decidedAt    DateTime?
+  createdAt    DateTime         @default(now())
+
+  @@index([employeeId, date])
+  @@index([status])
 }
 
 // -------------------------------------------------------------
