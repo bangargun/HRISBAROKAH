@@ -6,7 +6,8 @@ import { BACKEND_API, clearSession, getSessionUser, getToken } from '@/lib/auth'
 import { LEAVE_TYPES, actionFor, isPending, useAdminRequests } from '@/lib/requests';
 import AppShell from '@/components/AppShell';
 import DashboardHome from '@/components/DashboardHome';
-import AddEmployeeDialog from '@/components/AddEmployeeDialog';
+import EmployeeDialog from '@/components/EmployeeDialog';
+import EmployeeListModule from '@/components/EmployeeListModule';
 import RequestsApprovalModule from '@/components/RequestsApprovalModule';
 import OutletMasterModule from '@/components/OutletMasterModule';
 import WorkScheduleModule from '@/components/WorkScheduleModule';
@@ -2776,7 +2777,7 @@ export default function AdminDashboard() {
       title: 'Data Karyawan',
       icon: Users,
       subTabs: [
-        { id: 'employee-list', label: 'Karyawan Aktif' },
+        { id: 'employee-list', label: 'Daftar Karyawan' },
         { id: 'resignation-exit', label: 'Pengunduran Diri' },
       ],
     },
@@ -5643,9 +5644,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       developmentPlan: 'Pelatihan sertifikasi kompetensi keahlian stasiun lanjutan.',
     };
   };
-  const [empFilterOutlet, setEmpFilterOutlet] = useState<string>('ALL');
+  const [employeeListKey, setEmployeeListKey] = useState(0);
   const [empFilterPayment, setEmpFilterPayment] = useState<string>('ALL');
-  const [empSearchKeyword, setEmpSearchKeyword] = useState<string>('');
 
   const [isAddEmployeeModalOpen, setIsAddEmployeeModalOpen] = useState<boolean>(false);
   const [isImportExcelModalOpen, setIsImportExcelModalOpen] = useState<boolean>(false);
@@ -21320,113 +21320,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 onEmployeeUpdate={setEmployeesMasterList}
               />
             ) : (
-              (() => {
-                // Pilihan cabang diambil dari data karyawan yang ada, bukan daftar tetap
-                const outletOptions = Array.from(new Set(employeesMasterList.map((e) => e.outlet))).sort();
-                const keyword = empSearchKeyword.trim().toLowerCase();
-                const visibleEmployees = employeesMasterList.filter((emp) => {
-                  if (empFilterOutlet !== 'ALL' && emp.outlet !== empFilterOutlet) return false;
-                  if (!keyword) return true;
-                  return [emp.fullName, emp.nikKtp, emp.positionTitle].some((v) => (v || '').toLowerCase().includes(keyword));
-                });
-                return (
-                  <div className="space-y-4 text-sm">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <div className="relative">
-                          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden />
-                          <label className="sr-only" htmlFor="emp-search">Cari karyawan</label>
-                          <input
-                            id="emp-search"
-                            type="search"
-                            value={empSearchKeyword}
-                            onChange={(e) => setEmpSearchKeyword(e.target.value)}
-                            placeholder="Cari nama, NIK, atau posisi"
-                            className="w-64 rounded-md border border-slate-300 bg-white py-2 pl-9 pr-3 text-slate-800 placeholder-slate-400 focus:border-amber-500"
-                          />
-                        </div>
-                        <label className="sr-only" htmlFor="emp-outlet">Cabang</label>
-                        <select
-                          id="emp-outlet"
-                          value={empFilterOutlet}
-                          onChange={(e) => setEmpFilterOutlet(e.target.value)}
-                          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-800"
-                        >
-                          <option value="ALL">Semua cabang</option>
-                          {outletOptions.map((o) => (
-                            <option key={o} value={o}>{o}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <p className="text-slate-600">
-                        {visibleEmployees.length === employeesMasterList.length
-                          ? `${employeesMasterList.length} karyawan`
-                          : `${visibleEmployees.length} dari ${employeesMasterList.length} karyawan`}
-                      </p>
-                    </div>
-
-                    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-                      {employeesMasterList.length === 0 ? (
-                        <div className="p-10 text-center text-slate-600">
-                          <p className="font-medium text-slate-800">Belum ada karyawan.</p>
-                          <p className="mt-1">Gunakan tombol &quot;Tambah Karyawan&quot; di kanan atas untuk mendaftarkan karyawan pertama.</p>
-                        </div>
-                      ) : visibleEmployees.length === 0 ? (
-                        <p className="p-10 text-center text-slate-600">Tidak ada karyawan yang cocok dengan pencarian ini.</p>
-                      ) : (
-                        <div className="overflow-x-auto">
-                          <table className="w-full border-collapse text-left">
-                            <thead>
-                              <tr className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase text-slate-600">
-                                <th scope="col" className="px-4 py-3">Karyawan</th>
-                                <th scope="col" className="px-4 py-3">Cabang &amp; posisi</th>
-                                <th scope="col" className="px-4 py-3">Masa kerja</th>
-                                <th scope="col" className="px-4 py-3 text-right">Aksi</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                              {visibleEmployees.map((emp) => (
-                                <tr key={emp.id} className="hover:bg-slate-50">
-                                  <td className="px-4 py-3">
-                                    <p className="font-medium text-slate-900">{emp.fullName}</p>
-                                    <p className="font-mono text-xs text-slate-500">NIK {emp.nikKtp || '-'}</p>
-                                  </td>
-                                  <td className="px-4 py-3">
-                                    <p className="text-slate-800">{emp.positionTitle}</p>
-                                    <p className="text-xs text-slate-500">{emp.outlet}</p>
-                                  </td>
-                                  <td className="px-4 py-3 text-slate-700">
-                                    {calculateTenure(emp.joinDate).text}
-                                    <p className="text-xs text-slate-500">sejak {emp.joinDate}</p>
-                                  </td>
-                                  <td className="px-4 py-3">
-                                    <div className="flex justify-end gap-1.5">
-                                      <button
-                                        type="button"
-                                        onClick={() => setSelectedEmployeeDetail(emp)}
-                                        className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 font-medium text-slate-700 hover:bg-slate-50"
-                                      >
-                                        <Eye className="h-4 w-4" aria-hidden /> Detail
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => setSelectedReportCardEmp(emp)}
-                                        className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 font-medium text-slate-700 hover:bg-slate-50"
-                                      >
-                                        <Award className="h-4 w-4" aria-hidden /> Rapor
-                                      </button>
-                                    </div>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })()
+              <EmployeeListModule
+                reloadKey={employeeListKey}
+                onChanged={reloadEmployees}
+                showToast={showToast}
+                onOpenReport={(nik) => {
+                  const emp = employeesMasterList.find((e) => e.nikKtp === nik);
+                  if (emp) setSelectedReportCardEmp(emp);
+                }}
+              />
             )
           )}
 
@@ -27693,11 +27595,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       )}
 
       {isAddEmployeeModalOpen && (
-        <AddEmployeeDialog
+        <EmployeeDialog
           onClose={() => setIsAddEmployeeModalOpen(false)}
           onSaved={(fullName) => {
             setIsAddEmployeeModalOpen(false);
             showToast(`Karyawan ${fullName} tersimpan.`);
+            setEmployeeListKey((k) => k + 1);
             reloadEmployees();
           }}
         />

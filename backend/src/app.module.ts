@@ -10,6 +10,7 @@ import { FaceModule } from './modules/face/face.module';
 import { SchedulesModule } from './modules/schedules/schedules.module';
 import { PayrollModule } from './modules/payroll/payroll.module';
 import { HolidaysModule } from './modules/holidays/holidays.module';
+import { DepartmentsModule } from './modules/departments/departments.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { HolidaysModule } from './modules/holidays/holidays.module';
     SchedulesModule,
     PayrollModule,
     HolidaysModule,
+    DepartmentsModule,
   ],
   controllers: [],
   providers: [],

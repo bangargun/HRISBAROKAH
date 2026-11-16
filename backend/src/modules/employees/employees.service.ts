@@ -129,33 +129,84 @@ export class EmployeesService {
     });
   }
 
-  async update(id: string, dto: UpdateEmployeeDto) {
-    await this.getOrThrow(id);
-    await this.assertOutletAndPosition(dto.outletId, dto.positionId);
-    return this.prisma.employeeProfile.update({
-      where: { id },
-      data: dto,
-      include: {
-        user: { select: { id: true, username: true, role: true } },
-        outlet: true,
-        position: true,
-      },
+  async update(actor: AuthUser, id: string, dto: UpdateEmployeeDto) {
+    const employee = await this.getOrThrow(id);
+    const roleChanges = dto.role !== undefined && dto.role !== employee.user.role;
+    if (roleChanges) {
+      if (employee.userId === actor.id) {
+        throw new ForbiddenException('Anda tidak bisa mengubah peran akun Anda sendiri');
+      }
+      this.assertCanManageAdmin(actor, employee.user.role, dto.role);
+    } else {
+      this.assertCanManageAdmin(actor, employee.user.role);
+    }
+
+    if (dto.nik && dto.nik !== employee.nik) {
+      const taken = await this.prisma.employeeProfile.findUnique({ where: { nik: dto.nik } });
+      if (taken) throw new ConflictException(`NIK ${dto.nik} sudah terdaftar`);
+    }
+    if (dto.outletId !== employee.outletId) await this.assertOutletAndPosition(dto.outletId, undefined);
+    await this.assertOutletAndPosition(undefined, dto.positionId);
+
+    // Kepala cabang yang pindah cabang atau berganti peran dilepas dari jabatan kepala cabangnya
+    const leavesManagerPost =
+      (dto.outletId !== undefined && dto.outletId !== employee.outletId) ||
+      (roleChanges && dto.role !== UserRole.STORE_MANAGER);
+
+    return this.prisma.$transaction(async (tx) => {
+      if (leavesManagerPost) {
+        await tx.outlet.updateMany({ where: { managerId: id }, data: { managerId: null } });
+      }
+      if (roleChanges) {
+        await tx.user.update({ where: { id: employee.userId }, data: { role: dto.role } });
+      }
+      return tx.employeeProfile.update({
+        where: { id },
+        data: {
+          fullName: dto.fullName,
+          nik: dto.nik,
+          phone: dto.phone,
+          outletId: dto.outletId,
+          positionId: dto.positionId,
+          status: dto.status,
+          joinDate: dto.joinDate ? toDateOnly(parseDateParam(dto.joinDate.slice(0, 10))) : undefined,
+          bankName: dto.bankName,
+          bankAccountNumber: dto.bankAccountNumber,
+          bankAccountHolder: dto.bankAccountHolder,
+        },
+        include: {
+          user: { select: { id: true, username: true, role: true, isActive: true } },
+          outlet: true,
+          position: true,
+        },
+      });
     });
   }
 
-  async toggleActiveStatus(id: string) {
+  /** Aktifkan atau nonaktifkan akun. Akun nonaktif tidak bisa login dan tidak masuk hitungan gaji. */
+  async setActive(actor: AuthUser, id: string, isActive: boolean) {
     const employee = await this.getOrThrow(id);
-    const updated = await this.prisma.user.update({
-      where: { id: employee.userId },
-      data: { isActive: !employee.user.isActive },
-    });
-
+    if (employee.userId === actor.id) {
+      throw new ForbiddenException('Anda tidak bisa menonaktifkan akun Anda sendiri');
+    }
+    this.assertCanManageAdmin(actor, employee.user.role);
+    if (employee.user.isActive !== isActive) {
+      await this.prisma.$transaction(async (tx) => {
+        await tx.user.update({ where: { id: employee.userId }, data: { isActive } });
+        if (!isActive) await tx.outlet.updateMany({ where: { managerId: id }, data: { managerId: null } });
+      });
+    }
     return {
-      message: `Status karyawan ${employee.fullName} berhasil diubah menjadi ${
-        updated.isActive ? 'Aktif' : 'Non-aktif'
-      }`,
-      isActive: updated.isActive,
+      message: `${employee.fullName} sekarang ${isActive ? 'aktif' : 'nonaktif'}`,
+      isActive,
     };
+  }
+
+  /** Akun admin (HR, Keuangan, Super Admin) hanya boleh diubah oleh Super Admin. */
+  private assertCanManageAdmin(actor: AuthUser, ...roles: (UserRole | undefined)[]) {
+    if (actor.role !== UserRole.SUPER_ADMIN && roles.some((r) => r && ADMIN_ROLES.includes(r))) {
+      throw new ForbiddenException('Hanya Super Admin yang bisa mengubah akun admin');
+    }
   }
 
   /** Daftar jabatan untuk pilihan di form karyawan. */

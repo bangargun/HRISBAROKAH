@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
-import { CreateEmployeeDto, UpdateEmployeeDto } from './employees.dto';
+import { CreateEmployeeDto, SetActiveDto, UpdateEmployeeDto } from './employees.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -42,15 +42,16 @@ export class EmployeesController {
     return this.employeesService.create(user, dto);
   }
 
-  @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN, UserRole.AREA_MANAGER)
+  // Sama dengan tambah karyawan: hanya Super Admin dan HR
+  @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN)
   @Put(':id')
-  async update(@Param('id') id: string, @Body() dto: UpdateEmployeeDto) {
-    return this.employeesService.update(id, dto);
+  async update(@CurrentUser() user, @Param('id') id: string, @Body() dto: UpdateEmployeeDto) {
+    return this.employeesService.update(user, id, dto);
   }
 
   @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN)
-  @Patch(':id/toggle-status')
-  async toggleActiveStatus(@Param('id') id: string) {
-    return this.employeesService.toggleActiveStatus(id);
+  @Patch(':id/status')
+  async setActive(@CurrentUser() user, @Param('id') id: string, @Body() dto: SetActiveDto) {
+    return this.employeesService.setActive(user, id, dto.isActive);
   }
 }

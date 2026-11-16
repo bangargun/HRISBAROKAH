@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import AppShell from '@/components/AppShell';
+import PositionMasterModule from '@/components/PositionMasterModule';
 import { getSessionUser } from '@/lib/auth';
 import { actionFor, useAdminRequests } from '@/lib/requests';
 import {
@@ -53,32 +54,6 @@ export default function MasterDataPage() {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
-
-  // 2. Data Departemen & Posisi / Station Resto (Zero Mock Policy: Persistent State)
-  const [departments, setDepartments] = useState<any[]>([]);
-
-  const hasLoadedMasterRef = useRef(false);
-
-  useEffect(() => {
-    try {
-      const savedDepts = localStorage.getItem('hris_master_departments');
-      if (savedDepts) setDepartments(JSON.parse(savedDepts));
-
-    } catch (e) {
-      console.error('Error loading master data from localStorage:', e);
-    }
-    hasLoadedMasterRef.current = true;
-  }, []);
-
-  useEffect(() => {
-    if (hasLoadedMasterRef.current) {
-      try {
-        localStorage.setItem('hris_master_departments', JSON.stringify(departments));
-      } catch (e) {
-        console.error('Error saving departments:', e);
-      }
-    }
-  }, [departments]);
 
 
   // 4. Data Master Komponen Payroll & Service Charge
@@ -255,10 +230,7 @@ export default function MasterDataPage() {
     if (!editModalData) return;
 
     const { type, data } = editModalData;
-    if (type === 'departments') {
-      setDepartments(departments.map((d) => (d.id === data.id ? data : d)));
-      showToast(`Data station ${data.title} berhasil diperbarui!`);
-    } else if (type === 'payroll') {
+    if (type === 'payroll') {
       setPayrollRules(payrollRules.map((p) => (p.id === data.id ? data : p)));
       showToast(`Aturan ${data.componentName} berhasil diperbarui!`);
     } else if (type === 'leaves') {
@@ -274,9 +246,7 @@ export default function MasterDataPage() {
     if (!deleteModalData) return;
     const { type, id, name } = deleteModalData;
 
-    if (type === 'departments') {
-      setDepartments(departments.filter((d) => d.id !== id));
-    } else if (type === 'payroll') {
+    if (type === 'payroll') {
       setPayrollRules(payrollRules.filter((p) => p.id !== id));
     } else if (type === 'leaves') {
       setLeaveTypes(leaveTypes.filter((l) => l.id !== id));
@@ -300,7 +270,7 @@ export default function MasterDataPage() {
           <nav className="-mb-px flex gap-1 overflow-x-auto" aria-label="Bagian master data">
             {(
               [
-                { id: 'departments', label: 'Departemen & Stasiun' },
+                { id: 'departments', label: 'Departemen & Jabatan' },
                 { id: 'payroll', label: 'Komponen Gaji' },
                 { id: 'leaves', label: 'Jenis Cuti' },
               ] as { id: MasterSubTab; label: string }[]
@@ -331,89 +301,7 @@ export default function MasterDataPage() {
           {/* ========================================================= */}
           {/* SUB-TAB 2: DEPARTEMEN & STATION POSISI                   */}
           {/* ========================================================= */}
-          {activeTab === 'departments' && (
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold">
-                    <th className="py-3 px-4">Departemen / Divisi</th>
-                    <th className="py-3 px-4">Nama Posisi &amp; Station</th>
-                    <th className="py-3 px-4">Kategori Peran</th>
-                    <th className="py-3 px-4">Standar Gaji Pokok (Berdasarkan Masa Kerja)</th>
-                    <th className="py-3 px-4">Jumlah Staf</th>
-                    <th className="py-3 px-4 text-center">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {departments.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="py-12 text-center text-slate-500">
-                        <div className="flex flex-col items-center justify-center space-y-3">
-                          <div className="p-3 bg-amber-50 rounded-full text-amber-600">
-                            <ChefHat className="h-8 w-8" />
-                          </div>
-                          <div>
-                            <p className="font-bold text-slate-800 text-sm">Belum Ada Data Departemen / Posisi</p>
-                            <p className="text-xs text-slate-500 max-w-sm mt-0.5">
-                              Belum ada departemen. Tambahkan departemen dan stasiun kerja pertama.
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  ) : (
-                    departments.map((d) => (
-                    <tr key={d.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="py-3.5 px-4 font-semibold text-slate-800">{d.department}</td>
-                      <td className="py-3.5 px-4">
-                        <div className="font-bold text-slate-900">{d.title}</div>
-                        <div className="text-[10px] font-mono text-slate-400">{d.id}</div>
-                      </td>
-                      <td className="py-3.5 px-4 text-slate-600">{d.category}</td>
-                      <td className="py-3.5 px-4 font-mono text-[11px]">
-                        <div className="space-y-1">
-                          <div className="flex items-center space-x-1.5">
-                            <span className="px-1.5 py-0.5 rounded text-[10px] bg-amber-50 text-amber-700 font-semibold border border-amber-200">0 - 3 Bulan:</span>
-                            <span className="font-semibold text-emerald-700">{d.salaryUnder3Months}</span>
-                          </div>
-                          <div className="flex items-center space-x-1.5">
-                            <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">&gt; 3 Bulan:</span>
-                            <span className="font-bold text-emerald-800">{d.salaryOver3Months}</span>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4 font-bold text-slate-700">{d.activeStaff} Staf</td>
-                      <td className="py-3.5 px-4">
-                        <div className="flex items-center justify-center space-x-1.5">
-                          <button
-                            onClick={() => setReviewModalData({ type: 'departments', data: d })}
-                            className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Review / Detail"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => setEditModalData({ type: 'departments', data: { ...d } })}
-                            className="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition-colors"
-                            title="Edit Data"
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => setDeleteModalData({ type: 'departments', id: d.id, name: d.title })}
-                            className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors"
-                            title="Hapus Posisi"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          {activeTab === 'departments' && <PositionMasterModule />}
 
 
           {/* ========================================================= */}
@@ -666,120 +554,6 @@ export default function MasterDataPage() {
             <div className="space-y-3 text-xs max-h-96 overflow-y-auto pr-1">
 
               {/* 2. DEPARTMENTS & POSISI: SEMUA KOLOM TABEL ADA DI FORM EDIT */}
-              {editModalData.type === 'departments' && (
-                <>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Kode Posisi / Station</label>
-                      <input
-                        type="text"
-                        value={editModalData.data.id}
-                        onChange={(e) =>
-                          setEditModalData({
-                            ...editModalData,
-                            data: { ...editModalData.data, id: e.target.value },
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Kategori Peran</label>
-                      <input
-                        type="text"
-                        value={editModalData.data.category}
-                        onChange={(e) =>
-                          setEditModalData({
-                            ...editModalData,
-                            data: { ...editModalData.data, category: e.target.value },
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Nama Posisi &amp; Station</label>
-                    <input
-                      type="text"
-                      value={editModalData.data.title}
-                      onChange={(e) =>
-                        setEditModalData({
-                          ...editModalData,
-                          data: { ...editModalData.data, title: e.target.value },
-                        })
-                      }
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-bold"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Departemen / Divisi</label>
-                      <input
-                        type="text"
-                        value={editModalData.data.department}
-                        onChange={(e) =>
-                          setEditModalData({
-                            ...editModalData,
-                            data: { ...editModalData.data, department: e.target.value },
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Jumlah Staf Aktif</label>
-                      <input
-                        type="number"
-                        value={editModalData.data.activeStaff}
-                        onChange={(e) =>
-                          setEditModalData({
-                            ...editModalData,
-                            data: { ...editModalData.data, activeStaff: parseInt(e.target.value, 10) },
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-3 pt-1 border-t border-slate-100">
-                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      Standar Gaji Pokok Berdasarkan Lama Bekerja
-                    </p>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-slate-700 font-semibold mb-1 text-[11px]">Masa Kerja 0 - 3 Bulan (Probation / Training)</label>
-                        <input
-                          type="text"
-                          value={editModalData.data.salaryUnder3Months}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, salaryUnder3Months: e.target.value },
-                            })
-                          }
-                          className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold text-emerald-700 font-mono text-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-700 font-semibold mb-1 text-[11px]">Masa Kerja &gt; 3 Bulan (3 Bulan ke Atas)</label>
-                        <input
-                          type="text"
-                          value={editModalData.data.salaryOver3Months}
-                          onChange={(e) =>
-                            setEditModalData({
-                              ...editModalData,
-                              data: { ...editModalData.data, salaryOver3Months: e.target.value },
-                            })
-                          }
-                          className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold text-emerald-700 font-mono text-xs"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-
               {/* 4. PAYROLL: SEMUA KOLOM TABEL ADA DI FORM EDIT */}
               {editModalData.type === 'payroll' && (
                 <>

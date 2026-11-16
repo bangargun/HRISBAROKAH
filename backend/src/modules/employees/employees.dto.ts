@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
 import {
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -91,11 +92,24 @@ export class CreateEmployeeDto {
 }
 
 export class UpdateEmployeeDto {
+  @Transform(trim)
   @IsString()
+  @IsNotEmpty({ message: 'Nama lengkap wajib diisi' })
+  @MaxLength(100)
   @IsOptional()
   fullName?: string;
 
+  @Transform(trim)
   @IsString()
+  @IsNotEmpty({ message: 'NIK wajib diisi' })
+  @MaxLength(30)
+  @IsOptional()
+  nik?: string;
+
+  @Transform(trim)
+  @IsString()
+  @IsNotEmpty({ message: 'Nomor HP wajib diisi' })
+  @MaxLength(20)
   @IsOptional()
   phone?: string;
 
@@ -111,15 +125,31 @@ export class UpdateEmployeeDto {
   @IsOptional()
   status?: EmploymentStatus;
 
+  @Matches(DATE_PREFIX, { message: 'Tanggal masuk harus berformat YYYY-MM-DD' })
+  @IsOptional()
+  joinDate?: string;
+
+  @IsEnum(UserRole)
+  @IsOptional()
+  role?: UserRole;
+
   @IsString()
+  @MaxLength(60)
   @IsOptional()
   bankName?: string;
 
   @IsString()
+  @MaxLength(40)
   @IsOptional()
   bankAccountNumber?: string;
 
   @IsString()
+  @MaxLength(100)
   @IsOptional()
   bankAccountHolder?: string;
+}
+
+export class SetActiveDto {
+  @IsBoolean()
+  isActive: boolean;
 }
