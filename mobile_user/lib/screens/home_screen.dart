@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../services/api_service.dart';
 import 'kasbon_screen.dart';
 import 'requests_screen.dart';
+import 'payslip_screen.dart';
 import 'login_screen.dart';
 import 'face_camera_screen.dart';
 import 'face_enrollment_screen.dart';
@@ -517,6 +518,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const RequestsScreen()),
+                          ),
+                        ),
+                        _quickMenuCard(
+                          icon: Icons.receipt_long_rounded,
+                          title: 'Slip Gaji',
+                          color: Colors.indigo,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const PayslipScreen()),
                           ),
                         ),
                         _quickMenuCard(

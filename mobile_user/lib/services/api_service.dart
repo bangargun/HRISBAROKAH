@@ -209,6 +209,15 @@ class ApiService {
     }
   }
 
+  // Slip gaji saya (hanya periode yang sudah difinalkan HR)
+  static Future<List<dynamic>> getMyPayslips() async {
+    final url = Uri.parse('$baseUrl/payroll/my');
+    final response = await http.get(url, headers: await _headers());
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200) return data as List<dynamic>;
+    throw Exception(_errorMessage(data, 'Gagal memuat slip gaji'));
+  }
+
   // Data user yang login (disimpan saat login)
   static Future<Map<String, dynamic>?> getCurrentUser() async {
     final prefs = await SharedPreferences.getInstance();

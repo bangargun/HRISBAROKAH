@@ -45,6 +45,23 @@ export class PayrollService {
     return { outlet: { id: outlet.id, name: outlet.name, payrollCutoffDay: outlet.payrollCutoffDay }, period, rows };
   }
 
+  /** Slip gaji karyawan yang login: 12 periode terakhir yang sudah difinalkan (draf tidak ditampilkan). */
+  async myPayslips(userId: string) {
+    const profile = await this.prisma.employeeProfile.findUnique({ where: { userId } });
+    if (!profile) throw new NotFoundException('Profil karyawan tidak ditemukan');
+    const rows = await this.prisma.payroll.findMany({
+      where: { employeeId: profile.id, status: PayrollStatus.FINALIZED },
+      orderBy: [{ periodYear: 'desc' }, { periodMonth: 'desc' }],
+      take: 12,
+      include: { outlet: { select: { name: true } } },
+    });
+    return rows.map(({ kasbonAllocations, finalizedById, payslipPdfUrl, ...r }) => ({
+      ...r,
+      periodStart: ymd(r.periodStart),
+      periodEnd: ymd(r.periodEnd),
+    }));
+  }
+
   /** Membuat (ulang) draf gaji semua karyawan aktif cabang untuk periode itu. */
   async generate(dto: PayrollPeriodDto) {
     const outlet = await this.outletOrThrow(dto.outletId);
