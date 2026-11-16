@@ -56,14 +56,18 @@ export default function RequestsApprovalModule({ store, title, description, type
   const [busyId, setBusyId] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
   const [rejecting, setRejecting] = useState<AdminRequest | null>(null);
+  const [typeFilter, setTypeFilter] = useState<RequestType | 'ALL'>('ALL');
 
-  const scoped = useMemo(
+  const ofTypes = useMemo(
     () =>
       store.requests.filter(
         (r) => (!types || types.includes(r.type)) && (!statuses || statuses.includes(r.status)),
       ),
     [store.requests, types, statuses],
   );
+  // Pilihan jenis hanya dari jenis yang memang ada di daftar
+  const typeOptions = Array.from(new Set(ofTypes.map((r) => r.type)));
+  const scoped = typeFilter === 'ALL' ? ofTypes : ofTypes.filter((r) => r.type === typeFilter);
 
   const mine = scoped.filter((r) => actionFor(r, role));
   const counts = {
@@ -139,7 +143,24 @@ export default function RequestsApprovalModule({ store, title, description, type
         </button>
       </header>
 
-      <div className="px-5 pt-4 flex flex-wrap gap-2" role="tablist" aria-label="Saring pengajuan">
+      <div className="px-5 pt-4 flex flex-wrap items-center gap-2">
+      {typeOptions.length > 1 && (
+        <>
+          <label className="sr-only" htmlFor="request-type-filter">Jenis pengajuan</label>
+          <select
+            id="request-type-filter"
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value as RequestType | 'ALL')}
+            className="rounded-full border border-slate-200 bg-white px-3 py-1.5 font-bold text-slate-700"
+          >
+            <option value="ALL">Semua jenis</option>
+            {typeOptions.map((t) => (
+              <option key={t} value={t}>{REQUEST_TYPE_LABEL[t]}</option>
+            ))}
+          </select>
+        </>
+      )}
+      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Saring pengajuan">
         {filters.map((f) => (
           <button
             key={f.id}
@@ -156,6 +177,7 @@ export default function RequestsApprovalModule({ store, title, description, type
             {f.label} <span className="opacity-70">({counts[f.id]})</span>
           </button>
         ))}
+      </div>
       </div>
 
       {notice && (
