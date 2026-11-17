@@ -113,9 +113,10 @@ model Outlet {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  employees   EmployeeProfile[]
-  attendances Attendance[]
-  payrolls    Payroll[]
+  employees         EmployeeProfile[]
+  attendances       Attendance[]
+  payrolls          Payroll[]
+  dailyReportPhotos DailyReportPhoto[]
 }
 
 model Department {
@@ -155,6 +156,7 @@ model User {
   correctionsDecided AttendanceCorrection[] @relation("CorrectionDecidedBy")
   exitsCreated       EmployeeExit[]         @relation("ExitCreatedBy")
   exitsClosed        EmployeeExit[]         @relation("ExitClosedBy")
+  dailyReportPhotos  DailyReportPhoto[]
 }
 
 model EmployeeProfile {
@@ -659,4 +661,26 @@ model EmployeeExit {
 
   @@index([employeeId])
   @@index([status])
+}
+
+// -------------------------------------------------------------
+// LAPORAN HARIAN CABANG (FOTO CHECKLIST OPERASIONAL)
+// -------------------------------------------------------------
+// Satu foto per item checklist per cabang per hari; daftar item ada di
+// src/modules/daily-reports/daily-report.checklist.ts
+model DailyReportPhoto {
+  id            String   @id @default(uuid())
+  outletId      String
+  outlet        Outlet   @relation(fields: [outletId], references: [id])
+  date          DateTime @db.Date
+  itemKey       String
+  photoUrl      String
+  notes         String?
+  submittedById String
+  submittedBy   User     @relation(fields: [submittedById], references: [id])
+  submittedAt   DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([outletId, date, itemKey])
+  @@index([date])
 }

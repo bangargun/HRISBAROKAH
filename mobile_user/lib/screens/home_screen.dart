@@ -6,6 +6,7 @@ import '../services/api_service.dart';
 import 'kasbon_screen.dart';
 import 'requests_screen.dart';
 import 'payslip_screen.dart';
+import 'daily_report_screen.dart';
 import 'login_screen.dart';
 import 'face_camera_screen.dart';
 import 'face_enrollment_screen.dart';
@@ -538,6 +539,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             MaterialPageRoute(builder: (_) => const RequestsScreen(initialTab: 1)),
                           ),
                         ),
+                        if (_role == 'STORE_MANAGER')
+                          _quickMenuCard(
+                            icon: Icons.fact_check_rounded,
+                            title: 'Laporan Harian',
+                            color: Colors.orange,
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const DailyReportScreen()),
+                            ),
+                          ),
                         if (canManageFaces(_role))
                           _quickMenuCard(
                             icon: Icons.face_retouching_natural,

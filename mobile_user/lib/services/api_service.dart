@@ -29,6 +29,8 @@ class ApiService {
     await prefs.remove('user_data');
   }
 
+  static String get backendOrigin => baseUrl.replaceFirst(RegExp(r'/api/v1/?$'), '');
+
   static Future<Map<String, String>> _headers() async {
     final token = await getToken();
     return {
@@ -216,6 +218,35 @@ class ApiService {
     final data = jsonDecode(response.body);
     if (response.statusCode == 200) return data as List<dynamic>;
     throw Exception(_errorMessage(data, 'Gagal memuat slip gaji'));
+  }
+
+  // Laporan harian cabang: daftar item checklist
+  static Future<Map<String, dynamic>> getDailyChecklist() async {
+    final response = await http.get(Uri.parse('$baseUrl/daily-reports/checklist'), headers: await _headers());
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200) return data;
+    throw Exception(_errorMessage(data, 'Gagal memuat daftar laporan'));
+  }
+
+  // Laporan harian cabang untuk satu tanggal (kepala cabang: cabangnya sendiri)
+  static Future<Map<String, dynamic>> getDailyReport(String date) async {
+    final url = Uri.parse('$baseUrl/daily-reports').replace(queryParameters: {'date': date});
+    final response = await http.get(url, headers: await _headers());
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200) return data;
+    throw Exception(_errorMessage(data, 'Gagal memuat laporan harian'));
+  }
+
+  // Kirim / ganti foto satu item laporan harian
+  static Future<void> submitDailyReportPhoto(String date, String itemKey, String photoBase64, String? notes) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/daily-reports/$date/$itemKey'),
+      headers: await _headers(),
+      body: jsonEncode({'photoBase64': photoBase64, 'notes': ?notes}),
+    );
+    if (response.statusCode != 200) {
+      throw Exception(_errorMessage(jsonDecode(response.body), 'Gagal mengirim foto'));
+    }
   }
 
   // Data user yang login (disimpan saat login)

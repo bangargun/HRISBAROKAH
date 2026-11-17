@@ -13,6 +13,7 @@ import { HolidaysModule } from './modules/holidays/holidays.module';
 import { DepartmentsModule } from './modules/departments/departments.module';
 import { SanctionsModule } from './modules/sanctions/sanctions.module';
 import { ExitsModule } from './modules/exits/exits.module';
+import { DailyReportsModule } from './modules/daily-reports/daily-reports.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ExitsModule } from './modules/exits/exits.module';
     DepartmentsModule,
     SanctionsModule,
     ExitsModule,
+    DailyReportsModule,
   ],
   controllers: [],
   providers: [],

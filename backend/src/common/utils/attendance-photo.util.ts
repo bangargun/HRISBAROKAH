@@ -21,7 +21,7 @@ export interface DecodedPhoto {
  * Mengubah foto base64 (boleh dengan awalan data URI) menjadi buffer,
  * dan memastikan isinya benar-benar JPEG/PNG berukuran wajar.
  */
-export function decodePhoto(photoBase64: string): DecodedPhoto {
+export function decodePhoto(photoBase64: string, label = 'Foto selfie'): DecodedPhoto {
   const data = photoBase64.includes('base64,') ? photoBase64.split('base64,')[1] : photoBase64;
   const buffer = Buffer.from(data, 'base64');
 
@@ -29,26 +29,31 @@ export function decodePhoto(photoBase64: string): DecodedPhoto {
   const isPng =
     buffer.length > 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
   if (!isJpeg && !isPng) {
-    throw new BadRequestException('Foto selfie harus berupa gambar JPEG atau PNG');
+    throw new BadRequestException(`${label} harus berupa gambar JPEG atau PNG`);
   }
   if (buffer.length < MIN_BYTES) {
-    throw new BadRequestException('Foto selfie terlalu kecil atau rusak');
+    throw new BadRequestException(`${label} terlalu kecil atau rusak`);
   }
   if (buffer.length > MAX_BYTES) {
-    throw new BadRequestException('Ukuran foto selfie maksimal 2 MB');
+    throw new BadRequestException(`Ukuran ${label.toLowerCase()} maksimal 2 MB`);
   }
   return { buffer, ext: isJpeg ? 'jpg' : 'png' };
 }
 
-/** Simpan selfie absensi; mengembalikan path publik /uploads/attendance/<tanggal>/<uuid>.jpg */
-export async function saveAttendancePhoto(photo: DecodedPhoto): Promise<string> {
+/** Simpan foto publik; mengembalikan path /uploads/<folder>/<tanggal>/<uuid>.jpg */
+export async function savePublicPhoto(folder: string, photo: DecodedPhoto): Promise<string> {
   const day = businessDateString();
-  const dir = join(UPLOADS_ROOT, 'attendance', day);
+  const dir = join(UPLOADS_ROOT, folder, day);
   await mkdir(dir, { recursive: true });
 
   const fileName = `${randomUUID()}.${photo.ext}`;
   await writeFile(join(dir, fileName), photo.buffer);
-  return `/uploads/attendance/${day}/${fileName}`;
+  return `/uploads/${folder}/${day}/${fileName}`;
+}
+
+/** Simpan selfie absensi; mengembalikan path publik /uploads/attendance/<tanggal>/<uuid>.jpg */
+export function saveAttendancePhoto(photo: DecodedPhoto): Promise<string> {
+  return savePublicPhoto('attendance', photo);
 }
 
 /** Simpan foto acuan wajah di folder privat; mengembalikan path relatif terhadap storage/ */
