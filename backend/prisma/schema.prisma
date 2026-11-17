@@ -153,6 +153,8 @@ model User {
   sanctionsIssued    Sanction[]             @relation("SanctionIssuedBy")
   correctionsCreated AttendanceCorrection[] @relation("CorrectionCreatedBy")
   correctionsDecided AttendanceCorrection[] @relation("CorrectionDecidedBy")
+  exitsCreated       EmployeeExit[]         @relation("ExitCreatedBy")
+  exitsClosed        EmployeeExit[]         @relation("ExitClosedBy")
 }
 
 model EmployeeProfile {
@@ -195,6 +197,7 @@ model EmployeeProfile {
   payrolls         Payroll[]
   sanctions        Sanction[]
   corrections      AttendanceCorrection[]
+  exits            EmployeeExit[]
   discResults      DiscResult[]
   trainingProgress TrainingProgress[]
   sopSignatures    SopSignature[]
@@ -566,4 +569,94 @@ model PublicHoliday {
   date      DateTime @unique @db.Date
   name      String
   createdAt DateTime @default(now())
+}
+
+// -------------------------------------------------------------
+// KARYAWAN KELUAR (MENGUNDURKAN DIRI / PHK) & EXIT INTERVIEW
+// -------------------------------------------------------------
+enum ExitType {
+  // Mengundurkan diri: gaji periode terakhir tidak dibayar (kesepakatan kerja)
+  RESIGN
+  // Diberhentikan perusahaan: gaji dibayar prorata sampai hari terakhir kerja
+  TERMINATION
+}
+
+enum ExitReason {
+  // Mengundurkan diri
+  CAREER_OPPORTUNITY
+  FAMILY_DOMICILE
+  WORKLOAD_PHYSICAL
+  WORK_ENVIRONMENT
+  HEALTH
+  WALKOUT
+  // PHK
+  MISCONDUCT
+  PERFORMANCE
+  CONTRACT_END
+  RESTRUCTURING
+  OTHER
+}
+
+enum ResignNotice {
+  // Pemberitahuan 30 hari sesuai SOP
+  STANDARD
+  // Kurang dari 30 hari, disetujui manajemen
+  SHORT
+  // Keluar mendadak / mangkir
+  WALKOUT
+}
+
+enum RehireRecommendation {
+  RECOMMENDED
+  CONDITIONAL
+  NOT_RECOMMENDED
+}
+
+enum ExitStatus {
+  // Sedang proses serah terima (seragam, loker, kasbon)
+  OPEN
+  // Selesai: akun dinonaktifkan per hari terakhir kerja
+  COMPLETED
+  CANCELLED
+}
+
+model EmployeeExit {
+  id              String               @id @default(uuid())
+  employeeId      String
+  employee        EmployeeProfile      @relation(fields: [employeeId], references: [id])
+  type            ExitType
+  submittedDate   DateTime             @db.Date
+  lastWorkingDate DateTime             @db.Date
+  // Hanya untuk mengundurkan diri
+  notice          ResignNotice?
+  reason          ExitReason
+  reasonNotes     String
+  rehire          RehireRecommendation
+
+  // Serah terima
+  uniformReturned Boolean @default(false)
+  lockerCleared   Boolean @default(false)
+  handoverNotes   String?
+
+  // Exit interview dengan karyawan (opsional, skor 1-5)
+  interviewedAt         DateTime?
+  interviewNotes        String?
+  ratingLeadership      Int?
+  ratingSchedule        Int?
+  ratingTeam            Int?
+  ratingTraining        Int?
+  improvementSuggestion String?
+  wouldRecommend        Boolean?
+
+  status      ExitStatus @default(OPEN)
+  createdById String
+  createdBy   User       @relation("ExitCreatedBy", fields: [createdById], references: [id])
+  closedById  String?
+  closedBy    User?      @relation("ExitClosedBy", fields: [closedById], references: [id])
+  closedAt    DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([employeeId])
+  @@index([status])
 }

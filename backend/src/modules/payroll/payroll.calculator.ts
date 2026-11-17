@@ -23,6 +23,8 @@ export interface PayrollPeriod {
 
 export interface PayrollInput {
   joinDate: string; // YYYY-MM-DD
+  /** Hari terakhir kerja (karyawan yang keluar), YYYY-MM-DD. */
+  endDate?: string | null;
   period: PayrollPeriod;
   /** Tanggal hari ini (zona bisnis); hari mangkir hanya dihitung sampai tanggal ini. */
   today: string;
@@ -109,16 +111,21 @@ export function tenureAllowance(rules: PayrollRules, tenureMonths: number) {
 
 export function calculatePayroll(rules: PayrollRules, input: PayrollInput): PayrollResult {
   const { period } = input;
-  const tenureMonths = completedMonths(input.joinDate, period.end);
+  // Masa kerja dihitung sampai akhir periode, atau sampai hari terakhir kerja bila lebih awal
+  const tenureAsOf = input.endDate && input.endDate < period.end ? input.endDate : period.end;
+  const tenureMonths = completedMonths(input.joinDate, tenureAsOf);
   const fullBasic = tenureMonths < rules.probationMonths ? rules.basicSalaryProbation : rules.basicSalaryRegular;
   const dailyRate = fullBasic / 30;
 
-  // Prorata bila mulai bekerja setelah awal periode
+  // Prorata bila mulai bekerja setelah awal periode atau keluar sebelum akhir periode
   const employedFrom = input.joinDate > period.start ? input.joinDate : period.start;
-  const daysEmployed = employedFrom > period.end ? 0 : daysInclusive(employedFrom, period.end);
-  const basicSalary = input.joinDate > period.start ? Math.min(fullBasic, Math.round(dailyRate * daysEmployed)) : fullBasic;
+  const employedTo = input.endDate && input.endDate < period.end ? input.endDate : period.end;
+  const daysEmployed = employedFrom > employedTo ? 0 : daysInclusive(employedFrom, employedTo);
+  const partial = employedFrom !== period.start || employedTo !== period.end;
+  const prorate = (monthly: number) => (partial ? Math.min(monthly, Math.round((monthly / 30) * daysEmployed)) : monthly);
+  const basicSalary = prorate(fullBasic);
 
-  const inEmployment = (d: string) => d >= employedFrom && d <= period.end;
+  const inEmployment = (d: string) => d >= employedFrom && d <= employedTo;
   const present = new Map(input.attendance.filter((a) => inEmployment(a.date)).map((a) => [a.date, a.lateMinutes]));
   const daysPresent = present.size;
   const lateMinutes = Array.from(present.values()).reduce((n, m) => n + Math.max(0, m), 0);
@@ -128,7 +135,7 @@ export function calculatePayroll(rules: PayrollRules, input: PayrollInput): Payr
     for (const l of input.approvedLeaves) {
       if (types && !types.has(l.type)) continue;
       const from = l.start > employedFrom ? l.start : employedFrom;
-      const to = l.end < period.end ? l.end : period.end;
+      const to = l.end < employedTo ? l.end : employedTo;
       if (from <= to) eachDate(from, to).forEach((d) => set.add(d));
     }
     return set;
@@ -144,7 +151,9 @@ export function calculatePayroll(rules: PayrollRules, input: PayrollInput): Payr
   ).size;
 
   const mealAllowance = Math.round(rules.mealAllowancePerDay * daysPresent);
-  const tenure = Math.round(tenureAllowance(rules, tenureMonths));
+  // Tunjangan masa kerja ikut prorata hanya untuk yang keluar di tengah periode (karyawan baru belum mendapatkannya)
+  const fullTenure = Math.round(tenureAllowance(rules, tenureMonths));
+  const tenure = employedTo !== period.end ? prorate(fullTenure) : daysEmployed > 0 ? fullTenure : 0;
   const unpaidDeduction = Math.min(basicSalary, Math.round(dailyRate * (unpaidLeaveDays + absentDays)));
   const latePenalty = Math.round(rules.latePenaltyPerMinute * lateMinutes);
 

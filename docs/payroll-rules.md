@@ -11,6 +11,11 @@ Keputusan pemilik (15 November 2026):
 - Hari izin dan hari mangkir memotong gaji pokok.
 - Karyawan yang mulai bekerja di tengah periode mendapat gaji pokok prorata.
 
+Keputusan pemilik (17 November 2026), karyawan keluar:
+
+- **Mengundurkan diri**: gaji periode yang memuat hari terakhir kerja tidak dibayar, sesuai kesepakatan kerja. Karyawan itu tidak dimasukkan ke perhitungan gaji periode tersebut.
+- **PHK**: gaji periode terakhir dibayar prorata sampai hari terakhir kerja.
+
 ## Periode gaji
 
 Setiap cabang punya **tanggal tutup buku** (1–31). Periode bulan M berjalan dari sehari setelah tanggal tutup buku bulan sebelumnya sampai tanggal tutup buku bulan M.
@@ -30,6 +35,7 @@ Semua nominal dibulatkan ke rupiah terdekat.
 
 1. **Gaji pokok**: Rp 1.000.000 bila masa kerja di akhir periode kurang dari 3 bulan penuh, Rp 1.200.000 bila 3 bulan atau lebih.
    - Bila karyawan mulai bekerja setelah awal periode, gaji pokok = gaji pokok ÷ 30 × jumlah hari sejak tanggal masuk sampai akhir periode (maksimal gaji pokok penuh).
+   - Karyawan yang di-PHK sebelum akhir periode: gaji pokok **dan tunjangan masa kerja** = nominal ÷ 30 × jumlah hari kerja sampai hari terakhir kerja (maksimal nominal penuh). Hari setelah hari terakhir kerja tidak dihitung hadir, izin, maupun mangkir. Masa kerja dihitung sampai hari terakhir kerja.
 2. **Uang makan**: Rp 20.000 × jumlah hari karyawan absen masuk di periode itu.
 3. **Tunjangan masa kerja** (berdasarkan bulan kerja ke-n di akhir periode):
 

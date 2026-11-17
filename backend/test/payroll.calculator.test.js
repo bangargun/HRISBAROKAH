@@ -155,3 +155,31 @@ test('contoh lengkap sesuai dokumen', () => {
   assert.equal(r.kasbonDeduction, 250_000);
   assert.equal(r.netSalary, 1_200_000 + 440_000 + 250_000 - 15_000 - 250_000);
 });
+
+test('karyawan keluar di tengah periode: gaji pokok dan tunjangan prorata sampai hari terakhir', () => {
+  // Masuk 2025-01-10 → November 2026 bulan kerja ke-23 (tunjangan 250.000)
+  const r = calculatePayroll(rules, { ...base, endDate: '2026-11-15' });
+  assert.equal(r.daysEmployed, 15);
+  assert.equal(r.basicSalary, 600_000); // 1.200.000 / 30 x 15
+  assert.equal(r.tenureAllowance, 125_000); // 250.000 / 30 x 15
+});
+
+test('hari setelah hari terakhir kerja tidak dihitung mangkir maupun hadir', () => {
+  const r = calculatePayroll(rules, {
+    ...base,
+    endDate: '2026-11-15',
+    scheduledDates: ['2026-11-14', '2026-11-20'],
+    attendance: [{ date: '2026-11-20', lateMinutes: 30 }],
+  });
+  assert.equal(r.absentDays, 1);
+  assert.equal(r.daysPresent, 0);
+  assert.equal(r.lateMinutes, 0);
+});
+
+test('hari terakhir kerja sebelum periode dimulai: tidak ada gaji', () => {
+  const r = calculatePayroll(rules, { ...base, endDate: '2026-10-31' });
+  assert.equal(r.daysEmployed, 0);
+  assert.equal(r.basicSalary, 0);
+  assert.equal(r.tenureAllowance, 0);
+  assert.equal(r.netSalary, 0);
+});

@@ -124,7 +124,7 @@ import {
   Flame,
   UserX,
 } from 'lucide-react';
-import { ResignationExitModule } from '@/components/ResignationExitModule';
+import ExitsModule from '@/components/ExitsModule';
 import {
   AiSopStudio,
   AiSopModal,
@@ -2781,7 +2781,7 @@ export default function AdminDashboard() {
       icon: Users,
       subTabs: [
         { id: 'employee-list', label: 'Daftar Karyawan' },
-        { id: 'resignation-exit', label: 'Pengunduran Diri' },
+        { id: 'resignation-exit', label: 'Karyawan Keluar' },
       ],
     },
     attendance: {
@@ -17892,11 +17892,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
           {/* ========================================================= */}
           {activeMenu === 'employees' && (
             activeSubTab === 'resignation-exit' ? (
-              <ResignationExitModule
-                employees={employeesMasterList}
-                outlets={outletsConfigList}
+              <ExitsModule
                 showToast={showToast}
-                onEmployeeUpdate={setEmployeesMasterList}
+                onChanged={() => {
+                  setEmployeeListKey((k) => k + 1);
+                  reloadEmployees();
+                }}
               />
             ) : (
               <EmployeeListModule

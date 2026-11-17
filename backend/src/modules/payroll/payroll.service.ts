@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, PayrollStatus, RequestStatus, RequestType } from '@prisma/client';
+import { Prisma, PayrollStatus, RequestStatus, RequestType, ExitStatus, ExitType } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { businessDateString, businessDateTime, toDateOnly } from '../../common/utils/business-date.util';
 import { PayrollRules, calculatePayroll, payrollPeriod } from './payroll.calculator';
@@ -78,9 +78,20 @@ export class PayrollService {
 
     const start = toDateOnly(period.start);
     const end = toDateOnly(period.end);
+    const exitInPeriod = { status: { not: ExitStatus.CANCELLED }, lastWorkingDate: { gte: start, lte: end } };
     const employees = await this.prisma.employeeProfile.findMany({
-      where: { outletId: outlet.id, user: { isActive: true }, joinDate: { lte: businessDateTime(period.end, '23:59') } },
-      select: { id: true, fullName: true, joinDate: true },
+      // Karyawan aktif, plus yang hari terakhir kerjanya jatuh di periode ini (sudah atau belum ditutup HR)
+      where: {
+        outletId: outlet.id,
+        joinDate: { lte: businessDateTime(period.end, '23:59') },
+        OR: [{ user: { isActive: true } }, { exits: { some: { ...exitInPeriod } } }],
+      },
+      select: {
+        id: true,
+        fullName: true,
+        joinDate: true,
+        exits: { where: exitInPeriod, orderBy: { lastWorkingDate: 'asc' }, take: 1, select: { type: true, lastWorkingDate: true } },
+      },
     });
     const ids = employees.map((e) => e.id);
 
@@ -140,8 +151,12 @@ export class PayrollService {
     const data: Prisma.PayrollCreateManyInput[] = [];
     for (const e of employees) {
       if (finalizedElsewhere.has(e.id)) continue;
+      // Mengundurkan diri: gaji periode terakhir tidak dibayar (kesepakatan). PHK: prorata sampai hari terakhir.
+      const exit = e.exits[0];
+      if (exit?.type === ExitType.RESIGN) continue;
       const r = calculatePayroll(rules, {
         joinDate: ymd(e.joinDate),
+        endDate: exit ? ymd(exit.lastWorkingDate) : null,
         period,
         today,
         attendance: (attendanceBy.get(e.id) ?? []).map((a) => ({ date: ymd(a.date), lateMinutes: a.lateMinutes })),

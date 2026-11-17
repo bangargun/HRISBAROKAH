@@ -194,6 +194,8 @@ export class EmployeesService {
       await this.prisma.$transaction(async (tx) => {
         await tx.user.update({ where: { id: employee.userId }, data: { isActive } });
         if (!isActive) await tx.outlet.updateMany({ where: { managerId: id }, data: { managerId: null } });
+        // Dipekerjakan kembali: tanggal keluar lama tidak berlaku lagi (gaji kembali dihitung penuh)
+        if (isActive) await tx.employeeProfile.update({ where: { id }, data: { endDate: null } });
       });
     }
     return {

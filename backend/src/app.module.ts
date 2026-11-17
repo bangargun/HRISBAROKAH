@@ -12,6 +12,7 @@ import { PayrollModule } from './modules/payroll/payroll.module';
 import { HolidaysModule } from './modules/holidays/holidays.module';
 import { DepartmentsModule } from './modules/departments/departments.module';
 import { SanctionsModule } from './modules/sanctions/sanctions.module';
+import { ExitsModule } from './modules/exits/exits.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { SanctionsModule } from './modules/sanctions/sanctions.module';
     HolidaysModule,
     DepartmentsModule,
     SanctionsModule,
+    ExitsModule,
   ],
   controllers: [],
   providers: [],
