@@ -275,6 +275,20 @@ class ApiService {
     }
   }
 
+  // Ganti password sendiri; token baru disimpan agar tetap masuk di HP ini
+  static Future<void> changePassword(String oldPassword, String newPassword) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/auth/change-password'),
+      headers: await _headers(),
+      body: jsonEncode({'oldPassword': oldPassword, 'newPassword': newPassword}),
+    );
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(_errorMessage(data, 'Gagal mengganti password'));
+    }
+    await saveToken(data['accessToken'] as String);
+  }
+
   // Data user yang login (disimpan saat login)
   static Future<Map<String, dynamic>?> getCurrentUser() async {
     final prefs = await SharedPreferences.getInstance();

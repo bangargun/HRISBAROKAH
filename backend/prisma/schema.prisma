@@ -147,6 +147,8 @@ model User {
   passwordHash String
   role         UserRole @default(EMPLOYEE)
   isActive     Boolean  @default(true)
+  // Token login yang terbit sebelum waktu ini ditolak (setelah ganti / reset password)
+  passwordChangedAt DateTime?
   fcmToken     String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

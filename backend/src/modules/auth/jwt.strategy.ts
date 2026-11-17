@@ -17,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { sub: string; username: string; role: string }) {
+  async validate(payload: { sub: string; username: string; role: string; iat?: number }) {
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
       include: {
@@ -34,6 +34,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     if (!user || !user.isActive) {
       throw new UnauthorizedException('Akun tidak ditemukan atau tidak aktif');
+    }
+    // Token yang terbit sebelum password diganti / di-reset tidak berlaku lagi
+    if (user.passwordChangedAt && (payload.iat ?? 0) < Math.floor(user.passwordChangedAt.getTime() / 1000)) {
+      throw new UnauthorizedException('Password sudah diganti. Silakan masuk lagi.');
     }
 
     return user;

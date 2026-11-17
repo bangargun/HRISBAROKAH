@@ -204,6 +204,19 @@ export class EmployeesService {
     };
   }
 
+  async resetPassword(actor: AuthUser, id: string, newPassword: string) {
+    const employee = await this.getOrThrow(id);
+    if (employee.userId === actor.id) {
+      throw new BadRequestException('Untuk akun Anda sendiri, gunakan menu Akun saya → Ganti password');
+    }
+    this.assertCanManageAdmin(actor, employee.user.role);
+    await this.prisma.user.update({
+      where: { id: employee.userId },
+      data: { passwordHash: await bcrypt.hash(newPassword, 10), passwordChangedAt: new Date() },
+    });
+    return { message: `Password ${employee.fullName} sudah di-reset` };
+  }
+
   /** Akun admin (HR, Keuangan, Super Admin) hanya boleh diubah oleh Super Admin. */
   private assertCanManageAdmin(actor: AuthUser, ...roles: (UserRole | undefined)[]) {
     if (actor.role !== UserRole.SUPER_ADMIN && roles.some((r) => r && ADMIN_ROLES.includes(r))) {

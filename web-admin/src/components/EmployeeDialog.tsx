@@ -255,6 +255,8 @@ export default function EmployeeDialog({
             </div>
           )}
 
+          {isEdit && !roleLocked && <ResetPassword employeeId={employee.id} name={employee.fullName} />}
+
           {error && (
             <p role="alert" className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-rose-800">{error}</p>
           )}
@@ -275,5 +277,66 @@ export default function EmployeeDialog({
         </form>
       )}
     </Dialog>
+  );
+}
+
+/** HR membuat password sementara untuk karyawan yang lupa; sesi lama karyawan itu otomatis keluar. */
+function ResetPassword({ employeeId, name }: { employeeId: string; name: string }) {
+  const [open, setOpen] = useState(false);
+  const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
+
+  async function reset() {
+    if (password.length < 6) {
+      setNotice({ ok: false, text: 'Password sementara minimal 6 karakter' });
+      return;
+    }
+    setBusy(true);
+    setNotice(null);
+    try {
+      await apiFetch(`/employees/${employeeId}/reset-password`, { method: 'POST', body: JSON.stringify({ newPassword: password }) });
+      setNotice({ ok: true, text: `Password ${name} di-reset. Berikan password sementara ini dan minta ia menggantinya setelah masuk.` });
+      setOpen(false);
+    } catch (err) {
+      setNotice({ ok: false, text: (err as Error).message });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="space-y-2 border-t border-slate-100 pt-4">
+      <p className="text-xs font-semibold uppercase text-slate-500">Akun login</p>
+      {open ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="text"
+            autoComplete="off"
+            minLength={6}
+            maxLength={72}
+            placeholder="Password sementara"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="min-w-0 flex-1 rounded-md border border-slate-300 px-3 py-2 font-mono text-slate-800 focus:border-amber-500"
+          />
+          <button type="button" disabled={busy} onClick={reset} className="rounded-md bg-rose-700 px-3 py-2 font-medium text-white hover:bg-rose-800 disabled:opacity-50">
+            {busy ? 'Menyimpan…' : 'Reset password'}
+          </button>
+          <button type="button" disabled={busy} onClick={() => setOpen(false)} className="rounded-md px-3 py-2 font-medium text-slate-700 hover:bg-slate-100">
+            Batal
+          </button>
+        </div>
+      ) : (
+        <button type="button" onClick={() => { setOpen(true); setNotice(null); }} className="font-medium text-amber-700 hover:text-amber-800">
+          Reset password karyawan ini…
+        </button>
+      )}
+      {notice && (
+        <p role={notice.ok ? 'status' : 'alert'} className={`rounded-md border px-3 py-2 ${notice.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-rose-200 bg-rose-50 text-rose-800'}`}>
+          {notice.text}
+        </p>
+      )}
+    </div>
   );
 }

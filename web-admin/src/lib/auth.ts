@@ -48,6 +48,17 @@ function toSessionUser(user: any): SessionUser {
   return { id: user.id, username: user.username, role: user.role, fullName: user.profile?.fullName };
 }
 
+/** Setelah ganti password / username: simpan token baru (dan data user bila berubah). */
+export function updateSession(accessToken: string, user?: any): SessionUser | null {
+  try {
+    localStorage.setItem(TOKEN_KEY, accessToken);
+    if (user) localStorage.setItem(USER_KEY, JSON.stringify(toSessionUser(user)));
+  } catch {
+    // Penyimpanan browser tidak tersedia
+  }
+  return getSessionUser();
+}
+
 export function messageFrom(data: any, fallback: string): string {
   const message = data?.message;
   if (Array.isArray(message)) {

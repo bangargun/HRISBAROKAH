@@ -149,6 +149,13 @@ export class UpdateEmployeeDto {
   bankAccountHolder?: string;
 }
 
+export class ResetPasswordDto {
+  @IsString()
+  @MinLength(6, { message: 'Password minimal 6 karakter' })
+  @MaxLength(72)
+  newPassword: string;
+}
+
 export class SetActiveDto {
   @IsBoolean()
   isActive: boolean;

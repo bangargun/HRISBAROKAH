@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, ChangePasswordDto, UpdateFcmTokenDto } from './auth.dto';
+import { LoginDto, ChangePasswordDto, ChangeUsernameDto, UpdateFcmTokenDto } from './auth.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
@@ -26,6 +26,12 @@ export class AuthController {
     @Body() dto: ChangePasswordDto,
   ) {
     return this.authService.changePassword(userId, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('change-username')
+  async changeUsername(@CurrentUser('id') userId: string, @Body() dto: ChangeUsernameDto) {
+    return this.authService.changeUsername(userId, dto);
   }
 
   @UseGuards(JwtAuthGuard)

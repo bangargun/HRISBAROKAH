@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class LoginDto {
   @IsString()
@@ -21,7 +22,18 @@ export class ChangePasswordDto {
 
   @IsString()
   @MinLength(6, { message: 'Password baru minimal 6 karakter' })
+  @MaxLength(72)
   newPassword: string;
+}
+
+export class ChangeUsernameDto {
+  @IsString()
+  @IsNotEmpty({ message: 'Masukkan password saat ini' })
+  password: string;
+
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim().toLowerCase() : value))
+  @Matches(/^[a-z0-9._-]{3,30}$/, { message: 'Username 3-30 karakter: huruf kecil, angka, titik, garis bawah atau tanda hubung' })
+  newUsername: string;
 }
 
 export class UpdateFcmTokenDto {

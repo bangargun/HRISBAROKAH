@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
-import { CreateEmployeeDto, SetActiveDto, UpdateEmployeeDto } from './employees.dto';
+import { CreateEmployeeDto, ResetPasswordDto, SetActiveDto, UpdateEmployeeDto } from './employees.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -47,6 +47,13 @@ export class EmployeesController {
   @Put(':id')
   async update(@CurrentUser() user, @Param('id') id: string, @Body() dto: UpdateEmployeeDto) {
     return this.employeesService.update(user, id, dto);
+  }
+
+  // Karyawan lupa password: HR membuat password sementara; sesi lama karyawan itu keluar
+  @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN)
+  @Post(':id/reset-password')
+  async resetPassword(@CurrentUser() user, @Param('id') id: string, @Body() dto: ResetPasswordDto) {
+    return this.employeesService.resetPassword(user, id, dto.newPassword);
   }
 
   @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN)

@@ -8,6 +8,7 @@ import 'requests_screen.dart';
 import 'payslip_screen.dart';
 import 'daily_report_screen.dart';
 import 'survey360_screen.dart';
+import 'change_password_dialog.dart';
 import 'login_screen.dart';
 import 'face_camera_screen.dart';
 import 'face_enrollment_screen.dart';
@@ -247,6 +248,11 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadTodayAttendance,
+          ),
+          IconButton(
+            icon: const Icon(Icons.key),
+            tooltip: 'Ganti password',
+            onPressed: () => showDialog(context: context, builder: (_) => const ChangePasswordDialog()),
           ),
           IconButton(
             icon: const Icon(Icons.logout),

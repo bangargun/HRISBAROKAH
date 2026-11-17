@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { LogOut, Menu, X } from 'lucide-react';
 import { clearSession, getSessionUser, type SessionUser } from '@/lib/auth';
 import { NAV_GROUPS, ROLE_LABEL, type NavItem } from '@/lib/navigation';
+import AccountDialog from '@/components/AccountDialog';
 
 interface Props {
   /** Id menu yang sedang aktif (lihat NAV_GROUPS). */
@@ -38,6 +39,8 @@ export default function AppShell({ activeId, onSelect, title, counts, headerActi
   const [drawerOpen, setDrawerOpen] = useState(false);
   // Sesi dibaca setelah mount agar render server dan klien sama
   const [user, setUser] = useState<SessionUser | null>(null);
+
+  const [accountOpen, setAccountOpen] = useState(false);
 
   useEffect(() => setUser(getSessionUser()), []);
 
@@ -147,10 +150,15 @@ export default function AppShell({ activeId, onSelect, title, counts, headerActi
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-navy-700 text-xs font-semibold text-white">
             {initials(displayName) || '?'}
           </div>
-          <div className="min-w-0 flex-1">
+          <button
+            type="button"
+            onClick={() => setAccountOpen(true)}
+            className="min-w-0 flex-1 rounded-md text-left hover:bg-white/5"
+            title="Akun saya: ganti password atau username"
+          >
             <p className="truncate text-sm font-medium text-white">{displayName || 'Memuat…'}</p>
-            <p className="truncate text-xs text-slate-400">{user ? ROLE_LABEL[user.role] ?? user.role : ''}</p>
-          </div>
+            <p className="truncate text-xs text-slate-400">{user ? `${ROLE_LABEL[user.role] ?? user.role} · Akun saya` : ''}</p>
+          </button>
           <button
             type="button"
             onClick={logout}
@@ -178,6 +186,9 @@ export default function AppShell({ activeId, onSelect, title, counts, headerActi
         </header>
         <div className="flex min-h-0 flex-1 flex-col">{children}</div>
       </div>
+      {accountOpen && user && (
+        <AccountDialog user={user} onClose={() => setAccountOpen(false)} onChanged={(u) => setUser(u)} />
+      )}
     </div>
   );
 }
