@@ -28,6 +28,9 @@ interface PayrollRow {
   basicSalary: string;
   mealAllowance: string;
   tenureAllowance: string;
+  bonusIncentive: string;
+  kpiScore: number | null;
+  kpiGrade: string | null;
   unpaidDeduction: string;
   latePenalty: string;
   kasbonDeduction: string;
@@ -106,7 +109,7 @@ export default function PayrollModule() {
     () =>
       rows.reduce(
         (t, r) => ({
-          gross: t.gross + Number(r.basicSalary) + Number(r.mealAllowance) + Number(r.tenureAllowance),
+          gross: t.gross + Number(r.basicSalary) + Number(r.mealAllowance) + Number(r.tenureAllowance) + Number(r.bonusIncentive),
           deductions: t.deductions + Number(r.unpaidDeduction) + Number(r.latePenalty) + Number(r.kasbonDeduction),
           kasbon: t.kasbon + Number(r.kasbonDeduction),
           net: t.net + Number(r.netSalary),
@@ -285,6 +288,7 @@ export default function PayrollModule() {
                   <th scope="col" className="px-3 py-3 text-right">Gaji pokok</th>
                   <th scope="col" className="px-3 py-3 text-right">Uang makan</th>
                   <th scope="col" className="px-3 py-3 text-right">Tunj. masa kerja</th>
+                  <th scope="col" className="px-3 py-3 text-right">KPI & insentif</th>
                   <th scope="col" className="px-3 py-3 text-right">Izin & mangkir</th>
                   <th scope="col" className="px-3 py-3 text-right">Terlambat</th>
                   <th scope="col" className="px-3 py-3 text-right">Kasbon</th>
@@ -309,6 +313,16 @@ export default function PayrollModule() {
                     </td>
                     <td className="px-3 py-3 text-right text-slate-800">{rp(r.mealAllowance)}</td>
                     <td className="px-3 py-3 text-right text-slate-800">{rp(r.tenureAllowance)}</td>
+                    <td className="px-3 py-3 text-right">
+                      <span className={Number(r.bonusIncentive) ? 'text-emerald-700' : 'text-slate-500'}>
+                        {Number(r.bonusIncentive) ? rp(r.bonusIncentive) : '-'}
+                      </span>
+                      {r.kpiScore !== null && (
+                        <p className="text-xs text-slate-500">
+                          KPI {r.kpiScore}{r.kpiGrade ? ` (${r.kpiGrade})` : ', belum lengkap'}
+                        </p>
+                      )}
+                    </td>
                     <td className="px-3 py-3 text-right">
                       <span className={Number(r.unpaidDeduction) ? 'text-rose-700' : 'text-slate-500'}>
                         {Number(r.unpaidDeduction) ? `−${rp(r.unpaidDeduction)}` : '-'}

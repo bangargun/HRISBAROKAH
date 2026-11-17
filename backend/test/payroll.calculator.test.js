@@ -14,6 +14,7 @@ const rules = {
   tenureAllowanceMonth19: 250_000,
   tenureAllowanceStep: 50_000,
   kasbonMaxPercent: 50,
+  kpiIncentiveGradeA: 100_000,
 };
 
 const nov = { start: '2026-11-01', end: '2026-11-30' };
@@ -182,4 +183,62 @@ test('hari terakhir kerja sebelum periode dimulai: tidak ada gaji', () => {
   assert.equal(r.basicSalary, 0);
   assert.equal(r.tenureAllowance, 0);
   assert.equal(r.netSalary, 0);
+});
+
+// ---------------------------------------------------------------- KPI
+const present = (dates, late = []) => dates.map((date) => ({ date, lateMinutes: late.includes(date) ? 10 : 0, late: late.includes(date) }));
+
+test('KPI disiplin masuk = hari tepat waktu / (hari masuk + mangkir) x 100', () => {
+  const att = present(days(2, 8), [days(2, 8)[0], days(2, 8)[1]]); // 8 hadir, 2 terlambat
+  const r = calculatePayroll(rules, { ...base, attendance: att, scheduledDates: days(2, 10) }); // 2 mangkir
+  assert.equal(r.absentDays, 2);
+  assert.equal(r.kpi.disciplineIn, 60); // 6 tepat waktu / 10
+});
+
+test('KPI disiplin istirahat = hari istirahat sesuai batas / hari istirahat x 100', () => {
+  const breakDays = [...days(2, 3).map((date) => ({ date, overLimit: false })), { date: days(5, 1)[0], overLimit: true }];
+  const r = calculatePayroll(rules, { ...base, attendance: present(days(2, 4)), breakDays });
+  assert.equal(r.kpi.disciplineBreak, 75);
+});
+
+test('KPI sikap dari rata-rata survei 360 (1-5) x 20; kasbon 100 bila bebas kasbon', () => {
+  const r = calculatePayroll(rules, { ...base, attendance: present(days(2, 4)), surveyAverage: 4.5 });
+  assert.equal(r.kpi.attitude, 90);
+  assert.equal(r.kpi.kasbon, 100);
+  const withLoan = calculatePayroll(rules, { ...base, kasbons: [{ id: 'k', monthlyDeduction: 0, remainingAmount: 100 }] });
+  assert.equal(withLoan.kpi.kasbon, 0);
+});
+
+test('KPI skor berbobot 30/25/35/10 dan nilai A memberi insentif yang masuk gaji', () => {
+  const r = calculatePayroll(rules, {
+    ...base,
+    attendance: present(days(2, 10)),
+    scheduledDates: days(2, 10),
+    breakDays: days(2, 10).map((date) => ({ date, overLimit: false })),
+    surveyAverage: 4.5,
+  });
+  // 100*0.30 + 100*0.25 + 90*0.35 + 100*0.10 = 96.5
+  assert.equal(r.kpi.score, 96.5);
+  assert.equal(r.kpi.grade, 'A');
+  assert.equal(r.kpiIncentive, 100_000);
+  assert.equal(r.netSalary, 1_200_000 + 200_000 + 250_000 + 100_000); // gaji + uang makan 10 hari + tunjangan + insentif
+});
+
+test('KPI tanpa survei atau tanpa hari masuk: bobot dibagi ulang, tapi tidak dapat insentif', () => {
+  const r = calculatePayroll(rules, { ...base, attendance: present(days(2, 10)), scheduledDates: days(2, 10) });
+  assert.equal(r.kpi.attitude, null);
+  assert.equal(r.kpi.disciplineBreak, null);
+  assert.equal(r.kpi.score, 100); // (100*0.30 + 100*0.10) / 0.40
+  assert.equal(r.kpi.complete, false);
+  assert.equal(r.kpi.grade, null);
+  assert.equal(r.kpiIncentive, 0);
+});
+
+test('KPI nilai B ke bawah tidak dapat insentif', () => {
+  const att = present(days(2, 10), days(2, 4)); // 4 dari 10 terlambat
+  const r = calculatePayroll(rules, { ...base, attendance: att, scheduledDates: days(2, 10), surveyAverage: 4 });
+  // 60*0.30 + 80*0.35 + 100*0.10 = 56 / 0.75 = 74.7
+  assert.equal(r.kpi.score, 74.7);
+  assert.equal(r.kpi.grade, 'C');
+  assert.equal(r.kpiIncentive, 0);
 });

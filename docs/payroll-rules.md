@@ -79,3 +79,26 @@ Yang bisa melihat dan menjalankan penggajian: Super Admin, Admin HR dan Admin Ke
 - Ketentuan resign di tengah periode. Aturan "gaji berjalan hangus" di SOP lama sengaja **tidak** diotomatiskan karena berpotensi bertentangan dengan aturan pengupahan; mohon dikonfirmasi ke HR atau konsultan ketenagakerjaan.
 - Tunjangan masa kerja saat ini dibayar penuh walau karyawan tidak hadir sama sekali di periode itu, karena SOP tidak mengaitkannya dengan kehadiran. Mohon dikonfirmasi apakah ini memang dikehendaki.
 - Catatan: gaji pokok Rp 1–1,2 juta per bulan berada jauh di bawah UMK di sebagian besar daerah. Pastikan angka ini memang hanya sebagian dari total upah, atau sesuaikan di Aturan Gaji.
+
+## KPI kru dan insentif
+
+Keputusan pemilik (17 November 2026): KPI dihitung otomatis dari data, dan insentif nilai A masuk ke gaji.
+
+KPI dihitung per periode gaji yang sama dengan perhitungan gaji, untuk setiap karyawan:
+
+| Komponen | Bobot | Cara hitung |
+|---|---|---|
+| Disiplin masuk | 30% | Hari tepat waktu ÷ (hari masuk + hari mangkir) × 100. Hari tidak dijadwalkan dan hari cuti tidak dihitung. |
+| Disiplin istirahat | 25% | Hari istirahat yang tidak melewati batas cabang ÷ hari ada istirahat × 100. |
+| Sikap | 35% | Rata-rata survei 360° (skala 1–5) × 20. |
+| Bebas kasbon | 10% | 100 bila tidak ada sisa kasbon, 0 bila masih ada. |
+
+- Komponen yang belum punya data (misalnya belum pernah istirahat) tidak dihitung dan bobotnya dibagi ulang ke komponen lain.
+- Nilai huruf hanya diberikan bila disiplin masuk dan sikap sudah ada datanya: A ≥ 90, B ≥ 80, C ≥ 70, D di bawahnya.
+- Nilai A mendapat **insentif KPI** (awal Rp 100.000, bisa diubah di Aturan Gaji) yang ditambahkan ke gaji periode itu sebelum potongan.
+
+### Survei 360°
+
+- Diisi dari aplikasi HP oleh rekan satu cabang dan kepala cabang, 15 pertanyaan sikap kerja, skala 1–5.
+- Dibuka H-7 sampai H-3 sebelum tanggal tutup buku cabang. Satu kali per rekan per periode; tidak bisa menilai diri sendiri.
+- Nama penilai tidak ditampilkan di hasil survei.

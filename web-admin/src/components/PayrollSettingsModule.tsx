@@ -15,6 +15,7 @@ interface Settings {
   tenureAllowanceMonth19: number;
   tenureAllowanceStep: number;
   kasbonMaxPercent: number;
+  kpiIncentiveGradeA: number;
   updatedAt: string;
 }
 
@@ -37,6 +38,7 @@ const SECTIONS: { title: string; fields: { key: Key; label: string; unit: 'rp' |
       { key: 'tenureAllowanceMonth13', label: 'Masa kerja bulan ke-13 s.d. 18', unit: 'rp' },
       { key: 'tenureAllowanceMonth19', label: 'Masa kerja bulan ke-19 s.d. 24', unit: 'rp' },
       { key: 'tenureAllowanceStep', label: 'Tambahan per 6 bulan setelah bulan ke-24', unit: 'rp' },
+      { key: 'kpiIncentiveGradeA', label: 'Insentif KPI nilai A (skor ≥ 90)', unit: 'rp', hint: 'Masuk gaji otomatis bila KPI lengkap; isi 0 untuk menonaktifkan' },
     ],
   },
   {

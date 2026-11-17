@@ -249,6 +249,32 @@ class ApiService {
     }
   }
 
+  // Survei 360°: pertanyaan, jendela & rekan yang bisa dinilai, kirim penilaian
+  static Future<List<dynamic>> getSurveyQuestions() async {
+    final response = await http.get(Uri.parse('$baseUrl/survey360/questions'), headers: await _headers());
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200) return data as List<dynamic>;
+    throw Exception(_errorMessage(data, 'Gagal memuat pertanyaan survei'));
+  }
+
+  static Future<Map<String, dynamic>> getMySurvey() async {
+    final response = await http.get(Uri.parse('$baseUrl/survey360/mine'), headers: await _headers());
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200) return data;
+    throw Exception(_errorMessage(data, 'Gagal memuat survei'));
+  }
+
+  static Future<void> submitSurvey(String targetId, List<int> answers, String? comment) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/survey360'),
+      headers: await _headers(),
+      body: jsonEncode({'targetId': targetId, 'answers': answers, 'comment': ?comment}),
+    );
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(_errorMessage(jsonDecode(response.body), 'Gagal mengirim penilaian'));
+    }
+  }
+
   // Data user yang login (disimpan saat login)
   static Future<Map<String, dynamic>?> getCurrentUser() async {
     final prefs = await SharedPreferences.getInstance();

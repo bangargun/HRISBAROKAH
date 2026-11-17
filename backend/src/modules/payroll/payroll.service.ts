@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, PayrollStatus, RequestStatus, RequestType, ExitStatus, ExitType } from '@prisma/client';
+import { AttendanceStatus, Prisma, PayrollStatus, RequestStatus, RequestType, ExitStatus, ExitType } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { businessDateString, businessDateTime, toDateOnly } from '../../common/utils/business-date.util';
 import { PayrollRules, calculatePayroll, payrollPeriod } from './payroll.calculator';
@@ -63,19 +63,13 @@ export class PayrollService {
   }
 
   /** Membuat (ulang) draf gaji semua karyawan aktif cabang untuk periode itu. */
-  async generate(dto: PayrollPeriodDto) {
-    const outlet = await this.outletOrThrow(dto.outletId);
-    const period = payrollPeriod(dto.year, dto.month, outlet.payrollCutoffDay);
+  /**
+   * Hitung gaji (termasuk KPI) semua karyawan cabang untuk satu periode, tanpa menyimpan.
+   * Dipakai oleh generate (draf gaji) dan layar KPI agar angkanya selalu sama.
+   */
+  private async computePeriod(outlet: { id: string; payrollCutoffDay: number }, year: number, month: number) {
+    const period = payrollPeriod(year, month, outlet.payrollCutoffDay);
     const today = businessDateString();
-    if (period.start > today) {
-      throw new BadRequestException(`Periode ${period.start} s.d. ${period.end} belum dimulai`);
-    }
-
-    const where = { outletId: outlet.id, periodYear: dto.year, periodMonth: dto.month };
-    if (await this.prisma.payroll.count({ where: { ...where, status: PayrollStatus.FINALIZED } })) {
-      throw new ConflictException('Gaji periode ini sudah difinalkan dan tidak bisa dihitung ulang');
-    }
-
     const start = toDateOnly(period.start);
     const end = toDateOnly(period.end);
     const exitInPeriod = { status: { not: ExitStatus.CANCELLED }, lastWorkingDate: { gte: start, lte: end } };
@@ -99,17 +93,17 @@ export class PayrollService {
     const finalizedElsewhere = new Set(
       (
         await this.prisma.payroll.findMany({
-          where: { employeeId: { in: ids }, periodYear: dto.year, periodMonth: dto.month, NOT: { outletId: outlet.id } },
+          where: { employeeId: { in: ids }, periodYear: year, periodMonth: month, NOT: { outletId: outlet.id } },
           select: { employeeId: true },
         })
       ).map((p) => p.employeeId),
     );
 
-    const [rules, attendance, schedules, leaves, kasbons] = await Promise.all([
+    const [rules, attendance, schedules, leaves, kasbons, surveys] = await Promise.all([
       this.getSettings(),
       this.prisma.attendance.findMany({
         where: { employeeId: { in: ids }, date: { gte: start, lte: end }, clockInTime: { not: null } },
-        select: { employeeId: true, date: true, lateMinutes: true },
+        select: { employeeId: true, date: true, lateMinutes: true, status: true, breaks: { select: { isOverLimit: true } } },
       }),
       this.prisma.shiftSchedule.findMany({
         where: { employeeId: { in: ids }, date: { gte: start, lte: end } },
@@ -136,6 +130,11 @@ export class PayrollService {
         orderBy: { disbursedAt: 'asc' },
         select: { id: true, employeeId: true, monthlyDeduction: true, remainingAmount: true },
       }),
+      this.prisma.survey360Response.groupBy({
+        by: ['targetId'],
+        where: { targetId: { in: ids }, periodYear: year, periodMonth: month },
+        _avg: { average: true },
+      }),
     ]);
 
     const group = <T extends { employeeId: string }>(rows: T[]) => {
@@ -148,7 +147,8 @@ export class PayrollService {
     const leavesBy = group(leaves);
     const kasbonsBy = group(kasbons);
 
-    const data: Prisma.PayrollCreateManyInput[] = [];
+    const surveyOf = new Map(surveys.map((s) => [s.targetId, s._avg.average]));
+    const results: { employee: (typeof employees)[number]; result: ReturnType<typeof calculatePayroll> }[] = [];
     for (const e of employees) {
       if (finalizedElsewhere.has(e.id)) continue;
       // Mengundurkan diri: gaji periode terakhir tidak dibayar (kesepakatan). PHK: prorata sampai hari terakhir.
@@ -159,7 +159,15 @@ export class PayrollService {
         endDate: exit ? ymd(exit.lastWorkingDate) : null,
         period,
         today,
-        attendance: (attendanceBy.get(e.id) ?? []).map((a) => ({ date: ymd(a.date), lateMinutes: a.lateMinutes })),
+        attendance: (attendanceBy.get(e.id) ?? []).map((a) => ({
+          date: ymd(a.date),
+          lateMinutes: a.lateMinutes,
+          late: a.status === AttendanceStatus.LATE,
+        })),
+        breakDays: (attendanceBy.get(e.id) ?? [])
+          .filter((a) => a.breaks.length > 0)
+          .map((a) => ({ date: ymd(a.date), overLimit: a.breaks.some((b) => b.isOverLimit) })),
+        surveyAverage: surveyOf.get(e.id) ?? null,
         scheduledDates: (schedulesBy.get(e.id) ?? []).map((s) => ymd(s.date)),
         approvedLeaves: (leavesBy.get(e.id) ?? [])
           .filter((l) => l.startDate)
@@ -174,9 +182,32 @@ export class PayrollService {
           remainingAmount: Number(k.remainingAmount),
         })),
       });
-      const { kasbonAllocations, ...amounts } = r;
-      data.push({
+      results.push({ employee: e, result: r });
+    }
+    return { period, start, end, today, employees, finalizedElsewhere, results };
+  }
+
+  async generate(dto: PayrollPeriodDto) {
+    const outlet = await this.outletOrThrow(dto.outletId);
+    const period = payrollPeriod(dto.year, dto.month, outlet.payrollCutoffDay);
+    if (period.start > businessDateString()) {
+      throw new BadRequestException(`Periode ${period.start} s.d. ${period.end} belum dimulai`);
+    }
+
+    const where = { outletId: outlet.id, periodYear: dto.year, periodMonth: dto.month };
+    if (await this.prisma.payroll.count({ where: { ...where, status: PayrollStatus.FINALIZED } })) {
+      throw new ConflictException('Gaji periode ini sudah difinalkan dan tidak bisa dihitung ulang');
+    }
+
+    const { start, end, employees, finalizedElsewhere, results } = await this.computePeriod(outlet, dto.year, dto.month);
+    const ids = employees.map((e) => e.id);
+    const data: Prisma.PayrollCreateManyInput[] = results.map(({ employee: e, result: r }) => {
+      const { kasbonAllocations, kpi, kpiIncentive, ...amounts } = r;
+      return {
         ...amounts,
+        bonusIncentive: kpiIncentive,
+        kpiScore: kpi.score,
+        kpiGrade: kpi.grade,
         employeeId: e.id,
         outletId: outlet.id,
         periodYear: dto.year,
@@ -184,8 +215,8 @@ export class PayrollService {
         periodStart: start,
         periodEnd: end,
         kasbonAllocations,
-      });
-    }
+      };
+    });
 
     await this.prisma.$transaction([
       this.prisma.payroll.deleteMany({ where: { ...where, status: PayrollStatus.DRAFT } }),
@@ -197,6 +228,26 @@ export class PayrollService {
     ]);
 
     return { ...(await this.list(dto)), skipped: employees.filter((e) => finalizedElsewhere.has(e.id)).map((e) => e.fullName) };
+  }
+
+  /** KPI karyawan cabang untuk satu periode, dihitung dari data terkini (sama dengan rumus gaji). */
+  async kpi(dto: PayrollPeriodDto) {
+    const outlet = await this.outletOrThrow(dto.outletId);
+    const { period, results } = await this.computePeriod(outlet, dto.year, dto.month);
+    return {
+      outlet: { id: outlet.id, name: outlet.name },
+      period,
+      incentiveGradeA: (await this.getSettings()).kpiIncentiveGradeA,
+      rows: results
+        .map(({ employee, result }) => ({
+          employee: { id: employee.id, fullName: employee.fullName },
+          daysPresent: result.daysPresent,
+          absentDays: result.absentDays,
+          kpi: result.kpi,
+          incentive: result.kpiIncentive,
+        }))
+        .sort((a, b) => Number(b.kpi.complete) - Number(a.kpi.complete) || b.kpi.score - a.kpi.score),
+    };
   }
 
   /** Mengunci draf dan mencatat cicilan kasbon. */
@@ -266,6 +317,7 @@ export class PayrollService {
       tenureAllowanceMonth19: Number(row.tenureAllowanceMonth19),
       tenureAllowanceStep: Number(row.tenureAllowanceStep),
       kasbonMaxPercent: row.kasbonMaxPercent,
+      kpiIncentiveGradeA: Number(row.kpiIncentiveGradeA),
       updatedAt: row.updatedAt,
     };
   }

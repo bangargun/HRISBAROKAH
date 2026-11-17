@@ -31,4 +31,5 @@ export class UpdatePayrollSettingsDto {
   @IsNumber() @Min(0, money) @IsOptional() tenureAllowanceMonth19?: number;
   @IsNumber() @Min(0, money) @IsOptional() tenureAllowanceStep?: number;
   @IsInt() @Min(0) @Max(100, { message: 'Batas kasbon 0-100%' }) @IsOptional() kasbonMaxPercent?: number;
+  @IsNumber() @Min(0, money) @IsOptional() kpiIncentiveGradeA?: number;
 }

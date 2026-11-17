@@ -14,6 +14,8 @@ import { DepartmentsModule } from './modules/departments/departments.module';
 import { SanctionsModule } from './modules/sanctions/sanctions.module';
 import { ExitsModule } from './modules/exits/exits.module';
 import { DailyReportsModule } from './modules/daily-reports/daily-reports.module';
+import { Survey360Module } from './modules/survey360/survey360.module';
+import { InspectionsModule } from './modules/inspections/inspections.module';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { DailyReportsModule } from './modules/daily-reports/daily-reports.module
     SanctionsModule,
     ExitsModule,
     DailyReportsModule,
+    Survey360Module,
+    InspectionsModule,
   ],
   controllers: [],
   providers: [],

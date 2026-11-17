@@ -7,6 +7,7 @@ import 'kasbon_screen.dart';
 import 'requests_screen.dart';
 import 'payslip_screen.dart';
 import 'daily_report_screen.dart';
+import 'survey360_screen.dart';
 import 'login_screen.dart';
 import 'face_camera_screen.dart';
 import 'face_enrollment_screen.dart';
@@ -537,6 +538,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const RequestsScreen(initialTab: 1)),
+                          ),
+                        ),
+                        _quickMenuCard(
+                          icon: Icons.groups_rounded,
+                          title: 'Survei 360°',
+                          color: Colors.pink,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const Survey360Screen()),
                           ),
                         ),
                         if (_role == 'STORE_MANAGER')

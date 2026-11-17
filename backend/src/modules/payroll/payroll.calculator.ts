@@ -14,6 +14,8 @@ export interface PayrollRules {
   tenureAllowanceMonth19: number;
   tenureAllowanceStep: number;
   kasbonMaxPercent: number;
+  /** Insentif untuk KPI nilai A */
+  kpiIncentiveGradeA: number;
 }
 
 export interface PayrollPeriod {
@@ -28,8 +30,12 @@ export interface PayrollInput {
   period: PayrollPeriod;
   /** Tanggal hari ini (zona bisnis); hari mangkir hanya dihitung sampai tanggal ini. */
   today: string;
-  /** Tanggal-tanggal ada absen masuk, beserta menit terlambatnya. */
-  attendance: { date: string; lateMinutes: number }[];
+  /** Tanggal-tanggal ada absen masuk, beserta menit terlambatnya (late = melewati toleransi). */
+  attendance: { date: string; lateMinutes: number; late?: boolean }[];
+  /** Hari yang ada istirahatnya; overLimit bila ada istirahat melewati batas cabang. */
+  breakDays?: { date: string; overLimit: boolean }[];
+  /** Rata-rata survei 360° (skala 1-5) untuk periode ini, null bila belum ada. */
+  surveyAverage?: number | null;
   /** Tanggal yang dijadwalkan masuk. */
   scheduledDates: string[];
   /** Pengajuan yang sudah disetujui HR dan bersinggungan dengan periode. */
@@ -52,7 +58,49 @@ export interface PayrollResult {
   latePenalty: number;
   kasbonDeduction: number;
   kasbonAllocations: { kasbonId: string; amount: number }[];
+  kpi: KpiResult;
+  kpiIncentive: number;
   netSalary: number;
+}
+
+export type KpiGrade = 'A' | 'B' | 'C' | 'D';
+
+export interface KpiResult {
+  /** Hari tepat waktu ÷ (hari masuk + mangkir) × 100; null bila tidak ada hari kerja */
+  disciplineIn: number | null;
+  /** Hari istirahat sesuai batas ÷ hari istirahat × 100; null bila tidak pernah istirahat */
+  disciplineBreak: number | null;
+  /** Rata-rata survei 360° × 20; null bila belum ada survei */
+  attitude: number | null;
+  /** 100 bila bebas kasbon, 0 bila masih ada sisa kasbon */
+  kasbon: number;
+  score: number;
+  /** Null bila belum lengkap: nilai huruf hanya untuk KPI dengan data disiplin masuk dan survei */
+  grade: KpiGrade | null;
+  /** Disiplin masuk dan sikap tersedia; syarat mendapat nilai dan insentif */
+  complete: boolean;
+}
+
+export const KPI_WEIGHTS = { disciplineIn: 0.3, disciplineBreak: 0.25, attitude: 0.35, kasbon: 0.1 } as const;
+
+export function kpiGrade(score: number): KpiGrade {
+  return score >= 90 ? 'A' : score >= 80 ? 'B' : score >= 70 ? 'C' : 'D';
+}
+
+const round1 = (n: number) => Math.round(n * 10) / 10;
+const pct = (part: number, whole: number) => (whole > 0 ? round1((part / whole) * 100) : null);
+
+/** Nilai berbobot; komponen tanpa data dikeluarkan dan bobotnya dibagi ulang. */
+export function kpiScore(parts: Omit<KpiResult, 'score' | 'grade' | 'complete'>) {
+  let sum = 0;
+  let weight = 0;
+  for (const key of Object.keys(KPI_WEIGHTS) as (keyof typeof KPI_WEIGHTS)[]) {
+    const v = parts[key];
+    if (v === null) continue;
+    sum += v * KPI_WEIGHTS[key];
+    weight += KPI_WEIGHTS[key];
+  }
+  return weight ? round1(sum / weight) : 0;
 }
 
 const UNPAID_LEAVE_TYPES = new Set(['IZIN']);
@@ -157,7 +205,21 @@ export function calculatePayroll(rules: PayrollRules, input: PayrollInput): Payr
   const unpaidDeduction = Math.min(basicSalary, Math.round(dailyRate * (unpaidLeaveDays + absentDays)));
   const latePenalty = Math.round(rules.latePenaltyPerMinute * lateMinutes);
 
-  const gross = basicSalary + mealAllowance + tenure;
+  // KPI periode ini (lihat docs/payroll-rules.md, bagian KPI)
+  const onTimeDays = Array.from(present.keys()).filter((d) => !input.attendance.find((a) => a.date === d)?.late).length;
+  const breakDays = (input.breakDays ?? []).filter((b) => inEmployment(b.date));
+  const kpiParts = {
+    disciplineIn: pct(onTimeDays, daysPresent + absentDays),
+    disciplineBreak: pct(breakDays.filter((b) => !b.overLimit).length, breakDays.length),
+    attitude: input.surveyAverage != null ? round1(input.surveyAverage * 20) : null,
+    kasbon: input.kasbons.some((k) => k.remainingAmount > 0) ? 0 : 100,
+  };
+  const score = kpiScore(kpiParts);
+  const complete = kpiParts.disciplineIn !== null && kpiParts.attitude !== null;
+  const kpi: KpiResult = { ...kpiParts, score, grade: complete ? kpiGrade(score) : null, complete };
+  const kpiIncentive = kpi.grade === 'A' ? Math.round(rules.kpiIncentiveGradeA) : 0;
+
+  const gross = basicSalary + mealAllowance + tenure + kpiIncentive;
   const beforeKasbon = Math.max(0, gross - unpaidDeduction - latePenalty);
 
   // Cicilan kasbon: maks persentase gaji pokok dan tidak membuat gaji minus
@@ -187,6 +249,8 @@ export function calculatePayroll(rules: PayrollRules, input: PayrollInput): Payr
     latePenalty,
     kasbonDeduction,
     kasbonAllocations,
+    kpi,
+    kpiIncentive,
     netSalary: beforeKasbon - kasbonDeduction,
   };
 }

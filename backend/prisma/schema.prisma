@@ -113,10 +113,12 @@ model Outlet {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  employees         EmployeeProfile[]
-  attendances       Attendance[]
-  payrolls          Payroll[]
-  dailyReportPhotos DailyReportPhoto[]
+  employees          EmployeeProfile[]
+  attendances        Attendance[]
+  payrolls           Payroll[]
+  dailyReportPhotos  DailyReportPhoto[]
+  survey360Responses Survey360Response[]
+  inspections        OutletInspection[]
 }
 
 model Department {
@@ -151,12 +153,14 @@ model User {
 
   profile EmployeeProfile?
 
-  sanctionsIssued    Sanction[]             @relation("SanctionIssuedBy")
-  correctionsCreated AttendanceCorrection[] @relation("CorrectionCreatedBy")
-  correctionsDecided AttendanceCorrection[] @relation("CorrectionDecidedBy")
-  exitsCreated       EmployeeExit[]         @relation("ExitCreatedBy")
-  exitsClosed        EmployeeExit[]         @relation("ExitClosedBy")
-  dailyReportPhotos  DailyReportPhoto[]
+  sanctionsIssued      Sanction[]             @relation("SanctionIssuedBy")
+  correctionsCreated   AttendanceCorrection[] @relation("CorrectionCreatedBy")
+  correctionsDecided   AttendanceCorrection[] @relation("CorrectionDecidedBy")
+  exitsCreated         EmployeeExit[]         @relation("ExitCreatedBy")
+  exitsClosed          EmployeeExit[]         @relation("ExitClosedBy")
+  dailyReportPhotos    DailyReportPhoto[]
+  inspectionsCreated   OutletInspection[]     @relation("InspectionCreatedBy")
+  inspectionsConducted OutletInspection[]     @relation("InspectionConductedBy")
 }
 
 model EmployeeProfile {
@@ -200,6 +204,8 @@ model EmployeeProfile {
   sanctions        Sanction[]
   corrections      AttendanceCorrection[]
   exits            EmployeeExit[]
+  surveysReceived  Survey360Response[]    @relation("Survey360Target")
+  surveysGiven     Survey360Response[]    @relation("Survey360Respondent")
   discResults      DiscResult[]
   trainingProgress TrainingProgress[]
   sopSignatures    SopSignature[]
@@ -410,6 +416,10 @@ model Payroll {
   bpjsKesehatan       Decimal @default(0) @db.Decimal(12, 2)
   bpjsKetenagakerjaan Decimal @default(0) @db.Decimal(12, 2)
 
+  // KPI periode ini (bonusIncentive = insentif KPI nilai A)
+  kpiScore Float?
+  kpiGrade String?
+
   netSalary         Decimal   @db.Decimal(12, 2)
   // Rincian cicilan per kasbon ([{ kasbonId, amount }]); dipakai saat finalisasi
   kasbonAllocations Json      @default("[]")
@@ -440,6 +450,8 @@ model PayrollSetting {
   tenureAllowanceMonth19 Decimal  @default(250000) @db.Decimal(12, 2)
   tenureAllowanceStep    Decimal  @default(50000) @db.Decimal(12, 2)
   kasbonMaxPercent       Int      @default(50)
+  // Insentif KPI nilai A (>= 90)
+  kpiIncentiveGradeA     Decimal  @default(100000) @db.Decimal(12, 2)
   updatedAt              DateTime @updatedAt
   updatedById            String?
 }
@@ -683,4 +695,78 @@ model DailyReportPhoto {
 
   @@unique([outletId, date, itemKey])
   @@index([date])
+}
+
+// -------------------------------------------------------------
+// SURVEI 360° (SIKAP KERJA, BAGIAN DARI KPI)
+// -------------------------------------------------------------
+enum SurveyRespondentRole {
+  PEER
+  MANAGER
+}
+
+// Penilaian satu rekan oleh satu karyawan untuk satu periode gaji.
+// Pertanyaan ada di src/modules/survey360/survey360.questions.ts
+model Survey360Response {
+  id             String               @id @default(uuid())
+  periodYear     Int
+  periodMonth    Int
+  outletId       String
+  outlet         Outlet               @relation(fields: [outletId], references: [id])
+  targetId       String
+  target         EmployeeProfile      @relation("Survey360Target", fields: [targetId], references: [id])
+  respondentId   String
+  respondent     EmployeeProfile      @relation("Survey360Respondent", fields: [respondentId], references: [id])
+  respondentRole SurveyRespondentRole
+  // Jawaban skala 1-5, urut sesuai daftar pertanyaan
+  answers        Int[]
+  average        Float
+  comment        String?
+  createdAt      DateTime             @default(now())
+
+  @@unique([targetId, respondentId, periodYear, periodMonth])
+  @@index([outletId, periodYear, periodMonth])
+}
+
+// -------------------------------------------------------------
+// SIDAK / AUDIT SUPERVISOR KE CABANG
+// -------------------------------------------------------------
+enum InspectionType {
+  ROUTINE
+  SURPRISE
+}
+
+enum InspectionStatus {
+  SCHEDULED
+  DONE
+  CANCELLED
+}
+
+// Checklist ada di src/modules/inspections/inspection.checklist.ts
+model OutletInspection {
+  id            String           @id @default(uuid())
+  outletId      String
+  outlet        Outlet           @relation(fields: [outletId], references: [id])
+  type          InspectionType
+  scheduledDate DateTime         @db.Date
+  focusArea     String?
+  status        InspectionStatus @default(SCHEDULED)
+  createdById   String
+  createdBy     User             @relation("InspectionCreatedBy", fields: [createdById], references: [id])
+
+  // Hasil sidak
+  reportNumber      String?   @unique
+  passedItems       String[]
+  score             Int?
+  grade             String?
+  findings          String?
+  actionItems       String?
+  branchManagerName String?
+  conductedAt       DateTime?
+  conductedById     String?
+  conductedBy       User?     @relation("InspectionConductedBy", fields: [conductedById], references: [id])
+  createdAt         DateTime  @default(now())
+
+  @@index([outletId, scheduledDate])
+  @@index([status])
 }
