@@ -1,19 +1,25 @@
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
   IsBoolean,
   IsEnum,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
   Matches,
   MaxLength,
+  Min,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
 
 const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
 const DATE_PREFIX = /^\d{4}-\d{2}-\d{2}(T.*)?$/;
-import { EmploymentStatus, UserRole } from '@prisma/client';
+import { EmployeeDocumentType, EmploymentStatus, UserRole } from '@prisma/client';
 
 export class CreateEmployeeDto {
   // Akun User
@@ -147,6 +153,44 @@ export class UpdateEmployeeDto {
   @MaxLength(100)
   @IsOptional()
   bankAccountHolder?: string;
+}
+
+/** Satu baris Excel impor karyawan; semua teks, diperiksa di service. */
+export class ImportEmployeeRow {
+  @IsString() @IsOptional() fullName?: string;
+  @IsString() @IsOptional() nik?: string;
+  @IsString() @IsOptional() phone?: string;
+  @IsString() @IsOptional() outlet?: string;
+  @IsString() @IsOptional() position?: string;
+  @IsString() @IsOptional() joinDate?: string;
+  @IsString() @IsOptional() role?: string;
+  @IsString() @IsOptional() status?: string;
+  @IsString() @IsOptional() username?: string;
+  @IsString() @IsOptional() password?: string;
+  /** Nomor baris di Excel, agar laporan kesalahan menunjuk baris yang benar */
+  @IsInt() @Min(2) @IsOptional() excelRow?: number;
+}
+
+export class ImportEmployeesDto {
+  @IsArray()
+  @ArrayMinSize(1, { message: 'File tidak berisi data karyawan' })
+  @ArrayMaxSize(500, { message: 'Maksimal 500 karyawan per impor' })
+  @ValidateNested({ each: true })
+  @Type(() => ImportEmployeeRow)
+  rows: ImportEmployeeRow[];
+
+  @IsBoolean()
+  dryRun: boolean;
+}
+
+export class UploadDocumentDto {
+  @IsEnum(EmployeeDocumentType, { message: 'Jenis dokumen tidak valid' })
+  type: EmployeeDocumentType;
+
+  @IsString()
+  @MaxLength(200)
+  @IsOptional()
+  note?: string;
 }
 
 export class ResetPasswordDto {

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
-import { CreateEmployeeDto, ResetPasswordDto, SetActiveDto, UpdateEmployeeDto } from './employees.dto';
+import { CreateEmployeeDto, ImportEmployeesDto, ResetPasswordDto, SetActiveDto, UpdateEmployeeDto } from './employees.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -34,6 +34,13 @@ export class EmployeesController {
   @Get(':id')
   async findOne(@CurrentUser() user, @Param('id') id: string) {
     return this.employeesService.findOne(user, id);
+  }
+
+  // Impor dari Excel: dryRun=true hanya memeriksa; false menyimpan bila semua baris benar
+  @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN)
+  @Post('import')
+  async importMany(@CurrentUser() user, @Body() dto: ImportEmployeesDto) {
+    return this.employeesService.importMany(user, dto.rows, dto.dryRun);
   }
 
   @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN)

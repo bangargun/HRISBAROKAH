@@ -1,11 +1,15 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Award, Loader2, Pencil, Search } from 'lucide-react';
+import { Award, FileSpreadsheet, FileText, Loader2, Pencil, Printer, Search, Upload } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { getSessionUser } from '@/lib/auth';
 import Dialog from '@/components/Dialog';
 import EmployeeDialog, { EmployeeRecord } from '@/components/EmployeeDialog';
+import ImportEmployeesDialog from '@/components/ImportEmployeesDialog';
+import EmployeeDocumentsDialog from '@/components/EmployeeDocumentsDialog';
+import { ROLE_LABEL } from '@/lib/navigation';
+import { downloadWorkbook, newWorkbook, styleHeader } from '@/lib/excel';
 
 const STATUS_LABEL: Record<string, string> = {
   PROBATION: 'Masa percobaan',
@@ -15,6 +19,10 @@ const STATUS_LABEL: Record<string, string> = {
   INTERN: 'Magang',
 };
 const ADMIN_ROLES = ['SUPER_ADMIN', 'HR_ADMIN', 'FINANCE_ADMIN'];
+
+const escapeHtml = (v: string) =>
+  v.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+const roleLabel = (r: string) => (r === 'EMPLOYEE' ? 'Kru' : ROLE_LABEL[r] ?? r);
 
 function tenure(joinDate: string) {
   const start = new Date(joinDate);
@@ -52,6 +60,9 @@ export default function EmployeeListModule({
   const [confirming, setConfirming] = useState<EmployeeRecord | null>(null);
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [docsFor, setDocsFor] = useState<EmployeeRecord | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   const load = useCallback(() => {
     apiFetch<EmployeeRecord[]>('/employees')
@@ -100,10 +111,64 @@ export default function EmployeeListModule({
 
   const btn = 'btn btn-sm btn-secondary';
 
+  // Ekspor mengikuti filter yang sedang tampil (status, cabang, pencarian)
+  const exportTitle = `Data karyawan ${view === 'active' ? 'aktif' : 'nonaktif'}${outletFilter !== 'ALL' ? ` · ${outletFilter}` : ''}`;
+  const exportRows = () =>
+    visible.map((e) => [
+      e.fullName,
+      e.nik,
+      e.user.username,
+      e.phone,
+      e.outlet.name,
+      e.position.title,
+      e.position.department.name,
+      roleLabel(e.user.role),
+      STATUS_LABEL[e.status] ?? e.status,
+      e.joinDate.slice(0, 10),
+      tenure(e.joinDate),
+    ]);
+  const EXPORT_HEADERS = ['Nama', 'NIK', 'Username', 'No HP', 'Cabang', 'Jabatan', 'Departemen', 'Peran', 'Status kerja', 'Tanggal masuk', 'Masa kerja'];
+
+  async function exportExcel() {
+    setExporting(true);
+    try {
+      const wb = await newWorkbook();
+      const ws = wb.addWorksheet('Karyawan');
+      ws.addRow(EXPORT_HEADERS);
+      styleHeader(ws, [28, 20, 16, 16, 24, 20, 20, 16, 16, 14, 18]);
+      exportRows().forEach((r) => ws.addRow(r));
+      ws.autoFilter = { from: 'A1', to: { row: 1, column: EXPORT_HEADERS.length } };
+      const d = new Date();
+      const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      await downloadWorkbook(wb, `karyawan-${today}.xlsx`);
+    } catch (e) {
+      showToast(`Gagal membuat Excel: ${(e as Error).message}`);
+    } finally {
+      setExporting(false);
+    }
+  }
+
+  // PDF lewat dialog cetak browser (pilih "Simpan sebagai PDF")
+  function printPdf() {
+    const w = window.open('', '_blank', 'width=1100,height=800');
+    if (!w) return;
+    const rows = exportRows()
+      .map((r) => `<tr>${r.map((c) => `<td>${escapeHtml(String(c))}</td>`).join('')}</tr>`)
+      .join('');
+    w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(exportTitle)}</title>
+<style>@page{size:A4 landscape;margin:12mm}body{font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#15181e}
+h1{font-size:14px;margin:0 0 2px}p{margin:0 0 10px;color:#5a6779}table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #cfd6de;padding:4px 5px;text-align:left;vertical-align:top}th{background:#e8ebef}</style></head><body>
+<h1>${escapeHtml(exportTitle)}</h1><p>Barokah Grup · dicetak ${new Date().toLocaleString('id-ID')} · ${visible.length} karyawan</p>
+<table><thead><tr>${EXPORT_HEADERS.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>
+<script>window.onload=function(){window.print()}</script></body></html>`);
+    w.document.close();
+  }
+
   return (
     <div className="space-y-4 text-sm">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           <div className="segmented" role="group" aria-label="Status akun">
             {(['active', 'inactive'] as const).map((v) => (
               <button
@@ -129,7 +194,7 @@ export default function EmployeeListModule({
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="Cari nama, NIK, jabatan, username"
-              className="input pl-9 sm:w-72"
+              className="input pl-9 sm:w-64"
             />
           </div>
           <label className="sr-only" htmlFor="emp-outlet">Cabang</label>
@@ -145,11 +210,24 @@ export default function EmployeeListModule({
             ))}
           </select>
         </div>
-        {employees && (
-          <p className="text-slate-600">
-            {visible.length === inView.length ? `${inView.length} karyawan` : `${visible.length} dari ${inView.length} karyawan`}
-          </p>
-        )}
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {employees && (
+            <p className="mr-1 text-slate-600">
+              {visible.length === inView.length ? `${inView.length} karyawan` : `${visible.length} dari ${inView.length} karyawan`}
+            </p>
+          )}
+          {canEdit && (
+            <button type="button" onClick={() => setImporting(true)} className={btn}>
+              <Upload className="h-4 w-4" aria-hidden /> Impor Excel
+            </button>
+          )}
+          <button type="button" onClick={exportExcel} disabled={!visible.length || exporting} className={btn}>
+            {exporting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <FileSpreadsheet className="h-4 w-4" aria-hidden />} Unduh Excel
+          </button>
+          <button type="button" onClick={printPdf} disabled={!visible.length} className={btn}>
+            <Printer className="h-4 w-4" aria-hidden /> Cetak PDF
+          </button>
+        </div>
       </div>
 
       <div className="card overflow-hidden">
@@ -214,6 +292,11 @@ export default function EmployeeListModule({
                               <Pencil className="h-4 w-4" aria-hidden /> Ubah
                             </button>
                           )}
+                          {editable && (
+                            <button type="button" onClick={() => setDocsFor(emp)} className={btn}>
+                              <FileText className="h-4 w-4" aria-hidden /> Dokumen
+                            </button>
+                          )}
                           {editable && !isSelf(emp) && (
                             <button
                               type="button"
@@ -236,6 +319,19 @@ export default function EmployeeListModule({
           </div>
         )}
       </div>
+
+      {importing && (
+        <ImportEmployeesDialog
+          onClose={() => setImporting(false)}
+          onImported={(count) => {
+            showToast(`${count} karyawan berhasil diimpor.`);
+            load();
+            onChanged();
+          }}
+        />
+      )}
+
+      {docsFor && <EmployeeDocumentsDialog employee={docsFor} onClose={() => setDocsFor(null)} />}
 
       {editing && (
         <EmployeeDialog
