@@ -464,7 +464,7 @@ export function synthesizeSopWithAi(params: {
     riskLevel: params.riskLevel,
     effectiveDate: '20 Oktober 2026',
     revision: 'Rev. 01 (Edisi Standar Operasional 2026)',
-    author: 'AI Resto Intelligence & SPV Operasional',
+    author: 'SPV Operasional',
     reviewedBy: 'Operations Manager Barokah Grup',
     approvedBy: 'Arif Gunawan Panggabean (Direktur Utama)',
     scope: 'Seluruh Outlet Barokah Grup (Senopati, Kemang, PIK, BSD)',
@@ -539,7 +539,7 @@ export function AiSopStudio({ onSaveSop, showToast, employeesCount }: AiSopStudi
       });
       setGeneratedDoc(doc);
       setIsGenerating(false);
-      showToast(`✨ SOP Berhasil Dibuat: "${doc.title}"`);
+      showToast(`Draf SOP "${doc.title}" tersusun.`);
     }, 1700);
   };
 
@@ -570,7 +570,7 @@ DISETUJUI OLEH:
     `.trim();
 
     navigator.clipboard.writeText(text);
-    showToast('📋 Naskah lengkap SOP berhasil disalin ke clipboard!');
+    showToast('Naskah lengkap SOP disalin ke clipboard.');
   };
 
   const handlePrint = () => {
@@ -580,7 +580,7 @@ DISETUJUI OLEH:
   const handleSaveToMaster = () => {
     if (!generatedDoc) return;
     onSaveSop(generatedDoc);
-    showToast(`✅ Berhasil! "${generatedDoc.title}" telah disimpan ke Pustaka Master SOP.`);
+    showToast(`"${generatedDoc.title}" disimpan ke Pustaka SOP.`);
   };
 
   const stationOptions: Record<string, string[]> = {
@@ -612,45 +612,23 @@ DISETUJUI OLEH:
 
   return (
     <div className="space-y-6">
-      {/* Hero Studio Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-amber-950/80 to-slate-900 border border-amber-500/40 rounded-2xl p-5 text-white shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center space-x-2">
-            <span className="text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950 px-2 py-0.5 rounded flex items-center gap-1">
-              <Sparkles className="h-3 w-3 fill-slate-950" />
-              AI RESTO INTELLIGENCE ENGINE
-            </span>
-            <span className="text-xs text-amber-300 font-bold flex items-center gap-1">
-              <BookOpen className="h-3.5 w-3.5" />
-              SOP Generator &amp; Operational Studio 2026
-            </span>
-          </div>
-          <h3 className="text-lg font-black text-white tracking-tight">
-            STUDIO PEMBUATAN SOP OTOMATIS BERBASIS AI MULTI-OUTLET
-          </h3>
-          <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-            Rancang dan terbitkan Standard Operating Procedure (SOP) resmi berstandar industri F&amp;B internasional dalam hitungan detik. Mengakomodasi regulasi ketenagakerjaan, batasan HACCP, toleransi KPI, dan sanksi SK Barokah Grup.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2.5 shrink-0">
-          <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-800 text-right sm:text-left">
-            <span className="text-[10px] text-slate-400 block font-bold">Cakupan Kru Terkoneksi:</span>
-            <span className="font-mono text-lg font-black text-amber-400">
-              {employeesCount} Staf Resto (4 Cabang)
-            </span>
-          </div>
-        </div>
-      </div>
+      <section className="card p-4" aria-labelledby="sop-template-heading">
+        <h2 id="sop-template-heading" className="text-base font-semibold text-slate-900">
+          Template SOP
+        </h2>
+        <p className="mt-1 max-w-2xl text-sm text-slate-600">
+          Susun draf SOP dari template baku: pilih divisi, station dan tingkat risiko, lalu periksa pasal, toleransi KPI dan
+          sanksi sebelum menyimpannya ke Pustaka SOP. Berlaku untuk {employeesCount} karyawan aktif.
+        </p>
+      </section>
 
       {/* Preset Quick Chips */}
-      <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs space-y-2.5">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-black uppercase text-slate-700 tracking-wider flex items-center gap-1.5">
-            <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-            Template Rekomendasi Cepat (1-Klik Isi Form):
-          </span>
-          <span className="text-[11px] text-slate-400 font-medium">Pilih topik standar resto</span>
+      <section className="card space-y-2.5 p-4" aria-labelledby="sop-preset-heading">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h3 id="sop-preset-heading" className="text-sm font-semibold text-slate-900">
+            Isi cepat dari topik umum
+          </h3>
+          <span className="text-xs text-slate-500">Satu klik mengisi formulir di bawah</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {PRESET_SOP_PROMPTS.map((preset, idx) => (
@@ -665,34 +643,30 @@ DISETUJUI OLEH:
                 setCustomNotes(preset.prompt);
                 showToast(`Pola SOP "${preset.title}" terpilih`);
               }}
-              className="text-left px-3 py-1.5 bg-slate-50 hover:bg-amber-50 hover:border-amber-300 border border-slate-200 text-slate-700 hover:text-amber-900 rounded-xl text-xs font-semibold transition flex items-center gap-1.5"
+              className="btn btn-sm btn-secondary h-auto whitespace-normal text-left"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
-              <span>{preset.title}</span>
+              {preset.title}
             </button>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* Main Studio Grid (2 Columns: Controls on Left, Live Document Preview on Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: AI Parameters Control Panel */}
+        {/* Kolom kiri: isian template */}
         <div className="lg:col-span-5 space-y-5">
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-4">
-            <h4 className="font-black text-sm text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-              <Layers className="h-4 w-4 text-amber-600" />
-              <span>Parameter &amp; Rujukan Regulasi</span>
-            </h4>
+          <div className="card space-y-4 p-4">
+            <h3 className="border-b border-slate-100 pb-3 text-sm font-semibold text-slate-900">Isian template</h3>
 
             {/* Divisi Selector */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Divisi Operasional Restoran:</label>
-              <div className="grid grid-cols-2 gap-2">
+              <p id="sop-division-label" className="field-label">Divisi operasional</p>
+              <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="sop-division-label">
                 {[
-                  { id: 'KITCHEN (BOH)', label: '🍳 Kitchen (BOH)', icon: ChefHat },
-                  { id: 'SERVICE (FOH)', label: '🍽️ Service (FOH)', icon: Users },
-                  { id: 'CASHIER (POS)', label: '💵 Kasir & POS', icon: Wallet },
-                  { id: 'HR & LEGAL', label: '👥 HRD & Disiplin', icon: Building2 },
+                  { id: 'KITCHEN (BOH)', label: 'Kitchen (BOH)', icon: ChefHat },
+                  { id: 'SERVICE (FOH)', label: 'Service (FOH)', icon: Users },
+                  { id: 'CASHIER (POS)', label: 'Kasir & POS', icon: Wallet },
+                  { id: 'HR & LEGAL', label: 'HRD & Disiplin', icon: Building2 },
                 ].map((div) => {
                   const isSelected = selectedCategory === div.id;
                   return (
@@ -704,14 +678,15 @@ DISETUJUI OLEH:
                         const firstSt = stationOptions[div.id]?.[0] || 'Station Kerja';
                         setSelectedStation(firstSt);
                       }}
-                      className={`p-2.5 rounded-xl text-xs font-extrabold border text-left transition flex items-center justify-between ${
+                      aria-pressed={isSelected}
+                      className={`flex min-h-11 items-center justify-between gap-2 rounded-md border px-3 py-2 text-left text-sm font-medium transition-colors sm:min-h-9 ${
                         isSelected
-                          ? 'bg-amber-500 text-slate-950 border-amber-600 shadow-xs'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                          ? 'border-ink-800 bg-ink-800 text-white'
+                          : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
                       }`}
                     >
                       <span>{div.label}</span>
-                      {isSelected && <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />}
+                      {isSelected && <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />}
                     </button>
                   );
                 })}
@@ -720,11 +695,12 @@ DISETUJUI OLEH:
 
             {/* Station Selector */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Station / Pos Kerja Spesifik:</label>
+              <label htmlFor="sop-station" className="field-label">Station / pos kerja</label>
               <select
+                id="sop-station"
                 value={selectedStation}
                 onChange={(e) => setSelectedStation(e.target.value)}
-                className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800"
+                className="input"
               >
                 {(stationOptions[selectedCategory] || []).map((st) => (
                   <option key={st} value={st}>
@@ -736,39 +712,41 @@ DISETUJUI OLEH:
 
             {/* Topic Input */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Judul / Topik Inti SOP:</label>
+              <label htmlFor="sop-topic" className="field-label">Judul / topik SOP</label>
               <input
+                id="sop-topic"
                 type="text"
                 value={topicInput}
                 onChange={(e) => setTopicInput(e.target.value)}
                 placeholder="Misal: Standar Kebersihan Chiller & Suhu Unggas"
-                className="w-full text-xs font-semibold px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-900 placeholder:text-slate-400"
+                className="input"
               />
             </div>
 
             {/* Risk Level Selector */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Tingkat Risiko &amp; Dampak Regulasi:</label>
-              <div className="grid grid-cols-3 gap-1.5">
+              <p id="sop-risk-label" className="field-label">Tingkat risiko</p>
+              <div className="grid grid-cols-3 gap-1.5" role="group" aria-labelledby="sop-risk-label">
                 {[
-                  { id: 'KRITIS (HACCP/FINANCE)', label: '🔴 Kritis', desc: 'HACCP / Uang' },
-                  { id: 'SEDANG (OPERASIONAL)', label: '🟡 Sedang', desc: 'Speed / Mutu' },
-                  { id: 'STANDAR (RUTIN)', label: '🟢 Standar', desc: 'Grooming' },
+                  { id: 'KRITIS (HACCP/FINANCE)', label: 'Kritis', desc: 'HACCP / uang' },
+                  { id: 'SEDANG (OPERASIONAL)', label: 'Sedang', desc: 'Kecepatan / mutu' },
+                  { id: 'STANDAR (RUTIN)', label: 'Standar', desc: 'Grooming' },
                 ].map((rl) => {
                   const isCur = riskLevel === rl.id;
                   return (
                     <button
                       key={rl.id}
                       type="button"
+                      aria-pressed={isCur}
                       onClick={() => setRiskLevel(rl.id as any)}
-                      className={`p-2 rounded-xl text-center border transition ${
+                      className={`rounded-md border p-2 text-center transition-colors ${
                         isCur
-                          ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
-                          : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                          ? 'border-ink-800 bg-ink-800 text-white'
+                          : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
                       }`}
                     >
-                      <span className="block text-[11px] font-extrabold">{rl.label}</span>
-                      <span className="block text-[9px] text-slate-400">{rl.desc}</span>
+                      <span className="block text-sm font-medium">{rl.label}</span>
+                      <span className={`block text-xs ${isCur ? 'text-slate-300' : 'text-slate-500'}`}>{rl.desc}</span>
                     </button>
                   );
                 })}
@@ -777,50 +755,36 @@ DISETUJUI OLEH:
 
             {/* Custom Notes / Prompt Addition */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">
-                Instruksi Khusus / Catatan Tambahan (Opsional):
+              <label htmlFor="sop-notes" className="field-label">
+                Catatan tambahan (opsional)
               </label>
               <textarea
+                id="sop-notes"
                 rows={3}
                 value={customNotes}
                 onChange={(e) => setCustomNotes(e.target.value)}
                 placeholder="Tambahkan detail gramatur, suhu, batas waktu, atau larangan khusus yang ingin diwajibkan..."
-                className="w-full text-xs font-medium p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800 placeholder:text-slate-400 resize-none"
+                className="input resize-none"
               ></textarea>
             </div>
 
             {/* Generate Action Button */}
-            <button
-              type="button"
-              disabled={isGenerating}
-              onClick={handleGenerate}
-              className={`w-full py-3.5 rounded-xl font-black text-xs flex items-center justify-center space-x-2 transition shadow-md ${
-                isGenerating
-                  ? 'bg-amber-300 text-amber-900 cursor-not-allowed'
-                  : 'bg-amber-500 hover:bg-amber-400 text-slate-950 active:scale-98 shadow-amber-500/20'
-              }`}
-            >
+            <button type="button" disabled={isGenerating} onClick={handleGenerate} className="btn btn-primary w-full">
               {isGenerating ? (
                 <>
-                  <RotateCcw className="h-4 w-4 animate-spin text-amber-900" />
-                  <span>Sedang Merumuskan SOP Resmi...</span>
+                  <RotateCcw className="h-4 w-4 animate-spin" aria-hidden />
+                  Menyusun draf SOP…
                 </>
               ) : (
-                <>
-                  <Sparkles className="h-4 w-4 fill-slate-950" />
-                  <span>Sintesis &amp; Buat SOP dengan AI</span>
-                </>
+                'Susun draf SOP'
               )}
             </button>
 
-            {/* Animated Loading Status */}
+            {/* Status penyusunan */}
             {isGenerating && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 space-y-1 animate-pulse">
-                <span className="font-extrabold block text-[10px] uppercase tracking-wider text-amber-700">
-                  AI PROMPT SYNTHESIS IN PROGRESS
-                </span>
-                <p className="font-semibold text-xs text-slate-800">{generationStep}</p>
-              </div>
+              <p role="status" className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                {generationStep}
+              </p>
             )}
           </div>
         </div>
@@ -828,72 +792,52 @@ DISETUJUI OLEH:
         {/* Right Column: Live Document Preview & Actions */}
         <div className="lg:col-span-7 space-y-4">
           {generatedDoc ? (
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+            <div className="card flex flex-col overflow-hidden">
               {/* Document Header & Action Bar */}
-              <div className="p-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800">
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold bg-amber-500 text-slate-950 px-2 py-0.5 rounded">
-                      {generatedDoc.id}
-                    </span>
-                    <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-extrabold uppercase">
-                      STATUS: DOKUMEN RESMI
-                    </span>
-                  </div>
-                  <h4 className="font-black text-sm text-white line-clamp-1">
-                    {generatedDoc.title}
-                  </h4>
+              <div className="flex flex-col justify-between gap-3 border-b border-slate-200 p-4 sm:flex-row sm:items-center">
+                <div className="min-w-0 space-y-0.5">
+                  <p className="text-xs text-slate-500">
+                    {generatedDoc.id} · Pratinjau dokumen
+                  </p>
+                  <h3 className="line-clamp-1 text-sm font-semibold text-slate-900">{generatedDoc.title}</h3>
                 </div>
 
                 {/* Document Action Buttons */}
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    type="button"
-                    onClick={handleCopyText}
-                    className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 border border-slate-700"
-                    title="Salin Naskah SOP"
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Salin</span>
+                <div className="flex shrink-0 flex-wrap items-center gap-2">
+                  <button type="button" onClick={handleCopyText} className="btn btn-sm btn-secondary" title="Salin naskah SOP">
+                    <Copy className="h-4 w-4" aria-hidden />
+                    Salin
                   </button>
-                  <button
-                    type="button"
-                    onClick={handlePrint}
-                    className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 border border-slate-700"
-                    title="Cetak Naskah Resmi"
-                  >
-                    <Printer className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Cetak</span>
+                  <button type="button" onClick={handlePrint} className="btn btn-sm btn-secondary" title="Cetak naskah">
+                    <Printer className="h-4 w-4" aria-hidden />
+                    Cetak
                   </button>
-                  <button
-                    type="button"
-                    onClick={handleSaveToMaster}
-                    className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition flex items-center gap-1.5 shadow-sm active:scale-98"
-                  >
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    <span>Simpan ke Master SOP</span>
+                  <button type="button" onClick={handleSaveToMaster} className="btn btn-sm btn-primary">
+                    <CheckCircle2 className="h-4 w-4" aria-hidden />
+                    Simpan ke Pustaka SOP
                   </button>
                 </div>
               </div>
 
               {/* Sub-tab view inside Document Viewer */}
-              <div className="flex border-b border-slate-200 bg-slate-50 px-4 pt-2 gap-2 text-xs font-bold">
+              <div className="flex gap-1 overflow-x-auto border-b border-slate-200 px-4" role="group" aria-label="Bagian dokumen">
                 {[
-                  { id: 'document', label: '📄 Naskah Pasal Lengkap' },
-                  { id: 'kpis', label: '📊 Toleransi Mutu & KPI' },
-                  { id: 'sanctions', label: '⚖️ Klausul Sanksi' },
-                  { id: 'raw', label: '📝 Ringkasan Teks' },
+                  { id: 'document', label: 'Naskah pasal' },
+                  { id: 'kpis', label: 'Toleransi mutu & KPI' },
+                  { id: 'sanctions', label: 'Klausul sanksi' },
+                  { id: 'raw', label: 'Ringkasan teks' },
                 ].map((tb) => {
                   const isAct = activePreviewTab === tb.id;
                   return (
                     <button
                       key={tb.id}
                       type="button"
+                      aria-pressed={isAct}
                       onClick={() => setActivePreviewTab(tb.id as any)}
-                      className={`pb-2.5 px-3 border-b-2 font-extrabold transition ${
+                      className={`shrink-0 whitespace-nowrap border-b-2 px-3 py-3 text-sm transition-colors ${
                         isAct
-                          ? 'border-amber-600 text-slate-900'
-                          : 'border-transparent text-slate-500 hover:text-slate-800'
+                          ? 'border-brand-500 font-medium text-slate-900'
+                          : 'border-transparent text-slate-600 hover:border-slate-300 hover:text-slate-900'
                       }`}
                     >
                       {tb.label}
@@ -903,52 +847,44 @@ DISETUJUI OLEH:
               </div>
 
               {/* Document Body */}
-              <div className="p-6 space-y-6 max-h-[680px] overflow-y-auto font-sans text-slate-800 text-xs leading-relaxed">
+              <div className="max-h-[680px] space-y-6 overflow-y-auto p-6 text-sm leading-relaxed text-slate-800">
                 {/* Official Kop Surat Header */}
-                <div className="rounded-xl overflow-hidden shadow-xs border border-amber-200/60 bg-white mb-2">
-                  <img
-                    src="/kop-surat-barokah.jpg"
-                    alt="Kop Surat Resmi Barokah Grup"
-                    className="w-full h-auto object-contain block"
-                  />
+                <div className="mb-2 overflow-hidden rounded-md border border-slate-200 bg-white">
+                  <img src="/kop-surat-barokah.jpg" alt="Kop surat Barokah Grup" className="block h-auto w-full object-contain" />
                 </div>
 
                 {/* Metadata Strip */}
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px]">
+                <dl className="grid grid-cols-2 gap-3 rounded-md border border-slate-200 bg-slate-50 p-4 text-xs sm:grid-cols-4">
                   <div>
-                    <span className="text-slate-400 block font-semibold">Nomor Registrasi:</span>
-                    <span className="font-mono font-bold text-slate-900">{generatedDoc.id}</span>
+                    <dt className="text-slate-500">Nomor registrasi</dt>
+                    <dd className="font-medium text-slate-900">{generatedDoc.id}</dd>
                   </div>
                   <div>
-                    <span className="text-slate-400 block font-semibold">Nomor SK Direksi:</span>
-                    <span className="font-mono font-bold text-amber-700">{generatedDoc.skNumber}</span>
+                    <dt className="text-slate-500">Nomor SK direksi</dt>
+                    <dd className="font-medium text-slate-900">{generatedDoc.skNumber}</dd>
                   </div>
                   <div>
-                    <span className="text-slate-400 block font-semibold">Tingkat Risiko:</span>
-                    <span className="font-bold text-rose-700">{generatedDoc.riskLevel}</span>
+                    <dt className="text-slate-500">Tingkat risiko</dt>
+                    <dd className="font-medium text-rose-700">{generatedDoc.riskLevel}</dd>
                   </div>
                   <div>
-                    <span className="text-slate-400 block font-semibold">Tanggal Efektif:</span>
-                    <span className="font-bold text-slate-900">{generatedDoc.effectiveDate}</span>
+                    <dt className="text-slate-500">Tanggal efektif</dt>
+                    <dd className="font-medium text-slate-900">{generatedDoc.effectiveDate}</dd>
                   </div>
-                </div>
+                </dl>
 
                 {/* TAB 1: FULL DOCUMENT ARTICLES */}
                 {activePreviewTab === 'document' && (
                   <div className="space-y-6">
                     {generatedDoc.articles.map((art, idx) => (
                       <section key={idx} className="space-y-2 border-b border-slate-100 pb-5 last:border-0">
-                        <div className="flex items-center justify-between">
-                          <h5 className="font-black text-slate-950 text-xs uppercase tracking-tight flex items-center gap-1.5">
-                            <span className="bg-slate-900 text-white px-2 py-0.5 rounded text-[10px] font-mono">
-                              PASAL {art.number}
-                            </span>
-                            <span>{art.title}</span>
-                          </h5>
-                        </div>
+                        <h4 className="text-sm font-semibold text-slate-900">
+                          <span className="mr-1.5 text-slate-500">Pasal {art.number}</span>
+                          {art.title}
+                        </h4>
 
                         {art.content.map((p, pIdx) => (
-                          <p key={pIdx} className="text-slate-700 leading-relaxed text-xs">
+                          <p key={pIdx} className="text-sm leading-relaxed text-slate-700">
                             {p}
                           </p>
                         ))}
@@ -956,29 +892,27 @@ DISETUJUI OLEH:
                         {/* Callout Box if exists */}
                         {art.callout && (
                           <div
-                            className={`p-3.5 rounded-xl border text-xs font-medium space-y-1 ${
+                            className={`space-y-1 rounded-md border p-3 text-sm ${
                               art.callout.type === 'critical'
-                                ? 'bg-rose-50 border-rose-200 text-rose-900'
+                                ? 'border-rose-200 bg-rose-50 text-rose-900'
                                 : art.callout.type === 'warning'
-                                ? 'bg-amber-50 border-amber-200 text-amber-900'
-                                : 'bg-blue-50 border-blue-200 text-blue-900'
+                                ? 'border-amber-200 bg-amber-50 text-amber-900'
+                                : 'border-slate-200 bg-slate-50 text-slate-800'
                             }`}
                           >
-                            <span className="font-extrabold uppercase text-[10px] tracking-wider block">
-                              {art.callout.title}
-                            </span>
+                            <span className="block text-xs font-semibold">{art.callout.title}</span>
                             <p>{art.callout.text}</p>
                           </div>
                         )}
 
                         {/* Table if exists */}
                         {art.table && (
-                          <div className="overflow-x-auto rounded-xl border border-slate-200 mt-2">
-                            <table className="w-full text-left text-[11px]">
+                          <div className="mt-2 overflow-x-auto rounded-md border border-slate-200">
+                            <table className="w-full text-left text-xs">
                               <thead>
-                                <tr className="bg-slate-100 text-slate-700 font-extrabold border-b border-slate-200">
+                                <tr className="table-head">
                                   {art.table.headers.map((h, hIdx) => (
-                                    <th key={hIdx} className="py-2 px-3">
+                                    <th key={hIdx} className="px-3 py-2">
                                       {h}
                                     </th>
                                   ))}
@@ -986,9 +920,9 @@ DISETUJUI OLEH:
                               </thead>
                               <tbody className="divide-y divide-slate-100">
                                 {art.table.rows.map((r, rIdx) => (
-                                  <tr key={rIdx} className="hover:bg-slate-50/80">
+                                  <tr key={rIdx}>
                                     {r.map((cell, cIdx) => (
-                                      <td key={cIdx} className="py-2 px-3 font-medium text-slate-800">
+                                      <td key={cIdx} className="px-3 py-2 text-slate-800">
                                         {cell}
                                       </td>
                                     ))}
@@ -1002,32 +936,22 @@ DISETUJUI OLEH:
                     ))}
 
                     {/* Official Signatures Strip */}
-                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 mt-6 space-y-3">
-                      <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider block text-center">
-                        LEMBAR OTORISASI &amp; PENGESAHAN RESMI (3-TIER APPROVAL)
-                      </span>
-                      <div className="grid grid-cols-3 gap-3 text-center">
-                        <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-8">
-                          <span className="text-[10px] font-bold text-slate-400 block">Dibuat Oleh:</span>
-                          <div>
-                            <span className="font-extrabold text-xs text-slate-900 block">{generatedDoc.author}</span>
-                            <span className="text-[9px] text-slate-400">Unit Operasional</span>
+                    <div className="mt-6 space-y-3 rounded-md border border-slate-200 bg-slate-50 p-4">
+                      <p className="text-center text-xs font-medium text-slate-600">Lembar pengesahan (3 tingkat)</p>
+                      <div className="grid grid-cols-1 gap-3 text-center sm:grid-cols-3">
+                        {[
+                          { label: 'Dibuat oleh', name: generatedDoc.author, role: 'Unit Operasional' },
+                          { label: 'Ditinjau oleh', name: generatedDoc.reviewedBy, role: 'Operations Manager' },
+                          { label: 'Disahkan oleh', name: generatedDoc.approvedBy, role: 'Direktur Utama Barokah Grup' },
+                        ].map((s) => (
+                          <div key={s.label} className="space-y-8 rounded-md border border-slate-200 bg-white p-3">
+                            <span className="block text-xs text-slate-500">{s.label}</span>
+                            <div>
+                              <span className="block text-sm font-medium text-slate-900">{s.name}</span>
+                              <span className="text-xs text-slate-500">{s.role}</span>
+                            </div>
                           </div>
-                        </div>
-                        <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-8">
-                          <span className="text-[10px] font-bold text-slate-400 block">Ditinjau Oleh:</span>
-                          <div>
-                            <span className="font-extrabold text-xs text-slate-900 block">{generatedDoc.reviewedBy}</span>
-                            <span className="text-[9px] text-slate-400">Operations Manager</span>
-                          </div>
-                        </div>
-                        <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-8">
-                          <span className="text-[10px] font-bold text-slate-400 block">Disahkan Oleh:</span>
-                          <div>
-                            <span className="font-extrabold text-xs text-emerald-700 block">{generatedDoc.approvedBy}</span>
-                            <span className="text-[9px] text-slate-400">Direktur Utama Barokah Grup</span>
-                          </div>
-                        </div>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -1036,26 +960,24 @@ DISETUJUI OLEH:
                 {/* TAB 2: KPIS & TOLERANCES */}
                 {activePreviewTab === 'kpis' && (
                   <div className="space-y-4">
-                    <p className="text-xs text-slate-500">
+                    <p className="text-sm text-slate-600">
                       Ambang batas toleransi kualitas dan parameter kinerja yang wajib diuji secara berkala oleh Supervisor:
                     </p>
                     <div className="space-y-2.5">
                       {generatedDoc.kpis.map((kpi, kIdx) => (
                         <div
                           key={kIdx}
-                          className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-3"
+                          className="flex items-center justify-between gap-3 rounded-md border border-slate-200 bg-slate-50 p-3"
                         >
                           <div className="space-y-0.5">
-                            <span className="text-xs font-black text-slate-900 block">{kpi.metric}</span>
-                            <span className="text-[11px] text-slate-500 block">
-                              Target Mutu: <strong className="text-emerald-700">{kpi.target}</strong>
+                            <span className="block text-sm font-medium text-slate-900">{kpi.metric}</span>
+                            <span className="block text-xs text-slate-600">
+                              Target mutu: <strong className="font-medium text-emerald-800">{kpi.target}</strong>
                             </span>
                           </div>
                           <div className="text-right">
-                            <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded">
-                              Toleransi: {kpi.tolerance}
-                            </span>
-                            <span className="text-[10px] text-slate-400 block mt-1">Audit: {kpi.frequency}</span>
+                            <span className="badge badge-warning">Toleransi: {kpi.tolerance}</span>
+                            <span className="mt-1 block text-xs text-slate-500">Audit: {kpi.frequency}</span>
                           </div>
                         </div>
                       ))}
@@ -1066,22 +988,15 @@ DISETUJUI OLEH:
                 {/* TAB 3: SANCTIONS MATRIX */}
                 {activePreviewTab === 'sanctions' && (
                   <div className="space-y-4">
-                    <p className="text-xs text-slate-500">
+                    <p className="text-sm text-slate-600">
                       Matriks penegakan disiplin berjenjang berdasarkan regulasi Barokah Resto Grup:
                     </p>
                     <div className="space-y-2.5">
                       {generatedDoc.penalties.map((pen, pIdx) => (
-                        <div
-                          key={pIdx}
-                          className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-rose-100 text-rose-800">
-                              {pen.tier}
-                            </span>
-                          </div>
-                          <p className="text-xs font-bold text-slate-900">Pelanggaran: {pen.infraction}</p>
-                          <p className="text-[11px] text-slate-600">Sanksi: {pen.sanction}</p>
+                        <div key={pIdx} className="space-y-1.5 rounded-md border border-slate-200 bg-slate-50 p-3">
+                          <span className="badge badge-danger">{pen.tier}</span>
+                          <p className="text-sm font-medium text-slate-900">Pelanggaran: {pen.infraction}</p>
+                          <p className="text-xs text-slate-600">Sanksi: {pen.sanction}</p>
                         </div>
                       ))}
                     </div>
@@ -1090,7 +1005,7 @@ DISETUJUI OLEH:
 
                 {/* TAB 4: RAW TEXT SUMMARY */}
                 {activePreviewTab === 'raw' && (
-                  <div className="bg-slate-950 text-slate-200 p-4 rounded-xl font-mono text-[11px] space-y-2 whitespace-pre-wrap leading-relaxed">
+                  <div className="space-y-2 whitespace-pre-wrap rounded-md border border-slate-200 bg-slate-50 p-4 text-xs leading-relaxed text-slate-800">
                     {`# DOKUMEN RESMI BAROKAH RESTO GRUP
 KODE DOKUMEN: ${generatedDoc.id}
 NOMOR SK: ${generatedDoc.skNumber}
@@ -1110,11 +1025,10 @@ RUJUKAN HUKUM: ${generatedDoc.legalReferences.join('; ')}`}
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3 shadow-xs">
-              <Sparkles className="h-10 w-10 text-amber-500 mx-auto animate-bounce" />
-              <h4 className="font-black text-slate-900 text-base">Studio Siap Digunakan</h4>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
-                Pilih parameter operasional di sisi kiri atau klik salah satu rekomendasi cepat, lalu tekan &quot;Sintesis &amp; Buat SOP dengan AI&quot;.
+            <div className="card empty-state space-y-1">
+              <p className="font-medium text-slate-800">Belum ada draf SOP.</p>
+              <p className="mx-auto max-w-md">
+                Isi formulir di sisi kiri atau pilih salah satu topik umum, lalu tekan &quot;Susun draf SOP&quot;.
               </p>
             </div>
           )}
@@ -1136,28 +1050,26 @@ export function AiSopModal({ isOpen, onClose, onSaveSop, showToast, employeesCou
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
-      <div className="bg-white rounded-3xl max-w-6xl w-full p-6 shadow-2xl space-y-5 max-h-[94vh] overflow-y-auto border border-slate-200">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-          <div className="flex items-center space-x-2.5">
-            <div className="p-2 bg-amber-500 text-slate-950 rounded-xl shadow-xs">
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="font-black text-base text-slate-900">
-                AI SOP Generator Workbench
-              </h3>
-              <p className="text-xs text-slate-400">
-                Pembuatan Standard Operating Procedure (SOP) Berbasis AI untuk Barokah Resto Grup
-              </p>
-            </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-3 sm:p-5">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Buat SOP dari template"
+        className="max-h-[94vh] w-full max-w-6xl space-y-5 overflow-y-auto rounded-lg bg-canvas p-4 shadow-xl sm:p-6"
+      >
+        <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+          <div>
+            <h2 className="text-base font-semibold text-slate-900">Buat SOP dari template</h2>
+            <p className="text-sm text-slate-600">Draf SOP untuk Barokah Resto Grup, disimpan ke Pustaka SOP setelah diperiksa.</p>
           </div>
 
           <button
+            type="button"
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition"
+            aria-label="Tutup"
+            className="flex h-11 w-11 items-center justify-center rounded-md text-slate-500 hover:bg-slate-200 hover:text-slate-900 sm:h-9 sm:w-9"
           >
-            <X className="h-5 w-5" />
+            <X className="h-5 w-5" aria-hidden />
           </button>
         </div>
 
@@ -1213,76 +1125,72 @@ DISETUJUI OLEH:
     `.trim();
 
     navigator.clipboard.writeText(text);
-    showToast('📋 Naskah lengkap SOP berhasil disalin!');
+    showToast('Naskah lengkap SOP disalin.');
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
-      <div className="bg-white rounded-2xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
-        {/* Header / Kop Surat Resmi Barokah Grup */}
-        <div className="relative mb-3">
-          <div className="absolute right-2 top-2 flex items-center gap-1.5 z-10">
-            <button
-              onClick={handleCopy}
-              className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition bg-white/80 shadow-xs border border-slate-200"
-              title="Salin Naskah"
-            >
-              <Copy className="h-4 w-4" />
-            </button>
-            <button
-              onClick={handlePrint}
-              className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition bg-white/80 shadow-xs border border-slate-200"
-              title="Cetak SOP"
-            >
-              <Printer className="h-4 w-4" />
-            </button>
-            <button
-              onClick={onClose}
-              className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition bg-white/80 shadow-xs border border-slate-200"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-          <div className="rounded-xl overflow-hidden shadow-xs border border-amber-200/60 bg-white">
-            <img
-              src="/kop-surat-barokah.jpg"
-              alt="Kop Surat Resmi Barokah Grup"
-              className="w-full h-auto object-contain block"
-            />
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-3 sm:p-5">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Naskah SOP ${sop.title}`}
+        className="max-h-[92vh] w-full max-w-3xl space-y-6 overflow-y-auto rounded-lg bg-white p-6 text-slate-900 shadow-xl sm:p-8"
+      >
+        {/* Aksi dokumen */}
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <button type="button" onClick={handleCopy} className="btn btn-sm btn-secondary" title="Salin naskah">
+            <Copy className="h-4 w-4" aria-hidden />
+            Salin
+          </button>
+          <button type="button" onClick={handlePrint} className="btn btn-sm btn-secondary" title="Cetak SOP">
+            <Printer className="h-4 w-4" aria-hidden />
+            Cetak
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Tutup"
+            className="flex h-11 w-11 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900 sm:h-9 sm:w-9"
+          >
+            <X className="h-5 w-5" aria-hidden />
+          </button>
+        </div>
+
+        {/* Kop surat */}
+        <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
+          <img src="/kop-surat-barokah.jpg" alt="Kop surat Barokah Grup" className="block h-auto w-full object-contain" />
         </div>
 
         {/* Document Metadata Bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs">
-          <div>
-            <p className="font-bold text-slate-900">
-              No Registrasi : <span className="font-mono text-amber-700">{sop.id}</span>
-            </p>
-            <p className="font-bold text-slate-900 mt-0.5">
-              SK Direksi : <span className="text-slate-800 font-mono">{sop.skNumber}</span>
-            </p>
-            <p className="font-bold text-slate-900 mt-0.5">
-              Perihal : <span className="text-slate-800">{sop.title}</span>
-            </p>
-          </div>
-          <div className="text-right shrink-0">
-            <span className="bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1 rounded-full font-bold text-[10px] uppercase block mb-1">
-              STATUS: SOP RESMI AKTIF &amp; MENGIKAT
-            </span>
-            <span className="text-[10px] text-slate-400 block">Efektif: {sop.effectiveDate}</span>
+        <div className="flex flex-col items-start justify-between gap-2 rounded-md border border-slate-200 bg-slate-50 p-3.5 text-sm sm:flex-row sm:items-center">
+          <dl className="space-y-0.5">
+            <div>
+              <dt className="inline text-slate-500">No. registrasi: </dt>
+              <dd className="inline font-medium text-slate-900">{sop.id}</dd>
+            </div>
+            <div>
+              <dt className="inline text-slate-500">SK direksi: </dt>
+              <dd className="inline font-medium text-slate-900">{sop.skNumber}</dd>
+            </div>
+            <div>
+              <dt className="inline text-slate-500">Perihal: </dt>
+              <dd className="inline font-medium text-slate-900">{sop.title}</dd>
+            </div>
+          </dl>
+          <div className="shrink-0 text-left sm:text-right">
+            <span className="badge badge-success">SOP aktif</span>
+            <span className="mt-1 block text-xs text-slate-500">Efektif: {sop.effectiveDate}</span>
           </div>
         </div>
 
         {/* Body of SOP (Articles) */}
-        <div className="space-y-5 text-xs text-slate-800 leading-relaxed">
+        <div className="space-y-5 text-sm leading-relaxed text-slate-800">
           {sop.articles.map((art, idx) => (
             <section key={idx} className="space-y-2 border-b border-slate-100 pb-4 last:border-0">
-              <h4 className="font-black text-slate-950 text-sm uppercase flex items-center gap-2">
-                <span className="bg-slate-900 text-white px-2 py-0.5 rounded text-[10px] font-mono">
-                  PASAL {art.number}
-                </span>
-                <span>{art.title}</span>
-              </h4>
+              <h3 className="text-sm font-semibold text-slate-900">
+                <span className="mr-1.5 text-slate-500">Pasal {art.number}</span>
+                {art.title}
+              </h3>
 
               {art.content.map((c, cIdx) => (
                 <p key={cIdx} className="text-slate-700">
@@ -1292,26 +1200,26 @@ DISETUJUI OLEH:
 
               {art.callout && (
                 <div
-                  className={`p-3 rounded-xl border text-xs font-medium space-y-1 my-2 ${
+                  className={`my-2 space-y-1 rounded-md border p-3 text-sm ${
                     art.callout.type === 'critical'
-                      ? 'bg-rose-50 border-rose-200 text-rose-900'
+                      ? 'border-rose-200 bg-rose-50 text-rose-900'
                       : art.callout.type === 'warning'
-                      ? 'bg-amber-50 border-amber-200 text-amber-900'
-                      : 'bg-blue-50 border-blue-200 text-blue-900'
+                      ? 'border-amber-200 bg-amber-50 text-amber-900'
+                      : 'border-slate-200 bg-slate-50 text-slate-800'
                   }`}
                 >
-                  <span className="font-bold uppercase text-[10px] block">{art.callout.title}</span>
+                  <span className="block text-xs font-semibold">{art.callout.title}</span>
                   <p>{art.callout.text}</p>
                 </div>
               )}
 
               {art.table && (
-                <div className="overflow-x-auto rounded-xl border border-slate-200 mt-2">
-                  <table className="w-full text-left text-[11px]">
+                <div className="mt-2 overflow-x-auto rounded-md border border-slate-200">
+                  <table className="w-full text-left text-xs">
                     <thead>
-                      <tr className="bg-slate-100 text-slate-700 font-extrabold border-b border-slate-200">
+                      <tr className="table-head">
                         {art.table.headers.map((h, hIdx) => (
-                          <th key={hIdx} className="py-2 px-3">
+                          <th key={hIdx} className="px-3 py-2">
                             {h}
                           </th>
                         ))}
@@ -1319,9 +1227,9 @@ DISETUJUI OLEH:
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {art.table.rows.map((r, rIdx) => (
-                        <tr key={rIdx} className="hover:bg-slate-50/80">
+                        <tr key={rIdx}>
                           {r.map((cell, cellIdx) => (
-                            <td key={cellIdx} className="py-2 px-3 font-medium text-slate-800">
+                            <td key={cellIdx} className="px-3 py-2 text-slate-800">
                               {cell}
                             </td>
                           ))}
@@ -1336,16 +1244,14 @@ DISETUJUI OLEH:
 
           {/* KPI Tolerance Card */}
           {sop.kpis && sop.kpis.length > 0 && (
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
-              <span className="text-xs font-black uppercase tracking-wider text-slate-800 block">
-                Ambang Batas Toleransi Mutu &amp; KPI Station:
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+            <div className="space-y-2 rounded-md border border-slate-200 bg-slate-50 p-4">
+              <h3 className="text-sm font-semibold text-slate-900">Ambang batas toleransi mutu &amp; KPI station</h3>
+              <div className="grid grid-cols-1 gap-2 text-xs sm:grid-cols-2">
                 {sop.kpis.map((kpi, kIdx) => (
-                  <div key={kIdx} className="p-2.5 bg-white rounded-lg border border-slate-200 space-y-0.5">
-                    <span className="font-bold text-slate-900 block">{kpi.metric}</span>
-                    <span className="text-slate-500 block">
-                      Target: <strong className="text-emerald-700">{kpi.target}</strong> (Toleransi: {kpi.tolerance})
+                  <div key={kIdx} className="space-y-0.5 rounded-md border border-slate-200 bg-white p-2.5">
+                    <span className="block font-medium text-slate-900">{kpi.metric}</span>
+                    <span className="block text-slate-600">
+                      Target: <strong className="font-medium text-emerald-800">{kpi.target}</strong> (toleransi: {kpi.tolerance})
                     </span>
                   </div>
                 ))}
@@ -1354,43 +1260,30 @@ DISETUJUI OLEH:
           )}
 
           {/* 3-Tier Signatures */}
-          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 mt-6 space-y-3">
-            <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider block text-center">
-              LEMBAR PENGESAHAN RESMI (3-TIER APPROVAL)
-            </span>
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-8">
-                <span className="text-[10px] font-bold text-slate-400 block">Dibuat Oleh:</span>
-                <div>
-                  <span className="font-extrabold text-xs text-slate-900 block">{sop.author}</span>
-                  <span className="text-[9px] text-slate-400">Unit Operasional</span>
+          <div className="mt-6 space-y-3 rounded-md border border-slate-200 bg-slate-50 p-4">
+            <p className="text-center text-xs font-medium text-slate-600">Lembar pengesahan (3 tingkat)</p>
+            <div className="grid grid-cols-1 gap-3 text-center sm:grid-cols-3">
+              {[
+                { label: 'Dibuat oleh', name: sop.author, role: 'Unit Operasional' },
+                { label: 'Ditinjau oleh', name: sop.reviewedBy, role: 'Operations Manager' },
+                { label: 'Disahkan oleh', name: sop.approvedBy, role: 'Direktur Utama Barokah Grup' },
+              ].map((s) => (
+                <div key={s.label} className="space-y-8 rounded-md border border-slate-200 bg-white p-3">
+                  <span className="block text-xs text-slate-500">{s.label}</span>
+                  <div>
+                    <span className="block text-sm font-medium text-slate-900">{s.name}</span>
+                    <span className="text-xs text-slate-500">{s.role}</span>
+                  </div>
                 </div>
-              </div>
-              <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-8">
-                <span className="text-[10px] font-bold text-slate-400 block">Ditinjau Oleh:</span>
-                <div>
-                  <span className="font-extrabold text-xs text-slate-900 block">{sop.reviewedBy}</span>
-                  <span className="text-[9px] text-slate-400">Operations Manager</span>
-                </div>
-              </div>
-              <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-8">
-                <span className="text-[10px] font-bold text-slate-400 block">Disahkan Oleh:</span>
-                <div>
-                  <span className="font-extrabold text-xs text-emerald-700 block">{sop.approvedBy}</span>
-                  <span className="text-[9px] text-slate-400">Direktur Utama Barokah Grup</span>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
 
         {/* Footer actions */}
-        <div className="pt-4 border-t border-slate-100 flex justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition"
-          >
-            Tutup Naskah
+        <div className="flex justify-end gap-2 border-t border-slate-100 pt-4">
+          <button type="button" onClick={onClose} className="btn btn-secondary px-4">
+            Tutup naskah
           </button>
         </div>
       </div>

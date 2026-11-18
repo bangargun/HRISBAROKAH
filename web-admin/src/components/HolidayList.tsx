@@ -71,7 +71,7 @@ export default function HolidayList() {
   }
 
   return (
-    <section className="rounded-lg border border-slate-200 bg-white" aria-labelledby="holiday-heading">
+    <section className="card" aria-labelledby="holiday-heading">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
         <div>
           <h2 id="holiday-heading" className="font-semibold text-slate-900">Libur nasional</h2>
@@ -79,7 +79,7 @@ export default function HolidayList() {
         </div>
         <label className="flex items-center gap-2 text-slate-600">
           Tahun
-          <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="rounded-md border border-slate-300 px-2 py-1.5 text-slate-800">
+          <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="input w-auto px-2 py-1.5">
             {[year - 1, year, year + 1].map((y) => (
               <option key={y} value={y}>{y}</option>
             ))}
@@ -91,16 +91,16 @@ export default function HolidayList() {
         <form onSubmit={add} className="flex flex-wrap items-end gap-2 border-b border-slate-100 px-4 py-3">
           <label className="flex flex-col gap-1">
             <span className="text-xs font-medium text-slate-600">Tanggal</span>
-            <input type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="rounded-md border border-slate-300 px-2 py-1.5 text-slate-800" />
+            <input type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="input w-auto px-2 py-1.5" />
           </label>
           <label className="flex flex-1 flex-col gap-1">
             <span className="text-xs font-medium text-slate-600">Nama libur</span>
-            <input required maxLength={100} value={name} onChange={(e) => setName(e.target.value)} placeholder="Hari Raya Idulfitri" className="w-full min-w-[12rem] rounded-md border border-slate-300 px-3 py-1.5 text-slate-800" />
+            <input required maxLength={100} value={name} onChange={(e) => setName(e.target.value)} placeholder="Hari Raya Idulfitri" className="input min-w-[12rem] py-1.5" />
           </label>
           <button
             type="submit"
             disabled={busy}
-            className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+            className="btn btn-secondary"
           >
             {busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Plus className="h-4 w-4" aria-hidden />} Tambah
           </button>
@@ -137,7 +137,7 @@ export default function HolidayList() {
                   type="button"
                   onClick={() => remove(h)}
                   aria-label={`Hapus ${h.name}`}
-                  className="rounded-md p-1.5 text-slate-500 hover:bg-rose-50 hover:text-rose-700"
+                  className="flex h-11 w-11 items-center justify-center rounded-md text-slate-500 hover:bg-rose-50 hover:text-rose-700 sm:h-9 sm:w-9"
                 >
                   <Trash2 className="h-4 w-4" aria-hidden />
                 </button>

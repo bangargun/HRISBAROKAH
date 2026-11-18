@@ -210,7 +210,7 @@ export default function DailyAttendanceModule({ requests }: { requests: AdminReq
   }
 
   const stats: [string, string, string?][] = [
-    ['Tingkat kehadiran', rate === null ? '—' : `${rate}%`, `${attended} dari ${expected.length} yang wajib hadir`],
+    ['Tingkat kehadiran', rate === null ? '–' :`${rate}%`, `${attended} dari ${expected.length} yang wajib hadir`],
     ['Terlambat', String(count('LATE'))],
     [date < today ? 'Tidak hadir' : 'Belum absen', String(count('ABSENT', 'NOT_YET'))],
     ['Cuti / izin / sakit', String(count('LEAVE'))],
@@ -227,7 +227,7 @@ export default function DailyAttendanceModule({ requests }: { requests: AdminReq
               value={date}
               max={today}
               onChange={(e) => e.target.value && setDate(e.target.value)}
-              className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-slate-800"
+              className="input w-auto py-1.5"
             />
           </label>
           {outlets.length > 1 && (
@@ -237,7 +237,7 @@ export default function DailyAttendanceModule({ requests }: { requests: AdminReq
                 id="att-outlet"
                 value={outletId}
                 onChange={(e) => setOutletId(e.target.value)}
-                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-800"
+                className="input w-auto"
               >
                 <option value="">Semua cabang</option>
                 {outlets.map((o) => (
@@ -252,7 +252,7 @@ export default function DailyAttendanceModule({ requests }: { requests: AdminReq
             type="button"
             onClick={load}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+            className="btn btn-secondary"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} aria-hidden /> Muat ulang
           </button>
@@ -260,7 +260,7 @@ export default function DailyAttendanceModule({ requests }: { requests: AdminReq
             type="button"
             onClick={exportCsv}
             disabled={!rows?.length}
-            className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+            className="btn btn-secondary"
           >
             <Download className="h-4 w-4" aria-hidden /> Unduh CSV
           </button>
@@ -295,7 +295,7 @@ export default function DailyAttendanceModule({ requests }: { requests: AdminReq
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase text-slate-600">
+                <tr className="table-head">
                   <th scope="col" className="px-4 py-3">Karyawan</th>
                   <th scope="col" className="px-4 py-3">Jadwal</th>
                   <th scope="col" className="px-4 py-3">Masuk</th>

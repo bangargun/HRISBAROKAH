@@ -89,7 +89,7 @@ export default function PayrollSettingsModule() {
 
   if (!form) {
     return notice ? (
-      <p role="alert" className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800">{notice.text}</p>
+      <p role="alert" className="alert-error">{notice.text}</p>
     ) : (
       <div className="flex items-center justify-center gap-2 p-10 text-sm text-slate-500">
         <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Memuat aturan gaji…
@@ -105,13 +105,13 @@ export default function PayrollSettingsModule() {
       </p>
 
       {SECTIONS.map((sec) => (
-        <fieldset key={sec.title} className="rounded-lg border border-slate-200 bg-white p-4">
+        <fieldset key={sec.title} className="card p-4">
           <legend className="px-1 font-semibold text-slate-900">{sec.title}</legend>
           <div className="grid gap-4 sm:grid-cols-2">
             {sec.fields.map((f) => (
               <label key={f.key} className="block space-y-1">
                 <span className="font-medium text-slate-700">{f.label}</span>
-                <div className="flex items-center rounded-md border border-slate-300 focus-within:border-amber-500">
+                <div className="flex items-center rounded-md border border-slate-300 bg-white hover:border-slate-400 focus-within:border-brand-500">
                   {f.unit === 'rp' && <span className="pl-3 text-slate-500">Rp</span>}
                   <input
                     type="number"
@@ -147,14 +147,14 @@ export default function PayrollSettingsModule() {
         <span className="text-xs text-slate-500">Terakhir diubah {saved && stampFmt.format(new Date(saved.updatedAt))}</span>
         <div className="flex gap-2">
           {changed && (
-            <button type="button" onClick={() => saved && apply(saved)} className="rounded-md px-3 py-2 font-medium text-slate-700 hover:bg-slate-100">
+            <button type="button" onClick={() => saved && apply(saved)} className="btn btn-ghost">
               Batalkan
             </button>
           )}
           <button
             type="submit"
             disabled={!changed || saving}
-            className="inline-flex items-center gap-1.5 rounded-md bg-amber-500 px-4 py-2 font-medium text-slate-950 hover:bg-amber-400 disabled:opacity-50"
+            className="btn btn-primary px-4"
           >
             {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
             Simpan aturan

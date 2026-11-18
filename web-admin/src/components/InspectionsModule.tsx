@@ -53,7 +53,7 @@ const fmtDate = (ymd: string) => new Date(`${ymd.slice(0, 10)}T00:00:00`).toLoca
 function localYmd(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
-const field = 'w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800 focus:border-amber-500';
+const field = 'input';
 const escapeHtml = (v: string) =>
   v.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -101,14 +101,14 @@ export default function InspectionsModule({ showToast }: { showToast: (msg: stri
   return (
     <div className="space-y-4 text-sm">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="inline-flex rounded-md border border-slate-300 bg-white p-0.5" role="group" aria-label="Status sidak">
+        <div className="segmented" role="group" aria-label="Status sidak">
           {(['SCHEDULED', 'DONE'] as const).map((v) => (
             <button
               key={v}
               type="button"
               aria-pressed={view === v}
               onClick={() => setView(v)}
-              className={`rounded px-3 py-1.5 font-medium ${view === v ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'}`}
+              className="segmented-item"
             >
               {v === 'SCHEDULED' ? `Terjadwal${scheduledCount ? ` (${scheduledCount})` : ''}` : 'Hasil sidak'}
             </button>
@@ -118,14 +118,14 @@ export default function InspectionsModule({ showToast }: { showToast: (msg: stri
           <button
             type="button"
             onClick={() => setScheduling(true)}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-amber-500 px-3 py-1.5 font-medium text-slate-950 hover:bg-amber-400"
+            className="btn btn-primary shrink-0"
           >
             <Plus className="h-4 w-4" aria-hidden /> Jadwalkan sidak
           </button>
         )}
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+      <div className="card overflow-hidden">
         {error ? (
           <p role="alert" className="p-10 text-center text-rose-700">Gagal memuat sidak: {error}</p>
         ) : rows === null ? (
@@ -140,7 +140,7 @@ export default function InspectionsModule({ showToast }: { showToast: (msg: stri
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase text-slate-600">
+                <tr className="table-head">
                   <th scope="col" className="px-4 py-3">Tanggal</th>
                   <th scope="col" className="px-4 py-3">Cabang</th>
                   <th scope="col" className="px-4 py-3">Jenis & fokus</th>
@@ -175,13 +175,13 @@ export default function InspectionsModule({ showToast }: { showToast: (msg: stri
                       <div className="flex justify-end gap-1.5">
                         {r.status === 'SCHEDULED' && isAuditor && (
                           <>
-                            <button type="button" onClick={() => cancel(r)} className="rounded-md px-2.5 py-1.5 font-medium text-rose-700 hover:bg-rose-50">
+                            <button type="button" onClick={() => cancel(r)} className="btn btn-sm btn-ghost text-rose-700 hover:bg-rose-50">
                               Batalkan
                             </button>
                             <button
                               type="button"
                               onClick={() => setConducting(r)}
-                              className="rounded-md bg-slate-900 px-2.5 py-1.5 font-medium text-white hover:bg-slate-800"
+                              className="btn btn-sm btn-dark"
                             >
                               Isi hasil sidak
                             </button>
@@ -299,10 +299,10 @@ function ScheduleDialog({ onClose, onSaved }: { onClose: () => void; onSaved: (o
             <input maxLength={200} value={form.focusArea} onChange={(e) => setForm({ ...form, focusArea: e.target.value })} className={field} />
           </label>
           {form.type === 'SURPRISE' && <p className="text-xs text-slate-500">Sidak mendadak tidak terlihat oleh kepala cabang sampai hasilnya diisi.</p>}
-          {error && <p role="alert" className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-rose-800">{error}</p>}
+          {error && <p role="alert" className="alert-error">{error}</p>}
           <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
-            <button type="button" onClick={onClose} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">Batal</button>
-            <button type="submit" disabled={saving} className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800 disabled:opacity-50">
+            <button type="button" onClick={onClose} className="btn btn-ghost px-4">Batal</button>
+            <button type="submit" disabled={saving} className="btn btn-primary px-4">
               {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
               Jadwalkan
             </button>
@@ -366,7 +366,7 @@ function ConductDialog({
           const max = items.reduce((n, i) => n + i.points, 0);
           return (
             <section key={area} className="space-y-1.5">
-              <p className="flex justify-between text-xs font-semibold uppercase text-slate-500">
+              <p className="flex justify-between text-sm font-semibold text-slate-900">
                 <span>{label}</span>
                 <span>{got} / {max}</span>
               </p>
@@ -395,10 +395,10 @@ function ConductDialog({
           <span className="font-medium text-slate-700">Kepala cabang yang mendampingi</span>
           <input maxLength={100} value={manager} onChange={(e) => setManager(e.target.value)} className={field} />
         </label>
-        {error && <p role="alert" className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-rose-800">{error}</p>}
+        {error && <p role="alert" className="alert-error">{error}</p>}
         <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
-          <button type="button" disabled={saving} onClick={onClose} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">Batal</button>
-          <button type="submit" disabled={saving} className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800 disabled:opacity-50">
+          <button type="button" disabled={saving} onClick={onClose} className="btn btn-ghost px-4">Batal</button>
+          <button type="submit" disabled={saving} className="btn btn-primary px-4">
             {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
             Simpan hasil ({score}/100)
           </button>
@@ -449,8 +449,8 @@ ${r.actionItems ? `<p>Tindak lanjut:</p><p class="pre">${escapeHtml(r.actionItem
       {r.findings && <p className="whitespace-pre-line text-slate-700"><strong>Temuan:</strong> {r.findings}</p>}
       {r.actionItems && <p className="whitespace-pre-line text-slate-700"><strong>Tindak lanjut:</strong> {r.actionItems}</p>}
       <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
-        <button type="button" onClick={onClose} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">Tutup</button>
-        <button type="button" onClick={print} className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800">
+        <button type="button" onClick={onClose} className="btn btn-ghost px-4">Tutup</button>
+        <button type="button" onClick={print} className="btn btn-primary px-4">
           <Printer className="h-4 w-4" aria-hidden /> Cetak
         </button>
       </div>

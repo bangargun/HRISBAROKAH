@@ -91,7 +91,7 @@ const who = (u: Who) => u?.profile?.fullName ?? u?.username ?? '-';
 function localYmd(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
-const field = 'w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800 focus:border-amber-500 disabled:bg-slate-50';
+const field = 'input';
 
 /** Karyawan keluar (mengundurkan diri / PHK): pencatatan, serah terima, exit interview, penutupan akun. */
 export default function ExitsModule({ showToast, onChanged }: { showToast: (msg: string) => void; onChanged: () => void }) {
@@ -131,14 +131,14 @@ export default function ExitsModule({ showToast, onChanged }: { showToast: (msg:
   return (
     <div className="space-y-4 text-sm">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="inline-flex rounded-md border border-slate-300 bg-white p-0.5" role="group" aria-label="Status">
+        <div className="segmented" role="group" aria-label="Status">
           {(['OPEN', 'DONE'] as const).map((v) => (
             <button
               key={v}
               type="button"
               aria-pressed={view === v}
               onClick={() => setView(v)}
-              className={`rounded px-3 py-1.5 font-medium ${view === v ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'}`}
+              className="segmented-item"
             >
               {v === 'OPEN' ? `Sedang diproses${openCount ? ` (${openCount})` : ''}` : 'Selesai & dibatalkan'}
             </button>
@@ -148,14 +148,14 @@ export default function ExitsModule({ showToast, onChanged }: { showToast: (msg:
           <button
             type="button"
             onClick={() => setCreating(true)}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-amber-500 px-3 py-1.5 font-medium text-slate-950 hover:bg-amber-400"
+            className="btn btn-primary shrink-0"
           >
             <Plus className="h-4 w-4" aria-hidden /> Catat karyawan keluar
           </button>
         )}
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+      <div className="card overflow-hidden">
         {loadError ? (
           <p role="alert" className="p-10 text-center text-rose-700">Gagal memuat data: {loadError}</p>
         ) : rows === null ? (
@@ -170,7 +170,7 @@ export default function ExitsModule({ showToast, onChanged }: { showToast: (msg:
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase text-slate-600">
+                <tr className="table-head">
                   <th scope="col" className="px-4 py-3">Karyawan</th>
                   <th scope="col" className="px-4 py-3">Jenis & alasan</th>
                   <th scope="col" className="px-4 py-3">Hari terakhir</th>
@@ -377,15 +377,15 @@ function CreateExitDialog({ isHr, onClose, onSaved }: { isHr: boolean; onClose: 
             <span className="font-medium text-slate-700">Keterangan</span>
             <textarea required maxLength={2000} rows={3} value={form.reasonNotes} onChange={set('reasonNotes')} className={field} />
           </label>
-          {error && <p role="alert" className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-rose-800">{error}</p>}
+          {error && <p role="alert" className="alert-error">{error}</p>}
           <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
-            <button type="button" onClick={onClose} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">
+            <button type="button" onClick={onClose} className="btn btn-ghost px-4">
               Batal
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+              className="btn btn-primary px-4"
             >
               {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
               Simpan
@@ -474,7 +474,7 @@ function ManageExitDialog({
   }
 
   const canComplete = form.uniformReturned && form.lockerCleared && form.lastWorkingDate <= today;
-  const heading = 'text-xs font-semibold uppercase text-slate-500';
+  const heading = 'text-sm font-semibold text-slate-900';
 
   return (
     <Dialog wide title={`${TYPE_LABEL[exit.type]}: ${exit.employee.fullName}`} onClose={() => !busy && onClose()}>
@@ -579,7 +579,7 @@ function ManageExitDialog({
           </label>
         </section>
 
-        {error && <p role="alert" className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-rose-800">{error}</p>}
+        {error && <p role="alert" className="alert-error">{error}</p>}
         {editable && isHr && !canComplete && (
           <p className="text-xs text-slate-500">
             Proses bisa ditutup setelah seragam dan loker selesai, mulai hari terakhir kerja ({form.lastWorkingDate}).
@@ -597,7 +597,7 @@ function ManageExitDialog({
               {busy === 'cancel' ? 'Membatalkan…' : 'Batalkan proses keluar'}
             </button>
           )}
-          <button type="button" disabled={!!busy} onClick={onClose} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">
+          <button type="button" disabled={!!busy} onClick={onClose} className="btn btn-ghost px-4">
             Tutup
           </button>
           {editable && (
@@ -616,7 +616,7 @@ function ManageExitDialog({
               type="button"
               disabled={!!busy || !canComplete}
               onClick={() => run('complete')}
-              className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+              className="btn btn-primary px-4"
             >
               {busy === 'complete' && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
               Selesaikan & nonaktifkan akun

@@ -128,8 +128,8 @@ export default function EmployeeDialog({
     }
   }
 
-  const field = 'w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800 focus:border-amber-500 disabled:bg-slate-50 disabled:text-slate-500';
-  const heading = 'text-xs font-semibold uppercase text-slate-500';
+  const field = 'input';
+  const heading = 'text-sm font-semibold text-slate-900';
 
   return (
     <Dialog wide title={isEdit ? `Ubah data ${employee.fullName}` : 'Tambah karyawan'} onClose={onClose}>
@@ -146,7 +146,7 @@ export default function EmployeeDialog({
                 : 'Belum ada jabatan. Tambahkan dulu di Master Data → Departemen & Jabatan.')}
           </p>
           <div className="flex justify-end border-t border-slate-100 pt-3">
-            <button type="button" onClick={onClose} className="rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800">
+            <button type="button" onClick={onClose} className="btn btn-secondary px-4">
               Tutup
             </button>
           </div>
@@ -258,18 +258,14 @@ export default function EmployeeDialog({
           {isEdit && !roleLocked && <ResetPassword employeeId={employee.id} name={employee.fullName} />}
 
           {error && (
-            <p role="alert" className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-rose-800">{error}</p>
+            <p role="alert" className="alert-error">{error}</p>
           )}
 
           <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
-            <button type="button" onClick={onClose} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">
+            <button type="button" onClick={onClose} className="btn btn-ghost px-4">
               Batal
             </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800 disabled:opacity-50"
-            >
+            <button type="submit" disabled={saving} className="btn btn-primary px-4">
               {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
               {isEdit ? 'Simpan perubahan' : 'Simpan karyawan'}
             </button>
@@ -307,7 +303,7 @@ function ResetPassword({ employeeId, name }: { employeeId: string; name: string 
 
   return (
     <div className="space-y-2 border-t border-slate-100 pt-4">
-      <p className="text-xs font-semibold uppercase text-slate-500">Akun login</p>
+      <p className="text-sm font-semibold text-slate-900">Akun login</p>
       {open ? (
         <div className="flex flex-wrap items-center gap-2">
           <input
@@ -315,20 +311,21 @@ function ResetPassword({ employeeId, name }: { employeeId: string; name: string 
             autoComplete="off"
             minLength={6}
             maxLength={72}
+            aria-label="Password sementara"
             placeholder="Password sementara"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="min-w-0 flex-1 rounded-md border border-slate-300 px-3 py-2 font-mono text-slate-800 focus:border-amber-500"
+            className="input w-auto min-w-0 flex-1 font-mono"
           />
-          <button type="button" disabled={busy} onClick={reset} className="rounded-md bg-rose-700 px-3 py-2 font-medium text-white hover:bg-rose-800 disabled:opacity-50">
+          <button type="button" disabled={busy} onClick={reset} className="btn btn-danger">
             {busy ? 'Menyimpan…' : 'Reset password'}
           </button>
-          <button type="button" disabled={busy} onClick={() => setOpen(false)} className="rounded-md px-3 py-2 font-medium text-slate-700 hover:bg-slate-100">
+          <button type="button" disabled={busy} onClick={() => setOpen(false)} className="btn btn-ghost">
             Batal
           </button>
         </div>
       ) : (
-        <button type="button" onClick={() => { setOpen(true); setNotice(null); }} className="font-medium text-amber-700 hover:text-amber-800">
+        <button type="button" onClick={() => { setOpen(true); setNotice(null); }} className="link">
           Reset password karyawan ini…
         </button>
       )}

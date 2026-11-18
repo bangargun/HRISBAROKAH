@@ -84,7 +84,7 @@ export default function KpiModule() {
     load();
   }, [load]);
 
-  const select = 'rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-800';
+  const select = 'input w-auto';
 
   return (
     <div className="space-y-4 text-sm">
@@ -111,7 +111,7 @@ export default function KpiModule() {
             type="button"
             onClick={load}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-2 font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+            className="btn btn-secondary"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} aria-hidden /> Muat ulang
           </button>
@@ -130,7 +130,7 @@ export default function KpiModule() {
         {data ? rupiah.format(data.incentiveGradeA) : ''} di gaji periode yang sama.
       </p>
 
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+      <div className="card overflow-hidden">
         {error ? (
           <p role="alert" className="p-10 text-center text-rose-700">Gagal memuat KPI: {error}</p>
         ) : outlets && outlets.length === 0 ? (
@@ -145,7 +145,7 @@ export default function KpiModule() {
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase text-slate-600">
+                <tr className="table-head">
                   <th scope="col" className="px-4 py-3">Karyawan</th>
                   <th scope="col" className="px-3 py-3 text-right">Disiplin masuk</th>
                   <th scope="col" className="px-3 py-3 text-right">Istirahat</th>

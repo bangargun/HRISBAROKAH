@@ -159,7 +159,7 @@ export default function PayrollModule() {
             id="payroll-outlet"
             value={outletId}
             onChange={(e) => setOutletId(e.target.value)}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 font-medium text-slate-800"
+            className="input w-auto font-medium"
           >
             {outlets.map((o) => (
               <option key={o.id} value={o.id}>{o.name}</option>
@@ -170,7 +170,7 @@ export default function PayrollModule() {
             id="payroll-month"
             value={month}
             onChange={(e) => setMonth(Number(e.target.value))}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-800"
+            className="input w-auto"
           >
             {MONTHS.map((m, i) => (
               <option key={m} value={i + 1}>{m}</option>
@@ -181,7 +181,7 @@ export default function PayrollModule() {
             id="payroll-year"
             value={year}
             onChange={(e) => setYear(Number(e.target.value))}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-800"
+            className="input w-auto"
           >
             {years.map((y) => (
               <option key={y} value={y}>{y}</option>
@@ -210,7 +210,7 @@ export default function PayrollModule() {
               type="button"
               onClick={() => run('generate')}
               disabled={!outletId || busy !== null}
-              className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-2 font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              className="btn btn-secondary"
             >
               {busy === 'generate' ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Calculator className="h-4 w-4" aria-hidden />}
               {rows.length ? 'Hitung ulang' : 'Hitung draf'}
@@ -221,7 +221,7 @@ export default function PayrollModule() {
               type="button"
               onClick={() => setConfirm('finalize')}
               disabled={busy !== null}
-              className="inline-flex items-center gap-1.5 rounded-md bg-amber-500 px-3 py-2 font-medium text-slate-950 hover:bg-amber-400 disabled:opacity-50"
+              className="btn btn-primary"
             >
               <CheckCircle2 className="h-4 w-4" aria-hidden /> Finalkan
             </button>
@@ -231,7 +231,7 @@ export default function PayrollModule() {
               type="button"
               onClick={() => setConfirm('paid')}
               disabled={busy !== null}
-              className="inline-flex items-center gap-1.5 rounded-md bg-emerald-600 px-3 py-2 font-medium text-white hover:bg-emerald-500 disabled:opacity-50"
+              className="btn btn-primary"
             >
               <Wallet className="h-4 w-4" aria-hidden /> Tandai sudah dibayar
             </button>
@@ -282,7 +282,7 @@ export default function PayrollModule() {
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase text-slate-600">
+                <tr className="table-head">
                   <th scope="col" className="px-4 py-3">Karyawan</th>
                   <th scope="col" className="px-3 py-3 text-right">Hadir</th>
                   <th scope="col" className="px-3 py-3 text-right">Gaji pokok</th>
@@ -372,13 +372,13 @@ export default function PayrollModule() {
               : `Total ${rp(totals.net)} untuk ${rows.length} karyawan akan ditandai sudah ditransfer.`}
           </p>
           <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
-            <button type="button" onClick={() => setConfirm(null)} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">
+            <button type="button" onClick={() => setConfirm(null)} className="btn btn-ghost px-4">
               Batal
             </button>
             <button
               type="button"
               onClick={() => run(confirm)}
-              className="rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800"
+              className="btn btn-primary px-4"
             >
               {confirm === 'finalize' ? 'Finalkan' : 'Tandai dibayar'}
             </button>

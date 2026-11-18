@@ -59,7 +59,7 @@ export default function Survey360Module() {
 
   useEffect(load, [load]);
 
-  const select = 'rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-800';
+  const select = 'input w-auto';
 
   return (
     <div className="space-y-4 text-sm">
@@ -95,7 +95,7 @@ export default function Survey360Module() {
         periode gaji. Nama penilai tidak disimpan di hasil ini. Rata-rata × 20 menjadi nilai sikap di KPI.
       </p>
 
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+      <div className="card overflow-hidden">
         {error ? (
           <p role="alert" className="p-10 text-center text-rose-700">Gagal memuat survei: {error}</p>
         ) : outlets && outlets.length === 0 ? (
@@ -149,7 +149,7 @@ export default function Survey360Module() {
                       </div>
                       {r.comments.length > 0 && (
                         <div>
-                          <p className="text-xs font-semibold uppercase text-slate-500">Masukan anonim</p>
+                          <p className="font-semibold text-slate-900">Masukan anonim</p>
                           <ul className="mt-1 list-disc space-y-0.5 pl-5 text-slate-700">
                             {r.comments.map((c, i) => (
                               <li key={i}>{c}</li>

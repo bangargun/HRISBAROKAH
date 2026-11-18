@@ -179,7 +179,7 @@ export default function OutletMasterModule() {
             onClick={load}
             disabled={loading}
             aria-label="Muat ulang"
-            className="rounded-md border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-50 disabled:opacity-60"
+            className="btn btn-secondary w-11 px-0 text-slate-600 sm:w-9"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} aria-hidden />
           </button>
@@ -190,7 +190,7 @@ export default function OutletMasterModule() {
                 setNotice(null);
                 setForm({ ...EMPTY_FORM });
               }}
-              className="inline-flex items-center gap-1.5 rounded-md bg-amber-500 px-3 py-2 font-medium text-slate-950 hover:bg-amber-400"
+              className="btn btn-primary"
             >
               <Plus className="h-4 w-4" aria-hidden /> Tambah Cabang
             </button>
@@ -209,11 +209,11 @@ export default function OutletMasterModule() {
         </p>
       )}
 
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+      <div className="card overflow-hidden">
         {loadError && outlets.length === 0 ? (
           <div role="alert" className="bg-rose-50 p-8 text-center text-rose-800">
             <p>{loadError}</p>
-            <button type="button" onClick={load} className="mt-3 rounded-md border border-rose-300 px-3 py-1.5 font-medium hover:bg-rose-100">
+            <button type="button" onClick={load} className="btn btn-secondary mt-3">
               Coba lagi
             </button>
           </div>
@@ -230,7 +230,7 @@ export default function OutletMasterModule() {
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase text-slate-600">
+                <tr className="table-head">
                   <th scope="col" className="px-4 py-3">Cabang</th>
                   <th scope="col" className="px-4 py-3">Lokasi</th>
                   <th scope="col" className="px-4 py-3">Kepala cabang</th>
@@ -256,7 +256,7 @@ export default function OutletMasterModule() {
                         href={`https://www.google.com/maps?q=${o.latitude},${o.longitude}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-amber-700 hover:underline"
+                        className="link inline-flex items-center gap-1 text-xs"
                       >
                         Peta · radius {o.geofenceRadius} m
                         <ExternalLink className="h-3 w-3" aria-hidden />
@@ -300,7 +300,7 @@ export default function OutletMasterModule() {
                               setNotice(null);
                               setForm(toForm(o));
                             }}
-                            className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 font-medium text-slate-700 hover:bg-slate-50"
+                            className="btn btn-sm btn-secondary"
                           >
                             <Edit2 className="h-3.5 w-3.5" aria-hidden /> Ubah
                           </button>
@@ -308,9 +308,7 @@ export default function OutletMasterModule() {
                             <button
                               type="button"
                               onClick={() => setToggling(o)}
-                              className={`rounded-md border px-2.5 py-1.5 font-medium ${
-                                o.isActive ? 'border-rose-200 text-rose-700 hover:bg-rose-50' : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'
-                              }`}
+                              className={`btn btn-sm ${o.isActive ? 'btn-danger-outline' : 'btn-secondary'}`}
                             >
                               {o.isActive ? 'Nonaktifkan' : 'Aktifkan'}
                             </button>
@@ -338,15 +336,13 @@ export default function OutletMasterModule() {
               : 'Cabang akan muncul lagi di pilihan cabang.'}
           </p>
           <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
-            <button type="button" onClick={() => setToggling(null)} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">
+            <button type="button" onClick={() => setToggling(null)} className="btn btn-ghost px-4">
               Batal
             </button>
             <button
               type="button"
               onClick={() => confirmToggle(toggling)}
-              className={`rounded-md px-4 py-2 font-medium text-white ${
-                toggling.isActive ? 'bg-rose-600 hover:bg-rose-500' : 'bg-emerald-600 hover:bg-emerald-500'
-              }`}
+              className={`btn px-4 ${toggling.isActive ? 'btn-danger' : 'btn-primary'}`}
             >
               {toggling.isActive ? 'Nonaktifkan' : 'Aktifkan'}
             </button>
@@ -394,10 +390,10 @@ function OutletFormDialog({
     }
   }
 
-  const field = 'w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800 focus:border-amber-500 disabled:bg-slate-100 disabled:text-slate-500';
-  const time = 'w-full rounded-md border border-slate-300 px-2 py-1.5 tabular-nums text-slate-800 focus:border-amber-500';
+  const field = 'input';
+  const time = 'input px-2 py-1.5 tabular-nums';
   const section = 'space-y-3 border-t border-slate-100 pt-4';
-  const heading = 'text-xs font-semibold uppercase text-slate-500';
+  const heading = 'text-sm font-semibold text-slate-900';
 
   return (
     <Dialog wide title={isEdit ? `Ubah cabang ${initial.name}` : 'Tambah cabang'} onClose={onCancel}>
@@ -553,17 +549,17 @@ function OutletFormDialog({
           </div>
 
           {error && (
-            <p role="alert" className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-rose-800">{error}</p>
+            <p role="alert" className="alert-error">{error}</p>
           )}
 
           <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
-            <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">
+            <button type="button" onClick={onCancel} className="btn btn-ghost px-4">
               Batal
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+              className="btn btn-primary px-4"
             >
               {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
               Simpan cabang

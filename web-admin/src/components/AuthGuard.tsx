@@ -35,14 +35,14 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   if (isPublic || state === 'ok') return <>{children}</>;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4 text-center text-slate-300">
+    <div className="flex min-h-screen items-center justify-center bg-ink px-4 text-center text-slate-300">
       {state === 'offline' ? (
-        <div>
+        <div role="alert">
           <p className="text-sm">Server HRIS tidak bisa dihubungi. Pastikan backend sudah berjalan.</p>
           <button
             type="button"
             onClick={check}
-            className="mt-4 rounded-lg border border-slate-700 px-4 py-2 text-sm hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+            className="btn mt-4 border border-slate-500 px-4 text-slate-100 hover:bg-ink-700 active:bg-ink-600"
           >
             Coba lagi
           </button>

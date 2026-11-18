@@ -259,12 +259,14 @@ export default function MasterDataPage() {
   return (
     <AppShell activeId="master-data" title="Master Data" counts={{ requests: requestsAwaitingMe }}>
       {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 text-xs border border-slate-700">
-          <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-          <span className="font-medium">{toastMessage}</span>
-        </div>
-      )}
+      <div role="status" aria-live="polite" className="pointer-events-none fixed right-4 top-4 z-50 max-w-sm">
+        {toastMessage && (
+          <div className="flex items-start gap-2 rounded-lg bg-ink-800 px-4 py-3 text-sm text-white shadow-lg">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" aria-hidden />
+            <span>{toastMessage}</span>
+          </div>
+        )}
+      </div>
 
         <div className="shrink-0 border-b border-slate-200 bg-white px-4 sm:px-6">
           <nav className="-mb-px flex gap-1 overflow-x-auto" aria-label="Bagian master data">
@@ -282,8 +284,8 @@ export default function MasterDataPage() {
                 aria-current={activeTab === tab.id ? 'page' : undefined}
                 className={`shrink-0 whitespace-nowrap border-b-2 px-3 py-3 text-sm transition-colors ${
                   activeTab === tab.id
-                    ? 'border-amber-500 font-medium text-slate-900'
-                    : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800'
+                    ? 'border-brand-500 font-medium text-slate-900'
+                    : 'border-transparent text-slate-600 hover:border-slate-300 hover:text-slate-900'
                 }`}
               >
                 {tab.label}
@@ -308,10 +310,10 @@ export default function MasterDataPage() {
           {/* SUB-TAB 4: KOMPONEN PAYROLL & SERVICE CHARGE              */}
           {/* ========================================================= */}
           {activeTab === 'payroll' && (
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="card overflow-hidden">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold">
+                  <tr className="table-head">
                     <th className="py-3 px-4">Nama Komponen</th>
                     <th className="py-3 px-4">Tipe Komponen</th>
                     <th className="py-3 px-4">Rumus / Formula</th>
@@ -323,7 +325,7 @@ export default function MasterDataPage() {
                 <tbody className="divide-y divide-slate-100">
                   {payrollRules.map((pr) => (
                     <tr key={pr.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="py-3.5 px-4 font-bold text-slate-900">{pr.componentName}</td>
+                      <td className="py-3.5 px-4 font-medium text-slate-900">{pr.componentName}</td>
                       <td className="py-3.5 px-4">
                         <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-medium">
                           {pr.type}
@@ -336,7 +338,7 @@ export default function MasterDataPage() {
                         <div className="flex items-center justify-center space-x-1.5">
                           <button
                             onClick={() => setReviewModalData({ type: 'payroll', data: pr })}
-                            className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors"
                             title="Review Aturan"
                           >
                             <Eye className="h-4 w-4" />
@@ -368,10 +370,10 @@ export default function MasterDataPage() {
           {/* SUB-TAB 5: JENIS CUTI & IZIN                             */}
           {/* ========================================================= */}
           {activeTab === 'leaves' && (
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="card overflow-hidden">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold">
+                  <tr className="table-head">
                     <th className="py-3 px-4">Jenis Cuti / Izin</th>
                     <th className="py-3 px-4">Alokasi Kuota</th>
                     <th className="py-3 px-4">Memotong Saldo Cuti</th>
@@ -383,7 +385,7 @@ export default function MasterDataPage() {
                 <tbody className="divide-y divide-slate-100">
                   {leaveTypes.map((lt) => (
                     <tr key={lt.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="py-3.5 px-4 font-bold text-slate-900">{lt.name}</td>
+                      <td className="py-3.5 px-4 font-medium text-slate-900">{lt.name}</td>
                       <td className="py-3.5 px-4 font-medium text-slate-800">{lt.quota}</td>
                       <td className="py-3.5 px-4">
                         <span
@@ -400,7 +402,7 @@ export default function MasterDataPage() {
                         <div className="flex items-center justify-center space-x-1.5">
                           <button
                             onClick={() => setReviewModalData({ type: 'leaves', data: lt })}
-                            className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors"
                             title="Review Cuti"
                           >
                             <Eye className="h-4 w-4" />
@@ -433,29 +435,29 @@ export default function MasterDataPage() {
       {/* 3. MODAL REVIEW / DETAIL                                  */}
       {/* ========================================================= */}
       {reviewModalData && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 bg-ink/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-lg w-full p-6 shadow-xl space-y-4">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2">
-                <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
+                <div className="p-2 bg-slate-100 text-slate-700 rounded-md">
                   <Eye className="h-5 w-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-base">Detail &amp; Review Record</h3>
-                  <p className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
+                  <p className="text-xs text-slate-500">
                     Kategori: {reviewModalData.type.toUpperCase()}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setReviewModalData(null)}
-                className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg"
+                className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-md"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 space-y-2 text-xs">
+            <div className="space-y-2 rounded-md border border-slate-200 bg-slate-50 p-4 text-sm">
               {Object.entries(reviewModalData.data).map(([key, val]) => {
                 const fieldLabels: Record<string, string> = {
                   id: 'ID / Kode',
@@ -500,7 +502,7 @@ export default function MasterDataPage() {
                 };
                 return (
                   <div key={key} className="flex justify-between py-1.5 border-b border-slate-200/50 last:border-b-0 items-center">
-                    <span className="font-semibold text-slate-500 uppercase tracking-wide text-[10px]">
+                    <span className="text-xs text-slate-500">
                       {fieldLabels[key] || key}
                     </span>
                     <span className="font-bold text-slate-800 text-right">{String(val)}</span>
@@ -512,7 +514,7 @@ export default function MasterDataPage() {
             <div className="pt-2 flex justify-end">
               <button
                 onClick={() => setReviewModalData(null)}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800"
+                className="btn btn-secondary px-4"
               >
                 Tutup Review
               </button>
@@ -525,19 +527,19 @@ export default function MasterDataPage() {
       {/* 4. MODAL EDIT DATA MASTER                                 */}
       {/* ========================================================= */}
       {editModalData && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-ink/50 z-50 flex items-center justify-center p-4">
           <form
             onSubmit={handleSaveEdit}
-            className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4"
+            className="bg-white rounded-lg max-w-lg w-full p-6 shadow-xl space-y-4"
           >
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2">
-                <div className="p-2 bg-amber-50 text-amber-600 rounded-xl">
+                <div className="p-2 bg-slate-100 text-slate-700 rounded-md">
                   <Edit2 className="h-5 w-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-base">Edit Data Master</h3>
-                  <p className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
+                  <p className="text-xs text-slate-500">
                     Kategori: {editModalData.type.toUpperCase()}
                   </p>
                 </div>
@@ -545,7 +547,7 @@ export default function MasterDataPage() {
               <button
                 type="button"
                 onClick={() => setEditModalData(null)}
-                className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg"
+                className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-md"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -569,7 +571,7 @@ export default function MasterDataPage() {
                             data: { ...editModalData.data, id: e.target.value },
                           })
                         }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono"
+                        className="input font-mono"
                       />
                     </div>
                     <div>
@@ -583,7 +585,7 @@ export default function MasterDataPage() {
                             data: { ...editModalData.data, type: e.target.value },
                           })
                         }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold"
+                        className="input font-semibold"
                       />
                     </div>
                   </div>
@@ -598,7 +600,7 @@ export default function MasterDataPage() {
                           data: { ...editModalData.data, componentName: e.target.value },
                         })
                       }
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-bold"
+                      className="input font-bold"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -613,7 +615,7 @@ export default function MasterDataPage() {
                             data: { ...editModalData.data, formula: e.target.value },
                           })
                         }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono text-emerald-700 font-semibold"
+                        className="input font-mono text-emerald-700 font-semibold"
                       />
                     </div>
                     <div>
@@ -626,7 +628,7 @@ export default function MasterDataPage() {
                             data: { ...editModalData.data, taxable: e.target.value },
                           })
                         }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold"
+                        className="input font-semibold"
                       >
                         <option value="Ya (PPh 21)">Ya (PPh 21)</option>
                         <option value="Tidak">Tidak</option>
@@ -645,7 +647,7 @@ export default function MasterDataPage() {
                           data: { ...editModalData.data, notes: e.target.value },
                         })
                       }
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500"
+                      className="input"
                     />
                   </div>
                 </>
@@ -666,7 +668,7 @@ export default function MasterDataPage() {
                             data: { ...editModalData.data, id: e.target.value },
                           })
                         }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono"
+                        className="input font-mono"
                       />
                     </div>
                     <div>
@@ -679,7 +681,7 @@ export default function MasterDataPage() {
                             data: { ...editModalData.data, reduceQuota: e.target.value },
                           })
                         }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold"
+                        className="input font-semibold"
                       >
                         <option value="Ya">Ya</option>
                         <option value="Tidak">Tidak</option>
@@ -698,7 +700,7 @@ export default function MasterDataPage() {
                           data: { ...editModalData.data, name: e.target.value },
                         })
                       }
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-bold"
+                      className="input font-bold"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -713,7 +715,7 @@ export default function MasterDataPage() {
                             data: { ...editModalData.data, quota: e.target.value },
                           })
                         }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold"
+                        className="input font-semibold"
                       />
                     </div>
                     <div>
@@ -727,7 +729,7 @@ export default function MasterDataPage() {
                             data: { ...editModalData.data, requiresAttachment: e.target.value },
                           })
                         }
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500"
+                        className="input"
                       />
                     </div>
                   </div>
@@ -742,7 +744,7 @@ export default function MasterDataPage() {
                           data: { ...editModalData.data, minDaysNotice: e.target.value },
                         })
                       }
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold"
+                      className="input font-semibold"
                     />
                   </div>
                 </>
@@ -753,13 +755,13 @@ export default function MasterDataPage() {
               <button
                 type="button"
                 onClick={() => setEditModalData(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                className="btn btn-ghost px-4"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-sm"
+                className="btn btn-primary px-4"
               >
                 Simpan Perubahan
               </button>
@@ -772,8 +774,8 @@ export default function MasterDataPage() {
       {/* 5. MODAL KONFIRMASI DELETE                                */}
       {/* ========================================================= */}
       {deleteModalData && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 bg-ink/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl space-y-4">
             <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
               <AlertTriangle className="h-6 w-6" />
             </div>
@@ -788,13 +790,13 @@ export default function MasterDataPage() {
             <div className="pt-2 flex justify-center space-x-2">
               <button
                 onClick={() => setDeleteModalData(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                className="btn btn-ghost px-4"
               >
                 Batal
               </button>
               <button
                 onClick={handleConfirmDelete}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 shadow-sm"
+                className="btn btn-danger px-4"
               >
                 Ya, Hapus Sekarang
               </button>

@@ -115,14 +115,14 @@ export default function DailyReportsModule() {
               value={date}
               max={today}
               onChange={(e) => e.target.value && setDate(e.target.value)}
-              className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-slate-800"
+              className="input w-auto py-1.5"
             />
           </label>
           <button
             type="button"
             onClick={load}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+            className="btn btn-secondary"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} aria-hidden /> Muat ulang
           </button>
@@ -334,18 +334,18 @@ function UploadDialog({
             maxLength={500}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800 focus:border-amber-500"
+            className="input"
           />
         </label>
-        {error && <p role="alert" className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-rose-800">{error}</p>}
+        {error && <p role="alert" className="alert-error">{error}</p>}
         <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
-          <button type="button" disabled={saving} onClick={onClose} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">
+          <button type="button" disabled={saving} onClick={onClose} className="btn btn-ghost px-4">
             Batal
           </button>
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+            className="btn btn-primary px-4"
           >
             {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
             Kirim foto

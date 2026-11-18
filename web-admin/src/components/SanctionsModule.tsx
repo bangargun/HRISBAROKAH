@@ -112,20 +112,20 @@ export default function SanctionsModule({ showToast }: { showToast: (msg: string
     <div className="space-y-4 text-sm">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex rounded-md border border-slate-300 bg-white p-0.5" role="group" aria-label="Masa berlaku">
+          <div className="segmented" role="group" aria-label="Masa berlaku">
             {(['active', 'all'] as const).map((v) => (
               <button
                 key={v}
                 type="button"
                 aria-pressed={view === v}
                 onClick={() => setView(v)}
-                className={`rounded px-3 py-1.5 font-medium ${view === v ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'}`}
+                className="segmented-item"
               >
                 {v === 'active' ? 'Masih berlaku' : 'Semua'}
               </button>
             ))}
           </div>
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden />
             <label className="sr-only" htmlFor="sp-search">Cari surat</label>
             <input
@@ -134,7 +134,7 @@ export default function SanctionsModule({ showToast }: { showToast: (msg: string
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="Cari nama, NIK, nomor surat, cabang"
-              className="w-72 rounded-md border border-slate-300 bg-white py-2 pl-9 pr-3 text-slate-800 placeholder-slate-400 focus:border-amber-500"
+              className="input pl-9 sm:w-72"
             />
           </div>
         </div>
@@ -142,14 +142,14 @@ export default function SanctionsModule({ showToast }: { showToast: (msg: string
           <button
             type="button"
             onClick={() => setIssuing(true)}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-amber-500 px-3 py-1.5 font-medium text-slate-950 hover:bg-amber-400"
+            className="btn btn-primary shrink-0"
           >
             <Plus className="h-4 w-4" aria-hidden /> Terbitkan SP
           </button>
         )}
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+      <div className="card overflow-hidden">
         {loadError ? (
           <p role="alert" className="p-10 text-center text-rose-700">Gagal memuat surat: {loadError}</p>
         ) : rows === null ? (
@@ -166,7 +166,7 @@ export default function SanctionsModule({ showToast }: { showToast: (msg: string
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase text-slate-600">
+                <tr className="table-head">
                   <th scope="col" className="px-4 py-3">Surat</th>
                   <th scope="col" className="px-4 py-3">Karyawan</th>
                   <th scope="col" className="px-4 py-3">Pelanggaran</th>
@@ -247,16 +247,16 @@ export default function SanctionsModule({ showToast }: { showToast: (msg: string
           <p className="text-slate-700">
             Surat untuk {cancelling.employee.fullName} dihapus permanen. Gunakan hanya untuk surat yang salah terbit.
           </p>
-          {actionError && <p role="alert" className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-rose-800">{actionError}</p>}
+          {actionError && <p role="alert" className="alert-error">{actionError}</p>}
           <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
-            <button type="button" disabled={busy} onClick={() => setCancelling(null)} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">
+            <button type="button" disabled={busy} onClick={() => setCancelling(null)} className="btn btn-ghost px-4">
               Kembali
             </button>
             <button
               type="button"
               disabled={busy}
               onClick={() => cancel(cancelling)}
-              className="inline-flex items-center gap-1.5 rounded-md bg-rose-700 px-4 py-2 font-medium text-white hover:bg-rose-800 disabled:opacity-50"
+              className="btn btn-danger px-4"
             >
               {busy && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
               Batalkan surat
@@ -328,7 +328,7 @@ function IssueDialog({
     }
   }
 
-  const field = 'w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800 focus:border-amber-500';
+  const field = 'input';
 
   return (
     <Dialog wide title="Terbitkan surat peringatan" onClose={onClose}>
@@ -405,15 +405,15 @@ function IssueDialog({
               <span className="block text-xs text-slate-500">Paling lama 6 bulan sejak hari ini.</span>
             </label>
           </div>
-          {error && <p role="alert" className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-rose-800">{error}</p>}
+          {error && <p role="alert" className="alert-error">{error}</p>}
           <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
-            <button type="button" onClick={onClose} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">
+            <button type="button" onClick={onClose} className="btn btn-ghost px-4">
               Batal
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+              className="btn btn-primary px-4"
             >
               {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
               Terbitkan
@@ -498,13 +498,13 @@ ${s.witness ? `<div>Saksi,<br><br><br><br>${escapeHtml(s.witness)}</div>` : ''}
         </p>
       </div>
       <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
-        <button type="button" onClick={onClose} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">
+        <button type="button" onClick={onClose} className="btn btn-ghost px-4">
           Tutup
         </button>
         <button
           type="button"
           onClick={print}
-          className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800"
+          className="btn btn-primary px-4"
         >
           <Printer className="h-4 w-4" aria-hidden /> Cetak
         </button>

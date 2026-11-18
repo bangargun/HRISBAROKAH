@@ -6,7 +6,7 @@ import { apiFetch } from '@/lib/api';
 import { type SessionUser, updateSession } from '@/lib/auth';
 import Dialog from '@/components/Dialog';
 
-const field = 'w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800 focus:border-amber-500';
+const field = 'input';
 
 /** Akun saya: ganti password dan username akun yang sedang masuk. */
 export default function AccountDialog({
@@ -72,7 +72,7 @@ export default function AccountDialog({
       <p className="text-slate-600">
         Masuk sebagai <span className="font-mono font-medium text-slate-900">{user.username}</span>
       </p>
-      <div className="inline-flex rounded-md border border-slate-300 bg-white p-0.5" role="group" aria-label="Pengaturan akun">
+      <div className="segmented" role="group" aria-label="Pengaturan akun">
         {(['password', 'username'] as const).map((t) => (
           <button
             key={t}
@@ -82,7 +82,7 @@ export default function AccountDialog({
               setTab(t);
               setNotice(null);
             }}
-            className={`rounded px-3 py-1.5 font-medium ${tab === t ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'}`}
+            className="segmented-item"
           >
             {t === 'password' ? 'Ganti password' : 'Ganti username'}
           </button>
@@ -143,10 +143,10 @@ function Footer({ busy, notice, onClose, label }: { busy: boolean; notice: { ok:
         </p>
       )}
       <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
-        <button type="button" disabled={busy} onClick={onClose} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">
+        <button type="button" disabled={busy} onClick={onClose} className="btn btn-ghost px-4">
           Tutup
         </button>
-        <button type="submit" disabled={busy} className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800 disabled:opacity-50">
+        <button type="submit" disabled={busy} className="btn btn-primary px-4">
           {busy && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
           {label}
         </button>

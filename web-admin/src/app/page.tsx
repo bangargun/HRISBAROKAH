@@ -371,7 +371,7 @@ export default function AdminDashboard() {
       title: 'Klausul Jadwal Roster, Kuota Libur Cabang & Denda Peak Season (SOP-HR-003)',
       category: 'Jam Kerja & Operasional',
       badge: 'SOP-HR-003',
-      badgeColor: 'bg-blue-50 text-blue-700 border-blue-200',
+      badgeColor: 'bg-sky-50 text-sky-700 border-sky-200',
       text: 'Karyawan bersedia mematuhi sistem shift kerja operasional restoran dan jatah libur reguler 2 hari per bulan pada hari kerja biasa (weekday). Kuota harian cabang diatur baku: cabang dengan < 8 staf maksimal 1 orang libur per hari; cabang dengan >= 8 staf maksimal 2 orang libur per hari (wajib beda stasiun kerja). Pengambilan libur di akhir pekan (Sabtu/Minggu) dikenakan sanksi denda Rp 200.000/hari, dan libur pada Hari Libur Nasional (yang dikonfirmasi resmi oleh manajemen melalui Surat Keterangan / Pengumuman Peak Season) dikenakan sanksi denda Rp 250.000/hari. Pengajuan libur mendadak (< H-3) pada weekday memotong jatah libur dan dikenakan denda Rp 50.000/hari. Apabila jatah libur bulanan habis dan mengambil izin tambahan, upah harian tidak dibayar serta dikenakan denda Rp 15.000/hari untuk staf atau Rp 25.000/hari untuk leader.',
       legalReference: 'SOP-HR-003 & PP No. 35 Tahun 2021 (Waktu Kerja & Operasional Resto)',
       createdAt: 'Standar SOP 2026',
@@ -391,7 +391,7 @@ export default function AdminDashboard() {
       title: 'Klausul Mutasi Antar-Outlet & Kontinuitas Masa Kerja (SOP-HR-005)',
       category: 'Penempatan & Mutasi',
       badge: 'Mutasi Cabang',
-      badgeColor: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+      badgeColor: 'bg-slate-50 text-slate-700 border-slate-200',
       text: 'Pemindahtugasan (mutasi) antar-outlet Barokah Group dilakukan tanpa pemutusan hubungan kerja. Masa kerja dihitung secara akumulatif sejak tanggal pertama bergabung di Barokah Group (tidak pernah reset ke nol), hak tunjangan lama bekerja (SOP-HR-005) tetap berlanjut penuh, dan presensi biometrik wajah otomatis disinkronkan ke outlet tujuan.',
       legalReference: 'PP No. 35 Tahun 2021 & SOP-HR-005 Barokah Culinary Group',
       createdAt: 'Standar SOP 2026',
@@ -411,7 +411,7 @@ export default function AdminDashboard() {
       title: 'Klausul Hak Cuti Tahunan Berjenjang Berdasarkan Masa Kerja (SOP-HR-007)',
       category: 'Waktu Kerja & Cuti Resto',
       badge: 'SOP-HR-007',
-      badgeColor: 'bg-teal-50 text-teal-800 border-teal-200',
+      badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
       text: 'PIHAK KEDUA yang telah memiliki masa kerja minimal 1 (satu) tahun berhak atas Cuti Tahunan Berjenjang dengan upah terhitung (tetap dibayar penuh) sesuai SOP-HR-007: masa kerja 1 tahun berhak atas 1 hari cuti, masa kerja 2 tahun berhak atas 2 hari cuti, dan bertambah 1 hari untuk setiap kelipatan 1 tahun masa kerja seterusnya. Pengambilan cuti tahunan tunduk pada guardrails operasional ketat: (a) Tidak dapat digabungkan dengan jatah libur reguler bulanan; (b) Tidak dapat diambil pada akhir pekan (weekend: Sabtu atau Minggu); (c) Tidak dapat diambil pada Hari Libur Nasional / Tanggal Merah; dan (d) Tidak dapat menyambung sebelum atau sesudah libur Hari Raya Idul Fitri (Lebaran). Pengajuan wajib dilakukan minimal H-7 dan disetujui Kepala Cabang serta HRD.',
       legalReference: 'SOP-HR-007 & UU Ketenagakerjaan (Hak Cuti Tahunan Berbayar)',
       createdAt: 'Standar SOP 2026',
@@ -770,7 +770,7 @@ export default function AdminDashboard() {
         i.id === item.id ? { ...i, sentToHq: true, sentAt: timeStr } : i
       )
     );
-    showToast(`📤 Foto "${item.title}" berhasil dikirim langsung ke HQ pada pukul ${timeStr}!`);
+    showToast(`Foto "${item.title}" berhasil dikirim langsung ke HQ pada pukul ${timeStr}!`);
   };
 
   // Handler Kirim Sekaligus 14 Foto (Batch Submit All)
@@ -781,7 +781,7 @@ export default function AdminDashboard() {
       prev.map((i) => (i.completed ? { ...i, sentToHq: true, sentAt: i.sentAt || timeStr } : i))
     );
     const count = dailyReportItems.filter((i) => i.completed).length;
-    showToast(`🚀 Seluruh ${count} foto operasional terverifikasi berhasil dikirim ke HQ!`);
+    showToast(`Seluruh ${count} foto operasional terverifikasi berhasil dikirim ke HQ!`);
   };
 
   // =========================================================================
@@ -816,7 +816,7 @@ export default function AdminDashboard() {
 
   const handleMarkAllMessagesRead = () => {
     setKruInboxMessages((prev) => prev.map((m) => ({ ...m, isRead: true })));
-    showToast('📬 Semua pesan di Kotak Masuk telah ditandai dibaca.');
+    showToast('Semua pesan di Kotak Masuk telah ditandai dibaca.');
   };
 
   // =========================================================================
@@ -1006,10 +1006,10 @@ export default function AdminDashboard() {
       setTimeClockStatus('clocked_in');
       setTimeClockInTime(timeStr);
       setTimeClockLiveSeconds(0);
-      showToast(`🟢 Clock-in Berhasil! Sesi kerja Anda mulai tercatat pada ${timeStr}`);
+      showToast(`Clock-in Berhasil! Sesi kerja Anda mulai tercatat pada ${timeStr}`);
     } else {
       setTimeClockStatus('not_clocked');
-      showToast('🔴 Clock-out Berhasil! Rekap kehadiran shift hari ini telah disimpan ke server.');
+      showToast('Clock-out Berhasil! Rekap kehadiran shift hari ini telah disimpan ke server.');
     }
   };
 
@@ -1036,7 +1036,7 @@ export default function AdminDashboard() {
     setSageKudosList((prev) => [newEntry, ...prev]);
     setIsKudosModalOpen(false);
     setNewKudosMessage('');
-    showToast(`⭐ Kudos berhasil dikirim kepada ${newKudosRecipient}! Tampil di dashboard kru.`);
+    showToast(`Kudos berhasil dikirim kepada ${newKudosRecipient}! Tampil di dashboard kru.`);
   };
 
   // State: Filter Navigasi Shift 1 Bulan Penuh (Buka Buku 26 Sep s/d Tutup Buku 25 Okt)
@@ -1059,7 +1059,7 @@ export default function AdminDashboard() {
     setSageMeetings((prev) => [...prev, newMtg]);
     setIs1to1ModalOpen(false);
     setNew1to1Topic('');
-    showToast(`📅 Sesi 1-to-1 dengan ${new1to1Employee} berhasil dijadwalkan!`);
+    showToast(`Sesi 1-to-1 dengan ${new1to1Employee} berhasil dijadwalkan!`);
   };
 
   // Full Roster & Payroll Directory per Outlet untuk Cetak PDF Resmi (Dinamis dari Master Data)
@@ -1342,7 +1342,7 @@ export default function AdminDashboard() {
           <div class="header-left">
             <div>
               <h1 class="title">
-                ${isAllOutlets ? 'LAPORAN REKAPITULASI PAYROLL KONSOLIDASI SELURUH CABANG' : `LAPORAN REKAPITULASI PAYROLL & KEHADIRAN — ${activeOutletData?.outletName.toUpperCase()}`}
+                ${isAllOutlets ? 'LAPORAN REKAPITULASI PAYROLL KONSOLIDASI SELURUH CABANG' : `LAPORAN REKAPITULASI PAYROLL & KEHADIRAN:${activeOutletData?.outletName.toUpperCase()}`}
               </h1>
               <p class="subtitle">
                 <strong>Unit:</strong> ${isAllOutlets ? 'Konsolidasi 4 Outlet Restoran (Senopati, Kelapa Gading, BSD, Bintaro)' : `${activeOutletData?.outletName} • ${activeOutletData?.address}`}
@@ -1460,7 +1460,7 @@ export default function AdminDashboard() {
               <div style="margin-bottom: 20px; page-break-inside: avoid;">
                 ${isAllOutlets ? `
                   <div style="background: #e2e8f0; padding: 6px 10px; font-weight: 800; font-size: 10px; border-radius: 4px; margin-top: 10px; display: flex; justify-content: space-between;">
-                    <span>🏢 ${out.outletName.toUpperCase()} — ${out.address}</span>
+                    <span>${out.outletName.toUpperCase()}:${out.address}</span>
                     <span>Pimpinan: ${out.leader} • ${out.employees.length} Kru</span>
                   </div>
                 ` : ''}
@@ -1587,7 +1587,7 @@ export default function AdminDashboard() {
     printWindow.document.open();
     printWindow.document.write(htmlContent);
     printWindow.document.close();
-    showToast(`📄 Dokumen Resmi Payroll ${isAllOutlets ? 'Semua Cabang' : activeOutletData?.outletName} (${selectedMonth}) siap dicetak / disimpan PDF!`);
+    showToast(`Dokumen Resmi Payroll ${isAllOutlets ? 'Semua Cabang' : activeOutletData?.outletName} (${selectedMonth}) siap dicetak / disimpan PDF!`);
   };
 
   const handleDownloadPayrollBudgetPdf = () => {
@@ -1723,7 +1723,7 @@ export default function AdminDashboard() {
         setKruPrayerTurnMinutesRemaining((prev) => {
           if (prev <= 1) {
             setKruPrayerTurnActive(false);
-            showToast('🎉 Waktu giliran sholat selesai (15 Menit). Silakan kembali ke station dan infokan rekan berikutnya!');
+            showToast('Waktu giliran sholat selesai (15 Menit). Silakan kembali ke station dan infokan rekan berikutnya!');
             return 15;
           }
           return prev - 1;
@@ -2653,7 +2653,7 @@ export default function AdminDashboard() {
       description: isOpen
         ? `Jendela kasbon aktif (Tgl ${startDay} s.d. ${endDay}). Tersisa ${remaining} hari lagi sebelum cut-off.`
         : `Jendela kasbon tertutup. Pengajuan hanya dibuka tgl ${startDay} s.d. ${endDay} (H+10 setelah gajian & H-10 sebelum gajian).`,
-      statusBadge: isOpen ? '✓ JENDELA KASBON TERBUKA' : '🔒 JENDELA KASBON TERTUTUP',
+      statusBadge: isOpen ? '✓ JENDELA KASBON TERBUKA' : 'JENDELA KASBON TERTUTUP',
       badgeColor: isOpen
         ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
         : 'bg-rose-50 text-rose-800 border-rose-300',
@@ -3024,7 +3024,7 @@ export default function AdminDashboard() {
     setBreakStaffList(updated);
     setBreakRandomCounter((prev) => prev + 1);
     showToast(
-      '🎲 Jadwal Istirahat Bergantian (12:00 - 18:00 WIB) berhasil diacak otomatis dengan kepatuhan: Produksi ✓ Waiters ✓ Kasir/Perempuan ✓'
+      'Jadwal Istirahat Bergantian (12:00 - 18:00 WIB) berhasil diacak otomatis dengan kepatuhan: Produksi ✓ Waiters ✓ Kasir/Perempuan ✓'
     );
   };
 
@@ -3231,7 +3231,7 @@ export default function AdminDashboard() {
       rawGeneratedDoc: newSop,
     };
     setSopList((prev: any) => [newEntry, ...prev]);
-    showToast(`✅ Berhasil! "${newSop.title}" telah didaftarkan ke Pustaka Master SOP Barokah Grup.`);
+    showToast(`Berhasil! "${newSop.title}" telah didaftarkan ke Pustaka Master SOP Barokah Grup.`);
   };
 
   // =========================================================
@@ -3548,7 +3548,7 @@ export default function AdminDashboard() {
         strengths = ['Akurasi penghitungan kasir dan rekonsiliasi kas harian', 'Penegakan standar sanitasi dan Food Safety HACCP', 'Pengendalian HPP, waste log, dan pencegahan selisih stok'];
         developmentAreas = ['Belajar lebih fleksibel ketika menghadapi situasi darurat di lapangan', 'Hindari overthinking saat butuh keputusan cepat'];
         careerRecommendation = 'Posisi Ideal: Asisten Supervisor (Audit Kepatuhan & Mutu), Kasir Audit Closing, atau Inventory Controller Cabang';
-        badgeColor = 'bg-indigo-100 text-indigo-800 border-indigo-300';
+        badgeColor = 'bg-slate-100 text-slate-800 border-slate-300';
         break;
     }
 
@@ -3638,7 +3638,7 @@ export default function AdminDashboard() {
               onClick={() => setChartMode('radar')}
               className={`px-2.5 py-1 rounded-lg transition flex items-center gap-1 ${
                 chartMode === 'radar'
-                  ? isDark ? 'bg-purple-600 text-white shadow-xs' : 'bg-white text-purple-900 shadow-xs'
+                  ? isDark ? 'bg-ink-800 text-white shadow-xs' : 'bg-white text-slate-900 shadow-xs'
                   : isDark ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -3650,7 +3650,7 @@ export default function AdminDashboard() {
               onClick={() => setChartMode('donut')}
               className={`px-2.5 py-1 rounded-lg transition flex items-center gap-1 ${
                 chartMode === 'donut'
-                  ? isDark ? 'bg-purple-600 text-white shadow-xs' : 'bg-white text-purple-900 shadow-xs'
+                  ? isDark ? 'bg-ink-800 text-white shadow-xs' : 'bg-white text-slate-900 shadow-xs'
                   : isDark ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -3782,7 +3782,7 @@ export default function AdminDashboard() {
                 x={donutCenter}
                 y={donutCenter - 4}
                 textAnchor="middle"
-                className={`font-black ${isDark ? 'fill-white' : 'fill-slate-900'}`}
+                className={`font-semibold ${isDark ? 'fill-white' : 'fill-slate-900'}`}
                 fontSize={size === 'sm' ? '12px' : '15px'}
               >
                 {profileCode || dominantTrait}
@@ -3801,7 +3801,7 @@ export default function AdminDashboard() {
         )}
 
         {/* Legend 4 Kuadran */}
-        <div className="grid grid-cols-2 gap-x-3 gap-y-1 mt-2 text-[10px] font-bold">
+        <div className="grid grid-cols-2 gap-x-3 gap-y-1 mt-2 text-xs font-bold">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
             <span className={isDark ? 'text-rose-300' : 'text-rose-700'}>Dominance: {percentages.D}%</span>
@@ -4095,7 +4095,7 @@ Libur pada hari Sabtu dan Minggu (Weekend) dilarang keras karena merupakan jam s
       enrolledStaff: 0,
       passedStaff: 0,
       avgScore: 0,
-      thumbnailBadge: '⭐ Leader Master',
+      thumbnailBadge: 'Leader Master',
       description: 'Penerapan Situational Leadership, teknik pre-shift briefing 7 menit, penanganan konflik antarkru, dan pembinaan kru baru probation.',
       targetRole: 'Kepala Cabang, SPV Shift, Captain & Talent Pool Kru',
       content: `PANDUAN KURIKULUM KEPEMIMPINAN RESTORAN BAROKAH GRUP (LEAD-01):
@@ -4323,7 +4323,7 @@ Libur pada hari Sabtu dan Minggu (Weekend) dilarang keras karena merupakan jam s
   } | null>(null);
 
   // =========================================================
-  // KUIS MINGGUAN WAJIB (WEEKLY ROUTINE QUIZ — TANPA MODUL)
+  // KUIS MINGGUAN WAJIB (WEEKLY ROUTINE QUIZ:TANPA MODUL)
   // =========================================================
   interface WeeklyQuizQuestion {
     id: number;
@@ -4660,7 +4660,7 @@ Libur pada hari Sabtu dan Minggu (Weekend) dilarang keras karena merupakan jam s
 
   const [staffReportCards, setStaffReportCards] = useState<StaffReportCardItem[]>(initialStaffReportCards);
 
-  // Ringkasan nilai pelatihan dari rapor yang ada; null bila belum ada data (tampil "—", bukan NaN)
+  // Ringkasan nilai pelatihan dari rapor yang ada; null bila belum ada data (tampil "–", bukan NaN)
   const trainingResults = staffReportCards.flatMap((c) => c.moduleResults);
   const trainingAvgScore = staffReportCards.length
     ? Math.round((staffReportCards.reduce((acc, c) => acc + c.gpaScore, 0) / staffReportCards.length) * 10) / 10
@@ -4965,7 +4965,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
           enrolledStaff: 15,
           passedStaff: 0,
           avgScore: 0,
-          thumbnailBadge: '⭐ Leader Master',
+          thumbnailBadge: 'Leader Master',
           description: 'Penerapan Situational Leadership, teknik pre-shift briefing 7 menit, audit HPP food cost, dan de-eskalasi komplain tamu.',
           targetRole: 'Kepala Cabang, SPV Shift, Captain & Talent Pool Kru',
           content: `PANDUAN KEPEMIMPINAN RESTORAN BAROKAH GRUP:
@@ -5191,7 +5191,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       key: 'SUPERVISOR',
       name: 'Supervisor (Pengawas Operasional Area - SPV)',
       badge: 'Area Oversight & Audit',
-      badgeColor: 'bg-purple-100 text-purple-800 border-purple-200',
+      badgeColor: 'bg-slate-100 text-slate-800 border-slate-200',
       description: 'Penerima dan auditor laporan rutin harian (routine daily report foto opening, mid, closing) dari Kepala Cabang, evaluasi standar rasa & kebersihan. Tidak berwenang ACC kasbon/roster/libur.',
       assignedUsersCount: 2,
     },
@@ -5207,7 +5207,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       key: 'KEPALA_BAGIAN',
       name: 'Kepala Bagian (Head Kitchen / Captain Service)',
       badge: 'Section Lead',
-      badgeColor: 'bg-blue-100 text-blue-800 border-blue-200',
+      badgeColor: 'bg-sky-100 text-sky-800 border-sky-200',
       description: 'Pengawasan stasiun kerja langsung di lantai cabang, checklist resep & gramatur, serta persetujuan taktis penukaran gelombang istirahat (break slot swap) antar kru se-shift.',
       assignedUsersCount: 6,
     },
@@ -5802,11 +5802,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
     const selectedEmp = employeesMasterList.find((emp) => emp.id === spEmpId);
     if (!selectedEmp) {
-      showToast('⚠️ Silakan pilih karyawan yang akan diberikan Surat Peringatan!');
+      showToast('Silakan pilih karyawan yang akan diberikan Surat Peringatan!');
       return;
     }
     if (!spViolation.trim()) {
-      showToast('⚠️ Kronologi pelanggaran wajib diisi secara rinci!');
+      showToast('Kronologi pelanggaran wajib diisi secara rinci!');
       return;
     }
 
@@ -5855,7 +5855,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
     setSpSupervisorNote('');
     setSpFineAmount(0);
 
-    showToast(`✅ ${spNumber} untuk ${selectedEmp.fullName} berhasil diterbitkan & diarsipkan!`);
+    showToast(`${spNumber} untuk ${selectedEmp.fullName} berhasil diterbitkan & diarsipkan!`);
     setActiveSubTab('active-sp');
   };
 
@@ -6231,7 +6231,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       title: 'Pasal 1: Posisi Tugas, Station & Penempatan Outlet',
       category: 'Penempatan & Hierarki',
       badge: 'Kedudukan Staf',
-      badgeColor: 'bg-blue-50 text-blue-700 border-blue-200',
+      badgeColor: 'bg-sky-50 text-sky-700 border-sky-200',
       description: `Pihak Kedua dipekerjakan sebagai "${currentKruStaff.role}" di unit restoran "${currentKruStaff.outlet}". Pihak Kedua bersedia menjalankan seluruh tugas operasional harian dengan penuh tanggung jawab di bawah koordinasi Supervisor Cabang dan manajemen PT Barokah Kuliner Nusantara.`,
       highlightPoints: [
         `Posisi Penugasan: ${currentKruStaff.role}`,
@@ -6245,7 +6245,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       title: 'Pasal 2: Waktu Kerja, Sistem Shift & Kompensasi Lembur',
       category: 'Jam Kerja & Roster',
       badge: 'Jadwal Kerja',
-      badgeColor: 'bg-purple-50 text-purple-700 border-purple-200',
+      badgeColor: 'bg-slate-50 text-slate-700 border-slate-200',
       description: 'Waktu kerja normal adalah 8 (delapan) jam sehari dalam skema 6 hari kerja dan 1 hari istirahat mingguan sesuai jadwal smart roster. Karyawan berhak atas jeda istirahat 60 menit per shift. Penugasan lembur operasional saat event khusus atau akhir pekan diperhitungkan transparan dan dibayarkan pada slip gaji.',
       highlightPoints: [
         'Durasi Shift: 8 Jam Kerja Efektif per hari',
@@ -6315,7 +6315,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       title: 'Pasal 7: Ketentuan Izin Pulang Setengah Hari & Kehadiran Parsial',
       category: 'Tata Tertib Kehadiran',
       badge: 'SOP Bab 5',
-      badgeColor: 'bg-blue-50 text-blue-700 border-blue-200',
+      badgeColor: 'bg-sky-50 text-sky-700 border-sky-200',
       description: 'Pihak Kedua dapat mengajukan izin pulang setengah hari untuk keperluan mendesak atau kondisi sakit mendadak dengan persetujuan tertulis Kepala Cabang. Pada hari kerja biasa (weekday), kehadiran > 50% jam kerja tetap memperoleh hak upah pokok harian, namun uang makan dinas (Rp 20.000) dan upah lembur otomatis ditiadakan. Pada weekend/hari libur nasional, kehadiran 25%-50% jam kerja dikenakan denda Rp 100.000,- dan kehadiran < 25% jam kerja dikategorikan mangkir serta dikenakan SP1 dan denda Rp 200.000,-.',
       highlightPoints: [
         'Weekday >50%: Gaji pokok harian dapat, uang makan & lembur Rp 0',
@@ -6329,10 +6329,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
   const sessionRole = getSessionUser()?.role;
   const requestsAwaitingMe = adminRequests.requests.filter((r) => actionFor(r, sessionRole)).length;
 
-  const btnPrimary =
-    'inline-flex items-center gap-1.5 rounded-md bg-amber-500 px-3 py-1.5 text-sm font-medium text-slate-950 hover:bg-amber-400';
-  const btnSecondary =
-    'inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50';
+  const btnPrimary = 'btn btn-primary';
+  const btnSecondary = 'btn btn-secondary';
 
   const moduleActions =
     activeMenu === 'employees' ? (
@@ -6360,13 +6358,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       title={menuConfig[activeMenu].title}
       counts={{ requests: requestsAwaitingMe }}
     >
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 text-xs border border-slate-700">
-          <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-          <span className="font-medium">{toastMessage}</span>
-        </div>
-      )}
+      {/* Notifikasi singkat; satu-satunya elemen melayang, jadi satu-satunya yang berbayang */}
+      <div role="status" aria-live="polite" className="pointer-events-none fixed right-4 top-4 z-50 max-w-sm">
+        {toastMessage && (
+          <div className="flex items-start gap-2 rounded-lg bg-ink-800 px-4 py-3 text-sm text-white shadow-lg">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" aria-hidden />
+            <span>{toastMessage}</span>
+          </div>
+        )}
+      </div>
 
 
         {activeMenu !== 'hub' && (
@@ -6383,8 +6383,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     aria-current={isSubActive ? 'page' : undefined}
                     className={`shrink-0 whitespace-nowrap border-b-2 px-3 py-3 text-sm transition-colors ${
                       isSubActive
-                        ? 'border-amber-500 font-medium text-slate-900'
-                        : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800'
+                        ? 'border-brand-500 font-medium text-slate-900'
+                        : 'border-transparent text-slate-600 hover:border-slate-300 hover:text-slate-900'
                     }`}
                   >
                     {sub.label}
@@ -6512,84 +6512,49 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               ) : (
                 <div className="space-y-5">
                   {/* Official SOP Banner */}
-                  <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-slate-800 rounded-2xl p-5 text-white shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950 px-2 py-0.5 rounded">
-                          STANDAR OPERASIONAL BAKU
-                        </span>
-                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                          <ShieldCheck className="h-3.5 w-3.5" />
-                          Pedoman Resmi Barokah Grup &amp; Ayam Pecak 2001 Seafood
-                        </span>
+                  <section className="card space-y-4 p-4" aria-labelledby="sop-library-heading">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                      <div className="space-y-1">
+                        <h2 id="sop-library-heading" className="text-base font-semibold text-slate-900">
+                          Pustaka SOP
+                        </h2>
+                        <p className="max-w-2xl text-sm text-slate-600">
+                          Pedoman resmi Barokah Grup &amp; Ayam Pecak 2001 Seafood untuk seluruh staf FOH dan BOH. Aturan di sini dipakai
+                          untuk validasi presensi, pengajuan cuti/libur, dan komponen denda pada payroll.
+                        </p>
                       </div>
-                      <h3 className="text-lg font-black text-white tracking-tight">
-                        PUSTAKA STANDAR OPERASIONAL PROSEDUR (SOP)
-                      </h3>
-                      <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-                        Pedoman kerja baku yang mengikat seluruh staf FOH dan BOH. Seluruh aturan operasional terhubung langsung dengan sistem validasi presensi, pengajuan cuti/libur, dan komponen denda pada payroll.
-                      </p>
+                      <button type="button" onClick={() => setActiveSubTab('ai-sop-generator')} className="btn btn-secondary shrink-0">
+                        Buka Template SOP
+                      </button>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2 shrink-0">
-                      <button
-                        onClick={() => setActiveSubTab('ai-sop-generator')}
-                        className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-3.5 py-2.5 rounded-xl font-extrabold flex items-center space-x-1.5 shadow-md transition-all ring-2 ring-amber-300"
-                      >
-                        <Sparkles className="h-4 w-4 fill-slate-950" />
-                        <span>✨ AI SOP Studio</span>
-                      </button>
-                      <button
-                        onClick={() => setViewingOfficialSop008Doc(true)}
-                        className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3.5 py-2.5 rounded-xl font-bold flex items-center space-x-1.5 transition-all shadow-sm"
-                      >
-                        <ShieldAlert className="h-4 w-4 text-emerald-200" />
-                        <span>SOP Lupa Absen (008)</span>
-                      </button>
-                      <button
-                        onClick={() => setViewingOfficialSopAnnualLeaveDoc(true)}
-                        className="bg-teal-600 hover:bg-teal-500 text-white text-xs px-3.5 py-2.5 rounded-xl font-bold flex items-center space-x-1.5 transition-all shadow-sm"
-                      >
-                        <Calendar className="h-4 w-4 text-teal-200" />
-                        <span>SOP Cuti Tahunan (007)</span>
-                      </button>
-                      <button
-                        onClick={() => setViewingOfficialSopUnpaidDoc(true)}
-                        className="bg-sky-600 hover:bg-sky-500 text-white text-xs px-3.5 py-2.5 rounded-xl font-bold flex items-center space-x-1.5 transition-all shadow-sm"
-                      >
-                        <FileText className="h-4 w-4 text-sky-200" />
-                        <span>SOP Cuti &amp; Sakit (006)</span>
-                      </button>
-                      <button
-                        onClick={() => setViewingOfficialSopTenureDoc(true)}
-                        className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-3.5 py-2.5 rounded-xl font-black flex items-center space-x-1.5 shadow-sm transition-all"
-                      >
-                        <Award className="h-4 w-4 text-slate-950" />
-                        <span>SOP Tunjangan Lama Bekerja</span>
-                      </button>
-                      <button
-                        onClick={() => setViewingOfficialSopOnboardingDoc(true)}
-                        className="bg-amber-600 hover:bg-amber-500 text-white text-xs px-3.5 py-2.5 rounded-xl font-bold flex items-center space-x-1.5 transition-all shadow-sm"
-                      >
-                        <Wallet className="h-4 w-4 text-amber-200" />
-                        <span>SOP Gaji Kru Baru (Onboarding)</span>
-                      </button>
-                      <button
-                        onClick={() => setViewingOfficialSop2026Doc(true)}
-                        className="bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs px-3.5 py-2.5 rounded-xl font-bold flex items-center space-x-1.5 transition-all border border-slate-700"
-                      >
-                        <FileText className="h-4 w-4" />
-                        <span>SOP Jam Kerja 2026</span>
-                      </button>
-                      <button
-                        onClick={() => setViewingOfficialSopDoc(true)}
-                        className="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-2.5 rounded-xl font-bold flex items-center space-x-1.5 transition-all border border-slate-700"
-                      >
-                        <BookOpen className="h-3.5 w-3.5 text-amber-400" />
-                        <span>Juknis Libur No. 001/V/2025</span>
-                      </button>
+                    <div>
+                      <p className="mb-2 text-xs font-medium text-slate-600">Naskah SOP resmi</p>
+                      <div className="flex flex-wrap gap-2">
+                        <button type="button" onClick={() => setViewingOfficialSop008Doc(true)} className="btn btn-sm btn-secondary">
+                          SOP Lupa Absen (008)
+                        </button>
+                        <button type="button" onClick={() => setViewingOfficialSopAnnualLeaveDoc(true)} className="btn btn-sm btn-secondary">
+                          SOP Cuti Tahunan (007)
+                        </button>
+                        <button type="button" onClick={() => setViewingOfficialSopUnpaidDoc(true)} className="btn btn-sm btn-secondary">
+                          SOP Cuti &amp; Sakit (006)
+                        </button>
+                        <button type="button" onClick={() => setViewingOfficialSopTenureDoc(true)} className="btn btn-sm btn-secondary">
+                          SOP Tunjangan Lama Bekerja
+                        </button>
+                        <button type="button" onClick={() => setViewingOfficialSopOnboardingDoc(true)} className="btn btn-sm btn-secondary">
+                          SOP Gaji Kru Baru (Onboarding)
+                        </button>
+                        <button type="button" onClick={() => setViewingOfficialSop2026Doc(true)} className="btn btn-sm btn-secondary">
+                          SOP Jam Kerja 2026
+                        </button>
+                        <button type="button" onClick={() => setViewingOfficialSopDoc(true)} className="btn btn-sm btn-secondary">
+                          Juknis Libur No. 001/V/2025
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  </section>
 
                   {/* Grid SOP Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -6606,82 +6571,46 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       return (
                         <div
                           key={sop.id}
-                          className={`rounded-2xl p-4 space-y-3 shadow-sm border transition-all ${
-                            isAiGenerated
-                              ? 'bg-gradient-to-b from-indigo-50/70 to-white border-indigo-300 ring-2 ring-indigo-400/20'
-                              : isOfficialAttendanceCorrection
-                              ? 'bg-gradient-to-b from-emerald-50 to-white border-emerald-500 ring-2 ring-emerald-500/40'
-                              : isOfficialAnnualLeave
-                              ? 'bg-gradient-to-b from-teal-50 to-white border-teal-500 ring-2 ring-teal-500/40'
-                              : isOfficialUnpaid
-                              ? 'bg-gradient-to-b from-sky-50 to-white border-sky-500 ring-2 ring-sky-500/40'
-                              : isOfficialTenure
-                              ? 'bg-gradient-to-b from-amber-50 to-white border-amber-500 ring-2 ring-amber-500/40'
-                              : isOfficialOnboarding
-                              ? 'bg-gradient-to-b from-amber-50 to-white border-amber-400 ring-2 ring-amber-500/30'
-                              : isOfficial2026
-                              ? 'bg-gradient-to-b from-amber-50/90 to-white border-amber-400 ring-2 ring-amber-500/30'
-                              : isOfficial2025
-                              ? 'bg-gradient-to-b from-slate-50 to-white border-amber-300'
-                              : 'bg-white border-slate-200 hover:border-slate-300'
+                          className={`rounded-lg border bg-white p-4 space-y-3 ${
+                            isOfficial ? 'border-slate-300' : 'border-slate-200 hover:border-slate-300'
                           }`}
                         >
                           <div className="flex justify-between items-start gap-2">
-                            <span
-                              className={`text-[9px] font-extrabold px-2 py-0.5 rounded border uppercase ${
-                                isAiGenerated
-                                  ? 'text-indigo-950 bg-indigo-100 border-indigo-300'
-                                  : isOfficialAttendanceCorrection
-                                  ? 'text-emerald-950 bg-emerald-200 border-emerald-400 font-black'
-                                  : isOfficialAnnualLeave
-                                  ? 'text-teal-950 bg-teal-200 border-teal-400 font-black'
-                                  : isOfficialUnpaid
-                                  ? 'text-sky-950 bg-sky-200 border-sky-400 font-black'
-                                  : isOfficialTenure
-                                  ? 'text-amber-950 bg-amber-300 border-amber-500 font-black'
-                                  : isOfficialOnboarding
-                                  ? 'text-amber-950 bg-amber-200 border-amber-400 font-black'
-                                  : isOfficial2026
-                                  ? 'text-amber-950 bg-amber-200 border-amber-400'
-                                  : isOfficial2025
-                                  ? 'text-amber-900 bg-amber-100 border-amber-300'
-                                  : 'text-slate-700 bg-slate-100 border-slate-200'
-                              }`}
-                            >
-                              {isAiGenerated ? '✨ AI RESTO SOP' : sop.category.split('(')[0]}
+                            <span className={`badge ${isOfficial ? 'badge-success' : 'badge-neutral'}`}>
+                              {isAiGenerated ? 'Dari template' : sop.category.split('(')[0]}
                             </span>
-                            <span className="text-[10px] font-mono font-bold text-slate-500">{sop.id}</span>
+                            <span className="text-xs font-mono font-bold text-slate-500">{sop.id}</span>
                           </div>
 
                           <div>
                             {sop.skNumber && (
-                              <span className="text-[9px] font-mono text-amber-700 font-bold block mb-0.5">
+                              <span className="text-xs font-mono text-amber-700 font-bold block mb-0.5">
                                 SK: {sop.skNumber}
                               </span>
                             )}
-                            <h4 className="font-extrabold text-xs text-slate-900 leading-snug">
+                            <h4 className="font-semibold text-xs text-slate-900 leading-snug">
                               {sop.title}
                             </h4>
                           </div>
 
-                          <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                          <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
                             {sop.summary}
                           </p>
 
                           <div className="space-y-1 pt-1 border-t border-slate-100">
-                            <div className="flex justify-between text-[11px]">
+                            <div className="flex justify-between text-xs">
                               <span className="text-slate-500">Tanda Tangan Staf:</span>
                               <span className="font-bold text-emerald-700">{sop.signedCount} ({sop.compliance}%)</span>
                             </div>
                             <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                               <div
-                                className={`h-2 rounded-full ${isAiGenerated ? 'bg-indigo-600' : isOfficialAnnualLeave ? 'bg-teal-500' : isOfficialUnpaid ? 'bg-sky-500' : isOfficial ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                                className={`h-2 rounded-full ${isAiGenerated ? 'bg-ink-800' : isOfficialAnnualLeave ? 'bg-ink-800' : isOfficialUnpaid ? 'bg-sky-500' : isOfficial ? 'bg-amber-500' : 'bg-emerald-500'}`}
                                 style={{ width: `${sop.compliance}%` }}
                               ></div>
                             </div>
                           </div>
 
-                          <div className="flex justify-between items-center pt-2 text-[10px] text-slate-400 border-t border-slate-100">
+                          <div className="flex justify-between items-center pt-2 text-xs text-slate-500 border-t border-slate-100">
                             <span>Disahkan: {sop.updatedAt}</span>
                             <button
                               onClick={() => {
@@ -6719,12 +6648,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                   });
                                 }
                               }}
-                              className={`font-extrabold text-xs flex items-center space-x-1 ${
+                              className={`font-semibold text-xs flex items-center space-x-1 ${
                                 isAiGenerated
-                                  ? 'text-indigo-700 hover:text-indigo-900 bg-indigo-50 px-2 py-1 rounded-lg'
+                                  ? 'text-slate-700 hover:text-slate-900 bg-slate-50 px-2 py-1 rounded-lg'
                                   : isOfficial
                                   ? 'text-amber-700 hover:text-amber-900 bg-amber-100 px-2 py-1 rounded-lg'
-                                  : 'text-blue-600 hover:text-blue-800'
+                                  : 'text-sky-600 hover:text-sky-800'
                               }`}
                             >
                               <span>{isOfficial ? 'Buka Naskah SOP' : 'Lihat Dokumen'}</span>
@@ -6751,74 +6680,65 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
           {activeMenu === 'development' && (
             <div className="space-y-6">
               {/* LMS Knowledge Hero Banner */}
-              <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-900/60 rounded-2xl p-5 text-white shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <section className="card flex flex-col justify-between gap-4 p-4 md:flex-row md:items-start" aria-labelledby="training-heading">
                 <div className="space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider bg-indigo-500 text-white px-2 py-0.5 rounded">
-                      LMS RESTORAN &amp; KNOWLEDGE BASE
-                    </span>
-                    <span className="text-xs text-indigo-300 font-bold flex items-center gap-1">
-                      <GraduationCap className="h-3.5 w-3.5 text-amber-400" />
-                      Kurikulum Standar Barokah Grup 2026
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-black text-white tracking-tight">
-                    PUSAT PELATIHAN, RESEP BAKU &amp; SERTIFIKASI KRU
-                  </h3>
-                  <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-                    Tingkatkan standar keahlian {employeesMasterList.length} kru dapur (BOH) dan service (FOH). Setiap staf wajib menyelesaikan modul onboarding, memahami gramatur resep baku, dan lulus kuis evaluasi berkala untuk kenaikan tunjangan keahlian.
+                  <h2 id="training-heading" className="text-base font-semibold text-slate-900">
+                    Pelatihan, resep baku &amp; sertifikasi kru
+                  </h2>
+                  <p className="max-w-2xl text-sm text-slate-600">
+                    Kurikulum standar Barokah Grup 2026 untuk {employeesMasterList.length} kru dapur (BOH) dan service (FOH). Setiap staf
+                    menyelesaikan modul onboarding, memahami gramatur resep baku, dan lulus kuis evaluasi berkala untuk kenaikan
+                    tunjangan keahlian.
                   </p>
                 </div>
-
-                <div className="flex items-center space-x-2 shrink-0">
-                  <button
-                    onClick={() => {
-                      setSelectedTrainingModule(trainingModules[0]);
-                      setActiveQuizQuestionIndex(0);
-                      setQuizUserAnswers({});
-                      setQuizResultScore(null);
-                      setIsTrainingQuizModalOpen(true);
-                    }}
-                    className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-4 py-2.5 rounded-xl font-extrabold flex items-center space-x-2 shadow-md transition-all"
-                  >
-                    <Award className="h-4 w-4" />
-                    <span>Mulai Kuis Onboarding</span>
-                  </button>
-                </div>
-              </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedTrainingModule(trainingModules[0]);
+                    setActiveQuizQuestionIndex(0);
+                    setQuizUserAnswers({});
+                    setQuizResultScore(null);
+                    setIsTrainingQuizModalOpen(true);
+                  }}
+                  className="btn btn-primary shrink-0"
+                >
+                  <Award className="h-4 w-4" aria-hidden />
+                  Mulai Kuis Onboarding
+                </button>
+              </section>
 
               {/* LMS Metrics Strip */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-                  <p className="text-[11px] font-semibold text-slate-500 uppercase">Modul Kurikulum</p>
+                  <p className="text-xs font-medium text-slate-600">Modul Kurikulum</p>
                   <h4 className="text-xl font-bold text-slate-900 mt-0.5">4 Modul</h4>
-                  <span className="text-[11px] text-indigo-600 font-medium">BOH Dapur &amp; FOH Service</span>
+                  <span className="text-xs text-slate-600 font-medium">BOH Dapur &amp; FOH Service</span>
                 </div>
                 <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-                  <p className="text-[11px] font-semibold text-slate-500 uppercase">Total Kru Mengikuti</p>
+                  <p className="text-xs font-medium text-slate-600">Total Kru Mengikuti</p>
                   <h4 className="text-xl font-bold text-slate-900 mt-0.5">{employeesMasterList.length} Karyawan</h4>
-                  <span className="text-[11px] text-slate-500">Karyawan aktif</span>
+                  <span className="text-xs text-slate-500">Karyawan aktif</span>
                 </div>
                 <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-                  <p className="text-[11px] font-semibold text-slate-500 uppercase">Tingkat Kelulusan</p>
-                  <h4 className="text-xl font-bold text-emerald-600 mt-0.5">{trainingPassRate === null ? '—' : `${trainingPassRate}%`}</h4>
-                  <span className="text-[11px] text-slate-500">{trainingCertCount} sertifikat diterbitkan</span>
+                  <p className="text-xs font-medium text-slate-600">Tingkat Kelulusan</p>
+                  <h4 className="text-xl font-bold text-emerald-600 mt-0.5">{trainingPassRate === null ? '–' :`${trainingPassRate}%`}</h4>
+                  <span className="text-xs text-slate-500">{trainingCertCount} sertifikat diterbitkan</span>
                 </div>
                 <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-                  <p className="text-[11px] font-semibold text-slate-500 uppercase">Rata-Rata Nilai Kuis</p>
-                  <h4 className="text-xl font-bold text-indigo-600 mt-0.5">{trainingAvgScore === null ? '—' : `${trainingAvgScore} / 100`}</h4>
-                  <span className="text-[11px] text-amber-600 font-semibold">{trainingPredicate}</span>
+                  <p className="text-xs font-medium text-slate-600">Rata-Rata Nilai Kuis</p>
+                  <h4 className="text-xl font-bold text-slate-600 mt-0.5">{trainingAvgScore === null ? '–' :`${trainingAvgScore} / 100`}</h4>
+                  <span className="text-xs text-amber-600 font-semibold">{trainingPredicate}</span>
                 </div>
               </div>
 
               {/* SUB-TAB 1: TRAINING LMS COURSES & QUIZZES */}
               {activeSubTab === 'training-lms' && (
                 <div className="space-y-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-lg border border-slate-200">
                     <div>
-                      <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                      <h4 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
                         <span>Pustaka Modul Pelatihan &amp; Bank Soal Evaluasi</span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-50 text-slate-700 border border-slate-200">
                           {trainingModules.length} Modul Aktif
                         </span>
                       </h4>
@@ -6828,7 +6748,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => setIsGenerateModuleModalOpen(true)}
-                        className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 text-xs px-3.5 py-2 rounded-xl font-bold flex items-center space-x-1.5 shadow-sm transition-all"
+                        className="bg-brand-400 hover:bg-brand-300 text-slate-950 text-xs px-3.5 py-2 rounded-xl font-bold flex items-center space-x-1.5 shadow-sm transition-all"
                       >
                         <Sparkles className="h-4 w-4 text-slate-950" />
                         <span>Auto-Generate Modul</span>
@@ -6862,7 +6782,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           });
                           setIsModuleEditorOpen(true);
                         }}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3.5 py-2 rounded-xl font-bold flex items-center space-x-1.5 shadow-sm transition-all"
+                        className="bg-ink-800 hover:bg-ink-700 text-white text-xs px-3.5 py-2 rounded-xl font-bold flex items-center space-x-1.5 shadow-sm transition-all"
                       >
                         <Plus className="h-4 w-4" />
                         <span>+ Tambah Modul Baru</span>
@@ -6874,15 +6794,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     {trainingModules.map((mod) => (
                       <div
                         key={mod.id}
-                        className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                        className="bg-white rounded-lg border border-slate-200/90 p-5 shadow-xs hover:shadow-sm transition-all flex flex-col justify-between space-y-4"
                       >
                         <div className="space-y-3">
                           <div className="flex justify-between items-start gap-2">
-                            <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase">
+                            <span className="text-xs font-medium px-2 py-0.5 rounded bg-slate-100 text-slate-700">
                               {mod.code} • {mod.categoryLabel}
                             </span>
                             <div className="flex items-center space-x-1">
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
+                              <span className="text-xs font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
                                 {mod.thumbnailBadge}
                               </span>
                               <button
@@ -6890,7 +6810,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                   setEditingModuleData(JSON.parse(JSON.stringify(mod)));
                                   setIsModuleEditorOpen(true);
                                 }}
-                                className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
+                                className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-md transition-colors"
                                 title="Edit Modul & Soal Kuis"
                               >
                                 <Edit2 className="h-3.5 w-3.5" />
@@ -6909,29 +6829,29 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           </div>
 
                           <div>
-                            <h4 className="font-extrabold text-base text-slate-900 leading-snug">{mod.title}</h4>
+                            <h4 className="font-semibold text-base text-slate-900 leading-snug">{mod.title}</h4>
                             <p className="text-xs text-slate-500 mt-1 leading-relaxed">{mod.description}</p>
                           </div>
 
                           {/* Quick Info Tags */}
-                          <div className="flex flex-wrap gap-2 text-[11px]">
+                          <div className="flex flex-wrap gap-2 text-xs">
                             <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-700 font-medium">
                               ⏱️ Durasi: {mod.duration}
                             </span>
                             <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-700 font-medium">
-                              📚 {mod.lessonsCount} Sesi Pelajaran
+                              {mod.lessonsCount} Sesi Pelajaran
                             </span>
                             <span className="bg-amber-50 px-2 py-0.5 rounded text-amber-900 font-bold border border-amber-200">
-                              📝 {mod.sampleQuiz?.length || mod.quizQuestions} Soal Kuis (KKM {mod.passingScore}%)
+                              {mod.sampleQuiz?.length || mod.quizQuestions} Soal Kuis (KKM {mod.passingScore}%)
                             </span>
-                            <span className="bg-indigo-50 px-2 py-0.5 rounded text-indigo-700 font-bold">
-                              🎯 Target: {mod.targetRole}
+                            <span className="bg-slate-50 px-2 py-0.5 rounded text-slate-700 font-bold">
+                              Target: {mod.targetRole}
                             </span>
                           </div>
 
                           {/* Lessons Syllabus Checklist */}
                           <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1.5">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                            <span className="text-xs font-bold  text-slate-500 block">
                               Silabus Pelajaran:
                             </span>
                             {mod.modules.map((m, idx) => (
@@ -6940,7 +6860,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
                                   <span className="truncate">{m.title}</span>
                                 </span>
-                                <span className="text-slate-400 font-mono text-[10px] shrink-0">{m.duration}</span>
+                                <span className="text-slate-500 text-xs shrink-0">{m.duration}</span>
                               </div>
                             ))}
                           </div>
@@ -6955,11 +6875,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             </div>
                             <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                               <div
-                                className="h-2 rounded-full bg-gradient-to-r from-indigo-500 to-emerald-500"
+                                className="h-2 rounded-full bg-emerald-600"
                                 style={{ width: `${mod.enrolledStaff ? (mod.passedStaff / mod.enrolledStaff) * 100 : 0}%` }}
                               ></div>
                             </div>
-                            <div className="flex justify-between text-[10px] text-slate-400">
+                            <div className="flex justify-between text-xs text-slate-500">
                               <span>Rata-Rata Nilai: <strong className="text-emerald-700">{mod.avgScore}</strong></span>
                               <span>Standar Kelulusan: KKM {mod.passingScore}%</span>
                             </div>
@@ -6975,7 +6895,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               setQuizResultScore(null);
                               setIsTrainingQuizModalOpen(true);
                             }}
-                            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2 px-3 rounded-xl transition-all flex items-center justify-center space-x-1.5 shadow-xs"
+                            className="flex-1 bg-ink-800 hover:bg-ink-700 text-white font-bold text-xs py-2 px-3 rounded-xl transition-all flex items-center justify-center space-x-1.5 shadow-xs"
                           >
                             <Award className="h-3.5 w-3.5 text-amber-300" />
                             <span>Mulai Simulasi Kuis ({mod.sampleQuiz?.length || mod.quizQuestions} Soal)</span>
@@ -6985,7 +6905,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               setEditingModuleData(JSON.parse(JSON.stringify(mod)));
                               setIsModuleEditorOpen(true);
                             }}
-                            className="p-2 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors border border-indigo-200"
+                            className="p-2 text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200"
                             title="Edit Materi SOP & Soal Kuis"
                           >
                             <Edit2 className="h-4 w-4" />
@@ -7022,11 +6942,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* SUB-TAB: JADWAL TRAINING ONSITE CABANG */}
               {activeSubTab === 'training-schedules' && (
                 <div className="space-y-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-lg border border-slate-200">
                     <div>
-                      <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                      <h4 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
                         <span>Jadwal Pelatihan Onsite &amp; Sesi Tatap Muka Cabang</span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                           {trainingSchedules.length} Sesi Terjadwal
                         </span>
                       </h4>
@@ -7055,8 +6975,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         className="text-xs border border-slate-200 bg-white px-3 py-2 rounded-xl font-bold text-slate-700"
                       >
                         <option value="ALL">Semua Metode (Offline &amp; Online)</option>
-                        <option value="OFFLINE">🏢 Khusus Offline Onsite</option>
-                        <option value="ONLINE">💻 Khusus Online Webinar</option>
+                        <option value="OFFLINE">Khusus Offline Onsite</option>
+                        <option value="ONLINE">Khusus Online Webinar</option>
                       </select>
 
                       <button
@@ -7073,36 +6993,36 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   {/* Metrik Strip Jadwal */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div className="p-3 bg-white rounded-xl border border-slate-200">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">Total Sesi Pelatihan</span>
-                      <h5 className="text-lg font-black text-slate-900 mt-0.5">{trainingSchedules.length} Sesi</h5>
-                      <p className="text-[10px] text-indigo-700 font-semibold">
+                      <span className="text-xs font-medium text-slate-600">Total Sesi Pelatihan</span>
+                      <h5 className="text-lg font-semibold text-slate-900 mt-0.5">{trainingSchedules.length} Sesi</h5>
+                      <p className="text-xs text-slate-700 font-semibold">
                         {trainingSchedules.filter((s) => s.deliveryMode === 'ONLINE').length} Online • {trainingSchedules.filter((s) => s.deliveryMode === 'OFFLINE').length} Offline
                       </p>
                     </div>
                     <div className="p-3 bg-white rounded-xl border border-slate-200">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">Kru Terkonfirmasi Hadir</span>
-                      <h5 className="text-lg font-black text-emerald-600 mt-0.5">
+                      <span className="text-xs font-medium text-slate-600">Kru Terkonfirmasi Hadir</span>
+                      <h5 className="text-lg font-semibold text-emerald-600 mt-0.5">
                         {trainingSchedules.reduce((acc, s) => acc + s.confirmedStaff.length, 0)} Staf
                       </h5>
-                      <p className="text-[10px] text-emerald-700 font-semibold">Presensi Realtime dari HP Kru</p>
+                      <p className="text-xs text-emerald-700 font-semibold">Presensi Realtime dari HP Kru</p>
                     </div>
                     <div className="p-3 bg-white rounded-xl border border-slate-200">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">Total Kapasitas Kuota</span>
-                      <h5 className="text-lg font-black text-slate-900 mt-0.5">
+                      <span className="text-xs font-medium text-slate-600">Total Kapasitas Kuota</span>
+                      <h5 className="text-lg font-semibold text-slate-900 mt-0.5">
                         {trainingSchedules.reduce((acc, s) => acc + s.quota, 0)} Kursi
                       </h5>
-                      <p className="text-[10px] text-slate-500">Maksimum peserta sesi</p>
+                      <p className="text-xs text-slate-500">Maksimum peserta sesi</p>
                     </div>
                     <div className="p-3 bg-white rounded-xl border border-slate-200">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">Tingkat Keterisian</span>
-                      <h5 className="text-lg font-black text-amber-600 mt-0.5">
+                      <span className="text-xs font-medium text-slate-600">Tingkat Keterisian</span>
+                      <h5 className="text-lg font-semibold text-amber-600 mt-0.5">
                         {Math.round(
                           (trainingSchedules.reduce((acc, s) => acc + s.confirmedStaff.length, 0) /
                             Math.max(1, trainingSchedules.reduce((acc, s) => acc + s.quota, 0))) *
                             100
                         )}%
                       </h5>
-                      <p className="text-[10px] text-amber-700 font-semibold">Terkonfirmasi Presensi</p>
+                      <p className="text-xs text-amber-700 font-semibold">Terkonfirmasi Presensi</p>
                     </div>
                   </div>
 
@@ -7117,27 +7037,27 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         return (
                           <div
                             key={sch.id}
-                            className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs hover:shadow-md transition-all space-y-3 flex flex-col justify-between"
+                            className="bg-white rounded-lg border border-slate-200 p-4 shadow-xs hover:shadow-sm transition-all space-y-3 flex flex-col justify-between"
                           >
                             <div className="space-y-2.5">
                               {/* Header Card */}
                               <div className="flex items-center justify-between gap-1.5 flex-wrap">
                                 <div className="flex items-center gap-1.5 flex-wrap">
                                   {sch.deliveryMode === 'ONLINE' ? (
-                                    <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1">
-                                      <Video className="h-3 w-3 text-indigo-600" />
+                                    <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-50 text-slate-700 border border-slate-200 flex items-center gap-1">
+                                      <Video className="h-3 w-3 text-slate-600" />
                                       <span>ONLINE</span>
                                     </span>
                                   ) : (
-                                    <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
+                                    <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
                                       <Building2 className="h-3 w-3 text-amber-700" />
                                       <span>OFFLINE</span>
                                     </span>
                                   )}
-                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                                  <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
                                     {sch.type}
                                   </span>
-                                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+                                  <span className={`text-xs font-bold px-2 py-0.5 rounded-md border ${
                                     sch.status === 'Wajib Hadir'
                                       ? 'bg-rose-50 text-rose-700 border-rose-200'
                                       : sch.status === 'Terdaftar'
@@ -7147,24 +7067,24 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                     {sch.status}
                                   </span>
                                 </div>
-                                <span className="text-xs font-mono font-bold text-slate-400">{sch.id}</span>
+                                <span className="text-xs font-medium text-slate-500">{sch.id}</span>
                               </div>
 
                               <div>
-                                <h4 className="font-extrabold text-sm text-slate-900 leading-snug">{sch.title}</h4>
+                                <h4 className="font-semibold text-sm text-slate-900 leading-snug">{sch.title}</h4>
                                 <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
-                                    🎯 {sch.targetRoleLabel || sch.targetRole || 'Semua Jabatan'}
+                                  <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                                    {sch.targetRoleLabel || sch.targetRole || 'Semua Jabatan'}
                                   </span>
-                                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+                                  <span className={`text-xs font-bold px-2 py-0.5 rounded-md border ${
                                     sch.targetAudienceType === 'SPECIFIC_STAFF'
-                                      ? 'bg-purple-50 text-purple-700 border-purple-200'
+                                      ? 'bg-slate-50 text-slate-700 border-slate-200'
                                       : 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                   }`}>
-                                    👥 {sch.targetAudienceType === 'SPECIFIC_STAFF' ? `${sch.assignedStaffNiks?.length || 0} Staf Khusus` : 'Broadcast Seluruh Kru'}
+                                    {sch.targetAudienceType === 'SPECIFIC_STAFF' ? `${sch.assignedStaffNiks?.length || 0} Staf Khusus` : 'Broadcast Seluruh Kru'}
                                   </span>
-                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 border border-slate-200">
-                                    📍 {sch.outlet}
+                                  <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 border border-slate-200">
+                                    {sch.outlet}
                                   </span>
                                 </div>
                               </div>
@@ -7172,39 +7092,39 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               {/* Informasi Sesi */}
                               <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100 space-y-1.5 text-xs text-slate-600">
                                 <p className="flex items-center gap-2">
-                                  <CalendarDays className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+                                  <CalendarDays className="h-3.5 w-3.5 text-slate-500 shrink-0" />
                                   <span>{sch.date} • {sch.time}</span>
                                 </p>
                                 {sch.deliveryMode === 'ONLINE' ? (
                                   sch.onlineFormat === 'SELF_STUDY' ? (
-                                    <div className="bg-indigo-50/70 p-2.5 rounded-lg border border-indigo-200 text-indigo-950 space-y-1">
+                                    <div className="bg-slate-50/70 p-2.5 rounded-lg border border-slate-200 text-slate-950 space-y-1">
                                       <div className="flex items-center justify-between">
-                                        <span className="font-bold text-[11px] flex items-center gap-1.5 text-indigo-800">
-                                          <BookOpen className="h-3.5 w-3.5 text-indigo-600 shrink-0" />
+                                        <span className="font-bold text-xs flex items-center gap-1.5 text-slate-800">
+                                          <BookOpen className="h-3.5 w-3.5 text-slate-600 shrink-0" />
                                           <span>Mandiri: Baca Modul &amp; Tugas Resume</span>
                                         </span>
-                                        <span className="text-[10px] font-mono font-bold bg-white px-2 py-0.5 rounded border border-indigo-200 text-indigo-700">
+                                        <span className="text-xs font-mono font-bold bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-700">
                                           {sch.moduleId}
                                         </span>
                                       </div>
                                       {sch.taskInstructions && (
-                                        <p className="text-[11px] text-slate-600 italic bg-white/70 p-1.5 rounded border border-indigo-100">
-                                          📝 {sch.taskInstructions}
+                                        <p className="text-xs text-slate-600 italic bg-white/70 p-1.5 rounded border border-slate-200">
+                                          {sch.taskInstructions}
                                         </p>
                                       )}
                                     </div>
                                   ) : (
-                                    <div className="flex items-center justify-between gap-2 bg-indigo-50/70 p-2 rounded-lg border border-indigo-200 text-indigo-900">
+                                    <div className="flex items-center justify-between gap-2 bg-slate-50/70 p-2 rounded-lg border border-slate-200 text-slate-900">
                                       <div className="flex items-center gap-1.5 truncate">
-                                        <Video className="h-3.5 w-3.5 text-indigo-600 shrink-0" />
-                                        <span className="font-bold text-[11px] truncate font-mono">{sch.meetingLink || 'Google Meet Virtual Room'}</span>
+                                        <Video className="h-3.5 w-3.5 text-slate-600 shrink-0" />
+                                        <span className="font-bold text-xs truncate font-mono">{sch.meetingLink || 'Google Meet Virtual Room'}</span>
                                       </div>
                                       {sch.meetingLink && (
                                         <a
                                           href={sch.meetingLink}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="shrink-0 text-[10px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-0.5 rounded transition"
+                                          className="shrink-0 text-xs bg-ink-800 hover:bg-ink-700 text-white font-bold px-2 py-0.5 rounded transition"
                                         >
                                           Buka Link
                                         </a>
@@ -7233,7 +7153,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                 </div>
                                 <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                                   <div
-                                    className="h-2 rounded-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-300"
+                                    className="h-2 rounded-full bg-emerald-600 transition-all duration-300"
                                     style={{ width: `${Math.min(100, fillPercent)}%` }}
                                   />
                                 </div>
@@ -7275,20 +7195,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {activeSubTab === 'weekly-quizzes' && (
                 <div className="space-y-5">
                   {/* Banner Header */}
-                  <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-2xl p-5 text-slate-950 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="card flex flex-col justify-between gap-4 p-4 md:flex-row md:items-start">
                     <div className="space-y-1">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-[10px] font-black uppercase tracking-wider bg-slate-950 text-amber-400 px-2 py-0.5 rounded">
-                          EVALUASI RUTIN RETENSI SOP
-                        </span>
-                        <span className="text-xs font-bold text-slate-950/80 flex items-center gap-1">
-                          ⚡ Kuis Mingguan Wajib (10 Soal)
-                        </span>
-                      </div>
-                      <h3 className="text-lg font-black tracking-tight text-slate-950">
-                        Kuis Rutin Mingguan Tanpa Prasyarat Modul
-                      </h3>
-                      <p className="text-xs text-slate-950/85 max-w-2xl leading-relaxed">
+                      <h2 className="text-base font-semibold text-slate-900">Kuis mingguan wajib (10 soal)</h2>
+                      <p className="max-w-2xl text-sm text-slate-600">
                         Kuis berkala 10 soal wajib dikerjakan oleh seluruh staf dapur (BOH) dan service (FOH) setiap minggu untuk mengecek kesiapan operasional resto. Soal dapat di-generate otomatis 10 butir dengan skenario riil restoran.
                       </p>
                     </div>
@@ -7310,7 +7220,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         });
                         setIsCreateWeeklyQuizModalOpen(true);
                       }}
-                      className="px-4 py-2.5 bg-slate-950 hover:bg-slate-900 text-amber-400 font-extrabold text-xs rounded-xl shadow-lg transition flex items-center justify-center space-x-2 shrink-0 border border-amber-400/30"
+                      className="btn btn-primary shrink-0"
                     >
                       <Plus className="h-4 w-4" />
                       <span>+ Buat Kuis Mingguan (10 Soal)</span>
@@ -7319,30 +7229,30 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                   {/* Statistik Cepat Kuis Mingguan */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Kuis Diterbitkan</p>
-                      <p className="text-xl font-black text-slate-900">{weeklyQuizzesList.length} Edisi</p>
-                      <span className="text-[10px] text-emerald-600 font-bold">Rutin per minggu</span>
+                    <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-xs space-y-1">
+                      <p className="text-xs font-bold text-slate-500 ">Total Kuis Diterbitkan</p>
+                      <p className="text-xl font-semibold text-slate-900">{weeklyQuizzesList.length} Edisi</p>
+                      <span className="text-xs text-emerald-600 font-bold">Rutin per minggu</span>
                     </div>
 
-                    <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Format Soal Wajib</p>
-                      <p className="text-xl font-black text-amber-600">10 Butir</p>
-                      <span className="text-[10px] text-slate-500 font-medium">Tanpa modul prasyarat</span>
+                    <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-xs space-y-1">
+                      <p className="text-xs font-bold text-slate-500 ">Format Soal Wajib</p>
+                      <p className="text-xl font-semibold text-amber-600">10 Butir</p>
+                      <span className="text-xs text-slate-500 font-medium">Tanpa modul prasyarat</span>
                     </div>
 
-                    <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Standar Kelulusan</p>
-                      <p className="text-xl font-black text-indigo-600">KKM 80%</p>
-                      <span className="text-[10px] text-slate-500 font-medium">Min. 8 jawaban benar</span>
+                    <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-xs space-y-1">
+                      <p className="text-xs font-bold text-slate-500 ">Standar Kelulusan</p>
+                      <p className="text-xl font-semibold text-slate-600">KKM 80%</p>
+                      <span className="text-xs text-slate-500 font-medium">Min. 8 jawaban benar</span>
                     </div>
 
-                    <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Pengumpulan Kru</p>
-                      <p className="text-xl font-black text-emerald-600">
+                    <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-xs space-y-1">
+                      <p className="text-xs font-bold text-slate-500 ">Total Pengumpulan Kru</p>
+                      <p className="text-xl font-semibold text-emerald-600">
                         {weeklyQuizzesList.reduce((acc, q) => acc + (q.submissions?.length || 0), 0)} Kru
                       </p>
-                      <span className="text-[10px] text-emerald-600 font-bold">Sinkron real-time dari HP</span>
+                      <span className="text-xs text-emerald-600 font-bold">Sinkron real-time dari HP</span>
                     </div>
                   </div>
 
@@ -7358,29 +7268,29 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       return (
                         <div
                           key={quiz.id}
-                          className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition space-y-4 flex flex-col justify-between"
+                          className="bg-white rounded-lg border border-slate-200 p-5 shadow-xs hover:shadow-sm transition space-y-4 flex flex-col justify-between"
                         >
                           <div className="space-y-3">
                             <div className="flex items-center justify-between gap-2">
-                              <span className="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
-                                ⚡ {quiz.weekLabel}
+                              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                                {quiz.weekLabel}
                               </span>
                               <div className="flex items-center gap-1.5">
-                                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                                   {quiz.status}
                                 </span>
-                                <span className="text-xs font-mono font-bold text-slate-400">{quiz.id}</span>
+                                <span className="text-xs font-medium text-slate-500">{quiz.id}</span>
                               </div>
                             </div>
 
                             <div>
-                              <h4 className="font-extrabold text-sm text-slate-900 leading-snug">{quiz.title}</h4>
-                              <div className="flex flex-wrap items-center gap-1.5 mt-2 text-[11px]">
+                              <h4 className="font-semibold text-sm text-slate-900 leading-snug">{quiz.title}</h4>
+                              <div className="flex flex-wrap items-center gap-1.5 mt-2 text-xs">
                                 <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-700 font-bold">
-                                  🎯 {quiz.targetRoleLabel}
+                                  {quiz.targetRoleLabel}
                                 </span>
                                 <span className="bg-amber-50 px-2 py-0.5 rounded text-amber-900 font-bold border border-amber-200">
-                                  📝 {quiz.totalQuestions} Soal Resto
+                                  {quiz.totalQuestions} Soal Resto
                                 </span>
                                 <span className="bg-rose-50 px-2 py-0.5 rounded text-rose-700 font-bold">
                                   ⏰ Batas: {quiz.deadline}
@@ -7398,11 +7308,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               </div>
                               <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
                                 <div
-                                  className="h-2 rounded-full bg-gradient-to-r from-amber-500 to-emerald-500"
+                                  className="h-2 rounded-full bg-emerald-600"
                                   style={{ width: `${Math.min(100, totalSubmissions * 20)}%` }}
                                 />
                               </div>
-                              <div className="flex justify-between text-[10px] text-slate-500 pt-0.5">
+                              <div className="flex justify-between text-xs text-slate-500 pt-0.5">
                                 <span>Rata-Rata Nilai: <strong className="text-emerald-700">{avgScore} Poin</strong></span>
                                 <span>Standar Kelulusan: KKM {quiz.passingScore}%</span>
                               </div>
@@ -7411,7 +7321,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             {/* Daftar Pengumpulan Terbaru */}
                             {totalSubmissions > 0 && (
                               <div className="space-y-1.5 pt-1">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                                <span className="text-xs font-bold text-slate-400  block">
                                   Pengerjaan Terbaru dari Aplikasi HP:
                                 </span>
                                 <div className="space-y-1 max-h-32 overflow-y-auto pr-1">
@@ -7422,17 +7332,17 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                     >
                                       <div>
                                         <p className="font-bold text-slate-900">{sub.staffName}</p>
-                                        <p className="text-[10px] text-slate-400 font-mono">
+                                        <p className="text-xs text-slate-400 font-mono">
                                           {sub.staffNik} • {sub.role} ({sub.outlet})
                                         </p>
                                       </div>
                                       <div className="text-right">
-                                        <span className={`text-xs font-black px-2 py-0.5 rounded ${
+                                        <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
                                           sub.passed ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
                                         }`}>
                                           {sub.score} Poin {sub.passed ? '✓' : '✗'}
                                         </span>
-                                        <p className="text-[9px] text-slate-400 mt-0.5">{sub.submittedAt.split(',')[1] || sub.submittedAt}</p>
+                                        <p className="text-xs text-slate-500 mt-0.5">{sub.submittedAt.split(',')[1] || sub.submittedAt}</p>
                                       </div>
                                     </div>
                                   ))}
@@ -7454,7 +7364,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                   '\n\n...dan 7 butir soal lainnya siap dikerjakan kru di HP!'
                                 );
                               }}
-                              className="flex-1 py-2 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition flex items-center justify-center space-x-1.5 border border-indigo-200"
+                              className="flex-1 py-2 px-3 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl transition flex items-center justify-center space-x-1.5 border border-slate-200"
                             >
                               <BookOpen className="h-3.5 w-3.5" />
                               <span>Lihat 10 Butir Soal</span>
@@ -7481,21 +7391,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               )}
               {activeSubTab === 'leadership-articles' && (
                 <div className="space-y-5">
-                  <div className="bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 rounded-2xl p-5 text-slate-950 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="card flex flex-col justify-between gap-4 p-4 md:flex-row md:items-start">
                     <div className="space-y-1">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-[10px] font-black uppercase tracking-wider bg-slate-950 text-amber-400 px-2 py-0.5 rounded">
-                          LEADERSHIP &amp; SUCCESSION ACADEMY
-                        </span>
-                        <span className="text-xs font-bold text-slate-950/80 flex items-center gap-1">
-                          <Award className="h-3.5 w-3.5" />
-                          Standar Kompetensi Manajerial Barokah Grup
-                        </span>
-                      </div>
-                      <h3 className="text-lg font-black tracking-tight text-slate-950">
-                        PUSTAKA ARTIKEL KEPEMIMPINAN &amp; KUIS 10 SOAL LEADER
-                      </h3>
-                      <p className="text-xs text-slate-900 max-w-2xl leading-relaxed font-medium">
+                      <h2 className="text-base font-semibold text-slate-900">Artikel kepemimpinan &amp; kuis leader</h2>
+                      <p className="max-w-2xl text-sm text-slate-600">
                         Artikel-artikel kepemimpinan yang dapat Anda tulis dan kelola. Artikel ini <strong>otomatis muncul di aplikasi kru berkualifikasi leader &amp; talent pool</strong>. Setiap artikel dilengkapi evaluasi <strong>10 butir soal kuis skenario</strong> yang nilainya langsung tercatat di rapor karyawan.
                       </p>
                     </div>
@@ -7506,12 +7405,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           const draft = generateLeadershipArticleDraft('coaching_probation');
                           setEditingArticleData(draft);
                           setIsArticleEditorOpen(true);
-                          showToast('✨ Draf artikel kepemimpinan & 10 butir soal kuis berhasil di-generate! Anda dapat mengeditnya.');
+                          showToast('Draf artikel dan 10 soal kuis dibuat dari template. Silakan disunting.');
                         }}
-                        className="bg-slate-950 hover:bg-slate-900 text-amber-400 text-xs px-3.5 py-2.5 rounded-xl font-bold flex items-center space-x-1.5 shadow-md transition-all"
+                        type="button"
+                        className="btn btn-secondary"
                       >
-                        <Sparkles className="h-4 w-4" />
-                        <span>Auto-Generate Artikel &amp; 10 Soal</span>
+                        Draf dari template
                       </button>
                       <button
                         onClick={() => {
@@ -7535,10 +7434,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           setEditingArticleData(draft);
                           setIsArticleEditorOpen(true);
                         }}
-                        className="bg-white hover:bg-slate-100 text-slate-950 text-xs px-3.5 py-2.5 rounded-xl font-bold flex items-center space-x-1.5 shadow-sm transition-all"
+                        type="button"
+                        className="btn btn-primary"
                       >
-                        <Plus className="h-4 w-4" />
-                        <span>+ Tulis Artikel Baru</span>
+                        <Plus className="h-4 w-4" aria-hidden />
+                        Tulis artikel baru
                       </button>
                     </div>
                   </div>
@@ -7546,24 +7446,24 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   {/* Metrics Strip */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div className="p-3 bg-white rounded-xl border border-slate-200">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">Artikel Kepemimpinan</span>
-                      <h5 className="text-lg font-black text-slate-900 mt-0.5">{leadershipArticles.length} Artikel</h5>
-                      <p className="text-[10px] text-amber-700 font-semibold">Tersinkron ke Aplikasi Leader</p>
+                      <span className="text-xs font-medium text-slate-600">Artikel Kepemimpinan</span>
+                      <h5 className="text-lg font-semibold text-slate-900 mt-0.5">{leadershipArticles.length} Artikel</h5>
+                      <p className="text-xs text-amber-700 font-semibold">Tersinkron ke Aplikasi Leader</p>
                     </div>
                     <div className="p-3 bg-white rounded-xl border border-slate-200">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">Standar Evaluasi Kuis</span>
-                      <h5 className="text-lg font-black text-indigo-600 mt-0.5">10 Soal per Artikel</h5>
-                      <p className="text-[10px] text-indigo-700 font-semibold">Studi Kasus Skenario Nyata</p>
+                      <span className="text-xs font-medium text-slate-600">Standar Evaluasi Kuis</span>
+                      <h5 className="text-lg font-semibold text-slate-600 mt-0.5">10 Soal per Artikel</h5>
+                      <p className="text-xs text-slate-700 font-semibold">Studi Kasus Skenario Nyata</p>
                     </div>
                     <div className="p-3 bg-white rounded-xl border border-slate-200">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">Target Kualifikasi</span>
-                      <h5 className="text-lg font-black text-emerald-600 mt-0.5">Leader &amp; Talent Pool</h5>
-                      <p className="text-[10px] text-slate-500">Supervisor, Kepala Cabang &amp; SPV</p>
+                      <span className="text-xs font-medium text-slate-600">Target Kualifikasi</span>
+                      <h5 className="text-lg font-semibold text-emerald-600 mt-0.5">Leader &amp; Talent Pool</h5>
+                      <p className="text-xs text-slate-500">Supervisor, Kepala Cabang &amp; SPV</p>
                     </div>
                     <div className="p-3 bg-white rounded-xl border border-slate-200">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">Standar KKM Leader</span>
-                      <h5 className="text-lg font-black text-amber-600 mt-0.5">85% Kelulusan</h5>
-                      <p className="text-[10px] text-amber-800 font-semibold">Masuk Dossier Rapor SDM</p>
+                      <span className="text-xs font-medium text-slate-600">Standar KKM Leader</span>
+                      <h5 className="text-lg font-semibold text-amber-600 mt-0.5">85% Kelulusan</h5>
+                      <p className="text-xs text-amber-800 font-semibold">Masuk Dossier Rapor SDM</p>
                     </div>
                   </div>
 
@@ -7572,15 +7472,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     {leadershipArticles.map((art) => (
                       <div
                         key={art.id}
-                        className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                        className="bg-white rounded-lg border border-slate-200 p-5 shadow-xs hover:shadow-sm transition-all flex flex-col justify-between space-y-4"
                       >
                         <div className="space-y-3">
                           <div className="flex justify-between items-start gap-2">
-                            <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
-                              ⭐ {art.category} • {art.readTime}
+                            <span className="text-xs font-semibold  px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                              {art.category} • {art.readTime}
                             </span>
                             <div className="flex items-center space-x-1">
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-800 border border-indigo-200">
+                              <span className="text-xs font-bold px-2 py-0.5 rounded bg-slate-50 text-slate-800 border border-slate-200">
                                 {art.targetQualification}
                               </span>
                               <button
@@ -7588,7 +7488,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                   setEditingArticleData(JSON.parse(JSON.stringify(art)));
                                   setIsArticleEditorOpen(true);
                                 }}
-                                className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded"
+                                className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded"
                                 title="Edit Artikel & 10 Soal Kuis"
                               >
                                 <Edit2 className="h-3.5 w-3.5" />
@@ -7607,8 +7507,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           </div>
 
                           <div>
-                            <h4 className="font-extrabold text-base text-slate-900 leading-snug">{art.title}</h4>
-                            <p className="text-xs text-slate-400 font-medium mt-1">
+                            <h4 className="font-semibold text-base text-slate-900 leading-snug">{art.title}</h4>
+                            <p className="text-xs text-slate-500 font-medium mt-1">
                               Ditulis oleh: <strong className="text-slate-700">{art.author}</strong> ({art.authorRole}) • {art.publishedAt}
                             </p>
                             <p className="text-xs text-slate-600 mt-2 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
@@ -7618,7 +7518,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                           {/* Key Takeaways */}
                           <div className="space-y-1.5 pt-1">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                            <span className="text-xs font-medium text-slate-500 block">
                               Poin Kunci Kepemimpinan:
                             </span>
                             {art.keyTakeaways.map((point, pIdx) => (
@@ -7632,7 +7532,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           {/* Tags */}
                           <div className="flex flex-wrap gap-1.5 pt-1">
                             {art.tags.map((tag, tIdx) => (
-                              <span key={tIdx} className="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
+                              <span key={tIdx} className="text-xs font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
                                 #{tag}
                               </span>
                             ))}
@@ -7658,7 +7558,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               setArticleQuizResultScore(null);
                               setIsArticleQuizModalOpen(true);
                             }}
-                            className="flex-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-extrabold text-xs py-2 px-3 rounded-xl transition-all flex items-center justify-center space-x-1.5 shadow-xs"
+                            className="flex-1 bg-brand-400 hover:bg-brand-300 text-slate-950 font-semibold text-xs py-2 px-3 rounded-xl transition-all flex items-center justify-center space-x-1.5 shadow-xs"
                           >
                             <Award className="h-3.5 w-3.5 text-slate-950" />
                             <span>Mulai Kuis (10 Soal)</span>
@@ -7674,11 +7574,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {activeSubTab === 'rapor-karyawan' && (
                 <div className="space-y-5">
                   {/* Top Stats Banner */}
-                  <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
+                  <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-xs space-y-4">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                       <div>
-                        <h4 className="font-black text-base text-slate-900 flex items-center gap-2">
-                          <GraduationCap className="h-5 w-5 text-indigo-600" />
+                        <h4 className="font-semibold text-base text-slate-900 flex items-center gap-2">
+                          <GraduationCap className="h-5 w-5 text-slate-600" />
                           <span>Rapor Penilaian Karyawan &amp; Transkrip Kompetensi Kru</span>
                         </h4>
                         <p className="text-xs text-slate-500 mt-0.5">
@@ -7717,32 +7617,32 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     {/* Quick Rapor Metrics */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-100">
                       <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase">Total Kru Dinilai</span>
-                        <h5 className="text-lg font-black text-slate-900 mt-0.5">{staffReportCards.length} Staf</h5>
-                        <p className="text-[10px] text-slate-500">Punya rapor pelatihan</p>
+                        <span className="text-xs font-medium text-slate-600">Total Kru Dinilai</span>
+                        <h5 className="text-lg font-semibold text-slate-900 mt-0.5">{staffReportCards.length} Staf</h5>
+                        <p className="text-xs text-slate-500">Punya rapor pelatihan</p>
                       </div>
                       <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase">Rata-Rata IPK Training</span>
-                        <h5 className="text-lg font-black text-indigo-600 mt-0.5">
-                          {trainingAvgScore === null ? '—' : `${trainingAvgScore} / 100`}
+                        <span className="text-xs font-medium text-slate-600">Rata-Rata IPK Training</span>
+                        <h5 className="text-lg font-semibold text-slate-600 mt-0.5">
+                          {trainingAvgScore === null ? '–' :`${trainingAvgScore} / 100`}
                         </h5>
-                        <p className="text-[10px] text-indigo-700 font-semibold">{trainingPredicate}</p>
+                        <p className="text-xs text-slate-700 font-semibold">{trainingPredicate}</p>
                       </div>
                       <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase">Kelulusan Modul KKM</span>
-                        <h5 className="text-lg font-black text-emerald-600 mt-0.5">{trainingPassRate === null ? '—' : `${trainingPassRate}%`}</h5>
-                        <p className="text-[10px] text-slate-500">Memenuhi Syarat Insentif</p>
+                        <span className="text-xs font-medium text-slate-600">Kelulusan Modul KKM</span>
+                        <h5 className="text-lg font-semibold text-emerald-600 mt-0.5">{trainingPassRate === null ? '–' :`${trainingPassRate}%`}</h5>
+                        <p className="text-xs text-slate-500">Memenuhi Syarat Insentif</p>
                       </div>
                       <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase">Sertifikat Kelulusan</span>
-                        <h5 className="text-lg font-black text-amber-600 mt-0.5">{trainingCertCount} Diterbitkan</h5>
-                        <p className="text-[10px] text-amber-700 font-semibold">Siap Unduh &amp; Cetak PDF</p>
+                        <span className="text-xs font-medium text-slate-600">Sertifikat Kelulusan</span>
+                        <h5 className="text-lg font-semibold text-amber-600 mt-0.5">{trainingCertCount} Diterbitkan</h5>
+                        <p className="text-xs text-amber-700 font-semibold">Siap Unduh &amp; Cetak PDF</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Rapor Table */}
-                  <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+                  <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-xs">
                     <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
                         <h4 className="font-bold text-sm text-slate-900">Transkrip Nilai &amp; Hasil Evaluasi Karyawan</h4>
@@ -7756,7 +7656,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     <div className="overflow-x-auto">
                       <table className="w-full text-left text-xs border-collapse">
                         <thead>
-                          <tr className="border-b border-slate-200 bg-slate-50/80 text-slate-600 font-bold uppercase text-[10px]">
+                          <tr className="border-b border-slate-200 bg-slate-50/80 text-slate-600 font-medium text-xs">
                             <th className="p-3">Karyawan &amp; NIK</th>
                             <th className="p-3">Jabatan &amp; Outlet</th>
                             <th className="p-3">IPK Evaluasi</th>
@@ -7771,20 +7671,20 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             <tr key={staff.id} className="hover:bg-slate-50/80 transition-colors">
                               <td className="p-3">
                                 <div className="font-bold text-slate-900">{staff.name}</div>
-                                <div className="text-slate-400 font-mono text-[10px]">{staff.nik}</div>
+                                <div className="text-slate-500 text-xs">{staff.nik}</div>
                               </td>
                               <td className="p-3">
                                 <div className="text-slate-700 font-semibold">{staff.role}</div>
-                                <div className="text-slate-400 text-[11px]">{staff.outlet}</div>
+                                <div className="text-slate-500 text-xs">{staff.outlet}</div>
                               </td>
                               <td className="p-3 font-mono">
-                                <span className="font-extrabold text-sm text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-200">
+                                <span className="font-semibold text-sm text-slate-700 bg-slate-50 px-2 py-0.5 rounded-lg border border-slate-200">
                                   {staff.gpaScore}
                                 </span>
                               </td>
                               <td className="p-3">
                                 <span
-                                  className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase ${
+                                  className={`text-xs font-medium px-2 py-0.5 rounded ${
                                     staff.overallGrade.startsWith('A')
                                       ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                                       : 'bg-amber-100 text-amber-800 border border-amber-200'
@@ -7798,7 +7698,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                   {staff.moduleResults.map((m, mIdx) => (
                                     <span
                                       key={mIdx}
-                                      className="inline-flex items-center gap-1 text-[10px] font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200"
+                                      className="inline-flex items-center gap-1 text-xs font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200"
                                       title={`${m.moduleTitle} (Skor: ${m.score})`}
                                     >
                                       <CheckCircle2 className="h-3 w-3 text-emerald-600" />
@@ -7808,7 +7708,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                 </div>
                               </td>
                               <td className="p-3">
-                                <p className="text-[11px] text-slate-600 max-w-xs leading-relaxed">
+                                <p className="text-xs text-slate-600 max-w-xs leading-relaxed">
                                   {staff.careerRecommendation}
                                 </p>
                               </td>
@@ -7819,7 +7719,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                       setSelectedReportCardStaff(staff);
                                       setIsReportCardModalOpen(true);
                                     }}
-                                    className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors border border-indigo-200 flex items-center space-x-1 font-bold text-[11px] px-2.5"
+                                    className="p-1.5 text-slate-600 hover:text-slate-800 hover:bg-slate-50 rounded-lg transition-colors border border-slate-200 flex items-center space-x-1 font-bold text-xs px-2.5"
                                     title="Buka Transkrip Nilai Lengkap"
                                   >
                                     <FileText className="h-3.5 w-3.5" />
@@ -7843,7 +7743,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                         });
                                         setIsCertificateModalOpen(true);
                                       }}
-                                      className="p-1.5 text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors border border-amber-200 flex items-center space-x-1 font-bold text-[11px] px-2.5"
+                                      className="p-1.5 text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors border border-amber-200 flex items-center space-x-1 font-bold text-xs px-2.5"
                                       title="Cetak PDF Sertifikat Kelulusan Modul"
                                     >
                                       <Award className="h-3.5 w-3.5" />
@@ -7863,9 +7763,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* SUB-TAB 2: ONBOARDING CURRICULUM ROADMAP */}
               {activeSubTab === 'curriculum-path' && (
-                <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5">
+                <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-5">
                   <div>
-                    <h4 className="font-extrabold text-base text-slate-900">Jalur Kurikulum Onboarding Kru Baru (7-Day Program)</h4>
+                    <h4 className="font-semibold text-base text-slate-900">Jalur Kurikulum Onboarding Kru Baru (7-Day Program)</h4>
                     <p className="text-xs text-slate-500">Program wajib bagi seluruh staf magang dan kru baru sebelum lolos masa probation 3 bulan.</p>
                   </div>
 
@@ -7880,15 +7780,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     ].map((step, idx) => (
                       <div key={idx} className="flex items-start space-x-4 p-4 rounded-xl border border-slate-100 bg-slate-50/60">
                         <div className="w-16 shrink-0 text-center">
-                          <span className="font-mono font-black text-xs text-indigo-700 bg-indigo-100 px-2 py-1 rounded-md block">
+                          <span className="font-mono font-semibold text-xs text-slate-700 bg-slate-100 px-2 py-1 rounded-md block">
                             {step.day}
                           </span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <h5 className="font-bold text-xs text-slate-900">{step.title}</h5>
-                          <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{step.desc}</p>
+                          <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{step.desc}</p>
                         </div>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase shrink-0 ${
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded shrink-0 ${
                           step.status === 'LENGKAP' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
                         }`}>
                           {step.status}
@@ -7901,15 +7801,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* SUB-TAB 3: CERTIFICATION TRACKER */}
               {activeSubTab === 'certification-tracker' && (
-                <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+                <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4">
                   <div className="flex justify-between items-center">
                     <div>
-                      <h4 className="font-extrabold text-base text-slate-900">Pelacakan Sertifikasi Keahlian {employeesMasterList.length} Kru</h4>
+                      <h4 className="font-semibold text-base text-slate-900">Pelacakan Sertifikasi Keahlian {employeesMasterList.length} Kru</h4>
                       <p className="text-xs text-slate-500">Status sertifikasi kompetensi kuliner per stasiun kerja cabang.</p>
                     </div>
                     <button
                       onClick={() => showToast('Seluruh sertifikat kompetensi kru siap dicetak!')}
-                      className="text-xs font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5"
+                      className="text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5"
                     >
                       <Printer className="h-3.5 w-3.5" />
                       <span>Cetak Bundel Sertifikat</span>
@@ -7919,7 +7819,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr className="border-b border-slate-200 bg-slate-50/80 text-slate-600 font-bold uppercase text-[10px]">
+                        <tr className="border-b border-slate-200 bg-slate-50/80 text-slate-600 font-medium text-xs">
                           <th className="p-3">Kru &amp; NIK</th>
                           <th className="p-3">Posisi / Stasiun</th>
                           <th className="p-3">Cabang Outlet</th>
@@ -7931,20 +7831,20 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       <tbody className="divide-y divide-slate-100">
                         {employeesMasterList.length === 0 ? (
                           <tr>
-                            <td colSpan={6} className="p-8 text-center text-slate-400">
+                            <td colSpan={6} className="p-8 text-center text-slate-500">
                               Belum ada kru yang menyelesaikan modul sertifikasi LMS.
                             </td>
                           </tr>
                         ) : (
                           employeesMasterList.map((emp, i) => (
                             <tr key={i} className="hover:bg-slate-50/80 transition-colors">
-                              <td className="p-3 font-bold text-slate-900">{emp.fullName} <span className="text-slate-400 font-mono text-[10px]">({emp.id})</span></td>
+                              <td className="p-3 font-bold text-slate-900">{emp.fullName} <span className="text-slate-500 text-xs">({emp.id})</span></td>
                               <td className="p-3 text-slate-600">{emp.positionTitle}</td>
                               <td className="p-3 text-slate-600">{emp.outlet}</td>
-                              <td className="p-3 font-semibold text-indigo-700">Kitchen &amp; Service Standard</td>
+                              <td className="p-3 font-semibold text-slate-700">Kitchen &amp; Service Standard</td>
                               <td className="p-3 font-mono font-bold text-emerald-700">100.0</td>
                               <td className="p-3">
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase bg-emerald-100 text-emerald-800">
+                                <span className="text-xs font-medium px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
                                   Tersertifikasi
                                 </span>
                               </td>
@@ -7961,20 +7861,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {activeSubTab === 'disc-matrix' && (
                 <div className="space-y-6">
                   {/* Header Banner */}
-                  <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 text-white shadow-md border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="space-y-1.5 max-w-2xl">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-[10px] font-black uppercase tracking-wider bg-purple-500 text-slate-950 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                          <BrainCircuit className="h-3 w-3" />
-                          20 Soal Analisis DISC Restoran
-                        </span>
-                        <span className="text-xs text-amber-400 font-bold">Hirarki Operasional Multi-Level</span>
-                      </div>
-                      <h3 className="text-xl font-black text-white">
-                        Pemetaan Karakter Kerja DISC &amp; Penempatan Posisi Resto
-                      </h3>
-                      <p className="text-xs text-slate-300 leading-relaxed">
-                        Menganalisis 4 dimensi perilaku kerja: Dominance (D), Influence (I), Steadiness (S), dan Conscientiousness (C) untuk penempatan stasiun kerja dan promosi berjenjang: <strong>Supervisor (Tingkat Tertinggi)</strong> $\rightarrow$ <strong>Asisten Supervisor</strong> $\rightarrow$ <strong>Kepala Cabang</strong> $\rightarrow$ <strong>Kru Pelaksana</strong>.
+                  <div className="card flex flex-col justify-between gap-4 p-4 md:flex-row md:items-start">
+                    <div className="max-w-2xl space-y-1">
+                      <h2 className="text-base font-semibold text-slate-900">
+                        Tes DISC (20 soal) &amp; penempatan posisi
+                      </h2>
+                      <p className="text-sm text-slate-600">
+                        Memetakan 4 dimensi perilaku kerja: Dominance (D), Influence (I), Steadiness (S), dan Conscientiousness (C) untuk penempatan stasiun kerja dan promosi berjenjang: <strong>Supervisor</strong> → <strong>Asisten Supervisor</strong> → <strong>Kepala Cabang</strong> → <strong>Kru Pelaksana</strong>.
                       </p>
                     </div>
 
@@ -7988,99 +7881,98 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           setDiscTestResult(null);
                           setIsDiscTestModalOpen(true);
                         }}
-                        className="px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs rounded-xl shadow-md transition flex items-center gap-1.5"
+                        className="btn btn-primary"
                       >
-                        <BrainCircuit className="h-4 w-4" />
-                        <span>+ Mulai Asesmen DISC (20 Soal)</span>
+                        Mulai tes DISC
                       </button>
                     </div>
                   </div>
 
                   {/* 4 Quadrant Metrics Strip */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <div className="p-4 bg-white rounded-2xl border border-rose-200 shadow-xs space-y-1.5">
+                    <div className="p-4 bg-white rounded-lg border border-rose-200 shadow-xs space-y-1.5">
                       <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-rose-700 bg-rose-50 px-2 py-0.5 rounded">
+                        <span className="text-xs font-semibold  text-rose-700 bg-rose-50 px-2 py-0.5 rounded">
                           D • Dominance
                         </span>
-                        <span className="text-xs font-bold text-slate-400">
+                        <span className="text-xs font-medium text-slate-500">
                           {discProfilesList.filter(d => d.dominantTrait === 'D').length} Staf
                         </span>
                       </div>
-                      <h4 className="text-sm font-black text-slate-900">Tegas, Cepat &amp; Hasil</h4>
-                      <p className="text-[11px] text-slate-500 leading-tight">
+                      <h4 className="text-sm font-semibold text-slate-900">Tegas, Cepat &amp; Hasil</h4>
+                      <p className="text-xs text-slate-500 leading-tight">
                         Pemimpin taktis &amp; pengendali rush hour.
                       </p>
-                      <div className="pt-1.5 border-t border-rose-100 text-[10px] font-bold text-rose-800">
-                        🎯 Rekomendasi: <strong>Supervisor / Asisten SPV / Kepala Cabang</strong>
+                      <div className="pt-1.5 border-t border-rose-100 text-xs font-bold text-rose-800">
+                        Rekomendasi: <strong>Supervisor / Asisten SPV / Kepala Cabang</strong>
                       </div>
                     </div>
 
-                    <div className="p-4 bg-white rounded-2xl border border-amber-200 shadow-xs space-y-1.5">
+                    <div className="p-4 bg-white rounded-lg border border-amber-200 shadow-xs space-y-1.5">
                       <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 bg-amber-50 px-2 py-0.5 rounded">
+                        <span className="text-xs font-semibold  text-amber-800 bg-amber-50 px-2 py-0.5 rounded">
                           I • Influence
                         </span>
-                        <span className="text-xs font-bold text-slate-400">
+                        <span className="text-xs font-medium text-slate-500">
                           {discProfilesList.filter(d => d.dominantTrait === 'I').length} Staf
                         </span>
                       </div>
-                      <h4 className="text-sm font-black text-slate-900">Ramah &amp; Hospitality Hero</h4>
-                      <p className="text-[11px] text-slate-500 leading-tight">
+                      <h4 className="text-sm font-semibold text-slate-900">Ramah &amp; Hospitality Hero</h4>
+                      <p className="text-xs text-slate-500 leading-tight">
                         Pembangun semangat tim &amp; upselling pelanggan.
                       </p>
-                      <div className="pt-1.5 border-t border-amber-100 text-[10px] font-bold text-amber-900">
-                        🎯 Rekomendasi: <strong>Captain Service FOH &amp; Duta Hospitality</strong>
+                      <div className="pt-1.5 border-t border-amber-100 text-xs font-bold text-amber-900">
+                        Rekomendasi: <strong>Captain Service FOH &amp; Duta Hospitality</strong>
                       </div>
                     </div>
 
-                    <div className="p-4 bg-white rounded-2xl border border-emerald-200 shadow-xs space-y-1.5">
+                    <div className="p-4 bg-white rounded-lg border border-emerald-200 shadow-xs space-y-1.5">
                       <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">
+                        <span className="text-xs font-semibold  text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">
                           S • Steadiness
                         </span>
-                        <span className="text-xs font-bold text-slate-400">
+                        <span className="text-xs font-medium text-slate-500">
                           {discProfilesList.filter(d => d.dominantTrait === 'S').length} Staf
                         </span>
                       </div>
-                      <h4 className="text-sm font-black text-slate-900">Sabar, Stabil &amp; Setia</h4>
-                      <p className="text-[11px] text-slate-500 leading-tight">
+                      <h4 className="text-sm font-semibold text-slate-900">Sabar, Stabil &amp; Setia</h4>
+                      <p className="text-xs text-slate-500 leading-tight">
                         Konsisten menjaga rasa masakan &amp; minim konflik.
                       </p>
-                      <div className="pt-1.5 border-t border-emerald-100 text-[10px] font-bold text-emerald-800">
-                        🎯 Rekomendasi: <strong>Head Kitchen / Juru Masak Utama BOH</strong>
+                      <div className="pt-1.5 border-t border-emerald-100 text-xs font-bold text-emerald-800">
+                        Rekomendasi: <strong>Head Kitchen / Juru Masak Utama BOH</strong>
                       </div>
                     </div>
 
-                    <div className="p-4 bg-white rounded-2xl border border-indigo-200 shadow-xs space-y-1.5">
+                    <div className="p-4 bg-white rounded-lg border border-slate-200 shadow-xs space-y-1.5">
                       <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-indigo-800 bg-indigo-50 px-2 py-0.5 rounded">
+                        <span className="text-xs font-semibold  text-slate-800 bg-slate-50 px-2 py-0.5 rounded">
                           C • Conscientiousness
                         </span>
-                        <span className="text-xs font-bold text-slate-400">
+                        <span className="text-xs font-medium text-slate-500">
                           {discProfilesList.filter(d => d.dominantTrait === 'C').length} Staf
                         </span>
                       </div>
-                      <h4 className="text-sm font-black text-slate-900">Teliti, Presisi &amp; Taat SOP</h4>
-                      <p className="text-[11px] text-slate-500 leading-tight">
+                      <h4 className="text-sm font-semibold text-slate-900">Teliti, Presisi &amp; Taat SOP</h4>
+                      <p className="text-xs text-slate-500 leading-tight">
                         Akurasi kasir laci, audit gramatur, &amp; sanitasi HACCP.
                       </p>
-                      <div className="pt-1.5 border-t border-indigo-100 text-[10px] font-bold text-indigo-800">
-                        🎯 Rekomendasi: <strong>Asisten SPV Audit / Kasir Closing &amp; QC</strong>
+                      <div className="pt-1.5 border-t border-slate-200 text-xs font-bold text-slate-800">
+                        Rekomendasi: <strong>Asisten SPV Audit / Kasir Closing &amp; QC</strong>
                       </div>
                     </div>
                   </div>
 
                   {/* Filter Tabs */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200">
+                  <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-lg border border-slate-200">
                     <div className="flex items-center space-x-1 overflow-x-auto text-xs">
-                      <span className="font-bold text-slate-500 mr-2 text-[11px]">Filter Kuadran:</span>
+                      <span className="font-bold text-slate-500 mr-2 text-xs">Filter Kuadran:</span>
                       {[
                         { id: 'ALL', label: 'Semua Profil' },
-                        { id: 'D', label: '🔴 Dominance (D)' },
-                        { id: 'I', label: '🟡 Influence (I)' },
-                        { id: 'S', label: '🟢 Steadiness (S)' },
-                        { id: 'C', label: '🔵 Conscientiousness (C)' },
+                        { id: 'D', label: 'Dominance (D)' },
+                        { id: 'I', label: 'Influence (I)' },
+                        { id: 'S', label: 'Steadiness (S)' },
+                        { id: 'C', label: 'Conscientiousness (C)' },
                       ].map((tab) => (
                         <button
                           key={tab.id}
@@ -8109,37 +8001,37 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       .map((d) => (
                         <div
                           key={d.id}
-                          className="bg-white rounded-3xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition-all space-y-4 flex flex-col justify-between"
+                          className="bg-white rounded-lg border border-slate-200 p-5 shadow-xs hover:shadow-sm transition-all space-y-4 flex flex-col justify-between"
                         >
                           <div className="space-y-3">
                             {/* Card Header */}
                             <div className="flex justify-between items-start gap-2">
                               <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 rounded-2xl bg-slate-900 text-amber-400 font-black text-sm flex items-center justify-center shadow-xs">
+                                <div className="w-10 h-10 rounded-lg bg-slate-900 text-amber-400 font-semibold text-sm flex items-center justify-center shadow-xs">
                                   {d.avatar}
                                 </div>
                                 <div>
-                                  <h4 className="font-black text-sm text-slate-900">{d.name}</h4>
-                                  <p className="text-[11px] text-slate-500">
+                                  <h4 className="font-semibold text-sm text-slate-900">{d.name}</h4>
+                                  <p className="text-xs text-slate-500">
                                     {d.nik} • <strong className="text-slate-700">{d.role}</strong>
                                   </p>
-                                  <p className="text-[10px] text-slate-400">{d.outlet}</p>
+                                  <p className="text-xs text-slate-400">{d.outlet}</p>
                                 </div>
                               </div>
-                              <span className={`text-xs px-2.5 py-1 rounded-full font-black border ${d.badgeColor}`}>
+                              <span className={`text-xs px-2.5 py-1 rounded-full font-semibold border ${d.badgeColor}`}>
                                 {d.profileCode} • {d.dominantTrait} Dominan
                               </span>
                             </div>
 
                             {/* Profile Title Banner */}
                             <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100 flex items-center justify-between">
-                              <span className="text-xs font-black text-slate-800">{d.profileTitle}</span>
-                              <span className="text-[10px] text-slate-400 font-mono">Diuji: {d.testedAt}</span>
+                              <span className="text-xs font-semibold text-slate-800">{d.profileTitle}</span>
+                              <span className="text-xs text-slate-400 font-mono">Diuji: {d.testedAt}</span>
                             </div>
 
                             {/* 4-Color Distribution Bar */}
                             <div className="space-y-1.5">
-                              <div className="flex justify-between text-[10px] font-mono font-bold text-slate-600">
+                              <div className="flex justify-between text-xs font-mono font-bold text-slate-600">
                                 <span className="text-rose-600">D: {d.percentages.D}%</span>
                                 <span className="text-amber-600">I: {d.percentages.I}%</span>
                                 <span className="text-emerald-600">S: {d.percentages.S}%</span>
@@ -8154,7 +8046,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             </div>
 
                             {/* Visualisasi Mini Grafik Radar & Donut Chart */}
-                            <div className="bg-slate-50/80 p-3 rounded-2xl border border-slate-200/80 flex justify-center shadow-xs">
+                            <div className="bg-slate-50/80 p-3 rounded-lg border border-slate-200/80 flex justify-center shadow-xs">
                               <DiscChartVisualizer
                                 percentages={d.percentages}
                                 dominantTrait={d.dominantTrait}
@@ -8166,13 +8058,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             </div>
 
                             {/* Summary Text */}
-                            <p className="text-xs text-slate-600 leading-relaxed bg-slate-50/70 p-3 rounded-2xl border border-slate-100">
+                            <p className="text-xs text-slate-600 leading-relaxed bg-slate-50/70 p-3 rounded-lg border border-slate-100">
                               {d.summary}
                             </p>
 
                             {/* Career Recommendation in New Hierarchy */}
-                            <div className="bg-amber-50/70 border border-amber-200 p-3 rounded-2xl space-y-1">
-                              <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 block">
+                            <div className="bg-amber-50/70 border border-amber-200 p-3 rounded-lg space-y-1">
+                              <span className="text-xs font-semibold  text-amber-900 block">
                                 Rekomendasi Penempatan Sesuai Hirarki Operasional:
                               </span>
                               <p className="text-xs font-bold text-slate-800 leading-snug">
@@ -8183,7 +8075,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             {/* Strengths */}
                             <div className="flex flex-wrap gap-1.5 pt-1">
                               {d.strengths.map((str, sIdx) => (
-                                <span key={sIdx} className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded-lg border border-slate-200 font-medium">
+                                <span key={sIdx} className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded-lg border border-slate-200 font-medium">
                                   ✓ {str}
                                 </span>
                               ))}
@@ -8225,9 +8117,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                   showToast(`Data rapor untuk ${d.name} belum tersedia.`);
                                 }
                               }}
-                              className="flex-1 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
+                              className="flex-1 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
                             >
-                              <FileCheck2 className="h-3.5 w-3.5 text-indigo-600" />
+                              <FileCheck2 className="h-3.5 w-3.5 text-slate-600" />
                               <span>Lihat di Rapor</span>
                             </button>
                           </div>
@@ -8250,41 +8142,32 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
           {activeMenu === 'permissions' && (
             <div className="space-y-6">
               {/* Permission Matrix Hero Banner */}
-              <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-slate-800 rounded-2xl p-5 text-white shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="card flex flex-col justify-between gap-4 p-4 md:flex-row md:items-start">
                 <div className="space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-500 text-slate-950 px-2 py-0.5 rounded">
-                      SECURITY &amp; ROLE ACCESS CONTROL
-                    </span>
-                    <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                      <ShieldCheck className="h-3.5 w-3.5" />
-                      Multi-Tenant Role Matrix Barokah Grup
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-black text-white tracking-tight">
-                    MATRIKS HAK AKSES &amp; PERMISSION APLIKASI
-                  </h3>
-                  <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-                    Atur izin akses operasional secara presisi untuk 6 jenjang role. Setiap perubahan matriks berlaku instan pada Web Admin dan Aplikasi Kru Android di seluruh cabang restoran.
+                  <h2 className="text-base font-semibold text-slate-900">Matriks hak akses</h2>
+                  <p className="max-w-2xl text-sm text-slate-600">
+                    Atur izin akses operasional untuk 6 jenjang peran di web admin dan aplikasi kru, untuk seluruh cabang.
                   </p>
                 </div>
 
-                <div className="flex items-center space-x-2 shrink-0">
+                <div className="flex shrink-0 flex-wrap items-center gap-2">
                   <button
+                    type="button"
                     onClick={() => {
                       setPermissionMatrix(initialPermissionMatrix);
                       showToast('Matriks Permission telah di-reset ke Standar Default SOP Resto!');
                     }}
-                    className="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3.5 py-2.5 rounded-xl font-bold border border-slate-700 transition-all"
+                    className="btn btn-secondary"
                   >
                     Reset Default SOP
                   </button>
                   <button
+                    type="button"
                     onClick={() => showToast('Perubahan Matriks Hak Akses RBAC berhasil disimpan ke server!')}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2.5 rounded-xl font-extrabold flex items-center space-x-2 shadow-md transition-all"
+                    className="btn btn-primary"
                   >
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span>Simpan Perubahan Matriks</span>
+                    <CheckCircle2 className="h-4 w-4" aria-hidden />
+                    Simpan Perubahan Matriks
                   </button>
                 </div>
               </div>
@@ -8302,13 +8185,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     }`}
                   >
                     <div className="flex justify-between items-center mb-1">
-                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${r.badgeColor}`}>
+                      <span className={`text-xs font-bold px-1.5 py-0.5 rounded border ${r.badgeColor}`}>
                         {r.badge}
                       </span>
-                      <span className="text-[10px] font-bold text-slate-400">{r.assignedUsersCount} Akun</span>
+                      <span className="text-xs font-medium text-slate-500">{r.assignedUsersCount} Akun</span>
                     </div>
-                    <h5 className="font-extrabold text-xs text-slate-900 leading-tight">{r.name.split('(')[0]}</h5>
-                    <p className="text-[10px] text-slate-500 mt-1 line-clamp-1">{r.description}</p>
+                    <h5 className="font-semibold text-xs text-slate-900 leading-tight">{r.name.split('(')[0]}</h5>
+                    <p className="text-xs text-slate-500 mt-1 line-clamp-1">{r.description}</p>
                   </div>
                 ))}
               </div>
@@ -8357,18 +8240,18 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               </div>
 
               {/* Main Permission Matrix Table */}
-              <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+              <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-xs">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="border-b border-slate-200 bg-slate-900 text-white text-[11px] font-bold">
+                      <tr className="border-b border-slate-200 bg-slate-900 text-white text-xs font-bold">
                         <th className="p-3.5 min-w-[320px]">Kategori &amp; Fitur Sistem</th>
                         {roleDefinitions
                           .filter((r) => selectedRoleFilter === 'ALL' || selectedRoleFilter === r.key)
                           .map((r) => (
                             <th key={r.key} className="p-3 text-center min-w-[110px]">
-                              <span className="block text-amber-400 text-xs font-black">{r.badge}</span>
-                              <span className="text-[10px] text-slate-300 font-normal truncate block max-w-[130px] mx-auto">
+                              <span className="block text-amber-400 text-xs font-semibold">{r.badge}</span>
+                              <span className="text-xs text-slate-300 font-normal truncate block max-w-[130px] mx-auto">
                                 {r.name.split('(')[0]}
                               </span>
                             </th>
@@ -8393,17 +8276,17 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         return (
                           <React.Fragment key={cat}>
                             {/* Category Header Row */}
-                            <tr className="bg-slate-50/90 font-extrabold text-slate-800 border-t border-b border-slate-200/80">
+                            <tr className="bg-slate-50/90 font-semibold text-slate-800 border-t border-b border-slate-200/80">
                               <td
                                 colSpan={
                                   1 +
                                   roleDefinitions.filter((r) => selectedRoleFilter === 'ALL' || selectedRoleFilter === r.key).length
                                 }
-                                className="px-4 py-2 text-[11px] uppercase tracking-wider text-slate-600 flex items-center gap-2"
+                                className="px-4 py-2 text-xs  text-slate-600 flex items-center gap-2"
                               >
                                 <span className="w-2 h-2 rounded-full bg-amber-500"></span>
                                 <span>{cat}</span>
-                                <span className="text-[10px] font-normal text-slate-400 font-mono">({items.length} Otoritas)</span>
+                                <span className="text-xs font-normal text-slate-500">({items.length} Otoritas)</span>
                               </td>
                             </tr>
 
@@ -8413,7 +8296,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                   <div className="font-bold text-slate-900 text-xs flex items-center space-x-1.5">
                                     <span>{perm.label}</span>
                                   </div>
-                                  <p className="text-[11px] text-slate-500 leading-relaxed">{perm.description}</p>
+                                  <p className="text-xs text-slate-500 leading-relaxed">{perm.description}</p>
                                 </td>
 
                                 {roleDefinitions
@@ -8520,23 +8403,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
           {activeMenu === 'legal-docs' && (
             <div className="space-y-6">
               {/* Hero Banner Header */}
-              <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 border border-blue-900/60 rounded-2xl p-5 text-white shadow-lg flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div className="space-y-1.5">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider bg-blue-500 text-slate-950 px-2 py-0.5 rounded">
-                      LEGAL &amp; EMPLOYMENT CONTRACTS
-                    </span>
-                    <span className="text-xs text-blue-300 font-bold flex items-center gap-1">
-                      <Scale className="h-3.5 w-3.5" />
-                      Standar Ketenagakerjaan UU Cipta Kerja &amp; SOP F&amp;B
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-black text-white tracking-tight flex items-center gap-2">
-                    <FileSignature className="h-5 w-5 text-blue-400" />
-                    SURAT KEPUTUSAN (SK) DIREKSI &amp; KONTRAK KERJA KARYAWAN
-                  </h3>
-                  <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-                    Penerbitan otomatis dan arsip resmi SK Pengangkatan Tetap (PKWTT), SK Promosi Jabatan, SK Mutasi Outlet, Penyesuaian Gaji, serta Kontrak Kerja Waktu Tertentu (PKWT) Kru Restoran lengkap dengan generator dan live editor.
+              <div className="card flex flex-col justify-between gap-4 p-4 lg:flex-row lg:items-start">
+                <div className="space-y-1">
+                  <h2 className="text-base font-semibold text-slate-900">Surat keputusan (SK) &amp; kontrak kerja</h2>
+                  <p className="max-w-2xl text-sm text-slate-600">
+                    Penerbitan dan arsip SK Pengangkatan Tetap (PKWTT), SK Promosi Jabatan, SK Mutasi Outlet, Penyesuaian Gaji, serta
+                    Kontrak Kerja Waktu Tertentu (PKWT) kru, mengikuti UU Cipta Kerja dan SOP F&amp;B.
                   </p>
                 </div>
 
@@ -8547,10 +8419,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       setGenDocType('SK_PROMOSI');
                       setActiveSubTab('generate-doc');
                     }}
-                    className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3.5 py-2.5 rounded-xl font-bold flex items-center space-x-1.5 shadow-md transition-all"
+                    className="btn btn-primary"
                   >
-                    <Plus className="h-3.5 w-3.5" />
-                    <span>Terbitkan SK Baru</span>
+                    <Plus className="h-4 w-4" aria-hidden />
+                    Terbitkan SK Baru
                   </button>
                   <button
                     onClick={() => {
@@ -8558,10 +8430,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       setGenDocType('PKWT_KRU');
                       setActiveSubTab('generate-doc');
                     }}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3.5 py-2.5 rounded-xl font-bold flex items-center space-x-1.5 shadow-md transition-all"
+                    className="btn btn-secondary"
                   >
-                    <FileBadge className="h-3.5 w-3.5" />
-                    <span>Buat Kontrak PKWT</span>
+                    <FileBadge className="h-4 w-4" aria-hidden />
+                    Buat Kontrak PKWT
                   </button>
                   <button
                     onClick={() => {
@@ -8575,10 +8447,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       setGenSignatoryRole('Direktur Utama / Founder Barokah Grup');
                       setActiveSubTab('generate-doc');
                     }}
-                    className="bg-amber-600 hover:bg-amber-500 text-white text-xs px-3.5 py-2.5 rounded-xl font-bold flex items-center space-x-1.5 shadow-md transition-all"
+                    className="btn btn-secondary"
                   >
-                    <Megaphone className="h-3.5 w-3.5" />
-                    <span>Buat Surat Himbauan (SE)</span>
+                    <Megaphone className="h-4 w-4" aria-hidden />
+                    Buat Surat Himbauan (SE)
                   </button>
                 </div>
               </div>
@@ -8587,38 +8459,38 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] font-semibold text-slate-500 uppercase">Total Dokumen Arsip</p>
-                    <h4 className="text-xl font-black text-slate-900 mt-0.5">{legalDocsList.length} Dokumen</h4>
-                    <span className="text-[10px] text-blue-600 font-bold flex items-center gap-1 mt-0.5">
+                    <p className="text-xs font-medium text-slate-600">Total Dokumen Arsip</p>
+                    <h4 className="text-xl font-semibold text-slate-900 mt-0.5">{legalDocsList.length} Dokumen</h4>
+                    <span className="text-xs text-sky-600 font-bold flex items-center gap-1 mt-0.5">
                       <CheckCheck className="h-3 w-3" />
                       Semua Terdata Legal
                     </span>
                   </div>
-                  <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                  <div className="p-3 bg-sky-50 text-sky-600 rounded-xl">
                     <FileText className="h-5 w-5" />
                   </div>
                 </div>
 
                 <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] font-semibold text-slate-500 uppercase">Surat Keputusan (SK)</p>
-                    <h4 className="text-xl font-black text-purple-700 mt-0.5">
+                    <p className="text-xs font-medium text-slate-600">Surat Keputusan (SK)</p>
+                    <h4 className="text-xl font-semibold text-slate-700 mt-0.5">
                       {legalDocsList.filter((d) => d.docCategory === 'SK').length} Surat
                     </h4>
-                    <span className="text-[10px] text-slate-500 font-medium">Tetap, Promosi &amp; Mutasi</span>
+                    <span className="text-xs text-slate-500 font-medium">Tetap, Promosi &amp; Mutasi</span>
                   </div>
-                  <div className="p-3 bg-purple-50 text-purple-600 rounded-xl">
+                  <div className="p-3 bg-slate-50 text-slate-600 rounded-xl">
                     <Stamp className="h-5 w-5" />
                   </div>
                 </div>
 
                 <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] font-semibold text-slate-500 uppercase">Perjanjian Kerja (PKWT)</p>
-                    <h4 className="text-xl font-black text-emerald-700 mt-0.5">
+                    <p className="text-xs font-medium text-slate-600">Perjanjian Kerja (PKWT)</p>
+                    <h4 className="text-xl font-semibold text-emerald-700 mt-0.5">
                       {legalDocsList.filter((d) => d.docCategory === 'PKWT').length} Kontrak
                     </h4>
-                    <span className="text-[10px] text-emerald-600 font-bold">100% Kru Aktif Terlindungi</span>
+                    <span className="text-xs text-emerald-600 font-bold">100% Kru Aktif Terlindungi</span>
                   </div>
                   <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
                     <FileSignature className="h-5 w-5" />
@@ -8627,11 +8499,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                 <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] font-semibold text-slate-500 uppercase">Surat Himbauan (SE)</p>
-                    <h4 className="text-xl font-black text-amber-700 mt-0.5">
+                    <p className="text-xs font-medium text-slate-600">Surat Himbauan (SE)</p>
+                    <h4 className="text-xl font-semibold text-amber-700 mt-0.5">
                       {legalDocsList.filter((d) => d.docCategory === 'EDARAN').length} Surat
                     </h4>
-                    <span className="text-[10px] text-amber-600 font-bold">Libur, Shift &amp; Kuota Cabang</span>
+                    <span className="text-xs text-amber-600 font-bold">Libur, Shift &amp; Kuota Cabang</span>
                   </div>
                   <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
                     <Megaphone className="h-5 w-5" />
@@ -8656,15 +8528,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       onClick={() => setActiveSubTab(tab.id)}
                       className={`flex items-center space-x-2 pb-3 px-3 text-xs font-bold border-b-2 transition-all ${
                         isActive
-                          ? 'border-blue-600 text-blue-700'
+                          ? 'border-sky-600 text-sky-700'
                           : 'border-transparent text-slate-500 hover:text-slate-800'
                       }`}
                     >
                       <Icon className="h-4 w-4" />
                       <span>{tab.label}</span>
                       {tab.count !== undefined && (
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
-                          isActive ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-600'
+                        <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${
+                          isActive ? 'bg-sky-100 text-sky-800' : 'bg-slate-100 text-slate-600'
                         }`}>
                           {tab.count}
                         </span>
@@ -8688,7 +8560,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         placeholder="Cari berdasarkan nomor SK, nama staf, atau jabatan..."
                         value={docSearchQuery}
                         onChange={(e) => setDocSearchQuery(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
                       />
                     </div>
                     <div className="flex items-center space-x-2">
@@ -8698,7 +8570,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           setGenDocType('SK_PROMOSI');
                           setActiveSubTab('generate-doc');
                         }}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl flex items-center space-x-1.5 transition shadow-xs"
+                        className="bg-ink-800 hover:bg-ink-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl flex items-center space-x-1.5 transition shadow-xs"
                       >
                         <Plus className="h-3.5 w-3.5" />
                         <span>Terbitkan SK Baru</span>
@@ -8711,7 +8583,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse text-xs">
                         <thead>
-                          <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                          <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold  text-xs">
                             <th className="py-3 px-4">No. SK &amp; Kategori</th>
                             <th className="py-3 px-4">Karyawan Terkait</th>
                             <th className="py-3 px-4">Jabatan &amp; Lokasi Kerja</th>
@@ -8740,27 +8612,27 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                 doc.docType === 'SK_PENGANGKATAN'
                                   ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                                   : doc.docType === 'SK_PROMOSI'
-                                  ? 'bg-purple-50 text-purple-800 border-purple-200'
+                                  ? 'bg-slate-50 text-slate-800 border-slate-200'
                                   : doc.docType === 'SK_MUTASI'
-                                  ? 'bg-blue-50 text-blue-800 border-blue-200'
+                                  ? 'bg-sky-50 text-sky-800 border-sky-200'
                                   : 'bg-amber-50 text-amber-800 border-amber-200';
 
                               return (
                                 <tr key={doc.id} className="hover:bg-slate-50/80 transition-colors">
                                   <td className="py-3.5 px-4">
-                                    <div className="font-bold text-slate-900 font-mono text-[11px]">{doc.docNumber}</div>
-                                    <span className={`inline-block mt-1 px-2 py-0.5 rounded-md text-[10px] font-bold border ${badgeStyle}`}>
+                                    <div className="font-bold text-slate-900 font-mono text-xs">{doc.docNumber}</div>
+                                    <span className={`inline-block mt-1 px-2 py-0.5 rounded-md text-xs font-bold border ${badgeStyle}`}>
                                       {doc.title}
                                     </span>
                                   </td>
                                   <td className="py-3.5 px-4">
                                     <div className="font-bold text-slate-900">{doc.employeeName || doc.staffName}</div>
-                                    <div className="text-[11px] text-slate-500 font-mono">NIK: {doc.employeeNik || doc.staffNik}</div>
-                                    <div className="text-[10px] text-slate-400">ID: {doc.employeeId || doc.staffNik}</div>
+                                    <div className="text-xs text-slate-500 font-mono">NIK: {doc.employeeNik || doc.staffNik}</div>
+                                    <div className="text-xs text-slate-400">ID: {doc.employeeId || doc.staffNik}</div>
                                   </td>
                                   <td className="py-3.5 px-4">
                                     <div className="font-bold text-slate-800">{doc.newRole || doc.staffRole}</div>
-                                    <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                                    <div className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
                                       <MapPin className="h-3 w-3 text-slate-400" />
                                       {doc.newOutlet || doc.outlet}
                                     </div>
@@ -8769,18 +8641,18 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                     <span className="font-bold text-slate-900">
                                       Rp {(doc.agreedSalary || doc.salaryAgreement || 0).toLocaleString('id-ID')}
                                     </span>
-                                    <div className="text-[10px] text-emerald-600 font-medium">Take Home Pay Standar</div>
+                                    <div className="text-xs text-emerald-600 font-medium">Take Home Pay Standar</div>
                                   </td>
                                   <td className="py-3.5 px-4">
                                     <span className="font-semibold text-slate-700">{doc.effectiveDate}</span>
-                                    <div className="text-[10px] text-slate-400">Terbit: {doc.createdAt}</div>
+                                    <div className="text-xs text-slate-400">Terbit: {doc.createdAt}</div>
                                   </td>
                                   <td className="py-3.5 px-4">
                                     <div className="font-bold text-slate-800">{doc.signatoryName}</div>
-                                    <div className="text-[10px] text-slate-500">{doc.signatoryRole}</div>
+                                    <div className="text-xs text-slate-500">{doc.signatoryRole}</div>
                                   </td>
                                   <td className="py-3.5 px-4 text-center">
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                       <CheckCircle2 className="h-3 w-3 mr-1" />
                                       {doc.status}
                                     </span>
@@ -8792,7 +8664,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                           setSelectedDocForView(doc);
                                           setIsDocViewModalOpen(true);
                                         }}
-                                        className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition"
+                                        className="p-1.5 text-sky-600 hover:text-sky-800 hover:bg-sky-50 rounded-lg transition"
                                         title="Buka &amp; Cetak Surat Resmi"
                                       >
                                         <Printer className="h-4 w-4" />
@@ -8845,7 +8717,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         placeholder="Cari kontrak berdasarkan nama kru, nomor PKWT, atau penempatan..."
                         value={docSearchQuery}
                         onChange={(e) => setDocSearchQuery(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
                       />
                     </div>
                     <div className="flex items-center space-x-2">
@@ -8868,7 +8740,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse text-xs">
                         <thead>
-                          <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                          <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold  text-xs">
                             <th className="py-3 px-4">No. Kontrak PKWT</th>
                             <th className="py-3 px-4">Pihak Kedua (Karyawan)</th>
                             <th className="py-3 px-4">Posisi &amp; Outlet Resto</th>
@@ -8895,18 +8767,18 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             .map((doc) => (
                               <tr key={doc.id} className="hover:bg-slate-50/80 transition-colors">
                                 <td className="py-3.5 px-4">
-                                  <div className="font-bold text-slate-900 font-mono text-[11px]">{doc.docNumber}</div>
-                                  <span className="inline-block mt-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                                  <div className="font-bold text-slate-900 font-mono text-xs">{doc.docNumber}</div>
+                                  <span className="inline-block mt-1 px-2 py-0.5 rounded-md text-xs font-bold bg-sky-50 text-sky-800 border border-sky-200">
                                     {doc.title}
                                   </span>
                                 </td>
                                 <td className="py-3.5 px-4">
                                   <div className="font-bold text-slate-900">{doc.employeeName || doc.staffName}</div>
-                                  <div className="text-[11px] text-slate-500 font-mono">NIK: {doc.employeeNik || doc.staffNik}</div>
+                                  <div className="text-xs text-slate-500 font-mono">NIK: {doc.employeeNik || doc.staffNik}</div>
                                 </td>
                                 <td className="py-3.5 px-4">
                                   <div className="font-bold text-slate-800">{doc.newRole || doc.staffRole}</div>
-                                  <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                                  <div className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
                                     <MapPin className="h-3 w-3 text-slate-400" />
                                     {doc.newOutlet || doc.outlet}
                                   </div>
@@ -8915,17 +8787,17 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                   <div className="font-semibold text-slate-800">
                                     {doc.effectiveDate} s.d. {doc.expiredDate || 'Seterusnya'}
                                   </div>
-                                  <div className="text-[10px] text-blue-600 font-medium">Periode Kerja 12 Bulan</div>
+                                  <div className="text-xs text-sky-600 font-medium">Periode Kerja 12 Bulan</div>
                                 </td>
                                 <td className="py-3.5 px-4">
                                   <span className="font-bold text-slate-900">
                                     Rp {(doc.agreedSalary || doc.salaryAgreement || 0).toLocaleString('id-ID')}
                                   </span>
-                                  <div className="text-[10px] text-slate-500">Per Bulan (Nett)</div>
+                                  <div className="text-xs text-slate-500">Per Bulan (Nett)</div>
                                 </td>
                                 <td className="py-3.5 px-4">
                                   <div className="font-bold text-slate-800">{doc.signatoryName}</div>
-                                  <div className="text-[10px] text-slate-500">{doc.signatoryRole}</div>
+                                  <div className="text-xs text-slate-500">{doc.signatoryRole}</div>
                                 </td>
                                 <td className="py-3.5 px-4 text-center">
                                   {(() => {
@@ -8933,7 +8805,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                     if (isCurrentKru && kruContractApprovalStatus === 'PERLU_PERTEMUAN_MANAJEMEN') {
                                       return (
                                         <div className="flex flex-col items-center gap-1">
-                                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">
+                                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">
                                             <Users className="h-3 w-3 mr-1 text-amber-700" />
                                             PERLU DIALOG BIPARTIT
                                           </span>
@@ -8943,7 +8815,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                               onClick={() => {
                                                 alert(`[NOTIFIKASI HRD & MANAJEMEN OUTLET]\n\nPermintaan Pertemuan Bipartit dari Karyawan: ${currentKruStaff.name} (${currentKruStaff.id})\n\nKlausul yang Dipersoalkan:\n"${kruContractDisagreementInfo.clauseTitle}"\n\nCatatan / Alasan Keberatan Kru:\n"${kruContractDisagreementInfo.reason}"\n\nWaktu Pengajuan: ${kruContractDisagreementInfo.date}\n\nTindakan: Silakan undang kru untuk berdialog secara kekeluargaan sebelum memperbarui kontrak.`);
                                               }}
-                                              className="text-[10px] font-extrabold text-amber-800 hover:text-amber-950 underline cursor-pointer"
+                                              className="text-xs font-semibold text-amber-800 hover:text-amber-950 underline cursor-pointer"
                                             >
                                               Lihat Alasan Kru
                                             </button>
@@ -8953,14 +8825,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                     }
                                     if (isCurrentKru && kruContractApprovalStatus === 'MENUNGGU_REVIEW_KRU') {
                                       return (
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                                          <RotateCcw className="h-3 w-3 mr-1 text-blue-600 animate-spin" />
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                                          <RotateCcw className="h-3 w-3 mr-1 text-sky-600 animate-spin" />
                                           MENUNGGU REVIEW KRU
                                         </span>
                                       );
                                     }
                                     return (
-                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                         <CheckCircle2 className="h-3 w-3 mr-1" />
                                         {isCurrentKru && kruContractApprovalStatus === 'DITANDATANGANI_SAH' ? 'DITANDATANGANI (SAH)' : doc.status}
                                       </span>
@@ -8974,7 +8846,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                         setSelectedDocForView(doc);
                                         setIsDocViewModalOpen(true);
                                       }}
-                                      className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition"
+                                      className="p-1.5 text-sky-600 hover:text-sky-800 hover:bg-sky-50 rounded-lg transition"
                                       title="Buka &amp; Cetak Kontrak Resmi"
                                     >
                                       <Printer className="h-4 w-4" />
@@ -9026,7 +8898,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         placeholder="Cari surat edaran, perihal, atau outlet sasaran..."
                         value={docSearchQuery}
                         onChange={(e) => setDocSearchQuery(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
                       />
                     </div>
                     <div className="flex items-center space-x-2">
@@ -9055,7 +8927,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse text-xs">
                         <thead>
-                          <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                          <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold  text-xs">
                             <th className="py-3 px-4">No. Surat Edaran</th>
                             <th className="py-3 px-4">Perihal / Judul Himbauan</th>
                             <th className="py-3 px-4">Sasaran Penerima &amp; Cabang</th>
@@ -9081,34 +8953,34 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             .map((doc) => (
                               <tr key={doc.id} className="hover:bg-slate-50/80 transition-colors">
                                 <td className="py-3.5 px-4">
-                                  <div className="font-bold text-slate-900 font-mono text-[11px]">{doc.docNumber}</div>
-                                  <span className="inline-block mt-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200">
+                                  <div className="font-bold text-slate-900 font-mono text-xs">{doc.docNumber}</div>
+                                  <span className="inline-block mt-1 px-2 py-0.5 rounded-md text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200">
                                     SURAT EDARAN RESMI
                                   </span>
                                 </td>
                                 <td className="py-3.5 px-4 max-w-xs">
                                   <div className="font-bold text-slate-900">{doc.title}</div>
-                                  <div className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
+                                  <div className="text-xs text-slate-500 line-clamp-1 mt-0.5">
                                     {doc.contentBody}
                                   </div>
                                 </td>
                                 <td className="py-3.5 px-4">
                                   <div className="font-bold text-slate-800">{doc.staffName}</div>
-                                  <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                                  <div className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
                                     <MapPin className="h-3 w-3 text-slate-400" />
                                     {doc.outlet}
                                   </div>
                                 </td>
                                 <td className="py-3.5 px-4">
                                   <div className="font-semibold text-slate-800">{doc.effectiveDate}</div>
-                                  <div className="text-[10px] text-emerald-600 font-medium">Berlaku Seketika</div>
+                                  <div className="text-xs text-emerald-600 font-medium">Berlaku Seketika</div>
                                 </td>
                                 <td className="py-3.5 px-4">
                                   <div className="font-bold text-slate-800">{doc.signatoryName}</div>
-                                  <div className="text-[10px] text-slate-500">{doc.signatoryRole}</div>
+                                  <div className="text-xs text-slate-500">{doc.signatoryRole}</div>
                                 </td>
                                 <td className="py-3.5 px-4 text-center">
-                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                     <CheckCircle2 className="h-3 w-3 mr-1" />
                                     {doc.status}
                                   </span>
@@ -9120,7 +8992,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                         setSelectedDocForView(doc);
                                         setIsDocViewModalOpen(true);
                                       }}
-                                      className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition"
+                                      className="p-1.5 text-sky-600 hover:text-sky-800 hover:bg-sky-50 rounded-lg transition"
                                       title="Buka &amp; Cetak Surat Edaran"
                                     >
                                       <Printer className="h-4 w-4" />
@@ -9199,13 +9071,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                   {/* Left Column: Form Generator */}
                   <div className="lg:col-span-5 space-y-4">
-                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm space-y-4">
                       <div className="border-b border-slate-100 pb-3">
-                        <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                          <Plus className="h-4 w-4 text-blue-600" />
+                        <h4 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
+                          <Plus className="h-4 w-4 text-sky-600" />
                           Formulir Generator Dokumen
                         </h4>
-                        <p className="text-[11px] text-slate-500 mt-0.5">
+                        <p className="text-xs text-slate-500 mt-0.5">
                           Pilih staf dan konfigurasi parameter surat, dokumen resmi terbuat otomatis.
                         </p>
                       </div>
@@ -9223,9 +9095,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               setGenDocType('SK_PROMOSI');
                               setGenDocNumber(`SK-APS/HR-DIR/2026/X/${String(Math.floor(Math.random() * 800) + 100)}`);
                             }}
-                            className={`p-2 rounded-xl border text-[11px] font-bold flex items-center justify-center space-x-1.5 transition ${
+                            className={`p-2 rounded-xl border text-xs font-bold flex items-center justify-center space-x-1.5 transition ${
                               genDocCategory === 'SK'
-                                ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                                ? 'bg-ink-800 text-white border-ink-800 shadow-xs'
                                 : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                             }`}
                           >
@@ -9240,7 +9112,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               setGenDocNumber(`PKWT-BKN/HRD/2026/XI/${String(Math.floor(Math.random() * 800) + 100)}`);
                               setGenCustomClause('Karyawan menyepakati sistem operasional restoran Barokah Group: (1) Libur reguler 2 hari/bulan pada weekday tanpa libur nasional (SOP-HR-001/003). Kuota harian cabang: < 8 staf maks 1 orang, >= 8 staf maks 2 orang. Pelanggaran libur di weekend didenda Rp 200.000, dan libur Hari Libur Nasional (dengan konfirmasi Surat Keterangan / Peak Season Perusahaan) didenda Rp 250.000. Pengajuan mendadak (< H-3) weekday didenda Rp 50.000. Jatah libur habis: upah harian dipotong prorata (Gaji Pokok/30) serta denda Rp 15.000/hari (staf) atau Rp 25.000/hari (leader). (2) Kasbon: Sesuai SOP-HR-004 Pasal 4.2, karyawan baru < 3 bulan dilarang kasbon. (3) Sakit & Cuti Khusus (SOP-HR-006): Sakit diklaim hanya rawat inap Rumah Sakit di mana upah pokok dibayar penuh maksimal 3 hari saja (tanpa uang makan & lembur); hari ke-4 dst dan rawat jalan tidak dibayar (unpaid). Cuti dibayar penuh: Menikah 3 hari, duka cita keluarga inti 3 hari pertama dari total 7 hari, duka serumah 1 hari, istri melahirkan 2 hari, kebakaran 3 hari, kebanjiran 2 hari. Cuti tidak dibayar (Unpaid/potong upah pokok prorata / 30 hari, tanpa uang makan & lembur): Urus nikah/cerai 2 hari, sisa duka 4 hari, melahirkan 27 hari (setelah 3 hari dibayar), keguguran 11 hari (setelah 3 hari dibayar), dan umroh 14 hari. (4) Cuti Tahunan Berjenjang (SOP-HR-007): Masa kerja >= 1 tahun berhak atas cuti tahunan dengan upah terhitung (100% dibayar penuh upah pokok), yaitu 1 tahun dapat 1 hari, 2 tahun dapat 2 hari, dan bertambah 1 hari per tahun berikutnya. Pengambilan tunduk pada 4 guardrails ketat: dilarang digabung libur reguler, dilarang di weekend, dilarang di libur nasional, dan dilarang menyambung sebelum/sesudah libur Lebaran. Pengajuan minimal H-7. (5) Resign di Tengah Jalan (Wanprestasi PKWT / CLS-008): Apabila karyawan memutuskan hubungan kerja/mengundurkan diri sebelum masa kontrak PKWT berakhir, perusahaan tidak memiliki kewajiban membayar uang pesangon, kompensasi, maupun sisa gaji dan tunjangan yang belum terbayarkan pada bulan berjalan; seluruh hak finansial tersebut dinyatakan gugur/hangus (Rp 0) sebagai kompensasi ganti rugi operasional restoran. (6) Izin Pulang Setengah Hari (SOP Bab 5 & CLS-009): Kehadiran > 50% jam kerja pada weekday tetap memperoleh upah pokok harian, namun uang makan dinas (Rp 20.000) dan upah lembur ditiadakan. Kehadiran 25%-50% di weekend/libur nasional dikenakan denda Rp 100.000. Kehadiran < 25% dikualifikasikan mangkir (SP1) serta denda Rp 200.000 di weekend/libur nasional. Izin terencana wajib diajukan minimal H-1 dan disetujui Kepala Cabang dengan menunjuk rekan kru pengganti (cover station).');
                             }}
-                            className={`p-2 rounded-xl border text-[11px] font-bold flex items-center justify-center space-x-1.5 transition ${
+                            className={`p-2 rounded-xl border text-xs font-bold flex items-center justify-center space-x-1.5 transition ${
                               genDocCategory === 'PKWT'
                                 ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
                                 : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -9261,7 +9133,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               setGenSignatoryName('Arif Gunawan Panggabean');
                               setGenSignatoryRole('Direktur Utama / Founder Barokah Grup');
                             }}
-                            className={`p-2 rounded-xl border text-[11px] font-bold flex items-center justify-center space-x-1.5 transition ${
+                            className={`p-2 rounded-xl border text-xs font-bold flex items-center justify-center space-x-1.5 transition ${
                               genDocCategory === 'EDARAN'
                                 ? 'bg-amber-600 text-white border-amber-600 shadow-xs'
                                 : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -9301,7 +9173,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               setGenAnnouncementSubject('Surat Edaran & Instruksi Manajemen Restoran');
                             }
                           }}
-                          className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none"
                         >
                           {genDocCategory === 'SK' ? (
                             <>
@@ -9391,11 +9263,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                 setGenNewRole(found.positionTitle);
                               }
                             }}
-                            className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none"
                           >
                             {employeesMasterList.map((emp) => (
                               <option key={emp.id} value={emp.id}>
-                                {emp.fullName} ({emp.id}) — {emp.positionTitle} [{emp.outlet.split(',')[0]}]
+                                {emp.fullName} ({emp.id}) · {emp.positionTitle} [{emp.outlet.split(',')[0]}]
                               </option>
                             ))}
                           </select>
@@ -9412,7 +9284,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             type="text"
                             value={genDocNumber}
                             onChange={(e) => setGenDocNumber(e.target.value)}
-                            className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-mono focus:ring-2 focus:ring-brand-500 focus:outline-none"
                           />
                         </div>
                         <div>
@@ -9423,7 +9295,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             type="text"
                             value={genEffectiveDate}
                             onChange={(e) => setGenEffectiveDate(e.target.value)}
-                            className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                           />
                         </div>
                       </div>
@@ -9438,7 +9310,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             type="text"
                             value={genExpiredDate}
                             onChange={(e) => setGenExpiredDate(e.target.value)}
-                            className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                           />
                         </div>
                       )}
@@ -9455,7 +9327,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                 type="text"
                                 value={genNewRole}
                                 onChange={(e) => setGenNewRole(e.target.value)}
-                                className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                               />
                             </div>
                             <div>
@@ -9466,7 +9338,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                 type="text"
                                 value={genNewOutlet}
                                 onChange={(e) => setGenNewOutlet(e.target.value)}
-                                className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                               />
                             </div>
                           </div>
@@ -9480,7 +9352,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                 type="number"
                                 value={genAgreedSalary}
                                 onChange={(e) => setGenAgreedSalary(Number(e.target.value))}
-                                className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none"
                               />
                             </div>
                             <div>
@@ -9491,7 +9363,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                 type="text"
                                 value={genSignatoryName}
                                 onChange={(e) => setGenSignatoryName(e.target.value)}
-                                className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                               />
                             </div>
                           </div>
@@ -9535,7 +9407,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           rows={3}
                           value={genCustomClause}
                           onChange={(e) => setGenCustomClause(e.target.value)}
-                          className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                         />
                       </div>
 
@@ -9606,7 +9478,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             setIsDocViewModalOpen(true);
                             showToast(`Dokumen ${newDoc.docNumber} untuk ${newDoc.employeeName} berhasil diterbitkan!`);
                           }}
-                          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3 px-4 rounded-xl flex items-center justify-center space-x-2 shadow-md transition"
+                          className="flex-1 bg-ink-800 hover:bg-ink-700 text-white font-bold text-xs py-3 px-4 rounded-xl flex items-center justify-center space-x-2 shadow-sm transition"
                         >
                           <CheckCircle2 className="h-4 w-4" />
                           <span>Terbitkan &amp; Tampilkan Surat</span>
@@ -9617,9 +9489,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                   {/* Right Column: Live Document Preview */}
                   <div className="lg:col-span-7">
-                    <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-8 text-slate-800 space-y-6 relative overflow-hidden">
+                    <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-8 text-slate-800 space-y-6 relative overflow-hidden">
                       {/* Watermark */}
-                      <div className="absolute right-6 bottom-16 opacity-5 pointer-events-none select-none text-9xl font-black text-slate-900 tracking-widest">
+                      <div className="absolute right-6 bottom-16 opacity-5 pointer-events-none select-none text-9xl font-semibold text-slate-900 ">
                         BAROKAH
                       </div>
 
@@ -9634,7 +9506,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                       {/* Title & Number */}
                       <div className="text-center space-y-1">
-                        <h3 className="text-sm font-extrabold uppercase tracking-tight text-slate-900 underline underline-offset-4">
+                        <h3 className="text-sm font-semibold uppercase tracking-tight text-slate-900 underline underline-offset-4">
                           {genDocCategory === 'SK'
                             ? 'SURAT KEPUTUSAN DIREKSI'
                             : genDocCategory === 'PKWT'
@@ -9670,7 +9542,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             </div>
                             <div className="grid grid-cols-3">
                               <span className="text-slate-500 font-semibold">Sasaran / Penerima</span>
-                              <span className="col-span-2 font-bold text-blue-700">: {genTargetAudience}</span>
+                              <span className="col-span-2 font-bold text-sky-700">: {genTargetAudience}</span>
                             </div>
                             <div className="grid grid-cols-3">
                               <span className="text-slate-500 font-semibold">Target Outlet</span>
@@ -9700,7 +9572,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             </div>
                             <div className="grid grid-cols-3">
                               <span className="text-slate-500 font-semibold">Jabatan Baru / Posisi</span>
-                              <span className="col-span-2 font-bold text-blue-700">: {genNewRole}</span>
+                              <span className="col-span-2 font-bold text-sky-700">: {genNewRole}</span>
                             </div>
                             <div className="grid grid-cols-3">
                               <span className="text-slate-500 font-semibold">Lokasi Penempatan</span>
@@ -9724,13 +9596,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                       {/* Clauses */}
                       <div className="text-xs space-y-2 leading-relaxed text-slate-700">
-                        <h5 className="font-bold text-slate-900 uppercase text-[11px] border-b border-slate-100 pb-1">
+                        <h5 className="font-bold text-slate-900 uppercase text-xs border-b border-slate-100 pb-1">
                           {genDocCategory === 'EDARAN' ? 'POIN-POIN HIMBAUAN & KETENTUAN OPERASIONAL:' : 'KETENTUAN DAN KEWAJIBAN KERJA:'}
                         </h5>
                         <div className="whitespace-pre-line text-slate-800 font-normal leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200">
                           {genCustomClause}
                         </div>
-                        <p className="text-[11px] text-slate-500 italic">
+                        <p className="text-xs text-slate-500 italic">
                           {genDocCategory === 'EDARAN'
                             ? 'Surat Edaran ini bersifat resmi dan wajib dipatuhi serta disosialisasikan oleh seluruh Kepala Cabang kepada staf di stasiun kerja masing-masing.'
                             : 'Surat Keputusan / Kontrak ini mengikat kedua belah pihak dan berlaku terhitung sejak tanggal efektif yang tercantum di atas.'}
@@ -9744,13 +9616,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             <p className="font-semibold text-slate-600">Pihak Penerima (Pimpinan Cabang),</p>
                             <div>
                               <p className="font-bold text-slate-900 underline">Kepala Cabang &amp; SPV Resto</p>
-                              <p className="text-[10px] text-slate-500">{genNewOutlet}</p>
+                              <p className="text-xs text-slate-500">{genNewOutlet}</p>
                             </div>
                           </div>
                           <div className="space-y-12 relative">
                             <p className="font-semibold text-slate-600">Ditetapkan Oleh (Direksi),</p>
                             <div className="absolute top-4 left-1/2 -translate-x-1/2 opacity-70 pointer-events-none">
-                              <div className="border-2 border-dashed border-rose-600 rounded-full w-20 h-20 flex flex-col items-center justify-center text-rose-600 text-[8px] font-black rotate-[-12deg]">
+                              <div className="border-2 border-dashed border-rose-600 rounded-full w-20 h-20 flex flex-col items-center justify-center text-rose-600 text-[8px] font-semibold rotate-[-12deg]">
                                 <span>PT BKN</span>
                                 <span>SAH RESMI</span>
                                 <span>JAKARTA</span>
@@ -9758,7 +9630,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             </div>
                             <div>
                               <p className="font-bold text-slate-900 underline">{genSignatoryName}</p>
-                              <p className="text-[10px] text-slate-500">{genSignatoryRole}</p>
+                              <p className="text-xs text-slate-500">{genSignatoryRole}</p>
                             </div>
                           </div>
                         </div>
@@ -9770,13 +9642,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               <p className="font-bold text-slate-900 underline">
                                 {employeesMasterList.find((e) => e.id === genSelectedStaffId)?.fullName || 'Karyawan'}
                               </p>
-                              <p className="text-[10px] text-slate-500">Karyawan Bersangkutan</p>
+                              <p className="text-xs text-slate-500">Karyawan Bersangkutan</p>
                             </div>
                           </div>
                           <div className="space-y-12 relative">
                             <p className="font-semibold text-slate-600">Pihak Pertama (Manajemen),</p>
                             <div className="absolute top-4 left-1/2 -translate-x-1/2 opacity-70 pointer-events-none">
-                              <div className="border-2 border-dashed border-rose-600 rounded-full w-20 h-20 flex flex-col items-center justify-center text-rose-600 text-[8px] font-black rotate-[-12deg]">
+                              <div className="border-2 border-dashed border-rose-600 rounded-full w-20 h-20 flex flex-col items-center justify-center text-rose-600 text-[8px] font-semibold rotate-[-12deg]">
                                 <span>PT BKN</span>
                                 <span>SAH RESMI</span>
                                 <span>JAKARTA</span>
@@ -9784,7 +9656,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             </div>
                             <div>
                               <p className="font-bold text-slate-900 underline">{genSignatoryName}</p>
-                              <p className="text-[10px] text-slate-500">{genSignatoryRole}</p>
+                              <p className="text-xs text-slate-500">{genSignatoryRole}</p>
                             </div>
                           </div>
                         </div>
@@ -9792,7 +9664,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                       {/* Bottom Print Button */}
                       <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                        <span className="text-[10px] text-slate-400">Dokumen Sah Digital - Barokah HRIS v2026.10</span>
+                        <span className="text-xs text-slate-400">Dokumen Sah Digital - Barokah HRIS v2026.10</span>
                         <button
                           type="button"
                           onClick={() => window.print()}
@@ -9814,23 +9686,23 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {activeSubTab === 'template-library' && (
                 <div className="space-y-5">
                   {/* Hero Header Card with AI Trigger */}
-                  <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
-                        <span className="text-[10px] font-black uppercase tracking-wider bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                        <span className="text-xs font-semibold  bg-sky-100 text-sky-800 px-2 py-0.5 rounded">
                           LEGAL REPOSITORY
                         </span>
-                        <span className="text-xs text-purple-600 font-bold flex items-center gap-1">
+                        <span className="text-xs text-slate-600 font-bold flex items-center gap-1">
                           <Sparkles className="h-3.5 w-3.5" />
-                          AI Smart Clause Generator Aktif
+                          Template klausul tersedia
                         </span>
                       </div>
-                      <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                        <BookOpen className="h-4 w-4 text-blue-600" />
+                      <h4 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
+                        <BookOpen className="h-4 w-4 text-sky-600" />
                         Pustaka Klausul Baku F&amp;B &amp; Kepatuhan Disnaker
                       </h4>
                       <p className="text-xs text-slate-500 max-w-2xl leading-relaxed">
-                        Kelola seluruh klausul hukum restoran: edit klausul yang ada, gunakan langsung ke Generator Surat, atau tambahkan klausul baru secara otomatis menggunakan generator AI berstandar hukum ketenagakerjaan RI.
+                        Kelola seluruh klausul hukum restoran: edit klausul yang ada, gunakan langsung ke Generator Surat, atau tambahkan klausul baru dari template yang mengacu pada hukum ketenagakerjaan RI.
                       </p>
                     </div>
 
@@ -9842,10 +9714,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           setGeneratedClausePreview(null);
                           setIsAiClauseModalOpen(true);
                         }}
-                        className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-md flex items-center space-x-2 transition-all group"
+                        className="bg-ink-800 hover:bg-ink-700 text-white font-semibold text-xs px-4 py-2.5 rounded-xl shadow-sm flex items-center space-x-2 transition-all group"
                       >
                         <Sparkles className="h-4 w-4 text-amber-300 group-hover:rotate-12 transition-transform" />
-                        <span>Generate Klausul dengan AI</span>
+                        <span>Buat klausul dari template</span>
                       </button>
                       <button
                         type="button"
@@ -9855,7 +9727,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             title: 'Klausul Baru',
                             category: 'Tata Tertib Restoran',
                             badge: 'Kepatuhan',
-                            badgeColor: 'bg-blue-50 text-blue-700 border-blue-200',
+                            badgeColor: 'bg-sky-50 text-sky-700 border-sky-200',
                             text: 'Karyawan berkewajiban mematuhi seluruh peraturan internal restoran yang ditetapkan oleh manajemen.',
                             legalReference: 'Peraturan Perusahaan Barokah Grup',
                             createdAt: 'Baru Saja',
@@ -9880,7 +9752,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         placeholder="Cari klausul (resep, shift, hygiene, resign, gratifikasi)..."
                         value={clauseSearchQuery}
                         onChange={(e) => setClauseSearchQuery(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
                       />
                     </div>
 
@@ -9891,7 +9763,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           onClick={() => setSelectedClauseCategory(cat)}
                           className={`px-3 py-1.5 rounded-lg font-bold shrink-0 transition text-xs ${
                             selectedClauseCategory === cat
-                              ? 'bg-blue-600 text-white shadow-xs'
+                              ? 'bg-ink-800 text-white shadow-xs'
                               : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                           }`}
                         >
@@ -9920,33 +9792,33 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       .map((clause) => (
                         <div
                           key={clause.id}
-                          className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3 relative group"
+                          className="bg-white p-5 rounded-lg border border-slate-200 shadow-xs hover:shadow-sm transition-all flex flex-col justify-between space-y-3 relative group"
                         >
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                              <span className="text-xs font-medium text-slate-500">
                                 {clause.category}
                               </span>
                               <div className="flex items-center space-x-1.5">
                                 {clause.isAiGenerated && (
-                                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1">
-                                    <Sparkles className="h-2.5 w-2.5 text-purple-600" />
-                                    AI Generated
+                                  <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-50 text-slate-700 border border-slate-200 flex items-center gap-1">
+                                    <Sparkles className="h-2.5 w-2.5 text-slate-600" />
+                                    Dari template
                                   </span>
                                 )}
-                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${clause.badgeColor}`}>
+                                <span className={`text-xs font-bold px-2 py-0.5 rounded-md border ${clause.badgeColor}`}>
                                   {clause.badge}
                                 </span>
                               </div>
                             </div>
 
-                            <h5 className="font-extrabold text-xs text-slate-900 group-hover:text-blue-700 transition-colors">
+                            <h5 className="font-semibold text-xs text-slate-900 group-hover:text-sky-700 transition-colors">
                               {clause.title}
                             </h5>
 
                             {clause.legalReference && (
-                              <div className="flex items-center gap-1 text-[10px] text-slate-500 font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
-                                <Scale className="h-3 w-3 text-blue-500 shrink-0" />
+                              <div className="flex items-center gap-1 text-xs text-slate-500 font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
+                                <Scale className="h-3 w-3 text-sky-500 shrink-0" />
                                 <span className="line-clamp-1">{clause.legalReference}</span>
                               </div>
                             )}
@@ -9991,7 +9863,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                 setActiveSubTab('generate-doc');
                                 showToast('Klausul berhasil disalin ke formulir generator surat!');
                               }}
-                              className="bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs py-1.5 px-3 rounded-lg transition flex items-center space-x-1"
+                              className="bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold text-xs py-1.5 px-3 rounded-lg transition flex items-center space-x-1"
                             >
                               <Plus className="h-3.5 w-3.5" />
                               <span>Gunakan di Generator</span>
@@ -10002,15 +9874,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   {clausesList.length === 0 && (
-                    <div className="bg-white p-8 rounded-2xl border border-slate-200 text-center space-y-3">
+                    <div className="bg-white p-8 rounded-lg border border-slate-200 text-center space-y-3">
                       <BookOpen className="h-8 w-8 text-slate-400 mx-auto" />
                       <p className="text-xs text-slate-600 font-medium">Belum ada klausul di pustaka.</p>
                       <button
                         type="button"
                         onClick={() => setIsAiClauseModalOpen(true)}
-                        className="bg-purple-600 text-white font-bold text-xs px-4 py-2 rounded-xl"
+                        className="bg-ink-800 text-white font-medium text-xs px-4 py-2 rounded-md"
                       >
-                        Generate Klausul dengan AI
+                        Buat klausul dari template
                       </button>
                     </div>
                   )}
@@ -10031,15 +9903,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {reviewModalData && (
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl space-y-4">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2">
-                <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
+                <div className="p-2 bg-sky-50 text-sky-600 rounded-xl">
                   <Eye className="h-5 w-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-sm">{reviewModalData.title}</h3>
-                  <p className="text-[10px] text-slate-400 font-semibold uppercase">{reviewModalData.category}</p>
+                  <p className="text-xs text-slate-500 font-medium">{reviewModalData.category}</p>
                 </div>
               </div>
               <button
@@ -10053,7 +9925,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 space-y-2 text-xs">
               {Object.entries(reviewModalData.data).map(([key, val]) => (
                 <div key={key} className="flex justify-between py-1 border-b border-slate-200/50 last:border-b-0">
-                  <span className="font-semibold text-slate-500 text-[10px] uppercase">{key}</span>
+                  <span className="font-medium text-slate-600 text-xs">{key}</span>
                   <span className="font-bold text-slate-800 text-right">{String(val)}</span>
                 </div>
               ))}
@@ -10076,7 +9948,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {editModalData && (
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <form onSubmit={handleSaveEdit} className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+          <form onSubmit={handleSaveEdit} className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl space-y-4">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2">
                 <div className="p-2 bg-amber-50 text-amber-600 rounded-xl">
@@ -10390,13 +10262,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <>
                   <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs space-y-1">
                     <p className="font-bold text-slate-800">{editModalData.data.name} ({editModalData.data.nik})</p>
-                    <p className="text-slate-600 text-[11px]">{editModalData.data.department} • {editModalData.data.role}</p>
+                    <p className="text-slate-600 text-xs">{editModalData.data.department} • {editModalData.data.role}</p>
                     <div className="flex gap-1 pt-1">
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-white border border-amber-300 text-amber-800">
+                      <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-white border border-amber-300 text-amber-800">
                         {editModalData.data.gender}
                       </span>
                       {editModalData.data.isCashier && (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                        <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800">
                           Kasir Outlet
                         </span>
                       )}
@@ -10423,7 +10295,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         </option>
                       ))}
                     </select>
-                    <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">
+                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                       Catatan: Perpindahan staf tetap harus menjaga ketersediaan staf Produksi, Waiters, dan Kasir/Perempuan.
                     </p>
                   </div>
@@ -10455,7 +10327,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {deleteModalData && (
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+          <div className="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl space-y-4">
             <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
               <AlertTriangle className="h-6 w-6" />
             </div>
@@ -10490,7 +10362,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {editingMatrixPosition && (
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-lg w-full p-6 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
@@ -10500,7 +10372,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   <h3 className="font-bold text-slate-900 text-sm">
                     Edit Struktur Upah: {editingMatrixPosition.name}
                   </h3>
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-xs text-slate-500">
                     Standar Penggajian Restoran Barokah Grup 2026
                   </p>
                 </div>
@@ -10528,12 +10400,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             >
               {/* Gaji Pokok Tiers */}
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                <span className="font-bold text-slate-800 uppercase text-[10px] tracking-wider">
+                <span className="font-bold text-slate-800 uppercase text-xs ">
                   1. Gaji Pokok (Berdasarkan Jenjang Masa Kerja)
                 </span>
                 <div className="grid grid-cols-3 gap-2">
                   <div>
-                    <label className="block text-slate-600 mb-1 font-semibold text-[10px]">
+                    <label className="block text-slate-600 mb-1 font-semibold text-xs">
                       Magang 3 Hari (Rp)
                     </label>
                     <input
@@ -10549,7 +10421,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-600 mb-1 font-semibold text-[10px]">
+                    <label className="block text-slate-600 mb-1 font-semibold text-xs">
                       &lt; 3 Bulan (Rp)
                     </label>
                     <input
@@ -10565,7 +10437,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-600 mb-1 font-semibold text-[10px]">
+                    <label className="block text-slate-600 mb-1 font-semibold text-xs">
                       &gt; 3 Bulan (Rp)
                     </label>
                     <input
@@ -10585,12 +10457,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* Uang Makan & Lembur */}
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                <span className="font-bold text-slate-800 uppercase text-[10px] tracking-wider">
+                <span className="font-bold text-slate-800 uppercase text-xs ">
                   2. Uang Makan &amp; Lembur Tetap
                 </span>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-slate-600 mb-1 font-semibold text-[10px]">
+                    <label className="block text-slate-600 mb-1 font-semibold text-xs">
                       Uang Makan Harian (Rp/hari)
                     </label>
                     <input
@@ -10604,12 +10476,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       }
                       className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg font-mono font-bold"
                     />
-                    <p className="text-[9px] text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-500 mt-0.5">
                       30 hari = Rp {(editingMatrixPosition.mealAllowanceDaily * 30).toLocaleString('id-ID')}
                     </p>
                   </div>
                   <div>
-                    <label className="block text-slate-600 mb-1 font-semibold text-[10px]">
+                    <label className="block text-slate-600 mb-1 font-semibold text-xs">
                       Lembur Tetap Bulanan Max (Rp)
                     </label>
                     <input
@@ -10623,19 +10495,19 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       }
                       className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg font-mono font-bold text-slate-900"
                     />
-                    <p className="text-[9px] text-slate-400 mt-0.5">Maks. cap lembur per bulan</p>
+                    <p className="text-xs text-slate-500 mt-0.5">Maks. cap lembur per bulan</p>
                   </div>
                 </div>
               </div>
 
               {/* Tunjangan Posisi & Jabatan & Keluarga */}
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                <span className="font-bold text-slate-800 uppercase text-[10px] tracking-wider">
+                <span className="font-bold text-slate-800 uppercase text-xs ">
                   3. Tunjangan Fungsional &amp; Keluarga
                 </span>
                 <div className="grid grid-cols-3 gap-2">
                   <div>
-                    <label className="block text-slate-600 mb-1 font-semibold text-[10px]">
+                    <label className="block text-slate-600 mb-1 font-semibold text-xs">
                       Tunj. Posisi (Rp)
                     </label>
                     <input
@@ -10651,7 +10523,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-600 mb-1 font-semibold text-[10px]">
+                    <label className="block text-slate-600 mb-1 font-semibold text-xs">
                       Tunj. Jabatan (Rp)
                     </label>
                     <input
@@ -10667,7 +10539,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-600 mb-1 font-semibold text-[10px]">
+                    <label className="block text-slate-600 mb-1 font-semibold text-xs">
                       Tunj. Keluarga (Rp)
                     </label>
                     <input
@@ -10688,8 +10560,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Live Preview Totals inside Modal */}
               <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 flex justify-between items-center">
                 <div>
-                  <span className="text-[10px] font-bold text-amber-900 uppercase">Kalkulasi Otomatis Matriks</span>
-                  <p className="text-[11px] text-amber-800">
+                  <span className="text-xs font-bold text-amber-900 uppercase">Kalkulasi Otomatis Matriks</span>
+                  <p className="text-xs text-amber-800">
                     &gt; 3 Bulan: <b>Rp {getMatrixTotals(editingMatrixPosition).over3M.toLocaleString('id-ID')}</b> | Menikah: <b>Rp {getMatrixTotals(editingMatrixPosition).married.toLocaleString('id-ID')}</b>
                   </p>
                 </div>
@@ -10720,13 +10592,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {editingStaffPayroll && (
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-lg w-full p-6 shadow-xl space-y-4 max-h-[92vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div>
                 <h3 className="font-bold text-slate-900 text-sm">
                   Sesuaikan Payroll: {editingStaffPayroll.name}
                 </h3>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-xs text-slate-500">
                   {editingStaffPayroll.nik} • {editingStaffPayroll.positionTitle}
                 </p>
               </div>
@@ -10753,7 +10625,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             >
               {/* SECTION 1: KOMPONEN PENGHASILAN & GAJI (BISA EDIT MANUAL / AUTO) */}
               <div className="p-3 bg-amber-50/60 rounded-xl border border-amber-200 space-y-2.5">
-                <span className="font-bold text-amber-900 uppercase text-[10px] tracking-wider block">
+                <span className="font-bold text-amber-900 uppercase text-xs  block">
                   1. Komponen Penghasilan Kru (Manual / Otomatis)
                 </span>
                 
@@ -10763,14 +10635,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     <label className="block text-slate-800 font-bold text-xs">
                       Gaji Pokok Karyawan (Rp)
                     </label>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${
                       editingStaffPayroll.customBaseSalary && editingStaffPayroll.customBaseSalary > 0
                         ? 'bg-amber-100 text-amber-800 border border-amber-300'
                         : 'bg-slate-100 text-slate-600 border border-slate-200'
                     }`}>
                       {editingStaffPayroll.customBaseSalary && editingStaffPayroll.customBaseSalary > 0
-                        ? '✨ Manual'
-                        : '⚙️ Auto Matriks'}
+                        ? 'Manual'
+                        : 'Auto Matriks'}
                     </span>
                   </div>
                   <div className="flex gap-2">
@@ -10784,7 +10656,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         })
                       }
                       placeholder={`Contoh: Rp ${calculateStaffSalary(editingStaffPayroll, salaryMatrix).baseSalary.toLocaleString('id-ID')} (Auto)`}
-                      className="w-full px-3 py-1.5 border border-slate-300 focus:border-amber-500 rounded-lg font-mono font-black text-sm text-slate-900 bg-white"
+                      className="w-full px-3 py-1.5 border border-slate-300 focus:border-amber-500 rounded-lg font-mono font-semibold text-sm text-slate-900 bg-white"
                     />
                     {editingStaffPayroll.customBaseSalary !== undefined && editingStaffPayroll.customBaseSalary > 0 && (
                       <button
@@ -10795,7 +10667,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             customBaseSalary: undefined,
                           })
                         }
-                        className="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-[10px] font-bold whitespace-nowrap"
+                        className="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold whitespace-nowrap"
                         title="Kembalikan ke standar otomatis posisi & masa kerja"
                       >
                         Reset Auto
@@ -10811,7 +10683,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       <Award className="h-3.5 w-3.5 text-amber-600" />
                       <span>Masa Kerja Karyawan (Bulan)</span>
                     </label>
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
                       Tunjangan: +Rp {calculateStaffSalary(editingStaffPayroll, salaryMatrix).tenureAllow.toLocaleString('id-ID')}
                     </span>
                   </div>
@@ -10830,7 +10702,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       className="w-full px-3 py-1.5 border border-slate-300 focus:border-amber-500 rounded-lg font-mono font-bold text-slate-900 bg-white"
                     />
                   </div>
-                  <p className="text-[10px] text-slate-500 italic">
+                  <p className="text-xs text-slate-500 italic">
                     * SOP-HR-005: Bln 1-6 Rp 0 • Bln 7-12 Rp 100k • Bln 13-18 Rp 200k • Bln 19-24 Rp 250k (+Rp 50k tiap 6 bln).
                   </p>
                 </div>
@@ -10839,11 +10711,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <div className="grid grid-cols-2 gap-2.5">
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="block text-slate-700 font-semibold text-[11px]">
+                      <label className="block text-slate-700 font-semibold text-xs">
                         Uang Makan (Rp)
                       </label>
-                      <span className="text-[9px] text-slate-500 font-medium">
-                        {editingStaffPayroll.customMealAllowance !== undefined ? '✨ Manual' : 'Auto'}
+                      <span className="text-xs text-slate-500 font-medium">
+                        {editingStaffPayroll.customMealAllowance !== undefined ? 'Manual' : 'Auto'}
                       </span>
                     </div>
                     <div className="flex gap-1.5">
@@ -10868,7 +10740,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               customMealAllowance: undefined,
                             })
                           }
-                          className="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-[9px] font-bold"
+                          className="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold"
                           title="Reset ke otomatis hari kerja"
                         >
                           Reset
@@ -10879,11 +10751,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="block text-slate-700 font-semibold text-[11px]">
+                      <label className="block text-slate-700 font-semibold text-xs">
                         Uang Lembur (Rp)
                       </label>
-                      <span className="text-[9px] text-slate-500 font-medium">
-                        {editingStaffPayroll.customOvertime !== undefined ? '✨ Manual' : 'Auto'}
+                      <span className="text-xs text-slate-500 font-medium">
+                        {editingStaffPayroll.customOvertime !== undefined ? 'Manual' : 'Auto'}
                       </span>
                     </div>
                     <div className="flex gap-1.5">
@@ -10908,7 +10780,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               customOvertime: undefined,
                             })
                           }
-                          className="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-[9px] font-bold"
+                          className="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold"
                           title="Reset ke lembur otomatis"
                         >
                           Reset
@@ -10922,11 +10794,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <div className="grid grid-cols-2 gap-2.5">
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="block text-slate-700 font-semibold text-[11px]">
+                      <label className="block text-slate-700 font-semibold text-xs">
                         Tunj. Jabatan / Keahlian (Rp)
                       </label>
-                      <span className="text-[9px] text-slate-500 font-medium">
-                        {editingStaffPayroll.customPositionAllowance !== undefined ? '✨ Manual' : 'Auto'}
+                      <span className="text-xs text-slate-500 font-medium">
+                        {editingStaffPayroll.customPositionAllowance !== undefined ? 'Manual' : 'Auto'}
                       </span>
                     </div>
                     <div className="flex gap-1.5">
@@ -10951,7 +10823,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               customPositionAllowance: undefined,
                             })
                           }
-                          className="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-[9px] font-bold"
+                          className="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold"
                           title="Reset ke otomatis posisi"
                         >
                           Reset
@@ -10961,7 +10833,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   <div>
-                    <label className="block text-slate-700 font-semibold text-[11px] mb-1">
+                    <label className="block text-slate-700 font-semibold text-xs mb-1">
                       Bonus / Insentif Tambahan (Rp)
                     </label>
                     <input
@@ -10986,13 +10858,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       <Award className="h-3.5 w-3.5 text-amber-600" />
                       <span>Insentif KPI (Grade A = Rp 100.000)</span>
                     </label>
-                    <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-200 text-amber-900 border border-amber-400">
+                    <span className="text-xs font-semibold uppercase px-2 py-0.5 rounded bg-amber-200 text-amber-900 border border-amber-400">
                       SOP Resto
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <span className="text-[10px] text-slate-700 font-semibold block mb-0.5">Grade Penilaian</span>
+                      <span className="text-xs text-slate-700 font-semibold block mb-0.5">Grade Penilaian</span>
                       <select
                         value={editingStaffPayroll.kpiGrade || (editingStaffPayroll.kpiIncentive && editingStaffPayroll.kpiIncentive > 0 ? 'A' : 'B')}
                         onChange={(e) => {
@@ -11006,14 +10878,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         }}
                         className="w-full px-2 py-1.5 border border-amber-300 rounded-lg font-bold text-xs text-amber-950 bg-white"
                       >
-                        <option value="A">⭐ Grade A (&ge;90) &rarr; Bonus Rp 100.000</option>
+                        <option value="A">Grade A (&ge;90) &rarr; Bonus Rp 100.000</option>
                         <option value="B">Grade B (80-89) &rarr; Bonus Rp 0</option>
                         <option value="C">Grade C (70-79) &rarr; Bonus Rp 0</option>
                         <option value="D">Grade D (&lt;70) &rarr; Bonus Rp 0</option>
                       </select>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-700 font-semibold block mb-0.5">Nominal Insentif KPI (Rp)</span>
+                      <span className="text-xs text-slate-700 font-semibold block mb-0.5">Nominal Insentif KPI (Rp)</span>
                       <input
                         type="number"
                         value={editingStaffPayroll.kpiIncentive !== undefined ? editingStaffPayroll.kpiIncentive : (editingStaffPayroll.kpiGrade === 'A' ? 100000 : 0)}
@@ -11023,7 +10895,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             kpiIncentive: Math.max(0, parseInt(e.target.value, 10) || 0),
                           })
                         }
-                        className="w-full px-2.5 py-1.5 border border-amber-300 rounded-lg font-mono font-black text-amber-800 bg-white text-xs"
+                        className="w-full px-2.5 py-1.5 border border-amber-300 rounded-lg font-mono font-semibold text-amber-800 bg-white text-xs"
                         placeholder="100000"
                       />
                     </div>
@@ -11033,13 +10905,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* SECTION 2: PARAMETER OTOMATIS SISTEM (LOGIKA MASA KERJA & JADWAL RESTO) */}
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
-                <span className="font-bold text-slate-800 uppercase text-[10px] tracking-wider block">
+                <span className="font-bold text-slate-800 uppercase text-xs  block">
                   2. Parameter Otomatis Sistem Resto
                 </span>
 
                 <div className="grid grid-cols-3 gap-2.5">
                   <div>
-                    <label className="block text-slate-700 font-semibold mb-1 text-[11px]">
+                    <label className="block text-slate-700 font-semibold mb-1 text-xs">
                       Jenjang Masa Kerja
                     </label>
                     <select
@@ -11050,7 +10922,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           tenureStatus: e.target.value as any,
                         })
                       }
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-800 bg-white text-[11px]"
+                      className="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-800 bg-white text-xs"
                     >
                       <option value="MAGANG_3_HARI">Magang 3 Hari</option>
                       <option value="UNDER_3_MONTHS">&lt; 3 Bulan</option>
@@ -11060,7 +10932,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   <div>
-                    <label className="block text-slate-700 font-semibold mb-1 text-[11px]">
+                    <label className="block text-slate-700 font-semibold mb-1 text-xs">
                       Hari Kerja Masuk
                     </label>
                     <input
@@ -11072,12 +10944,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           daysWorked: parseInt(e.target.value, 10) || 0,
                         })
                       }
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-mono font-bold text-[11px] bg-white"
+                      className="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-mono font-bold text-xs bg-white"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-700 font-semibold mb-1 text-[11px]">
+                    <label className="block text-slate-700 font-semibold mb-1 text-xs">
                       Status Pernikahan
                     </label>
                     <select
@@ -11088,7 +10960,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           isMarried: e.target.value === 'true',
                         })
                       }
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-emerald-800 bg-white text-[11px]"
+                      className="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-emerald-800 bg-white text-xs"
                     >
                       <option value="false">Lajang</option>
                       <option value="true">Menikah (+200k)</option>
@@ -11098,7 +10970,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                 {/* SOP Libur 001/V/2025 */}
                 <div>
-                  <label className="block text-amber-900 font-bold mb-1 text-[11px]">
+                  <label className="block text-amber-900 font-bold mb-1 text-xs">
                     Hari Off Tidak Diambil (Insentif Libur SOP 001/V/2025)
                   </label>
                   <select
@@ -11109,7 +10981,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         unusedOffDays: parseInt(e.target.value, 10) || 0,
                       })
                     }
-                    className="w-full px-2.5 py-1.5 border border-amber-300 rounded-lg font-bold text-amber-950 bg-white text-[11px]"
+                    className="w-full px-2.5 py-1.5 border border-amber-300 rounded-lg font-bold text-amber-950 bg-white text-xs"
                   >
                     <option value={0}>0 Hari (Libur Penuh 2 Hari - Tanpa Insentif)</option>
                     <option value={1}>1 Hari Masuk Kerja (+Rp 75.000 Insentif SOP)</option>
@@ -11120,7 +10992,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* SECTION 3: POTONGAN & DENDA (INPUT MANUAL PER KARYAWAN) */}
               <div className="p-3 bg-rose-50/60 rounded-xl border border-rose-200 space-y-2.5">
-                <span className="font-bold text-rose-900 uppercase text-[10px] tracking-wider block">
+                <span className="font-bold text-rose-900 uppercase text-xs  block">
                   3. Potongan &amp; Denda Karyawan (Input Manual)
                 </span>
 
@@ -11139,10 +11011,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           stockFineDeduction: parseInt(e.target.value, 10) || 0,
                         })
                       }
-                      className="w-full px-2.5 py-1.5 border border-rose-300 focus:border-rose-500 rounded-lg font-mono font-black text-rose-700 bg-rose-50/40 text-sm"
+                      className="w-full px-2.5 py-1.5 border border-rose-300 focus:border-rose-500 rounded-lg font-mono font-semibold text-rose-700 bg-rose-50/40 text-sm"
                       placeholder="0"
                     />
-                    <p className="text-[9px] text-rose-600">Selisih opname dapur/bar</p>
+                    <p className="text-xs text-rose-600">Selisih opname dapur/bar</p>
                   </div>
 
                   {/* Potongan Kasbon */}
@@ -11159,16 +11031,16 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           kasbonDeduction: parseInt(e.target.value, 10) || 0,
                         })
                       }
-                      className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-mono font-black text-slate-800 text-sm"
+                      className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-mono font-semibold text-slate-800 text-sm"
                       placeholder="0"
                     />
-                    <p className="text-[9px] text-slate-500">Cicilan pinjaman berjalan</p>
+                    <p className="text-xs text-slate-500">Cicilan pinjaman berjalan</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
                   <div>
-                    <label className="block text-slate-700 font-semibold mb-1 text-[11px]">
+                    <label className="block text-slate-700 font-semibold mb-1 text-xs">
                       Potongan SP / Absensi (Rp)
                     </label>
                     <input
@@ -11186,7 +11058,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   <div>
-                    <label className="block text-rose-900 font-semibold mb-1 text-[11px]">
+                    <label className="block text-rose-900 font-semibold mb-1 text-xs">
                       Denda Pelanggaran Libur (Rp)
                     </label>
                     <input
@@ -11201,7 +11073,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       className="w-full px-2.5 py-1.5 border border-rose-300 rounded-lg font-mono font-bold text-rose-700 bg-white"
                       placeholder="Weekend 200k, Peak Season 250k, <H-3 50k, Jatah Habis 15k/25k"
                     />
-                    <span className="text-[9px] text-rose-600 block mt-0.5">
+                    <span className="text-xs text-rose-600 block mt-0.5">
                       SOP-003: Weekend 200k, Libur Nas. 250k (Peak Season), Mendadak &lt;H-3 50k, Izin Habis 15k (Staf)/25k (Leader)
                     </span>
                   </div>
@@ -11213,7 +11085,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     <label className="block text-rose-900 font-bold text-xs">
                       Hari Cuti Unpaid (SOP-HR-006):
                     </label>
-                    <span className="text-[10px] font-mono font-bold text-rose-700">
+                    <span className="text-xs font-mono font-bold text-rose-700">
                       Potongan: -Rp {((editingStaffPayroll.unpaidLeaveDays || 0) * Math.round((editingStaffPayroll.customBaseSalary || 1200000) / 30)).toLocaleString('id-ID')}
                     </span>
                   </div>
@@ -11227,35 +11099,35 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         unpaidLeaveDays: parseInt(e.target.value, 10) || 0,
                       })
                     }
-                    className="w-full px-2.5 py-1.5 border border-rose-300 focus:border-rose-500 rounded-lg font-mono font-black text-rose-700 bg-white text-sm"
+                    className="w-full px-2.5 py-1.5 border border-rose-300 focus:border-rose-500 rounded-lg font-mono font-semibold text-rose-700 bg-white text-sm"
                     placeholder="Contoh: 27 (Melahirkan), 11 (Keguguran), 4 (Duka), 2 (Nikah/Cerai), 14 (Umroh)"
                   />
-                  <p className="text-[9px] text-rose-600">
+                  <p className="text-xs text-rose-600">
                     Otomatis memotong upah secara prorata (Gaji Pokok / 30 hari), serta hari unpaid tidak mendapat uang makan &amp; lembur
                   </p>
                 </div>
 
                 {/* Hari Cuti Tahunan Berjenjang (SOP-HR-007) */}
-                <div className="p-2.5 bg-teal-50/70 rounded-lg border border-teal-200 space-y-1">
+                <div className="p-2.5 bg-emerald-50/70 rounded-lg border border-emerald-200 space-y-1">
                   <div className="flex items-center justify-between">
-                    <label className="block text-teal-950 font-bold text-xs">
+                    <label className="block text-emerald-950 font-bold text-xs">
                       Hari Cuti Tahunan Berjenjang (SOP-HR-007):
                     </label>
-                    <span className="text-[10px] font-mono font-bold text-teal-800 bg-teal-100 px-2 py-0.5 rounded">
+                    <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
                       Upah Pokok Terhitung (100% Paid)
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <span className="text-[10px] text-slate-500 block">Kuota Hak (Masa Kerja {editingStaffPayroll.monthsWorked || 0} Bln):</span>
-                      <span className="font-mono font-extrabold text-teal-900 text-xs">
+                      <span className="text-xs text-slate-500 block">Kuota Hak (Masa Kerja {editingStaffPayroll.monthsWorked || 0} Bln):</span>
+                      <span className="font-mono font-semibold text-emerald-900 text-xs">
                         {editingStaffPayroll.monthsWorked && editingStaffPayroll.monthsWorked >= 12
                           ? `${Math.floor(editingStaffPayroll.monthsWorked / 12)} Hari / Tahun`
                           : '0 Hari (< 1 Thn Kerja)'}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-500 block">Hari Cuti Diambil Bulan Ini:</span>
+                      <span className="text-xs text-slate-500 block">Hari Cuti Diambil Bulan Ini:</span>
                       <input
                         type="number"
                         min="0"
@@ -11267,12 +11139,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             annualLeaveDays: parseInt(e.target.value, 10) || 0,
                           })
                         }
-                        className="w-full px-2 py-1 border border-teal-300 focus:border-teal-500 rounded-lg font-mono font-black text-teal-900 bg-white text-xs"
+                        className="w-full px-2 py-1 border border-emerald-300 focus:border-emerald-500 rounded-lg font-mono font-semibold text-emerald-900 bg-white text-xs"
                         placeholder="0"
                       />
                     </div>
                   </div>
-                  <p className="text-[9px] text-teal-700">
+                  <p className="text-xs text-emerald-700">
                     SOP-HR-007: Upah pokok harian tetap dibayar utuh (Rp 0 potongan). Uang makan (Rp 20.000/hari) &amp; upah lembur ditiadakan pada hari cuti.
                   </p>
                 </div>
@@ -11283,13 +11155,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     <label className="block text-amber-950 font-bold text-xs">
                       Izin Pulang Setengah Hari (SOP Bab 5):
                     </label>
-                    <span className="text-[10px] font-mono font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-300">
+                    <span className="text-xs font-mono font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-300">
                       &gt; 50% Jam Kerja (Weekday)
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <span className="text-[10px] text-slate-600 block">Frekuensi Izin 1/2 Hari (Hari):</span>
+                      <span className="text-xs text-slate-600 block">Frekuensi Izin 1/2 Hari (Hari):</span>
                       <input
                         type="number"
                         min="0"
@@ -11300,12 +11172,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             halfDayLeaveDays: parseInt(e.target.value, 10) || 0,
                           })
                         }
-                        className="w-full px-2 py-1 border border-amber-300 focus:border-amber-500 rounded-lg font-mono font-black text-amber-950 bg-white text-xs"
+                        className="w-full px-2 py-1 border border-amber-300 focus:border-amber-500 rounded-lg font-mono font-semibold text-amber-950 bg-white text-xs"
                         placeholder="0"
                       />
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-600 block">Denda 1/2 Hari Weekend (Rp):</span>
+                      <span className="text-xs text-slate-600 block">Denda 1/2 Hari Weekend (Rp):</span>
                       <input
                         type="number"
                         min="0"
@@ -11317,13 +11189,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             halfDayPenalties: parseInt(e.target.value, 10) || 0,
                           })
                         }
-                        className="w-full px-2 py-1 border border-rose-300 focus:border-rose-500 rounded-lg font-mono font-black text-rose-800 bg-white text-xs"
+                        className="w-full px-2 py-1 border border-rose-300 focus:border-rose-500 rounded-lg font-mono font-semibold text-rose-800 bg-white text-xs"
                         placeholder="0"
                         title="Denda Rp 100.000 jika izin setengah hari (25-50%) di weekend/libur nasional"
                       />
                     </div>
                   </div>
-                  <p className="text-[9px] text-amber-800 leading-tight">
+                  <p className="text-xs text-amber-800 leading-tight">
                     SOP Bab 5: Upah pokok harian tetap dibayar (jika &gt; 50% shift weekday), namun uang makan (Rp 20.000/hari) &amp; upah lembur otomatis ditiadakan.
                   </p>
                 </div>
@@ -11347,7 +11219,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   <option value="SUDAH_DIBAYAR">SUDAH DIBAYAR</option>
                   <option value="PENDING_REVIEW">PENDING REVIEW</option>
                   <option value="GAJI_TERTUNDA">GAJI TERTUNDA (SOP Survey 360°)</option>
-                  <option value="HANGUS_RESIGN_SEPIHAK">🚫 HANGUS (Resign Sepihak di Tengah Jalan - Net Rp 0)</option>
+                  <option value="HANGUS_RESIGN_SEPIHAK">HANGUS (Resign Sepihak di Tengah Jalan - Net Rp 0)</option>
                 </select>
               </div>
 
@@ -11356,16 +11228,16 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 const liveCalc = calculateStaffSalary(editingStaffPayroll, salaryMatrix);
                 return (
                   <div className="p-3.5 bg-slate-900 text-white rounded-xl space-y-2 border border-slate-800">
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold border-b border-slate-800 pb-1.5">
+                    <div className="flex items-center justify-between text-xs text-slate-400 font-bold border-b border-slate-800 pb-1.5">
                       <span className="flex items-center gap-1.5">
                         <Sparkles className="h-3.5 w-3.5 text-amber-400" />
                         Kalkulasi Otomatis Sistem (Real-Time)
                       </span>
-                      <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800">
+                      <span className="text-xs font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800">
                         Live Preview
                       </span>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 text-[11px]">
+                    <div className="grid grid-cols-2 gap-2 text-xs">
                       <div>
                         <span className="text-slate-400">Gaji Pokok:</span>
                         <span className="font-bold text-white block">Rp {liveCalc.baseSalary.toLocaleString('id-ID')}</span>
@@ -11395,7 +11267,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       </div>
                     </div>
                     {editingStaffPayroll.paymentStatus === 'HANGUS_RESIGN_SEPIHAK' && (
-                      <div className="p-2.5 bg-rose-950/80 border border-rose-800 rounded-lg text-rose-200 text-[10px] space-y-1">
+                      <div className="p-2.5 bg-rose-950/80 border border-rose-800 rounded-lg text-rose-200 text-xs space-y-1">
                         <div className="font-bold flex items-center gap-1.5 text-rose-300">
                           <AlertTriangle className="h-3.5 w-3.5 text-rose-400 shrink-0" />
                           Status: Resign di Tengah Jalan (Wanprestasi PKWT / CLS-008)
@@ -11407,7 +11279,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     )}
                     <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
                       <span className="text-xs font-bold text-slate-200">Take Home Pay (THP Bersih):</span>
-                      <span className={`text-sm font-black ${editingStaffPayroll.paymentStatus === 'HANGUS_RESIGN_SEPIHAK' ? 'text-rose-400 line-through' : 'text-amber-400'}`}>
+                      <span className={`text-sm font-semibold ${editingStaffPayroll.paymentStatus === 'HANGUS_RESIGN_SEPIHAK' ? 'text-rose-400 line-through' : 'text-amber-400'}`}>
                         Rp {liveCalc.netPay.toLocaleString('id-ID')}
                       </span>
                     </div>
@@ -11440,7 +11312,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {viewingOfficialSopDoc && (
         <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
+          <div className="bg-white rounded-lg max-w-3xl w-full p-6 sm:p-8 shadow-xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
             {/* Header / Kop Surat Resmi Barokah Grup */}
             <div className="relative mb-3">
               <button
@@ -11468,18 +11340,18 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   Perihal : <span className="text-slate-800">Petunjuk Teknis Pengajuan Jatah Libur Karyawan</span>
                 </p>
               </div>
-              <span className="bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1 rounded-full font-bold text-[10px] uppercase shrink-0">
+              <span className="bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1 rounded-full font-bold text-xs uppercase shrink-0">
                 STATUS: SOP RESMI AKTIF &amp; MENGIKAT
               </span>
             </div>
 
             {/* Adendum Harmonisasi Regulasi 2026 */}
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-3 rounded-xl border border-amber-300 text-xs space-y-1">
-              <span className="font-extrabold text-amber-900 text-[11px] flex items-center gap-1.5">
+            <div className="bg-amber-50 p-3 rounded-xl border border-amber-300 text-xs space-y-1">
+              <span className="font-semibold text-amber-900 text-xs flex items-center gap-1.5">
                 <AlertTriangle className="h-4 w-4 text-amber-600" />
                 Catatan Adendum Harmonisasi Barokah Group (2026):
               </span>
-              <p className="text-[11px] text-amber-950 leading-relaxed">
+              <p className="text-xs text-amber-950 leading-relaxed">
                 Sesuai penetapan Manajemen Barokah Group 2026: (1) Sanksi libur di Hari Libur Nasional diselaraskan menjadi <b>Denda Rp 250.000,-</b> (wajib ada konfirmasi Surat Keterangan / Pengumuman Peak Season Perusahaan); (2) Pengajuan mendadak (&lt; H-3) pada weekday dikenakan <b>Denda Rp 50.000,-</b>; (3) Kuota harian cabang diatur baku berdasarkan jumlah staf cabang: <b>&lt; 8 staf maks 1 orang</b>, dan <b>&ge; 8 staf maks 2 orang</b>; (4) Jika jatah libur habis, berlaku ketentuan pemotongan prorata (Gaji Pokok / 30) serta denda Rp 15.000/hari (staf) atau Rp 25.000/hari (leader) sesuai SOP-HR-003 &amp; SOP-HR-006.
               </p>
             </div>
@@ -11488,7 +11360,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             <div className="space-y-5 text-xs text-slate-800 leading-relaxed">
               {/* 1. TUJUAN */}
               <section className="space-y-1.5">
-                <h4 className="font-black text-slate-950 text-sm uppercase">1. TUJUAN</h4>
+                <h4 className="font-semibold text-slate-950 text-sm uppercase">1. TUJUAN</h4>
                 <p className="text-slate-700 pl-4 border-l-2 border-amber-500">
                   Petunjuk teknis ini bertujuan untuk mengatur hak dan kewajiban karyawan dalam pengambilan hari libur (off) secara tertib, adil, dan terstruktur guna menjaga kualitas kerja dan kesehatan mental karyawan, serta memastikan kelancaran operasional restoran.
                 </p>
@@ -11496,23 +11368,23 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* 2. KETENTUAN UMUM */}
               <section className="space-y-2">
-                <h4 className="font-black text-slate-950 text-sm uppercase">2. KETENTUAN UMUM</h4>
+                <h4 className="font-semibold text-slate-950 text-sm uppercase">2. KETENTUAN UMUM</h4>
                 <div className="space-y-2 pl-4">
                   <div>
-                    <h5 className="font-extrabold text-slate-900">2.1 Hak Jatah Off</h5>
+                    <h5 className="font-semibold text-slate-900">2.1 Hak Jatah Off</h5>
                     <ul className="list-disc list-inside space-y-1 text-slate-700">
                       <li>Setiap karyawan memiliki hak <b>2 (dua) hari off setiap bulan</b>.</li>
                       <li>Jatah off dihitung dari tanggal 1 hingga akhir bulan.</li>
                     </ul>
                   </div>
                   <div>
-                    <h5 className="font-extrabold text-slate-900">2.2 Tenggat Waktu Penggunaan Off</h5>
+                    <h5 className="font-semibold text-slate-900">2.2 Tenggat Waktu Penggunaan Off</h5>
                     <p className="text-slate-700">
                       Jatah off yang tidak diambil selama 2 bulan berturut-turut, maka pada <b>bulan ke-3 karyawan wajib mengambil off</b>, demi mencegah kelelahan kerja dan menurunkan stres.
                     </p>
                   </div>
                   <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-200">
-                    <h5 className="font-extrabold text-emerald-950">2.3 Insentif Tidak Mengambil Off</h5>
+                    <h5 className="font-semibold text-emerald-950">2.3 Insentif Tidak Mengambil Off</h5>
                     <p className="text-emerald-900">
                       Bila jatah off tidak digunakan dalam 1 bulan, maka karyawan mendapat insentif sebesar <b>Rp75.000 per hari</b> yang tidak diambil (<b>maks. Rp150.000 per bulan</b>).
                     </p>
@@ -11522,10 +11394,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* 3. ATURAN PENGAMBILAN OFF */}
               <section className="space-y-2">
-                <h4 className="font-black text-slate-950 text-sm uppercase">3. ATURAN PENGAMBILAN OFF</h4>
+                <h4 className="font-semibold text-slate-950 text-sm uppercase">3. ATURAN PENGAMBILAN OFF</h4>
                 <div className="space-y-2.5 pl-4">
                   <div>
-                    <h5 className="font-extrabold text-slate-900">3.1 Pengambilan Off Normal</h5>
+                    <h5 className="font-semibold text-slate-900">3.1 Pengambilan Off Normal</h5>
                     <ul className="list-disc list-inside space-y-1 text-slate-700">
                       <li>Pengambilan off <b>hanya diperbolehkan pada weekday (Senin–Jumat)</b> dan bukan hari libur nasional.</li>
                       <li className="text-rose-700 font-semibold">
@@ -11534,20 +11406,20 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     </ul>
                   </div>
                   <div className="bg-rose-50/70 p-3 rounded-xl border border-rose-200">
-                    <h5 className="font-extrabold text-rose-950">3.2 Off Lebih dari 2 Hari dalam Sebulan</h5>
+                    <h5 className="font-semibold text-rose-950">3.2 Off Lebih dari 2 Hari dalam Sebulan</h5>
                     <p className="text-rose-900">
                       Jika karyawan mengambil off lebih dari 2 hari dalam satu bulan, maka akan dikenakan <b>sanksi Rp75.000 per hari tambahan</b> (berlaku kelipatan).
                     </p>
-                    <p className="text-[11px] text-rose-800 italic mt-0.5">
+                    <p className="text-xs text-rose-800 italic mt-0.5">
                       Contoh: ambil 3 hari = kena denda Rp75.000; ambil 4 hari = kena denda Rp150.000.
                     </p>
                   </div>
                   <div className="bg-rose-50/70 p-3 rounded-xl border border-rose-200">
-                    <h5 className="font-extrabold text-rose-950">3.3 Off Lebih dari 2 Hari Berturut-Turut</h5>
+                    <h5 className="font-semibold text-rose-950">3.3 Off Lebih dari 2 Hari Berturut-Turut</h5>
                     <p className="text-rose-900">
                       Jika mengambil lebih dari 2 hari off berturut-turut, maka dikenakan <b>sanksi Rp100.000 per hari tambahan</b> dari hari ketiga dan seterusnya (berlaku kelipatan).
                     </p>
-                    <p className="text-[11px] text-rose-800 italic mt-0.5">
+                    <p className="text-xs text-rose-800 italic mt-0.5">
                       Contoh: ambil 3 hari berturut = kena denda Rp100.000; ambil 4 hari = Rp200.000.
                     </p>
                   </div>
@@ -11556,18 +11428,18 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* 4. MEKANISME PENGAJUAN OFF */}
               <section className="space-y-2">
-                <h4 className="font-black text-slate-950 text-sm uppercase">4. MEKANISME PENGAJUAN OFF</h4>
+                <h4 className="font-semibold text-slate-950 text-sm uppercase">4. MEKANISME PENGAJUAN OFF</h4>
                 <div className="space-y-2.5 pl-4">
                   <div>
-                    <h5 className="font-extrabold text-slate-900">4.1 Format Pengajuan</h5>
-                    <div className="bg-slate-100 p-2.5 rounded-lg font-mono text-[11px] text-slate-800 border border-slate-200">
+                    <h5 className="font-semibold text-slate-900">4.1 Format Pengajuan</h5>
+                    <div className="bg-slate-100 p-2.5 rounded-lg font-mono text-xs text-slate-800 border border-slate-200">
                       <p>Dilakukan di grup WhatsApp tim dengan format:</p>
                       <p className="font-bold text-amber-900 mt-1">Nama : [Nama Lengkap]</p>
                       <p className="font-bold text-amber-900">Tanggal Libur : [Tanggal yang diajukan]</p>
                     </div>
                   </div>
                   <div>
-                    <h5 className="font-extrabold text-slate-900">4.2 Waktu Pengajuan &amp; Kuota Harian</h5>
+                    <h5 className="font-semibold text-slate-900">4.2 Waktu Pengajuan &amp; Kuota Harian</h5>
                     <ul className="list-disc list-inside space-y-1 text-slate-700">
                       <li>Pengajuan <b>maksimal H-3</b> sebelum hari yang diajukan kecuali keadaan darurat.</li>
                       <li><b>Senin, Kamis, Jumat, Sabtu, Minggu:</b> maksimal <b>1 orang</b> per hari.</li>
@@ -11576,11 +11448,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     </ul>
                   </div>
                   <div className="bg-amber-50 p-3 rounded-xl border border-amber-200">
-                    <h5 className="font-extrabold text-amber-950">4.3 Kombinasi Posisi (Guardrails Station)</h5>
+                    <h5 className="font-semibold text-amber-950">4.3 Kombinasi Posisi (Guardrails Station)</h5>
                     <p className="text-amber-900 mb-1">
                       Jika 2 orang mengambil off di hari yang sama, <b>tidak boleh dari posisi yang sama</b>, seperti:
                     </p>
-                    <div className="grid grid-cols-2 gap-1 font-bold text-[11px] text-amber-950">
+                    <div className="grid grid-cols-2 gap-1 font-bold text-xs text-amber-950">
                       <span>• Tidak boleh dua koki</span>
                       <span>• Tidak boleh dua kasir</span>
                       <span>• Tidak boleh dua waiters</span>
@@ -11592,22 +11464,22 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* 5. PELANGGARAN DAN SANKSI */}
               <section className="space-y-2">
-                <h4 className="font-black text-slate-950 text-sm uppercase">5. PELANGGARAN DAN SANKSI</h4>
+                <h4 className="font-semibold text-slate-950 text-sm uppercase">5. PELANGGARAN DAN SANKSI</h4>
                 <div className="space-y-2 pl-4">
                   <div className="bg-rose-50 p-2.5 rounded-lg border border-rose-200">
-                    <h5 className="font-extrabold text-rose-950">5.1 Off Tanpa Pemberitahuan</h5>
+                    <h5 className="font-semibold text-rose-950">5.1 Off Tanpa Pemberitahuan</h5>
                     <p className="text-rose-900">
                       Jika off dilakukan tanpa pemberitahuan, maka akan <b>langsung diberikan Surat Peringatan (SP) 1</b>.
                     </p>
                   </div>
                   <div className="bg-rose-100 p-2.5 rounded-lg border border-rose-300">
-                    <h5 className="font-extrabold text-rose-950">5.2 Off Tanpa Kabar Selama 5 Hari</h5>
+                    <h5 className="font-semibold text-rose-950">5.2 Off Tanpa Kabar Selama 5 Hari</h5>
                     <p className="text-rose-950 font-bold">
                       Jika dalam waktu 5 hari berturut-turut karyawan tidak ada kabar, maka akan <b>dianggap resign secara otomatis</b>.
                     </p>
                   </div>
                   <div>
-                    <h5 className="font-extrabold text-slate-900">5.3 Bentrok Pengajuan</h5>
+                    <h5 className="font-semibold text-slate-900">5.3 Bentrok Pengajuan</h5>
                     <p className="text-slate-700">
                       Jika terjadi bentrok jadwal, prioritas diberikan kepada keperluan darurat (sakit, keluarga, dsb.). Manajemen akan memberikan keputusan akhir berdasarkan urgensi dan kebutuhan operasional.
                     </p>
@@ -11617,14 +11489,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* 6. PENUTUP & PENGESAHAN */}
               <section className="space-y-3 pt-3 border-t border-slate-200">
-                <h4 className="font-black text-slate-950 text-sm uppercase">6. PENUTUP</h4>
+                <h4 className="font-semibold text-slate-950 text-sm uppercase">6. PENUTUP</h4>
                 <p className="text-slate-700 italic">
                   Petunjuk teknis ini berlaku sebagai <b>aturan resmi internal dan wajib ditaati seluruh karyawan</b>. Ketidaktahuan terhadap aturan ini bukan alasan untuk pelanggaran. Demi kenyamanan bersama, mari jaga kedisiplinan dan komunikasi yang baik.
                 </p>
 
                 {/* Tanda Tangan Resmi */}
                 <div className="pt-4 flex justify-between items-end">
-                  <div className="text-[11px] text-slate-500">
+                  <div className="text-xs text-slate-500">
                     <p>Diterbitkan di: Kota Tebing Tinggi</p>
                     <p>Unit Usaha: Ayam Pecak 2001 Seafood</p>
                     <p className="text-emerald-700 font-bold mt-1">✓ Terverifikasi Digital di Sistem HRIS</p>
@@ -11634,9 +11506,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     <div className="h-10 w-28 border-b-2 border-slate-900 flex items-center justify-center mx-auto text-slate-400 font-serif italic text-sm">
                       (Arif G. P.)
                     </div>
-                    <p className="font-black text-slate-950 text-xs">ARIF GUNAWAN PANGGABEAN</p>
-                    <p className="text-[10px] text-slate-600 font-medium">Manajemen Ayam Pecak 2001 Seafood</p>
-                    <p className="text-[10px] text-slate-500 font-mono">Tanggal: 25 Mei 2025</p>
+                    <p className="font-semibold text-slate-950 text-xs">ARIF GUNAWAN PANGGABEAN</p>
+                    <p className="text-xs text-slate-600 font-medium">Manajemen Ayam Pecak 2001 Seafood</p>
+                    <p className="text-xs text-slate-500 font-mono">Tanggal: 25 Mei 2025</p>
                   </div>
                 </div>
               </section>
@@ -11644,7 +11516,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
             {/* Modal Footer Actions */}
             <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3">
-              <span className="text-[11px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 Aturan ini telah aktif sebagai guardrail otomatis pada aplikasi Android staf.
               </span>
               <div className="flex space-x-2">
@@ -11673,7 +11545,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {viewingOfficialSop2026Doc && (
         <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-white rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
+          <div className="bg-white rounded-lg max-w-4xl w-full p-6 sm:p-8 shadow-xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
             {/* Header / Kop Surat Resmi Barokah Grup */}
             <div className="relative mb-3">
               <button
@@ -11692,12 +11564,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             </div>
 
             {/* Document Metadata Bar */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-200 text-xs">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-amber-50 p-4 rounded-xl border border-amber-200 text-xs">
               <div>
-                <p className="font-extrabold text-slate-900 text-sm">
+                <p className="font-semibold text-slate-900 text-sm">
                   STANDARD OPERATIONAL PROCEDURE (SOP)
                 </p>
-                <p className="font-black text-amber-800 text-base">
+                <p className="font-semibold text-amber-800 text-base">
                   JAM KERJA, JAM OPERASIONAL DAN KEHADIRAN
                 </p>
                 <p className="text-slate-700 font-semibold mt-0.5">
@@ -11705,15 +11577,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <span className="bg-emerald-600 text-white px-3 py-1 rounded-full font-black text-[10px] uppercase shadow-xs inline-block">
+                <span className="bg-emerald-600 text-white px-3 py-1 rounded-full font-semibold text-xs uppercase shadow-xs inline-block">
                   BERLAKU: 01 APRIL 2026
                 </span>
-                <p className="text-[10px] text-slate-500 font-mono mt-1">Dokumen Asli (8 Halaman)</p>
+                <p className="text-xs text-slate-500 font-mono mt-1">Dokumen Asli (8 Halaman)</p>
               </div>
             </div>
 
             {/* Quick Navigation Pills */}
-            <div className="flex flex-wrap gap-1.5 p-2 bg-slate-100 rounded-xl text-[10px] font-bold">
+            <div className="flex flex-wrap gap-1.5 p-2 bg-slate-100 rounded-xl text-xs font-bold">
               <span className="text-slate-500 py-1 px-2">Lompat Cepat:</span>
               <a href="#sop26-bab1" className="bg-white hover:bg-amber-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Bab 1: Jam Kerja</a>
               <a href="#sop26-bab2" className="bg-white hover:bg-amber-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Bab 2: Jam Operasional</a>
@@ -11730,12 +11602,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* BAB 1: JAM KERJA, ISTIRAHAT & LEMBUR */}
               <section id="sop26-bab1" className="space-y-3 p-4 bg-slate-50/70 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded text-[10px]">BAB 1</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">KETENTUAN JAM KERJA, ISTIRAHAT &amp; LEMBUR</h4>
+                  <span className="bg-amber-500 text-slate-950 font-semibold px-2 py-0.5 rounded text-xs">BAB 1</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">KETENTUAN JAM KERJA, ISTIRAHAT &amp; LEMBUR</h4>
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-[11px] border border-slate-200 rounded-lg overflow-hidden">
+                  <table className="w-full text-left text-xs border border-slate-200 rounded-lg overflow-hidden">
                     <thead className="bg-slate-200 text-slate-900 font-bold">
                       <tr>
                         <th className="p-2 border">Unit Usaha</th>
@@ -11781,25 +11653,25 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* BAB 2: JAM OPERASIONAL OUTLET */}
               <section id="sop26-bab2" className="space-y-3 p-4 bg-slate-50/70 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded text-[10px]">BAB 2</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">JAM OPERASIONAL OUTLET (BUKA, TUTUP &amp; CLOSING)</h4>
+                  <span className="bg-amber-500 text-slate-950 font-semibold px-2 py-0.5 rounded text-xs">BAB 2</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">JAM OPERASIONAL OUTLET (BUKA, TUTUP &amp; CLOSING)</h4>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
                     <p className="font-bold text-slate-900">Ayam Bakar Surabaya</p>
-                    <p className="text-[11px] text-slate-600">• Weekday: Buka 11.00 - 22.00 WIB (Closing 23.00)</p>
-                    <p className="text-[11px] text-slate-600">• Weekend: Buka 11.00 - 23.00 WIB (Closing 24.00)</p>
+                    <p className="text-xs text-slate-600">• Weekday: Buka 11.00 - 22.00 WIB (Closing 23.00)</p>
+                    <p className="text-xs text-slate-600">• Weekend: Buka 11.00 - 23.00 WIB (Closing 24.00)</p>
                   </div>
                   <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
                     <p className="font-bold text-slate-900">Ayam Pecak 2001 Seafood</p>
-                    <p className="text-[11px] text-slate-600">• Setiap Hari: Buka 11.00 - 24.00 WIB</p>
-                    <p className="text-[11px] text-amber-700 font-semibold">• Jam Closing: 01.00 WIB</p>
+                    <p className="text-xs text-slate-600">• Setiap Hari: Buka 11.00 - 24.00 WIB</p>
+                    <p className="text-xs text-amber-700 font-semibold">• Jam Closing: 01.00 WIB</p>
                   </div>
                   <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
                     <p className="font-bold text-slate-900">Pecel Lele Pak Haji</p>
-                    <p className="text-[11px] text-slate-600">• Setiap Hari: Buka 11.00 - 24.00 WIB</p>
-                    <p className="text-[11px] text-amber-700 font-semibold">• Jam Closing: 01.00 WIB</p>
+                    <p className="text-xs text-slate-600">• Setiap Hari: Buka 11.00 - 24.00 WIB</p>
+                    <p className="text-xs text-amber-700 font-semibold">• Jam Closing: 01.00 WIB</p>
                   </div>
                 </div>
               </section>
@@ -11807,14 +11679,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* BAB 3: KETENTUAN KEHADIRAN & LIBUR RESMI */}
               <section id="sop26-bab3" className="space-y-3 p-4 bg-slate-50/70 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded text-[10px]">BAB 3</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">KETENTUAN KEHADIRAN &amp; OFF RESMI (LIBUR REGULER)</h4>
+                  <span className="bg-amber-500 text-slate-950 font-semibold px-2 py-0.5 rounded text-xs">BAB 3</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">KETENTUAN KEHADIRAN &amp; OFF RESMI (LIBUR REGULER)</h4>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-2">
-                    <h5 className="font-extrabold text-slate-900">Ketentuan Dasar &amp; Kuota Cabang</h5>
-                    <ul className="list-disc list-inside space-y-1 text-slate-700 text-[11px]">
+                    <h5 className="font-semibold text-slate-900">Ketentuan Dasar &amp; Kuota Cabang</h5>
+                    <ul className="list-disc list-inside space-y-1 text-slate-700 text-xs">
                       <li>Hak jatah libur resmi adalah <b>2 hari per bulan</b> setelah masa kerja minimal 1 bulan.</li>
                       <li>Wajib diajukan ke HRD minimal <b>H-3</b> sebelum tanggal libur. Pengajuan &lt; H-3 masuk kategori Libur Tambahan.</li>
                       <li>Outlet dengan <b>&lt; 8 staf</b>: Maksimal <b>1 orang off per hari</b>.</li>
@@ -11823,8 +11695,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-2">
-                    <h5 className="font-extrabold text-slate-900">Konsekuensi Pengambilan Hari</h5>
-                    <div className="space-y-1.5 text-[11px]">
+                    <h5 className="font-semibold text-slate-900">Konsekuensi Pengambilan Hari</h5>
+                    <div className="space-y-1.5 text-xs">
                       <div className="p-2 bg-emerald-50 border border-emerald-200 rounded-lg">
                         <span className="font-bold text-emerald-950">Weekday (Senin - Jumat):</span>
                         <p className="text-emerald-900">Gaji harian tetap dibayar penuh (tanpa sanksi denda).</p>
@@ -11845,14 +11717,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* BAB 4: KETENTUAN SAKIT */}
               <section id="sop26-bab4" className="space-y-3 p-4 bg-slate-50/70 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded text-[10px]">BAB 4</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">KETENTUAN SAKIT (RAWAT INAP VS RAWAT JALAN)</h4>
+                  <span className="bg-amber-500 text-slate-950 font-semibold px-2 py-0.5 rounded text-xs">BAB 4</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">KETENTUAN SAKIT (RAWAT INAP VS RAWAT JALAN)</h4>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-200 space-y-2">
-                    <h5 className="font-extrabold text-emerald-950">🏥 Sakit Rawat Inap (Opname RS)</h5>
-                    <div className="space-y-1 text-[11px] text-emerald-900">
+                    <h5 className="font-semibold text-emerald-950">Sakit Rawat Inap (Opname RS)</h5>
+                    <div className="space-y-1 text-xs text-emerald-900">
                       <p className="font-bold">• Rawat Inap &le; 3 Hari (Surat RS Resmi):</p>
                       <ul className="list-disc list-inside pl-2 space-y-0.5">
                         <li>Gaji Pokok / Upah Harian: <b>TETAP DAPAT (100%)</b></li>
@@ -11866,8 +11738,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   <div className="p-3 bg-amber-50/60 rounded-xl border border-amber-200 space-y-2">
-                    <h5 className="font-extrabold text-amber-950">🩺 Sakit Rawat Jalan (Klinik/Puskesmas)</h5>
-                    <div className="space-y-1.5 text-[11px] text-slate-700">
+                    <h5 className="font-semibold text-amber-950">Sakit Rawat Jalan (Klinik/Puskesmas)</h5>
+                    <div className="space-y-1.5 text-xs text-slate-700">
                       <p>• <b>Klaim Upah</b>: Sakit rawat jalan tidak mendapatkan upah harian/prorata, uang makan &amp; lembur (unpaid).</p>
                       <div className="p-2 bg-white rounded border border-amber-200">
                         <p className="font-bold text-slate-900">• Sakit di Weekend / Libur Nasional:</p>
@@ -11882,12 +11754,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* BAB 5: MASUK SETENGAH HARI */}
               <section id="sop26-bab5" className="space-y-3 p-4 bg-slate-50/70 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded text-[10px]">BAB 5</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">KETENTUAN MASUK SETENGAH HARI (PARSIAL)</h4>
+                  <span className="bg-amber-500 text-slate-950 font-semibold px-2 py-0.5 rounded text-xs">BAB 5</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">KETENTUAN MASUK SETENGAH HARI (PARSIAL)</h4>
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-[11px] border border-slate-200 rounded-lg overflow-hidden">
+                  <table className="w-full text-left text-xs border border-slate-200 rounded-lg overflow-hidden">
                     <thead className="bg-slate-200 text-slate-900 font-bold">
                       <tr>
                         <th className="p-2 border">Durasi Kehadiran</th>
@@ -11938,11 +11810,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* BAB 6: LIBUR TAMBAHAN & DISPENSASI */}
               <section id="sop26-bab6" className="space-y-3 p-4 bg-slate-50/70 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded text-[10px]">BAB 6</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">LIBUR TAMBAHAN (DI LUAR JATAH OFF) &amp; DISPENSASI</h4>
+                  <span className="bg-amber-500 text-slate-950 font-semibold px-2 py-0.5 rounded text-xs">BAB 6</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">LIBUR TAMBAHAN (DI LUAR JATAH OFF) &amp; DISPENSASI</h4>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                   <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1.5">
                     <p className="font-bold text-slate-900">Pengajuan Mendadak (&lt; H-3)</p>
                     <p className="text-slate-600">
@@ -11962,7 +11834,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
                 </div>
 
-                <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-[11px] text-blue-900">
+                <div className="p-2.5 bg-sky-50 border border-sky-200 rounded-lg text-xs text-sky-900">
                   <b>Dispensasi Alasan Tertentu:</b> Libur keperluan darurat keluarga, pernikahan, atau kedukaan yang telah disetujui HRD secara resmi <b>TIDAK DIKENAKAN SANKSI DENDA</b>.
                 </div>
               </section>
@@ -11970,11 +11842,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* BAB 7: INTEGRITAS ABSENSI & KEDISIPLINAN */}
               <section id="sop26-bab7" className="space-y-3 p-4 bg-slate-50/70 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded text-[10px]">BAB 7</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">INTEGRITAS ABSENSI &amp; SANKSI INDISIPLINER</h4>
+                  <span className="bg-amber-500 text-slate-950 font-semibold px-2 py-0.5 rounded text-xs">BAB 7</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">INTEGRITAS ABSENSI &amp; SANKSI INDISIPLINER</h4>
                 </div>
 
-                <div className="space-y-2 text-[11px] text-slate-700">
+                <div className="space-y-2 text-xs text-slate-700">
                   <p>1. Seluruh karyawan wajib melakukan absensi masuk dan absensi pulang melalui sistem biometrik/aplikasi HRIS sesuai jam kerja.</p>
                   <p>2. Karyawan yang tidak melakukan absensi dianggap belum hadir sampai diverifikasi oleh atasan langsung.</p>
                   <p className="text-rose-700 font-bold">
@@ -11988,7 +11860,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* PENGESAHAN DOKUMEN */}
               <section className="pt-4 border-t-2 border-slate-900 flex flex-col sm:flex-row justify-between items-end gap-4">
-                <div className="text-[11px] text-slate-500 space-y-0.5">
+                <div className="text-xs text-slate-500 space-y-0.5">
                   <p className="font-bold text-slate-700">Ditetapkan di: Kota Tebing Tinggi</p>
                   <p>Berlaku Efektif: <b>01 April 2026</b></p>
                   <p className="text-emerald-700 font-bold">✓ Terkoneksi Otomatis ke Payroll, Roster &amp; Kru App</p>
@@ -11999,16 +11871,16 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   <div className="h-12 w-32 border-b-2 border-slate-900 flex items-center justify-center mx-auto text-slate-400 font-serif italic text-sm">
                     (Direksi)
                   </div>
-                  <p className="font-black text-slate-950 text-xs">DIREKSI &amp; MANAJEMEN HRD</p>
-                  <p className="text-[10px] text-slate-600 font-semibold uppercase">BAROKAH GRUP INDONESIA</p>
-                  <p className="text-[9px] text-slate-400 font-mono">Verifikasi Hash Digital: BG-SOP-2026-04-VALID</p>
+                  <p className="font-semibold text-slate-950 text-xs">DIREKSI &amp; MANAJEMEN HRD</p>
+                  <p className="text-xs text-slate-600 font-semibold uppercase">BAROKAH GRUP INDONESIA</p>
+                  <p className="text-xs text-slate-400 font-mono">Verifikasi Hash Digital: BG-SOP-2026-04-VALID</p>
                 </div>
               </section>
             </div>
 
             {/* Modal Footer Actions */}
             <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3">
-              <span className="text-[11px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 Formula denda &amp; kuota SOP ini aktif secara real-time di seluruh sistem HRIS.
               </span>
               <div className="flex space-x-2">
@@ -12037,7 +11909,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {viewingOfficialSopOnboardingDoc && (
         <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-white rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
+          <div className="bg-white rounded-lg max-w-4xl w-full p-6 sm:p-8 shadow-xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
             {/* Header / Kop Surat Resmi Barokah Grup */}
             <div className="relative mb-3">
               <button
@@ -12056,15 +11928,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             </div>
 
             {/* Document Metadata Bar */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-200 text-xs">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-amber-50 p-4 rounded-xl border border-amber-200 text-xs">
               <div>
-                <p className="font-extrabold text-slate-900 text-sm">
+                <p className="font-semibold text-slate-900 text-sm">
                   STANDARD OPERATIONAL PROCEDURE (SOP)
                 </p>
-                <p className="font-black text-amber-900 text-base">
+                <p className="font-semibold text-amber-900 text-base">
                   SKEMA PENGGAJIAN KARYAWAN BARU (ONBOARDING PAYROLL 3 BULAN PERTAMA)
                 </p>
-                <p className="text-slate-600 font-mono text-[11px] mt-0.5">
+                <p className="text-slate-600 font-mono text-xs mt-0.5">
                   Nomor Dokumen: <span className="font-bold text-amber-800">004/HR-PAY/2026/BAROKAH</span> | Klasifikasi: Operasional HRD &amp; Payroll
                 </p>
                 <p className="text-slate-700 font-semibold mt-0.5">
@@ -12072,15 +11944,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <span className="bg-amber-600 text-white px-3 py-1 rounded-full font-black text-[10px] uppercase shadow-xs inline-block">
+                <span className="bg-amber-600 text-white px-3 py-1 rounded-full font-semibold text-xs uppercase shadow-xs inline-block">
                   BERLAKU: 21 OKTOBER 2026
                 </span>
-                <p className="text-[10px] text-slate-500 font-mono mt-1">Dokumen Resmi Acuan HRIS</p>
+                <p className="text-xs text-slate-500 font-mono mt-1">Dokumen Resmi Acuan HRIS</p>
               </div>
             </div>
 
             {/* Quick Navigation Pills */}
-            <div className="flex flex-wrap gap-1.5 p-2 bg-slate-100 rounded-xl text-[10px] font-bold">
+            <div className="flex flex-wrap gap-1.5 p-2 bg-slate-100 rounded-xl text-xs font-bold">
               <span className="text-slate-500 py-1 px-2">Lompat Cepat:</span>
               <a href="#sop-onb-pasal1" className="bg-white hover:bg-amber-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Pasal 1: Siklus Standar Resto</a>
               <a href="#sop-onb-pasal2" className="bg-white hover:bg-amber-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Pasal 2: Skema 3 Tahap Onboarding</a>
@@ -12096,8 +11968,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 1: SIKLUS PENGGAJIAN STANDAR RESTORAN */}
               <section id="sop-onb-pasal1" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-slate-900 text-amber-300 font-black px-2 py-0.5 rounded text-[10px]">PASAL 1</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">SIKLUS PENGGAJIAN STANDAR RESTORAN (ACUAN UTAMA)</h4>
+                  <span className="bg-slate-900 text-amber-300 font-semibold px-2 py-0.5 rounded text-xs">PASAL 1</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">SIKLUS PENGGAJIAN STANDAR RESTORAN (ACUAN UTAMA)</h4>
                 </div>
 
                 <div className="bg-amber-50/60 border border-amber-200 rounded-lg p-3 text-slate-800 space-y-2">
@@ -12106,32 +11978,32 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
                     <div className="bg-white p-3 rounded-lg border border-amber-300 shadow-xs">
-                      <div className="flex items-center space-x-1.5 text-amber-800 font-black text-xs mb-1">
+                      <div className="flex items-center space-x-1.5 text-amber-800 font-semibold text-xs mb-1">
                         <Clock className="h-4 w-4" />
                         <span>1.1. Periode Tutup Buku (Cut-Off) Operasional</span>
                       </div>
-                      <p className="text-[11px] text-slate-700 leading-relaxed">
+                      <p className="text-xs text-slate-700 leading-relaxed">
                         Periode tutup buku (cut-off) operasional restoran dihitung dari <strong>tanggal 6 bulan sebelumnya sampai dengan tanggal 5 bulan berjalan</strong>.
                       </p>
-                      <span className="inline-block mt-2 text-[10px] font-mono bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-bold">
+                      <span className="inline-block mt-2 text-xs font-mono bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-bold">
                         Contoh: 06 Juni s/d 05 Juli
                       </span>
                     </div>
 
                     <div className="bg-white p-3 rounded-lg border border-amber-300 shadow-xs">
-                      <div className="flex items-center space-x-1.5 text-emerald-800 font-black text-xs mb-1">
+                      <div className="flex items-center space-x-1.5 text-emerald-800 font-semibold text-xs mb-1">
                         <Wallet className="h-4 w-4" />
                         <span>1.2. Pembayaran Gaji Serentak (Payday)</span>
                       </div>
-                      <p className="text-[11px] text-slate-700 leading-relaxed">
+                      <p className="text-xs text-slate-700 leading-relaxed">
                         Pembayaran gaji (payday) seluruh outlet dilaksanakan <strong>serentak pada tanggal 10</strong> setiap bulannya melalui transfer rekening bank karyawan.
                       </p>
-                      <span className="inline-block mt-2 text-[10px] font-mono bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded font-bold border border-emerald-200">
+                      <span className="inline-block mt-2 text-xs font-mono bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded font-bold border border-emerald-200">
                         Cair: Tanggal 10 Setiap Bulan
                       </span>
                     </div>
                   </div>
-                  <p className="text-[10px] text-slate-500 italic pt-1">
+                  <p className="text-xs text-slate-500 italic pt-1">
                     * Ketentuan ini mengikat untuk seluruh staf dan kru restoran yang telah melewati masa penyesuaian onboarding.
                   </p>
                 </div>
@@ -12140,27 +12012,27 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 2: KETENTUAN PENGGAJIAN KARYAWAN BARU */}
               <section id="sop-onb-pasal2" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded text-[10px]">PASAL 2</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">KETENTUAN PENGGAJIAN KARYAWAN BARU (SKEMA 3 BULAN PERTAMA)</h4>
+                  <span className="bg-amber-500 text-slate-950 font-semibold px-2 py-0.5 rounded text-xs">PASAL 2</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">KETENTUAN PENGGAJIAN KARYAWAN BARU (SKEMA 3 BULAN PERTAMA)</h4>
                 </div>
 
-                <p className="text-[11px] text-slate-700">
+                <p className="text-xs text-slate-700">
                   Untuk menjaga keadilan hak keringat kru baru sekaligus menyelaraskan catatan pembukuan akuntansi outlet, diberlakukan 3 tahapan penyesuaian penggajian:
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {/* BULAN 1 */}
-                  <div className="p-3.5 bg-white rounded-xl border-2 border-blue-200 shadow-xs space-y-2">
+                  <div className="p-3.5 bg-white rounded-xl border-2 border-sky-200 shadow-xs space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="bg-blue-600 text-white text-[10px] font-black px-2 py-0.5 rounded">TAHAP 1</span>
-                      <span className="text-[10px] font-extrabold text-blue-700">BULAN KE-1</span>
+                      <span className="bg-ink-800 text-white text-xs font-semibold px-2 py-0.5 rounded">TAHAP 1</span>
+                      <span className="text-xs font-semibold text-sky-700">BULAN KE-1</span>
                     </div>
                     <h5 className="font-bold text-slate-900 text-xs">Gaji Pertama (Genap 1 Bulan Bekerja)</h5>
-                    <p className="text-[11px] text-slate-600 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       Karyawan yang baru bergabung akan mendapatkan gaji setelah <strong>genap 1 (satu) bulan bekerja</strong>.
                     </p>
-                    <div className="bg-blue-50 p-2 rounded-lg text-[10px] space-y-1 border border-blue-100">
-                      <p className="font-bold text-blue-900">• Status: GAJI FULL (100%)</p>
+                    <div className="bg-sky-50 p-2 rounded-lg text-xs space-y-1 border border-sky-100">
+                      <p className="font-bold text-sky-900">• Status: GAJI FULL (100%)</p>
                       <p className="text-slate-600">• Diberikan tepat 1 bulan sejak mulai bergabung.</p>
                       <p className="text-slate-600">• Contoh: Masuk 10 Mei → Gajian di 10 Juni.</p>
                     </div>
@@ -12169,14 +12041,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   {/* BULAN 2 */}
                   <div className="p-3.5 bg-white rounded-xl border-2 border-amber-300 shadow-xs space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="bg-amber-600 text-white text-[10px] font-black px-2 py-0.5 rounded">TAHAP 2</span>
-                      <span className="text-[10px] font-extrabold text-amber-800">BULAN KE-2</span>
+                      <span className="bg-amber-600 text-white text-xs font-semibold px-2 py-0.5 rounded">TAHAP 2</span>
+                      <span className="text-xs font-semibold text-amber-800">BULAN KE-2</span>
                     </div>
                     <h5 className="font-bold text-slate-900 text-xs">Penyesuaian Gaji (Penyelarasan Cut-Off)</h5>
-                    <p className="text-[11px] text-slate-600 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       Dihitung dari tanggal selesai bulan pertama hingga tanggal tutup buku restoran (tanggal 5).
                     </p>
-                    <div className="bg-amber-50 p-2 rounded-lg text-[10px] space-y-1 border border-amber-200">
+                    <div className="bg-amber-50 p-2 rounded-lg text-xs space-y-1 border border-amber-200">
                       <p className="font-bold text-amber-900">• Status: GAJI PRORATA PENYESUAIAN</p>
                       <p className="text-slate-600">• Periode: Tgl 10 s/d Tgl 5 bulan berikutnya.</p>
                       <p className="text-slate-600">• Gajian dibayarkan serentak tgl 10.</p>
@@ -12186,14 +12058,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   {/* BULAN 3 */}
                   <div className="p-3.5 bg-white rounded-xl border-2 border-emerald-300 shadow-xs space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded">TAHAP 3</span>
-                      <span className="text-[10px] font-extrabold text-emerald-800">BULAN KE-3 DST</span>
+                      <span className="bg-emerald-600 text-white text-xs font-semibold px-2 py-0.5 rounded">TAHAP 3</span>
+                      <span className="text-xs font-semibold text-emerald-800">BULAN KE-3 DST</span>
                     </div>
                     <h5 className="font-bold text-slate-900 text-xs">Siklus Reguler Penuh Restoran</h5>
-                    <p className="text-[11px] text-slate-600 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       Mulai bulan ketiga dan seterusnya, karyawan sudah 100% mengikuti siklus operasional restoran.
                     </p>
-                    <div className="bg-emerald-50 p-2 rounded-lg text-[10px] space-y-1 border border-emerald-200">
+                    <div className="bg-emerald-50 p-2 rounded-lg text-xs space-y-1 border border-emerald-200">
                       <p className="font-bold text-emerald-900">• Status: GAJI FULL REGULER (100%)</p>
                       <p className="text-slate-600">• Periode: Tgl 6 s/d Tgl 5 bulan berjalan.</p>
                       <p className="text-slate-600">• Gajian serentak tgl 10 setiap bulan.</p>
@@ -12205,19 +12077,19 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 3: TABEL SIMULASI OPERASIONAL NYATA */}
               <section id="sop-onb-pasal3" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-slate-900 text-amber-300 font-black px-2 py-0.5 rounded text-[10px]">PASAL 3</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">SIMULASI OPERASIONAL KASUS NYATA (MASUK TANGGAL 10 MEI)</h4>
+                  <span className="bg-slate-900 text-amber-300 font-semibold px-2 py-0.5 rounded text-xs">PASAL 3</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">SIMULASI OPERASIONAL KASUS NYATA (MASUK TANGGAL 10 MEI)</h4>
                 </div>
 
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-[11px] text-blue-950 flex items-center space-x-2">
-                  <AlertTriangle className="h-4 w-4 text-blue-600 shrink-0" />
+                <div className="p-3 bg-sky-50 border border-sky-200 rounded-lg text-xs text-sky-950 flex items-center space-x-2">
+                  <AlertTriangle className="h-4 w-4 text-sky-600 shrink-0" />
                   <span>
                     <strong>Studi Kasus Resmi:</strong> Karyawan baru <strong>Budi Santoso (Cook Kitchen)</strong> bergabung dan mulai aktif bekerja pada tanggal <strong>10 Mei (10 Bulan 5)</strong>.
                   </span>
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-[11px] border border-slate-200 rounded-lg overflow-hidden">
+                  <table className="w-full text-left text-xs border border-slate-200 rounded-lg overflow-hidden">
                     <thead className="bg-slate-900 text-amber-300 font-bold">
                       <tr>
                         <th className="p-2.5 border border-slate-700">Tahapan Penggajian</th>
@@ -12229,50 +12101,50 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 bg-white">
-                      <tr className="hover:bg-blue-50/40">
-                        <td className="p-2.5 font-bold text-blue-900 border">
-                          <span className="px-2 py-0.5 bg-blue-100 rounded text-[10px] font-black mr-1">Bulan 1</span>
+                      <tr className="hover:bg-sky-50/40">
+                        <td className="p-2.5 font-bold text-sky-900 border">
+                          <span className="px-2 py-0.5 bg-sky-100 rounded text-xs font-semibold mr-1">Bulan 1</span>
                           Gaji Awal Kerja
                         </td>
                         <td className="p-2.5 font-mono border">10 Mei – 09 Juni</td>
                         <td className="p-2.5 text-slate-600 border">09 Juni (Genap 1 Bln)</td>
-                        <td className="p-2.5 font-bold text-blue-700 border">10 Juni (10 Bulan 6)</td>
-                        <td className="p-2.5 font-extrabold text-blue-800 border bg-blue-50/30">
+                        <td className="p-2.5 font-bold text-sky-700 border">10 Juni (10 Bulan 6)</td>
+                        <td className="p-2.5 font-semibold text-sky-800 border bg-sky-50/30">
                           GAJI FULL (100%)
                         </td>
-                        <td className="p-2.5 text-slate-600 border text-[10px]">
+                        <td className="p-2.5 text-slate-600 border text-xs">
                           Hak penuh setelah genap menyelesaikan 30 hari kalender kerja awal.
                         </td>
                       </tr>
 
                       <tr className="hover:bg-amber-50/40">
                         <td className="p-2.5 font-bold text-amber-900 border">
-                          <span className="px-2 py-0.5 bg-amber-100 rounded text-[10px] font-black mr-1">Bulan 2</span>
+                          <span className="px-2 py-0.5 bg-amber-100 rounded text-xs font-semibold mr-1">Bulan 2</span>
                           Penyesuaian Gaji
                         </td>
                         <td className="p-2.5 font-mono border font-semibold text-amber-900">10 Juni – 05 Juli</td>
                         <td className="p-2.5 font-bold text-slate-900 border">05 Juli (Tutup Buku Resto)</td>
                         <td className="p-2.5 font-bold text-amber-700 border">10 Juli</td>
-                        <td className="p-2.5 font-extrabold text-amber-900 border bg-amber-50/50">
+                        <td className="p-2.5 font-semibold text-amber-900 border bg-amber-50/50">
                           PRORATA PENYESUAIAN
                         </td>
-                        <td className="p-2.5 text-slate-600 border text-[10px]">
+                        <td className="p-2.5 text-slate-600 border text-xs">
                           Penyelarasan tanggal kerja agar menyatu dengan tutup buku serentak restoran (tgl 5).
                         </td>
                       </tr>
 
                       <tr className="hover:bg-emerald-50/40">
                         <td className="p-2.5 font-bold text-emerald-900 border">
-                          <span className="px-2 py-0.5 bg-emerald-100 rounded text-[10px] font-black mr-1">Bulan 3</span>
+                          <span className="px-2 py-0.5 bg-emerald-100 rounded text-xs font-semibold mr-1">Bulan 3</span>
                           Gaji Reguler Penuh
                         </td>
                         <td className="p-2.5 font-mono border font-semibold text-emerald-900">06 Juli – 05 Agustus</td>
                         <td className="p-2.5 font-bold text-slate-900 border">05 Agustus (Tutup Buku Resto)</td>
                         <td className="p-2.5 font-bold text-emerald-700 border">10 Agustus</td>
-                        <td className="p-2.5 font-extrabold text-emerald-800 border bg-emerald-50/50">
+                        <td className="p-2.5 font-semibold text-emerald-800 border bg-emerald-50/50">
                           GAJI FULL (100%)
                         </td>
-                        <td className="p-2.5 text-slate-600 border text-[10px]">
+                        <td className="p-2.5 text-slate-600 border text-xs">
                           100% mengikuti siklus standar restoran seterusnya (cut-off 6-5, cair tgl 10).
                         </td>
                       </tr>
@@ -12284,17 +12156,17 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 4: FORMULA PERHITUNGAN PRORATA & ATURAN KASBON */}
               <section id="sop-onb-pasal4" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded text-[10px]">PASAL 4</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">FORMULA PRORATA BULAN KEDUA &amp; PEMBATASAN KASBON</h4>
+                  <span className="bg-amber-500 text-slate-950 font-semibold px-2 py-0.5 rounded text-xs">PASAL 4</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">FORMULA PRORATA BULAN KEDUA &amp; PEMBATASAN KASBON</h4>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-2">
                     <h5 className="font-bold text-slate-900 text-xs">4.1. Formula Perhitungan Prorata Bulan 2:</h5>
-                    <div className="p-2.5 bg-slate-900 text-amber-300 font-mono text-[10px] rounded-lg">
+                    <div className="p-2.5 bg-slate-900 text-amber-300 font-mono text-xs rounded-lg">
                       Gaji Bulan 2 = (Jumlah Hari Kerja Riil / Hari Kerja Standar) × (Gaji Pokok + Tunjangan Tetap)
                     </div>
-                    <p className="text-[11px] text-slate-600 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       Hari kerja riil dihitung dari tanggal 10 Juni sampai dengan 5 Juli (dikurangi hari libur resmi mingguan). Tunjangan kehadiran dan transport dihitung berdasarkan absensi clock-in aktual.
                     </p>
                   </div>
@@ -12304,10 +12176,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       <ShieldCheck className="h-4 w-4 text-rose-600" />
                       <span>4.2. Kebijakan Kasbon Karyawan Baru (SOP-HR-002):</span>
                     </h5>
-                    <p className="text-[11px] text-slate-700 leading-relaxed">
+                    <p className="text-xs text-slate-700 leading-relaxed">
                       Sesuai Pedoman Kasbon Restoran (SOP-HR-002), karyawan baru yang <strong>belum genap 3 (tiga) bulan bekerja</strong> atau masih berada dalam skema penyesuaian gaji <strong>TIDAK DIPERBOLEHKAN</strong> mengajukan pinjaman kasbon.
                     </p>
-                    <p className="text-[10px] text-rose-700 font-semibold">
+                    <p className="text-xs text-rose-700 font-semibold">
                       * Sistem HRIS mengunci otomatis form pengajuan kasbon bagi NIK karyawan berstatus onboarding.
                     </p>
                   </div>
@@ -12317,36 +12189,36 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 5: KOMPONEN PAYROLL & INSENTIF KPI GRADE A */}
               <section id="sop-onb-pasal5" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-slate-900 text-amber-300 font-black px-2 py-0.5 rounded text-[10px]">PASAL 5</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">KOMPONEN PAYROLL &amp; INSENTIF KPI GRADE A (RP 100.000)</h4>
+                  <span className="bg-slate-900 text-amber-300 font-semibold px-2 py-0.5 rounded text-xs">PASAL 5</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">KOMPONEN PAYROLL &amp; INSENTIF KPI GRADE A (RP 100.000)</h4>
                 </div>
 
                 <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2">
                   <p className="font-bold text-emerald-950 text-xs">
                     Insentif Prestasi Kinerja Kru Baru:
                   </p>
-                  <p className="text-[11px] text-slate-700 leading-relaxed">
+                  <p className="text-xs text-slate-700 leading-relaxed">
                     Meskipun berstatus onboarding, kru baru tetap berhak menerima <strong>Insentif Prestasi Sebesar Rp 100.000</strong> yang dimasukkan langsung ke dalam kolom Payroll apabila berhasil meraih <strong>Grade A</strong> pada evaluasi bulanan:
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
                     <div className="bg-white p-2 rounded-lg border border-emerald-200 text-center">
-                      <span className="text-[10px] text-slate-500 font-bold block">Disiplin Masuk</span>
-                      <span className="text-xs font-black text-emerald-700">Bobot 30%</span>
+                      <span className="text-xs text-slate-500 font-bold block">Disiplin Masuk</span>
+                      <span className="text-xs font-semibold text-emerald-700">Bobot 30%</span>
                     </div>
                     <div className="bg-white p-2 rounded-lg border border-emerald-200 text-center">
-                      <span className="text-[10px] text-slate-500 font-bold block">Disiplin Break</span>
-                      <span className="text-xs font-black text-emerald-700">Bobot 25%</span>
+                      <span className="text-xs text-slate-500 font-bold block">Disiplin Break</span>
+                      <span className="text-xs font-semibold text-emerald-700">Bobot 25%</span>
                     </div>
                     <div className="bg-white p-2 rounded-lg border border-emerald-200 text-center">
-                      <span className="text-[10px] text-slate-500 font-bold block">Survei 360° Attitude</span>
-                      <span className="text-xs font-black text-emerald-700">Bobot 35%</span>
+                      <span className="text-xs text-slate-500 font-bold block">Survei 360° Attitude</span>
+                      <span className="text-xs font-semibold text-emerald-700">Bobot 35%</span>
                     </div>
                     <div className="bg-white p-2 rounded-lg border border-emerald-200 text-center">
-                      <span className="text-[10px] text-slate-500 font-bold block">Bebas Kasbon</span>
-                      <span className="text-xs font-black text-emerald-700">Bobot 10%</span>
+                      <span className="text-xs text-slate-500 font-bold block">Bebas Kasbon</span>
+                      <span className="text-xs font-semibold text-emerald-700">Bobot 10%</span>
                     </div>
                   </div>
-                  <p className="text-[10px] text-emerald-800 italic pt-1">
+                  <p className="text-xs text-emerald-800 italic pt-1">
                     * Karyawan dengan Grade B, C, dan D tidak mendapatkan insentif (Rp 0).
                   </p>
                 </div>
@@ -12355,44 +12227,44 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* LEMBAR PENGESAHAN DOKUMEN RESMI */}
               <section id="sop-onb-pengesahan" className="p-4 bg-slate-50/80 rounded-xl border border-slate-200 space-y-4">
                 <div className="text-center space-y-1">
-                  <p className="text-[11px] font-bold text-slate-500 uppercase">LEMBAR PENGESAHAN DIREKSI &amp; MANAJEMEN HRD</p>
-                  <p className="text-xs font-black text-slate-900">DITETAPKAN DI JAKARTA, PADA TANGGAL 21 OKTOBER 2026</p>
+                  <p className="text-xs font-medium text-slate-600">LEMBAR PENGESAHAN DIREKSI &amp; MANAJEMEN HRD</p>
+                  <p className="text-xs font-semibold text-slate-900">DITETAPKAN DI JAKARTA, PADA TANGGAL 21 OKTOBER 2026</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                   <div className="p-3 bg-white rounded-xl border border-slate-200 text-center space-y-2">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">Disusun Oleh,</p>
+                    <p className="text-xs font-medium text-slate-600">Disusun Oleh,</p>
                     <div className="h-12 flex items-center justify-center">
                       <span className="font-serif italic font-bold text-slate-600 text-sm">Hendra Pratama</span>
                     </div>
                     <div className="border-t border-slate-200 pt-1">
-                      <p className="font-bold text-slate-900 text-[11px]">Hendra Pratama, S.E.</p>
-                      <p className="text-[10px] text-slate-500">Head of Payroll &amp; HR Ops</p>
+                      <p className="font-bold text-slate-900 text-xs">Hendra Pratama, S.E.</p>
+                      <p className="text-xs text-slate-500">Head of Payroll &amp; HR Ops</p>
                     </div>
                   </div>
 
                   <div className="p-3 bg-white rounded-xl border border-slate-200 text-center space-y-2">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">Diverifikasi Oleh,</p>
+                    <p className="text-xs font-medium text-slate-600">Diverifikasi Oleh,</p>
                     <div className="h-12 flex items-center justify-center">
                       <span className="font-serif italic font-bold text-slate-600 text-sm">dr. Siti Rahmawati</span>
                     </div>
                     <div className="border-t border-slate-200 pt-1">
-                      <p className="font-bold text-slate-900 text-[11px]">Siti Rahmawati, M.M.</p>
-                      <p className="text-[10px] text-slate-500">General Manager HRD</p>
+                      <p className="font-bold text-slate-900 text-xs">Siti Rahmawati, M.M.</p>
+                      <p className="text-xs text-slate-500">General Manager HRD</p>
                     </div>
                   </div>
 
                   <div className="p-3 bg-white rounded-xl border-2 border-amber-300 text-center space-y-2 relative overflow-hidden bg-amber-50/20">
-                    <span className="absolute top-1 right-1 text-[8px] font-black bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded uppercase">
+                    <span className="absolute top-1 right-1 text-[8px] font-semibold bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded uppercase">
                       TERVERIFIKASI
                     </span>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">Disetujui &amp; Disahkan,</p>
+                    <p className="text-xs font-medium text-slate-600">Disetujui &amp; Disahkan,</p>
                     <div className="h-12 flex items-center justify-center">
-                      <span className="font-serif italic font-black text-amber-900 text-sm">H. Bambang Sutrisno</span>
+                      <span className="font-serif italic font-semibold text-amber-900 text-sm">H. Bambang Sutrisno</span>
                     </div>
                     <div className="border-t border-slate-200 pt-1">
-                      <p className="font-black text-slate-950 text-[11px]">H. Bambang Sutrisno</p>
-                      <p className="text-[10px] text-amber-800 font-bold">Managing Director - Barokah F&amp;B Group</p>
+                      <p className="font-semibold text-slate-950 text-xs">H. Bambang Sutrisno</p>
+                      <p className="text-xs text-amber-800 font-bold">Managing Director - Barokah F&amp;B Group</p>
                     </div>
                   </div>
                 </div>
@@ -12402,7 +12274,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
             {/* Modal Footer Actions */}
             <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3">
-              <span className="text-[11px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 Dokumen ini merupakan acuan mutlak kalkulasi sistem Payroll &amp; HRIS Barokah Grup.
               </span>
               <div className="flex space-x-2">
@@ -12442,7 +12314,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {viewingOfficialSopTenureDoc && (
         <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-white rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
+          <div className="bg-white rounded-lg max-w-4xl w-full p-6 sm:p-8 shadow-xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
             {/* Header / Kop Surat Resmi Barokah Grup */}
             <div className="relative mb-3">
               <button
@@ -12461,15 +12333,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             </div>
 
             {/* Document Metadata Bar */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-200 text-xs">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-amber-50 p-4 rounded-xl border border-amber-200 text-xs">
               <div>
-                <p className="font-extrabold text-slate-900 text-sm">
+                <p className="font-semibold text-slate-900 text-sm">
                   STANDARD OPERATIONAL PROCEDURE (SOP)
                 </p>
-                <p className="font-black text-amber-900 text-base">
+                <p className="font-semibold text-amber-900 text-base">
                   KETENTUAN GAJI POKOK &amp; TUNJANGAN LAMA BEKERJA (TENURE ALLOWANCE)
                 </p>
-                <p className="text-slate-600 font-mono text-[11px] mt-0.5">
+                <p className="text-slate-600 font-mono text-xs mt-0.5">
                   Nomor Dokumen: <span className="font-bold text-amber-800">005/HR-PAY/2026/BAROKAH</span> | Klasifikasi: Operasional SDM &amp; Payroll
                 </p>
                 <p className="text-slate-700 font-semibold mt-0.5">
@@ -12477,15 +12349,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <span className="bg-amber-600 text-white px-3 py-1 rounded-full font-black text-[10px] uppercase shadow-xs inline-block">
+                <span className="bg-amber-600 text-white px-3 py-1 rounded-full font-semibold text-xs uppercase shadow-xs inline-block">
                   BERLAKU: 21 OKTOBER 2026
                 </span>
-                <p className="text-[10px] text-slate-500 font-mono mt-1">Dokumen Resmi Acuan HRIS</p>
+                <p className="text-xs text-slate-500 font-mono mt-1">Dokumen Resmi Acuan HRIS</p>
               </div>
             </div>
 
             {/* Quick Navigation Pills */}
-            <div className="flex flex-wrap gap-1.5 p-2 bg-slate-100 rounded-xl text-[10px] font-bold">
+            <div className="flex flex-wrap gap-1.5 p-2 bg-slate-100 rounded-xl text-xs font-bold">
               <span className="text-slate-500 py-1 px-2">Lompat Cepat:</span>
               <a href="#sop-ten-pasal1" className="bg-white hover:bg-amber-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Pasal 1: Gaji Pokok</a>
               <a href="#sop-ten-pasal2" className="bg-white hover:bg-amber-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Pasal 2: Tunjangan Blok 6 Bln</a>
@@ -12501,16 +12373,16 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 1: STRUKTUR GAJI POKOK BERDASARKAN LAMA BEKERJA */}
               <section id="sop-ten-pasal1" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-slate-900 text-amber-300 font-black px-2 py-0.5 rounded text-[10px]">PASAL 1</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">STRUKTUR GAJI POKOK BERDASARKAN MASA KERJA (ACUAN SOP RESTO)</h4>
+                  <span className="bg-slate-900 text-amber-300 font-semibold px-2 py-0.5 rounded text-xs">PASAL 1</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">STRUKTUR GAJI POKOK BERDASARKAN MASA KERJA (ACUAN SOP RESTO)</h4>
                 </div>
 
-                <p className="text-[11px] text-slate-700">
+                <p className="text-xs text-slate-700">
                   Mengacu pada pedoman struktur skala upah Barokah Resto Group, Gaji Pokok karyawan dibagi menjadi 2 tahap kelayakan masa kerja:
                 </p>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-[11px] border border-slate-200 rounded-lg overflow-hidden">
+                  <table className="w-full text-left text-xs border border-slate-200 rounded-lg overflow-hidden">
                     <thead className="bg-slate-900 text-amber-300 font-bold">
                       <tr>
                         <th className="p-2.5 border border-slate-700">Tingkat Posisi / Divisi</th>
@@ -12520,62 +12392,62 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         <th className="p-2.5 border border-slate-700">Ketentuan Evaluasi</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-200 bg-white font-mono text-[11px]">
+                    <tbody className="divide-y divide-slate-200 bg-white font-mono text-xs">
                       <tr className="hover:bg-amber-50/40">
                         <td className="p-2 font-bold font-sans text-slate-900 border">KASIR / FRONT COUNTER</td>
                         <td className="p-2 border">Rp 1.000.000</td>
                         <td className="p-2 font-bold text-emerald-700 border bg-emerald-50/30">Rp 1.200.000</td>
                         <td className="p-2 text-emerald-600 font-bold border">+Rp 200.000</td>
-                        <td className="p-2 font-sans text-[10px] text-slate-600 border">Otomatis naik setelah 90 hari kalender kerja</td>
+                        <td className="p-2 font-sans text-xs text-slate-600 border">Otomatis naik setelah 90 hari kalender kerja</td>
                       </tr>
                       <tr className="hover:bg-amber-50/40">
                         <td className="p-2 font-bold font-sans text-slate-900 border">WAITERS / PRAMUSAJI</td>
                         <td className="p-2 border">Rp 1.000.000</td>
                         <td className="p-2 font-bold text-emerald-700 border bg-emerald-50/30">Rp 1.200.000</td>
                         <td className="p-2 text-emerald-600 font-bold border">+Rp 200.000</td>
-                        <td className="p-2 font-sans text-[10px] text-slate-600 border">Otomatis naik setelah 90 hari kalender kerja</td>
+                        <td className="p-2 font-sans text-xs text-slate-600 border">Otomatis naik setelah 90 hari kalender kerja</td>
                       </tr>
                       <tr className="hover:bg-amber-50/40">
                         <td className="p-2 font-bold font-sans text-slate-900 border">KOKI (WOK, GORENG, BAKAR)</td>
                         <td className="p-2 border">Rp 1.000.000</td>
                         <td className="p-2 font-bold text-emerald-700 border bg-emerald-50/30">Rp 1.200.000</td>
                         <td className="p-2 text-emerald-600 font-bold border">+Rp 200.000</td>
-                        <td className="p-2 font-sans text-[10px] text-slate-600 border">Otomatis naik setelah 90 hari kalender kerja</td>
+                        <td className="p-2 font-sans text-xs text-slate-600 border">Otomatis naik setelah 90 hari kalender kerja</td>
                       </tr>
                       <tr className="hover:bg-amber-50/40">
                         <td className="p-2 font-bold font-sans text-slate-900 border">HELPER PERSIAPAN DAPUR</td>
                         <td className="p-2 border">Rp 1.000.000</td>
                         <td className="p-2 font-bold text-emerald-700 border bg-emerald-50/30">Rp 1.200.000</td>
                         <td className="p-2 text-emerald-600 font-bold border">+Rp 200.000</td>
-                        <td className="p-2 font-sans text-[10px] text-slate-600 border">Otomatis naik setelah 90 hari kalender kerja</td>
+                        <td className="p-2 font-sans text-xs text-slate-600 border">Otomatis naik setelah 90 hari kalender kerja</td>
                       </tr>
                       <tr className="hover:bg-amber-50/40">
                         <td className="p-2 font-bold font-sans text-slate-900 border">KEPALA PRODUKSI / HEAD COOK</td>
                         <td className="p-2 border">Rp 1.000.000</td>
                         <td className="p-2 font-bold text-emerald-700 border bg-emerald-50/30">Rp 1.200.000</td>
                         <td className="p-2 text-emerald-600 font-bold border">+Rp 200.000</td>
-                        <td className="p-2 font-sans text-[10px] text-slate-600 border">Otomatis naik setelah 90 hari kalender kerja</td>
+                        <td className="p-2 font-sans text-xs text-slate-600 border">Otomatis naik setelah 90 hari kalender kerja</td>
                       </tr>
                       <tr className="hover:bg-amber-50/40">
                         <td className="p-2 font-bold font-sans text-slate-900 border">KEPALA CABANG (STORE MANAGER)</td>
                         <td className="p-2 border">Rp 1.500.000</td>
                         <td className="p-2 font-bold text-emerald-700 border bg-emerald-50/30">Rp 1.700.000</td>
                         <td className="p-2 text-emerald-600 font-bold border">+Rp 200.000</td>
-                        <td className="p-2 font-sans text-[10px] text-slate-600 border">Evaluasi KPI &amp; omzet target outlet</td>
+                        <td className="p-2 font-sans text-xs text-slate-600 border">Evaluasi KPI &amp; omzet target outlet</td>
                       </tr>
                       <tr className="hover:bg-amber-50/40">
                         <td className="p-2 font-bold font-sans text-slate-900 border">ASISTEN SUPERVISOR</td>
                         <td className="p-2 border">Rp 1.900.000</td>
                         <td className="p-2 font-bold text-emerald-700 border bg-emerald-50/30">Rp 2.100.000</td>
                         <td className="p-2 text-emerald-600 font-bold border">+Rp 200.000</td>
-                        <td className="p-2 font-sans text-[10px] text-slate-600 border">Evaluasi leadership &amp; audit operasional</td>
+                        <td className="p-2 font-sans text-xs text-slate-600 border">Evaluasi leadership &amp; audit operasional</td>
                       </tr>
                       <tr className="hover:bg-amber-50/40">
                         <td className="p-2 font-bold font-sans text-slate-900 border">SUPERVISOR AREA</td>
                         <td className="p-2 border">Rp 2.400.000</td>
                         <td className="p-2 font-bold text-emerald-700 border bg-emerald-50/30">Rp 2.700.000</td>
                         <td className="p-2 text-emerald-600 font-bold border">+Rp 300.000</td>
-                        <td className="p-2 font-sans text-[10px] text-slate-600 border">SK Resmi Direksi Barokah Group</td>
+                        <td className="p-2 font-sans text-xs text-slate-600 border">SK Resmi Direksi Barokah Group</td>
                       </tr>
                     </tbody>
                   </table>
@@ -12585,41 +12457,41 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 2: SKEMA TUNJANGAN LAMA BEKERJA (BLOK 6 BULANAN) */}
               <section id="sop-ten-pasal2" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded text-[10px]">PASAL 2</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">SKEMA TUNJANGAN LAMA BEKERJA DALAM BLOK 6 BULAN</h4>
+                  <span className="bg-amber-500 text-slate-950 font-semibold px-2 py-0.5 rounded text-xs">PASAL 2</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">SKEMA TUNJANGAN LAMA BEKERJA DALAM BLOK 6 BULAN</h4>
                 </div>
 
-                <p className="text-[11px] text-slate-700">
+                <p className="text-xs text-slate-700">
                   Sebagai wujud apresiasi atas kesetiaan, dedikasi, dan loyalitas karyawan di lingkungan Barokah Resto Group, diberikan <strong>Tunjangan Lama Bekerja (Tenure Allowance)</strong> dengan skema blok interval 6 bulanan:
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                   <div className="p-3.5 bg-white rounded-xl border border-slate-200 space-y-1.5 shadow-2xs">
-                    <span className="text-[10px] font-black text-slate-500 uppercase block">Tahap Awal</span>
-                    <h5 className="font-black text-slate-900 text-xs">Bulan 1 s/d 6</h5>
-                    <p className="text-xl font-black text-slate-400 font-mono">Rp 0</p>
-                    <p className="text-[10px] text-slate-500 leading-tight">Masa pengenalan kultur, training SOP, dan stabilisasi jam kerja.</p>
+                    <span className="text-xs font-medium text-slate-600 block">Tahap Awal</span>
+                    <h5 className="font-semibold text-slate-900 text-xs">Bulan 1 s/d 6</h5>
+                    <p className="text-xl font-semibold text-slate-500 tabular-nums">Rp 0</p>
+                    <p className="text-xs text-slate-500 leading-tight">Masa pengenalan kultur, training SOP, dan stabilisasi jam kerja.</p>
                   </div>
 
                   <div className="p-3.5 bg-white rounded-xl border-2 border-amber-300 space-y-1.5 shadow-xs bg-amber-50/20">
-                    <span className="text-[10px] font-black text-amber-800 uppercase block">Periode ke-1</span>
-                    <h5 className="font-black text-slate-900 text-xs">Bulan 7 s/d 12</h5>
-                    <p className="text-xl font-black text-amber-700 font-mono">Rp 100.000</p>
-                    <p className="text-[10px] text-slate-600 leading-tight">Tambahan pertama sebesar Rp 100.000/bln pasca genap 6 bulan bekerja.</p>
+                    <span className="text-xs font-semibold text-amber-800 uppercase block">Periode ke-1</span>
+                    <h5 className="font-semibold text-slate-900 text-xs">Bulan 7 s/d 12</h5>
+                    <p className="text-xl font-semibold text-amber-700 font-mono">Rp 100.000</p>
+                    <p className="text-xs text-slate-600 leading-tight">Tambahan pertama sebesar Rp 100.000/bln pasca genap 6 bulan bekerja.</p>
                   </div>
 
                   <div className="p-3.5 bg-white rounded-xl border-2 border-emerald-300 space-y-1.5 shadow-xs bg-emerald-50/20">
-                    <span className="text-[10px] font-black text-emerald-800 uppercase block">Periode ke-2</span>
-                    <h5 className="font-black text-slate-900 text-xs">Bulan 13 s/d 18</h5>
-                    <p className="text-xl font-black text-emerald-700 font-mono">Rp 200.000</p>
-                    <p className="text-[10px] text-slate-600 leading-tight">Tambah lagi Rp 100.000 pasca genap 1 tahun (Total Rp 200.000/bln).</p>
+                    <span className="text-xs font-semibold text-emerald-800 uppercase block">Periode ke-2</span>
+                    <h5 className="font-semibold text-slate-900 text-xs">Bulan 13 s/d 18</h5>
+                    <p className="text-xl font-semibold text-emerald-700 font-mono">Rp 200.000</p>
+                    <p className="text-xs text-slate-600 leading-tight">Tambah lagi Rp 100.000 pasca genap 1 tahun (Total Rp 200.000/bln).</p>
                   </div>
 
-                  <div className="p-3.5 bg-white rounded-xl border-2 border-blue-300 space-y-1.5 shadow-xs bg-blue-50/20">
-                    <span className="text-[10px] font-black text-blue-800 uppercase block">Periode ke-3 dst</span>
-                    <h5 className="font-black text-slate-900 text-xs">Bulan 19 Ke Atas</h5>
-                    <p className="text-xl font-black text-blue-700 font-mono">+ Rp 50.000</p>
-                    <p className="text-[10px] text-slate-600 leading-tight">Setiap kelipatan 6 bulan bertambah Rp 50.000/bln secara kumulatif.</p>
+                  <div className="p-3.5 bg-white rounded-xl border-2 border-sky-300 space-y-1.5 shadow-xs bg-sky-50/20">
+                    <span className="text-xs font-semibold text-sky-800 uppercase block">Periode ke-3 dst</span>
+                    <h5 className="font-semibold text-slate-900 text-xs">Bulan 19 Ke Atas</h5>
+                    <p className="text-xl font-semibold text-sky-700 font-mono">+ Rp 50.000</p>
+                    <p className="text-xs text-slate-600 leading-tight">Setiap kelipatan 6 bulan bertambah Rp 50.000/bln secara kumulatif.</p>
                   </div>
                 </div>
               </section>
@@ -12627,29 +12499,29 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 3: KLAUSUL WAKTU PENCAIRAN (+1 BULAN) */}
               <section id="sop-ten-pasal3" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-slate-900 text-amber-300 font-black px-2 py-0.5 rounded text-[10px]">PASAL 3</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">KLAUSUL WAKTU PENCAIRAN HAK TUNJANGAN (+1 BULAN)</h4>
+                  <span className="bg-slate-900 text-amber-300 font-semibold px-2 py-0.5 rounded text-xs">PASAL 3</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">KLAUSUL WAKTU PENCAIRAN HAK TUNJANGAN (+1 BULAN)</h4>
                 </div>
 
                 <div className="bg-amber-50/70 border border-amber-200 rounded-lg p-3 text-slate-800 space-y-2">
                   <p className="font-semibold text-amber-950 text-xs">
                     Mekanisme Sinkronisasi Tutup Buku &amp; Pencairan Gaji:
                   </p>
-                  <p className="text-[11px] leading-relaxed text-slate-700">
+                  <p className="text-xs leading-relaxed text-slate-700">
                     Sesuai SOP Siklus Penggajian (SOP-HR-004), operasional restoran memberlakukan cut-off dari <strong>tanggal 6 s/d tanggal 5 bulan berjalan</strong> dan pencairan serentak pada <strong>tanggal 10</strong>. Maka, pemberian tunjangan lama bekerja mengikuti prinsip <strong>+ 1 Bulan dari Usia Bekerja yang Memenuhi Syarat</strong>:
                   </p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-1 text-[11px]">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-1 text-xs">
                     <div className="p-2.5 bg-white rounded-lg border border-amber-200">
                       <p className="font-bold text-slate-900 mb-1">1. Syarat 6 Bulan Terpenuhi:</p>
-                      <p className="text-slate-600 text-[10px]">Karyawan menuntaskan genap 6 bulan kerja di bulan ke-6. Maka hak tunjangan pertama sebesar <strong>Rp 100.000</strong> mulai dicairkan pada <strong>Bulan ke-7 s/d 12</strong>.</p>
+                      <p className="text-slate-600 text-xs">Karyawan menuntaskan genap 6 bulan kerja di bulan ke-6. Maka hak tunjangan pertama sebesar <strong>Rp 100.000</strong> mulai dicairkan pada <strong>Bulan ke-7 s/d 12</strong>.</p>
                     </div>
                     <div className="p-2.5 bg-white rounded-lg border border-amber-200">
                       <p className="font-bold text-slate-900 mb-1">2. Syarat 12 Bulan (1 Thn) Terpenuhi:</p>
-                      <p className="text-slate-600 text-[10px]">Karyawan menuntaskan genap 12 bulan kerja di bulan ke-12. Maka kenaikan tunjangan menjadi <strong>Rp 200.000</strong> mulai dicairkan pada <strong>Bulan ke-13 s/d 18</strong>.</p>
+                      <p className="text-slate-600 text-xs">Karyawan menuntaskan genap 12 bulan kerja di bulan ke-12. Maka kenaikan tunjangan menjadi <strong>Rp 200.000</strong> mulai dicairkan pada <strong>Bulan ke-13 s/d 18</strong>.</p>
                     </div>
                     <div className="p-2.5 bg-white rounded-lg border border-amber-200">
                       <p className="font-bold text-slate-900 mb-1">3. Syarat 18 Bulan Terpenuhi:</p>
-                      <p className="text-slate-600 text-[10px]">Karyawan menuntaskan genap 18 bulan kerja di bulan ke-18. Maka kenaikan tunjangan menjadi <strong>Rp 250.000</strong> mulai dicairkan pada <strong>Bulan ke-19 s/d 24</strong>.</p>
+                      <p className="text-slate-600 text-xs">Karyawan menuntaskan genap 18 bulan kerja di bulan ke-18. Maka kenaikan tunjangan menjadi <strong>Rp 250.000</strong> mulai dicairkan pada <strong>Bulan ke-19 s/d 24</strong>.</p>
                     </div>
                   </div>
                 </div>
@@ -12658,12 +12530,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 4: TABEL MATRIKS SIMULASI LENGKAP 1 S/D 48 BULAN */}
               <section id="sop-ten-pasal4" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-slate-900 text-amber-300 font-black px-2 py-0.5 rounded text-[10px]">PASAL 4</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">MATRIKS SIMULASI TUNJANGAN LAMA BEKERJA (BULAN 1 S/D 48)</h4>
+                  <span className="bg-slate-900 text-amber-300 font-semibold px-2 py-0.5 rounded text-xs">PASAL 4</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">MATRIKS SIMULASI TUNJANGAN LAMA BEKERJA (BULAN 1 S/D 48)</h4>
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-[11px] border border-slate-200 rounded-lg overflow-hidden">
+                  <table className="w-full text-left text-xs border border-slate-200 rounded-lg overflow-hidden">
                     <thead className="bg-slate-900 text-amber-300 font-bold">
                       <tr>
                         <th className="p-2.5 border border-slate-700">Rentang Bulan Masa Kerja</th>
@@ -12673,69 +12545,69 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         <th className="p-2.5 border border-slate-700">Keterangan Eskalasi</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-200 bg-white font-mono text-[11px]">
+                    <tbody className="divide-y divide-slate-200 bg-white font-mono text-xs">
                       <tr>
                         <td className="p-2 font-sans font-bold text-slate-700 border">Bulan 1 s/d 2</td>
                         <td className="p-2 border">Rp 1.000.000</td>
                         <td className="p-2 text-slate-400 border">Rp 0</td>
                         <td className="p-2 font-bold text-slate-900 border">Rp 1.000.000</td>
-                        <td className="p-2 font-sans text-[10px] text-slate-500 border">Masa kerja &lt; 3 bulan (Probation)</td>
+                        <td className="p-2 font-sans text-xs text-slate-500 border">Masa kerja &lt; 3 bulan (Probation)</td>
                       </tr>
                       <tr className="bg-amber-50/30">
                         <td className="p-2 font-sans font-bold text-slate-800 border">Bulan 3 s/d 6</td>
                         <td className="p-2 font-bold text-emerald-700 border">Rp 1.200.000</td>
                         <td className="p-2 text-slate-400 border">Rp 0</td>
                         <td className="p-2 font-bold text-slate-900 border">Rp 1.200.000</td>
-                        <td className="p-2 font-sans text-[10px] text-emerald-800 border">Gaji pokok naik ke Rp 1.200.000 pasca 3 bulan</td>
+                        <td className="p-2 font-sans text-xs text-emerald-800 border">Gaji pokok naik ke Rp 1.200.000 pasca 3 bulan</td>
                       </tr>
                       <tr className="bg-amber-100/50">
                         <td className="p-2 font-sans font-bold text-amber-900 border">Bulan 7 s/d 12</td>
                         <td className="p-2 font-bold text-slate-800 border">Rp 1.200.000</td>
-                        <td className="p-2 font-extrabold text-amber-800 border bg-amber-100/70">+ Rp 100.000</td>
-                        <td className="p-2 font-extrabold text-slate-950 border">Rp 1.300.000</td>
-                        <td className="p-2 font-sans text-[10px] text-amber-900 border">Tunjangan pertama (+1 bln setelah genap 6 bln)</td>
+                        <td className="p-2 font-semibold text-amber-800 border bg-amber-100/70">+ Rp 100.000</td>
+                        <td className="p-2 font-semibold text-slate-950 border">Rp 1.300.000</td>
+                        <td className="p-2 font-sans text-xs text-amber-900 border">Tunjangan pertama (+1 bln setelah genap 6 bln)</td>
                       </tr>
                       <tr className="bg-emerald-50/40">
                         <td className="p-2 font-sans font-bold text-emerald-900 border">Bulan 13 s/d 18</td>
                         <td className="p-2 font-bold text-slate-800 border">Rp 1.200.000</td>
-                        <td className="p-2 font-extrabold text-emerald-800 border bg-emerald-100/70">+ Rp 200.000</td>
-                        <td className="p-2 font-extrabold text-slate-950 border">Rp 1.400.000</td>
-                        <td className="p-2 font-sans text-[10px] text-emerald-900 border">Kenaikan kedua (+1 bln setelah genap 12 bln / 1 thn)</td>
+                        <td className="p-2 font-semibold text-emerald-800 border bg-emerald-100/70">+ Rp 200.000</td>
+                        <td className="p-2 font-semibold text-slate-950 border">Rp 1.400.000</td>
+                        <td className="p-2 font-sans text-xs text-emerald-900 border">Kenaikan kedua (+1 bln setelah genap 12 bln / 1 thn)</td>
                       </tr>
-                      <tr className="bg-blue-50/40">
-                        <td className="p-2 font-sans font-bold text-blue-900 border">Bulan 19 s/d 24</td>
+                      <tr className="bg-sky-50/40">
+                        <td className="p-2 font-sans font-bold text-sky-900 border">Bulan 19 s/d 24</td>
                         <td className="p-2 font-bold text-slate-800 border">Rp 1.200.000</td>
-                        <td className="p-2 font-extrabold text-blue-800 border bg-blue-100/70">+ Rp 250.000</td>
-                        <td className="p-2 font-extrabold text-slate-950 border">Rp 1.450.000</td>
-                        <td className="p-2 font-sans text-[10px] text-blue-900 border">Kelipatan 6 bulan: tambah Rp 50.000 kumulatif</td>
-                      </tr>
-                      <tr>
-                        <td className="p-2 font-sans font-bold text-purple-900 border">Bulan 25 s/d 30</td>
-                        <td className="p-2 font-bold text-slate-800 border">Rp 1.200.000</td>
-                        <td className="p-2 font-extrabold text-purple-800 border bg-purple-100/70">+ Rp 300.000</td>
-                        <td className="p-2 font-extrabold text-slate-950 border">Rp 1.500.000</td>
-                        <td className="p-2 font-sans text-[10px] text-purple-900 border">Kelipatan 6 bulan: tambah Rp 50.000 kumulatif</td>
+                        <td className="p-2 font-semibold text-sky-800 border bg-sky-100/70">+ Rp 250.000</td>
+                        <td className="p-2 font-semibold text-slate-950 border">Rp 1.450.000</td>
+                        <td className="p-2 font-sans text-xs text-sky-900 border">Kelipatan 6 bulan: tambah Rp 50.000 kumulatif</td>
                       </tr>
                       <tr>
-                        <td className="p-2 font-sans font-bold text-indigo-900 border">Bulan 31 s/d 36</td>
+                        <td className="p-2 font-sans font-bold text-slate-900 border">Bulan 25 s/d 30</td>
                         <td className="p-2 font-bold text-slate-800 border">Rp 1.200.000</td>
-                        <td className="p-2 font-extrabold text-indigo-800 border bg-indigo-100/70">+ Rp 350.000</td>
-                        <td className="p-2 font-extrabold text-slate-950 border">Rp 1.550.000</td>
-                        <td className="p-2 font-sans text-[10px] text-indigo-900 border">Kelipatan 6 bulan: tambah Rp 50.000 kumulatif (3 Tahun)</td>
+                        <td className="p-2 font-semibold text-slate-800 border bg-slate-100/70">+ Rp 300.000</td>
+                        <td className="p-2 font-semibold text-slate-950 border">Rp 1.500.000</td>
+                        <td className="p-2 font-sans text-xs text-slate-900 border">Kelipatan 6 bulan: tambah Rp 50.000 kumulatif</td>
+                      </tr>
+                      <tr>
+                        <td className="p-2 font-sans font-bold text-slate-900 border">Bulan 31 s/d 36</td>
+                        <td className="p-2 font-bold text-slate-800 border">Rp 1.200.000</td>
+                        <td className="p-2 font-semibold text-slate-800 border bg-slate-100/70">+ Rp 350.000</td>
+                        <td className="p-2 font-semibold text-slate-950 border">Rp 1.550.000</td>
+                        <td className="p-2 font-sans text-xs text-slate-900 border">Kelipatan 6 bulan: tambah Rp 50.000 kumulatif (3 Tahun)</td>
                       </tr>
                       <tr>
                         <td className="p-2 font-sans font-bold text-rose-900 border">Bulan 37 s/d 42</td>
                         <td className="p-2 font-bold text-slate-800 border">Rp 1.200.000</td>
-                        <td className="p-2 font-extrabold text-rose-800 border bg-rose-100/70">+ Rp 400.000</td>
-                        <td className="p-2 font-extrabold text-slate-950 border">Rp 1.600.000</td>
-                        <td className="p-2 font-sans text-[10px] text-rose-900 border">Kelipatan 6 bulan: tambah Rp 50.000 kumulatif</td>
+                        <td className="p-2 font-semibold text-rose-800 border bg-rose-100/70">+ Rp 400.000</td>
+                        <td className="p-2 font-semibold text-slate-950 border">Rp 1.600.000</td>
+                        <td className="p-2 font-sans text-xs text-rose-900 border">Kelipatan 6 bulan: tambah Rp 50.000 kumulatif</td>
                       </tr>
                       <tr>
                         <td className="p-2 font-sans font-bold text-slate-900 border">Bulan 43 s/d 48</td>
                         <td className="p-2 font-bold text-slate-800 border">Rp 1.200.000</td>
-                        <td className="p-2 font-extrabold text-slate-800 border bg-slate-200">+ Rp 450.000</td>
-                        <td className="p-2 font-extrabold text-slate-950 border">Rp 1.650.000</td>
-                        <td className="p-2 font-sans text-[10px] text-slate-700 border">Kelipatan 6 bulan: tambah Rp 50.000 kumulatif (4 Tahun)</td>
+                        <td className="p-2 font-semibold text-slate-800 border bg-slate-200">+ Rp 450.000</td>
+                        <td className="p-2 font-semibold text-slate-950 border">Rp 1.650.000</td>
+                        <td className="p-2 font-sans text-xs text-slate-700 border">Kelipatan 6 bulan: tambah Rp 50.000 kumulatif (4 Tahun)</td>
                       </tr>
                     </tbody>
                   </table>
@@ -12745,11 +12617,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 5: INTEGRASI SISTEM PAYROLL & SLIP GAJI */}
               <section id="sop-ten-pasal5" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-slate-900 text-amber-300 font-black px-2 py-0.5 rounded text-[10px]">PASAL 5</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">INTEGRASI MODUL PAYROLL &amp; TRANSPARANSI SLIP GAJI</h4>
+                  <span className="bg-slate-900 text-amber-300 font-semibold px-2 py-0.5 rounded text-xs">PASAL 5</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">INTEGRASI MODUL PAYROLL &amp; TRANSPARANSI SLIP GAJI</h4>
                 </div>
 
-                <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-2 text-[11px] text-slate-700">
+                <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-2 text-xs text-slate-700">
                   <p>
                     1. <strong>Tercatat Otomatis:</strong> Nilai Tunjangan Lama Bekerja dihitung secara real-time berdasarkan usia kerja resmi yang tersimpan di Master Data Karyawan HRIS.
                   </p>
@@ -12765,44 +12637,44 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* LEMBAR PENGESAHAN DOKUMEN RESMI */}
               <section id="sop-ten-pengesahan" className="p-4 bg-slate-50/80 rounded-xl border border-slate-200 space-y-4">
                 <div className="text-center space-y-1">
-                  <p className="text-[11px] font-bold text-slate-500 uppercase">LEMBAR PENGESAHAN DIREKSI &amp; MANAJEMEN HRD</p>
-                  <p className="text-xs font-black text-slate-900">DITETAPKAN DI JAKARTA, PADA TANGGAL 21 OKTOBER 2026</p>
+                  <p className="text-xs font-medium text-slate-600">LEMBAR PENGESAHAN DIREKSI &amp; MANAJEMEN HRD</p>
+                  <p className="text-xs font-semibold text-slate-900">DITETAPKAN DI JAKARTA, PADA TANGGAL 21 OKTOBER 2026</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                   <div className="p-3 bg-white rounded-xl border border-slate-200 text-center space-y-2">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">Disusun Oleh,</p>
+                    <p className="text-xs font-medium text-slate-600">Disusun Oleh,</p>
                     <div className="h-12 flex items-center justify-center">
                       <span className="font-serif italic font-bold text-slate-600 text-sm">Hendra Pratama</span>
                     </div>
                     <div className="border-t border-slate-200 pt-1">
-                      <p className="font-bold text-slate-900 text-[11px]">Hendra Pratama, S.E.</p>
-                      <p className="text-[10px] text-slate-500">Head of Payroll &amp; Compensation</p>
+                      <p className="font-bold text-slate-900 text-xs">Hendra Pratama, S.E.</p>
+                      <p className="text-xs text-slate-500">Head of Payroll &amp; Compensation</p>
                     </div>
                   </div>
 
                   <div className="p-3 bg-white rounded-xl border border-slate-200 text-center space-y-2">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">Diverifikasi Oleh,</p>
+                    <p className="text-xs font-medium text-slate-600">Diverifikasi Oleh,</p>
                     <div className="h-12 flex items-center justify-center">
                       <span className="font-serif italic font-bold text-slate-600 text-sm">dr. Siti Rahmawati</span>
                     </div>
                     <div className="border-t border-slate-200 pt-1">
-                      <p className="font-bold text-slate-900 text-[11px]">Siti Rahmawati, M.M.</p>
-                      <p className="text-[10px] text-slate-500">General Manager HRD</p>
+                      <p className="font-bold text-slate-900 text-xs">Siti Rahmawati, M.M.</p>
+                      <p className="text-xs text-slate-500">General Manager HRD</p>
                     </div>
                   </div>
 
                   <div className="p-3 bg-white rounded-xl border-2 border-amber-300 text-center space-y-2 relative overflow-hidden bg-amber-50/20">
-                    <span className="absolute top-1 right-1 text-[8px] font-black bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded uppercase">
+                    <span className="absolute top-1 right-1 text-[8px] font-semibold bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded uppercase">
                       TERVERIFIKASI
                     </span>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">Disetujui &amp; Disahkan,</p>
+                    <p className="text-xs font-medium text-slate-600">Disetujui &amp; Disahkan,</p>
                     <div className="h-12 flex items-center justify-center">
-                      <span className="font-serif italic font-black text-amber-900 text-sm">H. Bambang Sutrisno</span>
+                      <span className="font-serif italic font-semibold text-amber-900 text-sm">H. Bambang Sutrisno</span>
                     </div>
                     <div className="border-t border-slate-200 pt-1">
-                      <p className="font-black text-slate-950 text-[11px]">H. Bambang Sutrisno</p>
-                      <p className="text-[10px] text-amber-800 font-bold">Managing Director - Barokah F&amp;B Group</p>
+                      <p className="font-semibold text-slate-950 text-xs">H. Bambang Sutrisno</p>
+                      <p className="text-xs text-amber-800 font-bold">Managing Director - Barokah F&amp;B Group</p>
                     </div>
                   </div>
                 </div>
@@ -12812,7 +12684,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
             {/* Modal Footer Actions */}
             <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3">
-              <span className="text-[11px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 Dokumen ini merupakan acuan mutlak kalkulasi Tunjangan Masa Kerja pada seluruh outlet Barokah Grup.
               </span>
               <div className="flex space-x-2">
@@ -12851,7 +12723,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {viewingOfficialSopAnnualLeaveDoc && (
         <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-white rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
+          <div className="bg-white rounded-lg max-w-4xl w-full p-6 sm:p-8 shadow-xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
             {/* Header / Kop Surat Resmi Barokah Grup */}
             <div className="relative mb-3">
               <button
@@ -12860,7 +12732,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               >
                 <X className="h-5 w-5" />
               </button>
-              <div className="rounded-xl overflow-hidden shadow-xs border border-teal-200/60 bg-white">
+              <div className="rounded-xl overflow-hidden shadow-xs border border-emerald-200/60 bg-white">
                 <img
                   src="/kop-surat-barokah.jpg"
                   alt="Kop Surat Resmi Barokah Grup"
@@ -12870,38 +12742,38 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             </div>
 
             {/* Document Metadata Bar */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-gradient-to-r from-teal-50 to-emerald-50 p-4 rounded-xl border border-teal-200 text-xs">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-emerald-50 p-4 rounded-xl border border-emerald-200 text-xs">
               <div>
-                <p className="font-extrabold text-slate-900 text-sm">
+                <p className="font-semibold text-slate-900 text-sm">
                   STANDARD OPERATIONAL PROCEDURE (SOP)
                 </p>
-                <p className="font-black text-teal-950 text-base">
+                <p className="font-semibold text-emerald-950 text-base">
                   KETENTUAN HAK CUTI TAHUNAN BERJENJANG BERDASARKAN MASA KERJA &amp; KETENTUAN UPAH TERHITUNG
                 </p>
-                <p className="text-slate-600 font-mono text-[11px] mt-0.5">
-                  Nomor Dokumen: <span className="font-bold text-teal-800">007/HR-LEAVE/2026/BAROKAH</span> | Klasifikasi: SDM &amp; Hak Istirahat Karyawan
+                <p className="text-slate-600 font-mono text-xs mt-0.5">
+                  Nomor Dokumen: <span className="font-bold text-emerald-800">007/HR-LEAVE/2026/BAROKAH</span> | Klasifikasi: SDM &amp; Hak Istirahat Karyawan
                 </p>
                 <p className="text-slate-700 font-semibold mt-0.5">
                   Unit Usaha: Ayam Bakar Surabaya, Pecel Lele Pak Haji, Ayam Pecak 2001 Seafood, &amp; Seluruh Kitchen Pusat.
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <span className="bg-teal-700 text-white px-3 py-1 rounded-full font-black text-[10px] uppercase shadow-xs inline-block">
+                <span className="bg-ink-800 text-white px-3 py-1 rounded-full font-semibold text-xs uppercase shadow-xs inline-block">
                   BERLAKU: 22 OKTOBER 2026
                 </span>
-                <p className="text-[10px] text-slate-500 font-mono mt-1">Dokumen Resmi Acuan HRIS &amp; PKWT</p>
+                <p className="text-xs text-slate-500 font-mono mt-1">Dokumen Resmi Acuan HRIS &amp; PKWT</p>
               </div>
             </div>
 
             {/* Quick Navigation Pills */}
-            <div className="flex flex-wrap gap-1.5 p-2 bg-slate-100 rounded-xl text-[10px] font-bold">
+            <div className="flex flex-wrap gap-1.5 p-2 bg-slate-100 rounded-xl text-xs font-bold">
               <span className="text-slate-500 py-1 px-2">Lompat Cepat:</span>
-              <a href="#sop-ann-pasal1" className="bg-white hover:bg-teal-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Pasal 1: Filosofi Loyalitas</a>
-              <a href="#sop-ann-pasal2" className="bg-white hover:bg-teal-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Pasal 2: Skema Berjenjang (1-10 Thn)</a>
-              <a href="#sop-ann-pasal3" className="bg-white hover:bg-teal-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Pasal 3: Upah Terhitung (100% Paid)</a>
-              <a href="#sop-ann-pasal4" className="bg-white hover:bg-teal-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Pasal 4: 4 Guardrails Ketat</a>
-              <a href="#sop-ann-pasal5" className="bg-white hover:bg-teal-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Pasal 5: Prosedur H-7 &amp; Kuota Cabang</a>
-              <a href="#sop-ann-pasal6" className="bg-white hover:bg-teal-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Lembar Pengesahan</a>
+              <a href="#sop-ann-pasal1" className="bg-white hover:bg-emerald-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Pasal 1: Filosofi Loyalitas</a>
+              <a href="#sop-ann-pasal2" className="bg-white hover:bg-emerald-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Pasal 2: Skema Berjenjang (1-10 Thn)</a>
+              <a href="#sop-ann-pasal3" className="bg-white hover:bg-emerald-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Pasal 3: Upah Terhitung (100% Paid)</a>
+              <a href="#sop-ann-pasal4" className="bg-white hover:bg-emerald-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Pasal 4: 4 Guardrails Ketat</a>
+              <a href="#sop-ann-pasal5" className="bg-white hover:bg-emerald-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Pasal 5: Prosedur H-7 &amp; Kuota Cabang</a>
+              <a href="#sop-ann-pasal6" className="bg-white hover:bg-emerald-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Lembar Pengesahan</a>
             </div>
 
             {/* Body of SOP Annual Leave */}
@@ -12910,8 +12782,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 1: FILOSOFI PENGHARGAAN LOYALITAS & HAK DASAR KRU */}
               <section id="sop-ann-pasal1" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-slate-900 text-teal-300 font-black px-2 py-0.5 rounded text-[10px]">PASAL 1</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">HAKIKAT, TUJUAN &amp; FILOSOFI PENGHARGAAN LOYALITAS MASA KERJA</h4>
+                  <span className="bg-slate-900 text-emerald-300 font-semibold px-2 py-0.5 rounded text-xs">PASAL 1</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">HAKIKAT, TUJUAN &amp; FILOSOFI PENGHARGAAN LOYALITAS MASA KERJA</h4>
                 </div>
                 <p>
                   1. Cuti Tahunan Berjenjang adalah hak istirahat tahunan resmi berbayar penuh yang diberikan oleh Manajemen Barokah F&amp;B Group kepada karyawan sebagai wujud apresiasi atas kesetiaan, dedikasi, integritas, dan masa pengabdian kerja yang berkesinambungan tanpa putus kontrak.
@@ -12927,18 +12799,18 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 2: SKEMA PERHITUNGAN HAK CUTI TAHUNAN BERJENJANG */}
               <section id="sop-ann-pasal2" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-slate-900 text-teal-300 font-black px-2 py-0.5 rounded text-[10px]">PASAL 2</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">SKEMA FORMULA PERHITUNGAN HAK CUTI TAHUNAN BERJENJANG</h4>
+                  <span className="bg-slate-900 text-emerald-300 font-semibold px-2 py-0.5 rounded text-xs">PASAL 2</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">SKEMA FORMULA PERHITUNGAN HAK CUTI TAHUNAN BERJENJANG</h4>
                 </div>
                 <p>
                   1. Alokasi kuota hari Cuti Tahunan bertambah 1 (satu) hari kerja untuk setiap kelipatan 1 (satu) tahun masa kerja aktif yang telah diselesaikan karyawan secara sah, dengan formula matematis baku:
                 </p>
-                <div className="p-3 bg-white rounded-lg border border-teal-200 font-mono text-center font-bold text-teal-900 text-xs">
+                <div className="p-3 bg-white rounded-lg border border-emerald-200 font-mono text-center font-bold text-emerald-900 text-xs">
                   Hak Cuti Tahunan (Hari/Tahun) = ⌊ Tahun Masa Kerja Aktif ⌋ (untuk Masa Kerja ≥ 1 Tahun)
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-[11px] border border-slate-200 rounded-lg overflow-hidden bg-white">
-                    <thead className="bg-teal-900 text-white font-bold">
+                  <table className="w-full text-xs border border-slate-200 rounded-lg overflow-hidden bg-white">
+                    <thead className="bg-ink-800 text-white font-bold">
                       <tr>
                         <th className="p-2 text-left">Masa Kerja Karyawan</th>
                         <th className="p-2 text-center">Hak Cuti Tahunan</th>
@@ -12954,45 +12826,45 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         <td className="p-2 text-slate-500">Masa orientasi &amp; pematangan kompetensi resto</td>
                       </tr>
                       <tr>
-                        <td className="p-2 font-bold text-teal-900">Genap 1 Tahun (Tahun ke-1)</td>
-                        <td className="p-2 text-center font-black text-teal-700 bg-teal-50">1 Hari / Tahun</td>
+                        <td className="p-2 font-bold text-emerald-900">Genap 1 Tahun (Tahun ke-1)</td>
+                        <td className="p-2 text-center font-semibold text-emerald-700 bg-emerald-50">1 Hari / Tahun</td>
                         <td className="p-2 text-center font-bold text-emerald-700">Dibayar Penuh (100%)</td>
                         <td className="p-2 text-slate-700">Hak cuti perdana aktif otomatis di HRIS</td>
                       </tr>
                       <tr className="bg-slate-50">
-                        <td className="p-2 font-bold text-teal-900">Genap 2 Tahun (Tahun ke-2)</td>
-                        <td className="p-2 text-center font-black text-teal-700 bg-teal-50">2 Hari / Tahun</td>
+                        <td className="p-2 font-bold text-emerald-900">Genap 2 Tahun (Tahun ke-2)</td>
+                        <td className="p-2 text-center font-semibold text-emerald-700 bg-emerald-50">2 Hari / Tahun</td>
                         <td className="p-2 text-center font-bold text-emerald-700">Dibayar Penuh (100%)</td>
                         <td className="p-2 text-slate-700">Loyalitas 24 bulan pengabdian operasional</td>
                       </tr>
                       <tr>
-                        <td className="p-2 font-bold text-teal-900">Genap 3 Tahun (Tahun ke-3)</td>
-                        <td className="p-2 text-center font-black text-teal-700 bg-teal-50">3 Hari / Tahun</td>
+                        <td className="p-2 font-bold text-emerald-900">Genap 3 Tahun (Tahun ke-3)</td>
+                        <td className="p-2 text-center font-semibold text-emerald-700 bg-emerald-50">3 Hari / Tahun</td>
                         <td className="p-2 text-center font-bold text-emerald-700">Dibayar Penuh (100%)</td>
                         <td className="p-2 text-slate-700">Staf senior terlatih &amp; penguasaan multi-station</td>
                       </tr>
                       <tr className="bg-slate-50">
-                        <td className="p-2 font-bold text-teal-900">Genap 4 Tahun (Tahun ke-4)</td>
-                        <td className="p-2 text-center font-black text-teal-700 bg-teal-50">4 Hari / Tahun</td>
+                        <td className="p-2 font-bold text-emerald-900">Genap 4 Tahun (Tahun ke-4)</td>
+                        <td className="p-2 text-center font-semibold text-emerald-700 bg-emerald-50">4 Hari / Tahun</td>
                         <td className="p-2 text-center font-bold text-emerald-700">Dibayar Penuh (100%)</td>
                         <td className="p-2 text-slate-700">Kader calon Leader / Supervisor Outlet</td>
                       </tr>
                       <tr>
-                        <td className="p-2 font-bold text-teal-900">Genap 5 Tahun (Tahun ke-5)</td>
-                        <td className="p-2 text-center font-black text-teal-700 bg-teal-50">5 Hari / Tahun</td>
+                        <td className="p-2 font-bold text-emerald-900">Genap 5 Tahun (Tahun ke-5)</td>
+                        <td className="p-2 text-center font-semibold text-emerald-700 bg-emerald-50">5 Hari / Tahun</td>
                         <td className="p-2 text-center font-bold text-emerald-700">Dibayar Penuh (100%)</td>
                         <td className="p-2 text-slate-700">Karyawan teladan pilar utama operasional cabang</td>
                       </tr>
-                      <tr className="bg-teal-50/50">
-                        <td className="p-2 font-bold text-teal-950">Setiap +1 Tahun Seterusnya (N Tahun)</td>
-                        <td className="p-2 text-center font-black text-teal-800 bg-teal-100">+1 Hari (N Hari)</td>
+                      <tr className="bg-emerald-50/50">
+                        <td className="p-2 font-bold text-emerald-950">Setiap +1 Tahun Seterusnya (N Tahun)</td>
+                        <td className="p-2 text-center font-semibold text-emerald-800 bg-emerald-100">+1 Hari (N Hari)</td>
                         <td className="p-2 text-center font-bold text-emerald-700">Dibayar Penuh (100%)</td>
-                        <td className="p-2 text-teal-900 font-semibold">Bertambah 1 hari secara linier tanpa batas maksimal</td>
+                        <td className="p-2 text-emerald-900 font-semibold">Bertambah 1 hari secara linier tanpa batas maksimal</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <p className="text-[11px] text-slate-600 italic">
+                <p className="text-xs text-slate-600 italic">
                   2. Sifat Kuota Cuti Tahunan: Kuota cuti berlaku selama 1 (satu) tahun periode berjalan terhitung sejak tanggal timbulnya hak. Hak cuti tidak dapat diuangkan (no encashment/kompensasi rupiah) dan tidak dapat diakumulasikan ke tahun-tahun berikutnya (hangus otomatis pada pergantian periode tahunan).
                 </p>
               </section>
@@ -13000,8 +12872,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 3: STATUS PENGUPAHAN TERHITUNG (100% PAID LEAVE) */}
               <section id="sop-ann-pasal3" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-slate-900 text-teal-300 font-black px-2 py-0.5 rounded text-[10px]">PASAL 3</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">STATUS PENGUPAHAN &amp; KOMPONEN UPAH TERHITUNG (PAID LEAVE)</h4>
+                  <span className="bg-slate-900 text-emerald-300 font-semibold px-2 py-0.5 rounded text-xs">PASAL 3</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">STATUS PENGUPAHAN &amp; KOMPONEN UPAH TERHITUNG (PAID LEAVE)</h4>
                 </div>
                 <p>
                   1. <b>Upah Pokok Terhitung (Dibayar 100% Penuh):</b> Karyawan yang mengambil cuti tahunan resmi yang telah disetujui tetap menerima upah pokok harian secara penuh tanpa ada pemotongan prorata absensi harian (Gaji Pokok / 30).
@@ -13017,8 +12889,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 4: 4 GUARDRAILS KETAT LARANGAN PENGAMBILAN CUTI */}
               <section id="sop-ann-pasal4" className="space-y-3 p-4 bg-rose-50/50 rounded-xl border-2 border-rose-300">
                 <div className="flex items-center gap-2 border-b border-rose-200 pb-2">
-                  <span className="bg-rose-600 text-white font-black px-2 py-0.5 rounded text-[10px]">PASAL 4</span>
-                  <h4 className="font-black text-rose-950 text-sm uppercase">EMPAT (4) GUARDRAILS OPERASIONAL &amp; LARANGAN KERAS PENGAMBILAN</h4>
+                  <span className="bg-rose-600 text-white font-semibold px-2 py-0.5 rounded text-xs">PASAL 4</span>
+                  <h4 className="font-semibold text-rose-950 text-sm uppercase">EMPAT (4) GUARDRAILS OPERASIONAL &amp; LARANGAN KERAS PENGAMBILAN</h4>
                 </div>
                 <p className="text-rose-950 font-medium">
                   Demi menjamin kelancaran pelayanan restoran, mencegah kekosongan stasiun dapur, serta menjaga keadilan shift operasional, pengambilan Cuti Tahunan Berjenjang terikat secara mutlak pada 4 (empat) guardrails larangan ketat berikut:
@@ -13031,7 +12903,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       <XCircle className="h-4 w-4 shrink-0 text-rose-600" />
                       <span>1. Dilarang Digabung Libur Reguler</span>
                     </div>
-                    <p className="text-[11px] text-slate-600 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       Cuti tahunan <b>DILARANG KERAS</b> diambil berturut-turut atau menempel langsung dengan jatah libur reguler bulanan (2 hari off). Pengambilan cuti tahunan wajib diselingi minimal <b>2 (dua) hari kerja aktif normal</b> agar stasiun kerja tidak mengalami kekosongan kru berhari-hari.
                     </p>
                   </div>
@@ -13042,7 +12914,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       <XCircle className="h-4 w-4 shrink-0 text-rose-600" />
                       <span>2. Dilarang Diambil di Weekend</span>
                     </div>
-                    <p className="text-[11px] text-slate-600 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       Cuti tahunan <b>DILARANG KERAS</b> diambil pada hari Sabtu dan Minggu (weekend). Seluruh kru wajib siaga penuh melayani lonjakan pengunjung di akhir pekan. Cuti tahunan hanya dapat dijadwalkan pada hari kerja biasa (weekday: Senin s.d. Jumat).
                     </p>
                   </div>
@@ -13053,7 +12925,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       <XCircle className="h-4 w-4 shrink-0 text-rose-600" />
                       <span>3. Dilarang di Hari Libur Nasional</span>
                     </div>
-                    <p className="text-[11px] text-slate-600 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       Cuti tahunan <b>DILARANG KERAS</b> diambil pada Hari Libur Nasional resmi pemerintah, cuti bersama, atau hari besar keagamaan yang berstatus <i>Peak Season</i> restoran. Pengambilan libur pada tanggal merah tanpa izin direksi dikenakan denda pelanggaran <b>Rp 250.000,-</b> sesuai SOP-HR-003.
                     </p>
                   </div>
@@ -13064,7 +12936,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       <XCircle className="h-4 w-4 shrink-0 text-rose-600" />
                       <span>4. Dilarang Menyambung Libur Lebaran</span>
                     </div>
-                    <p className="text-[11px] text-slate-600 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       Cuti tahunan <b>DILARANG KERAS</b> diambil menyambung, mendahului, atau memperpanjang jadwal Libur Hari Raya Idul Fitri (Lebaran), baik pada periode <b>H-7 sebelum Lebaran</b> maupun <b>H+7 setelah Lebaran</b> (<i>Resto Blackout Period</i>).
                     </p>
                   </div>
@@ -13075,8 +12947,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 5: TATA CARA PENGAJUAN, KUOTA CABANG & VERIFIKASI */}
               <section id="sop-ann-pasal5" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-slate-900 text-teal-300 font-black px-2 py-0.5 rounded text-[10px]">PASAL 5</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">TATA CARA PENGAJUAN, KUOTA HARIAN CABANG &amp; PROSEDUR VERIFIKASI</h4>
+                  <span className="bg-slate-900 text-emerald-300 font-semibold px-2 py-0.5 rounded text-xs">PASAL 5</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">TATA CARA PENGAJUAN, KUOTA HARIAN CABANG &amp; PROSEDUR VERIFIKASI</h4>
                 </div>
                 <p>
                   1. <b>Batas Minimal Pengajuan:</b> Pengajuan cuti tahunan wajib didaftarkan oleh kru melalui Aplikasi HRIS Kru selambat-lambatnya <b>H-7 (tujuh hari kalender)</b> sebelum tanggal cuti yang direncanakan. Pengajuan mendadak (&lt; H-7) otomatis ditolak oleh sistem.
@@ -13084,7 +12956,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <p>
                   2. <b>Batas Kuota Harian Cabang (SOP-HR-003):</b> Total kru yang diperbolehkan off/cuti pada hari yang sama di satu cabang dibatasi ketat:
                 </p>
-                <ul className="list-disc pl-5 space-y-1 text-[11px] text-slate-700">
+                <ul className="list-disc pl-5 space-y-1 text-xs text-slate-700">
                   <li>Cabang dengan jumlah staf <b>&lt; 8 orang:</b> Maksimal <b>1 (satu) orang</b> yang diizinkan libur/cuti per hari.</li>
                   <li>Cabang dengan jumlah staf <b>≥ 8 orang:</b> Maksimal <b>2 (dua) orang</b> yang diizinkan libur/cuti per hari, dengan syarat mutlak berasal dari divisi/stasiun kerja yang berbeda (contoh: 1 orang staf Kitchen BOH dan 1 orang staf Service FOH).</li>
                 </ul>
@@ -13096,46 +12968,46 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 6: LEMBAR PENGESAHAN DIREKSI */}
               <section id="sop-ann-pasal6" className="space-y-4 pt-2 border-t border-slate-200">
                 <div className="text-center space-y-1">
-                  <h4 className="font-black text-slate-950 text-xs uppercase tracking-wide">LEMBAR PENGESAHAN DOKUMEN RESMI</h4>
-                  <p className="text-[11px] text-slate-500">
+                  <h4 className="font-semibold text-slate-950 text-xs ">LEMBAR PENGESAHAN DOKUMEN RESMI</h4>
+                  <p className="text-xs text-slate-500">
                     Ditetapkan di Jakarta pada tanggal 22 Oktober 2026. Mengikat seluruh entitas restoran dan kitchen PT Barokah Kuliner Nusantara.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
                   <div className="p-3 bg-white rounded-xl border border-slate-200 text-center space-y-2">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">Dibuat Oleh,</p>
+                    <p className="text-xs font-medium text-slate-600">Dibuat Oleh,</p>
                     <div className="h-12 flex items-center justify-center">
                       <span className="font-serif italic font-bold text-slate-600 text-sm">Hendra Pratama</span>
                     </div>
                     <div className="border-t border-slate-200 pt-1">
-                      <p className="font-bold text-slate-900 text-[11px]">Hendra Pratama, S.E.</p>
-                      <p className="text-[10px] text-slate-500">Head of Payroll &amp; Compensation</p>
+                      <p className="font-bold text-slate-900 text-xs">Hendra Pratama, S.E.</p>
+                      <p className="text-xs text-slate-500">Head of Payroll &amp; Compensation</p>
                     </div>
                   </div>
 
                   <div className="p-3 bg-white rounded-xl border border-slate-200 text-center space-y-2">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">Diverifikasi Oleh,</p>
+                    <p className="text-xs font-medium text-slate-600">Diverifikasi Oleh,</p>
                     <div className="h-12 flex items-center justify-center">
                       <span className="font-serif italic font-bold text-slate-600 text-sm">Siti Rahmawati</span>
                     </div>
                     <div className="border-t border-slate-200 pt-1">
-                      <p className="font-bold text-slate-900 text-[11px]">Siti Rahmawati, M.M.</p>
-                      <p className="text-[10px] text-slate-500">General Manager HRD</p>
+                      <p className="font-bold text-slate-900 text-xs">Siti Rahmawati, M.M.</p>
+                      <p className="text-xs text-slate-500">General Manager HRD</p>
                     </div>
                   </div>
 
-                  <div className="p-3 bg-white rounded-xl border-2 border-teal-400 text-center space-y-2 relative overflow-hidden bg-teal-50/20">
-                    <span className="absolute top-1 right-1 text-[8px] font-black bg-teal-600 text-white px-1.5 py-0.5 rounded uppercase">
+                  <div className="p-3 bg-white rounded-xl border-2 border-emerald-400 text-center space-y-2 relative overflow-hidden bg-emerald-50/20">
+                    <span className="absolute top-1 right-1 text-[8px] font-semibold bg-ink-800 text-white px-1.5 py-0.5 rounded uppercase">
                       TERVERIFIKASI
                     </span>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">Disetujui &amp; Disahkan,</p>
+                    <p className="text-xs font-medium text-slate-600">Disetujui &amp; Disahkan,</p>
                     <div className="h-12 flex items-center justify-center">
-                      <span className="font-serif italic font-black text-teal-950 text-sm">H. Bambang Sutrisno</span>
+                      <span className="font-serif italic font-semibold text-emerald-950 text-sm">H. Bambang Sutrisno</span>
                     </div>
                     <div className="border-t border-slate-200 pt-1">
-                      <p className="font-black text-slate-950 text-[11px]">H. Bambang Sutrisno</p>
-                      <p className="text-[10px] text-teal-800 font-bold">Managing Director - Barokah F&amp;B Group</p>
+                      <p className="font-semibold text-slate-950 text-xs">H. Bambang Sutrisno</p>
+                      <p className="text-xs text-emerald-800 font-bold">Managing Director - Barokah F&amp;B Group</p>
                     </div>
                   </div>
                 </div>
@@ -13145,7 +13017,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
             {/* Modal Footer Actions */}
             <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3">
-              <span className="text-[11px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 Dokumen ini merupakan acuan mutlak pengajuan &amp; pengesahan Cuti Tahunan Berjenjang di seluruh outlet Barokah Grup.
               </span>
               <div className="flex space-x-2">
@@ -13153,7 +13025,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   onClick={() => showToast('Salinan naskah resmi SOP Cuti Tahunan Berjenjang (SK: 007/HR-LEAVE/2026/BAROKAH) siap dicetak!')}
                   className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white flex items-center space-x-1.5 shadow-sm"
                 >
-                  <Download className="h-3.5 w-3.5 text-teal-400" />
+                  <Download className="h-3.5 w-3.5 text-emerald-400" />
                   <span>Cetak / Unduh PDF</span>
                 </button>
                 <button
@@ -13162,9 +13034,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     setActiveMenu('kru-portal');
                     showToast('Navigasi ke Portal Kru: Pengajuan Cuti Tahunan Berjenjang siap digunakan!');
                   }}
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-500 text-white flex items-center space-x-1 shadow-sm"
+                  className="px-4 py-2 rounded-xl text-xs font-bold bg-ink-800 hover:bg-ink-700 text-white flex items-center space-x-1 shadow-sm"
                 >
-                  <Calendar className="h-3.5 w-3.5 text-teal-100" />
+                  <Calendar className="h-3.5 w-3.5 text-emerald-100" />
                   <span>Buka Portal Pengajuan Cuti</span>
                 </button>
                 <button
@@ -13184,7 +13056,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {viewingOfficialSopUnpaidDoc && (
         <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-white rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
+          <div className="bg-white rounded-lg max-w-4xl w-full p-6 sm:p-8 shadow-xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
             {/* Header / Kop Surat Resmi Barokah Grup */}
             <div className="relative mb-3">
               <button
@@ -13203,15 +13075,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             </div>
 
             {/* Document Metadata Bar */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-gradient-to-r from-sky-50 to-blue-50 p-4 rounded-xl border border-sky-200 text-xs">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-sky-50 p-4 rounded-xl border border-sky-200 text-xs">
               <div>
-                <p className="font-extrabold text-slate-900 text-sm">
+                <p className="font-semibold text-slate-900 text-sm">
                   STANDARD OPERATIONAL PROCEDURE (SOP)
                 </p>
-                <p className="font-black text-sky-950 text-base">
+                <p className="font-semibold text-sky-950 text-base">
                   KETENTUAN HAK LIBUR OPERASIONAL, CUTI KHUSUS, DISPENSASI MUSIBAH, KLAIM SAKIT RAWAT INAP &amp; UPAH PRORATA
                 </p>
-                <p className="text-slate-600 font-mono text-[11px] mt-0.5">
+                <p className="text-slate-600 font-mono text-xs mt-0.5">
                   Nomor Dokumen: <span className="font-bold text-sky-800">006/HR-LEAVE/2026/BAROKAH</span> | Klasifikasi: Operasional SDM &amp; Penggajian
                 </p>
                 <p className="text-slate-700 font-semibold mt-0.5">
@@ -13219,15 +13091,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <span className="bg-sky-700 text-white px-3 py-1 rounded-full font-black text-[10px] uppercase shadow-xs inline-block">
+                <span className="bg-sky-700 text-white px-3 py-1 rounded-full font-semibold text-xs uppercase shadow-xs inline-block">
                   BERLAKU: 22 OKTOBER 2026
                 </span>
-                <p className="text-[10px] text-slate-500 font-mono mt-1">Dokumen Acuan Kontrak PKWT &amp; Payroll</p>
+                <p className="text-xs text-slate-500 font-mono mt-1">Dokumen Acuan Kontrak PKWT &amp; Payroll</p>
               </div>
             </div>
 
             {/* Quick Navigation Pills */}
-            <div className="flex flex-wrap gap-1.5 p-2 bg-slate-100 rounded-xl text-[10px] font-bold">
+            <div className="flex flex-wrap gap-1.5 p-2 bg-slate-100 rounded-xl text-xs font-bold">
               <span className="text-slate-500 py-1 px-2">Lompat Cepat:</span>
               <a href="#sop-unp-pasal1" className="bg-white hover:bg-sky-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Pasal 1: Libur Reguler 2 Hari</a>
               <a href="#sop-unp-pasal2" className="bg-white hover:bg-sky-100 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition">Pasal 2: Cuti Khusus Dibayar Penuh</a>
@@ -13243,8 +13115,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 1: SISTEM LIBUR REGULER OPERASIONAL RESTORAN */}
               <section id="sop-unp-pasal1" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-slate-900 text-sky-300 font-black px-2 py-0.5 rounded text-[10px]">PASAL 1</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">SISTEM WAKTU KERJA &amp; HAK LIBUR REGULER OPERASIONAL RESTORAN</h4>
+                  <span className="bg-slate-900 text-sky-300 font-semibold px-2 py-0.5 rounded text-xs">PASAL 1</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">SISTEM WAKTU KERJA &amp; HAK LIBUR REGULER OPERASIONAL RESTORAN</h4>
                 </div>
                 <p>
                   1. Mengingat karakteristik industri restoran dan makanan siap saji yang beroperasi tanpa henti 7 (tujuh) hari dalam seminggu, sistem kerja di Barokah Group <b>tidak memberlakukan libur mingguan 4 hari sebulan dan tidak memberlakukan hari libur nasional / tanggal merah</b>.
@@ -13260,14 +13132,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 2: CUTI KHUSUS KELUARGA DIBAYAR PENUH */}
               <section id="sop-unp-pasal2" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-slate-900 text-sky-300 font-black px-2 py-0.5 rounded text-[10px]">PASAL 2</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">HAK CUTI KHUSUS KELUARGA &amp; DISPENSASI MUSIBAH DIBAYAR PENUH (PAID LEAVE)</h4>
+                  <span className="bg-slate-900 text-sky-300 font-semibold px-2 py-0.5 rounded text-xs">PASAL 2</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">HAK CUTI KHUSUS KELUARGA &amp; DISPENSASI MUSIBAH DIBAYAR PENUH (PAID LEAVE)</h4>
                 </div>
                 <p>
                   Perusahaan memberikan hak cuti khusus dengan <b>upah pokok tetap dibayar penuh (100%)</b> untuk kondisi-kondisi darurat berikut:
                 </p>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-[11px] border border-slate-200 rounded-lg overflow-hidden bg-white">
+                  <table className="w-full text-xs border border-slate-200 rounded-lg overflow-hidden bg-white">
                     <thead className="bg-slate-900 text-white font-bold">
                       <tr>
                         <th className="p-2 text-left">Peristiwa / Keperluan Cuti Khusus</th>
@@ -13279,13 +13151,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     <tbody className="divide-y divide-slate-100">
                       <tr>
                         <td className="p-2 font-bold text-slate-800">Karyawan Sendiri Menikah</td>
-                        <td className="p-2 text-center font-black text-emerald-700 bg-emerald-50">3 Hari Kerja</td>
+                        <td className="p-2 text-center font-semibold text-emerald-700 bg-emerald-50">3 Hari Kerja</td>
                         <td className="p-2 text-center font-bold text-emerald-700">Dibayar Penuh (100%)</td>
                         <td className="p-2 text-slate-600">Undangan &amp; Buku Nikah resmi KUA/Catatan Sipil</td>
                       </tr>
                       <tr className="bg-slate-50">
                         <td className="p-2 font-bold text-slate-800">Duka Cita Keluarga Inti (Ortu / Anak / Pasangan)</td>
-                        <td className="p-2 text-center font-black text-slate-900">7 Hari Total</td>
+                        <td className="p-2 text-center font-semibold text-slate-900">7 Hari Total</td>
                         <td className="p-2 text-center font-bold text-amber-800 bg-amber-50">
                           3 Hari Pertama Dibayar, 4 Hari Unpaid
                         </td>
@@ -13305,20 +13177,20 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       </tr>
                       <tr>
                         <td className="p-2 font-bold text-slate-800">Dispensasi Musibah Kebakaran Tempat Tinggal</td>
-                        <td className="p-2 text-center font-black text-emerald-700 bg-emerald-50">3 Hari Kerja</td>
+                        <td className="p-2 text-center font-semibold text-emerald-700 bg-emerald-50">3 Hari Kerja</td>
                         <td className="p-2 text-center font-bold text-emerald-700">Dibayar Penuh (100%)</td>
                         <td className="p-2 text-slate-600">Surat Keterangan Musibah Damkar / Polsek / RT-RW</td>
                       </tr>
                       <tr className="bg-slate-50">
                         <td className="p-2 font-bold text-slate-800">Dispensasi Musibah Banjir Tempat Tinggal</td>
-                        <td className="p-2 text-center font-black text-emerald-700 bg-emerald-50">2 Hari Kerja</td>
+                        <td className="p-2 text-center font-semibold text-emerald-700 bg-emerald-50">2 Hari Kerja</td>
                         <td className="p-2 text-center font-bold text-emerald-700">Dibayar Penuh (100%)</td>
                         <td className="p-2 text-slate-600">Foto dokumentasi lokasi &amp; konfirmasi RT/RW</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <p className="text-[11px] text-slate-600 italic">
+                <p className="text-xs text-slate-600 italic">
                   Catatan: Selama hari pelaksanaan cuti khusus dibayar penuh di atas, karyawan tidak mendapatkan uang makan harian (Rp 20.000,-/hari) dan upah lembur ditiadakan (Rp 0,-).
                 </p>
               </section>
@@ -13326,15 +13198,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 3: KETENTUAN KLAIM SAKIT RAWAT INAP RS */}
               <section id="sop-unp-pasal3" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-slate-900 text-sky-300 font-black px-2 py-0.5 rounded text-[10px]">PASAL 3</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">STANDAR KLAIM SAKIT (HANYA SAKIT RAWAT INAP RUMAH SAKIT)</h4>
+                  <span className="bg-slate-900 text-sky-300 font-semibold px-2 py-0.5 rounded text-xs">PASAL 3</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">STANDAR KLAIM SAKIT (HANYA SAKIT RAWAT INAP RUMAH SAKIT)</h4>
                 </div>
                 <div className="p-3 bg-amber-50 rounded-xl border border-amber-300 space-y-1.5">
-                  <div className="flex items-center gap-1.5 text-amber-900 font-extrabold text-xs">
+                  <div className="flex items-center gap-1.5 text-amber-900 font-semibold text-xs">
                     <ShieldAlert className="h-4 w-4 text-amber-700" />
                     <span>KETETAPAN MUTLAK KLAIM SAKIT RESMI RESTORAN</span>
                   </div>
-                  <p className="text-[11px] text-amber-950 leading-relaxed">
+                  <p className="text-xs text-amber-950 leading-relaxed">
                     Sakit yang dapat diajukan klaimnya pada sistem penggajian Barokah Group <b>HANYA sakit yang memerlukan RAWAT INAP (opname) di Rumah Sakit atau Puskesmas Rawat Inap resmi</b> yang dibuktikan dengan Surat Keterangan Rawat Inap, resume medis, dan kwitansi administrasi Rumah Sakit.
                   </p>
                 </div>
@@ -13355,35 +13227,35 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 4: CUTI TIDAK DIBAYAR (UNPAID LEAVE) */}
               <section id="sop-unp-pasal4" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-slate-900 text-sky-300 font-black px-2 py-0.5 rounded text-[10px]">PASAL 4</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">KETENTUAN CUTI TIDAK DIBAYAR (UNPAID LEAVE / DI LUAR TANGGUNGAN)</h4>
+                  <span className="bg-slate-900 text-sky-300 font-semibold px-2 py-0.5 rounded text-xs">PASAL 4</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">KETENTUAN CUTI TIDAK DIBAYAR (UNPAID LEAVE / DI LUAR TANGGUNGAN)</h4>
                 </div>
                 <p>
                   Karyawan yang mengajukan izin untuk keperluan berikut diberikan izin resmi tanpa sanksi denda, namun <b>upah pokok harian tidak dibayarkan (unpaid / potong prorata)</b>:
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-[11px]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
                   <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
-                    <span className="font-extrabold text-slate-900 block">⚖️ Pengurusan Legalitas Pernikahan / Perceraian:</span>
+                    <span className="font-semibold text-slate-900 block">Pengurusan Legalitas Pernikahan / Perceraian:</span>
                     <p className="text-slate-600">Maksimal 2 (dua) hari kerja di KUA, Pengadilan Agama, atau Catatan Sipil. Status: <b>Unpaid penuh (2 hari)</b>.</p>
                   </div>
                   <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
-                    <span className="font-extrabold text-slate-900 block">🖤 Sisa Masa Duka Cita Keluarga Inti:</span>
+                    <span className="font-semibold text-slate-900 block">Sisa Masa Duka Cita Keluarga Inti:</span>
                     <p className="text-slate-600">Total 7 hari izin: Hari ke-1 s.d. ke-3 dibayar penuh; <b>Hari ke-4 s.d. ke-7 (4 hari) berstatus unpaid</b>.</p>
                   </div>
                   <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
-                    <span className="font-extrabold text-slate-900 block">👶 Cuti Melahirkan Karyawati:</span>
+                    <span className="font-semibold text-slate-900 block">Cuti Melahirkan Karyawati:</span>
                     <p className="text-slate-600">Diberikan 1 (satu) bulan / 30 hari kalender: <b>3 hari pertama dibayar penuh, 27 hari sisanya berstatus unpaid</b>.</p>
                   </div>
                   <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
-                    <span className="font-extrabold text-slate-900 block">🏥 Cuti Keguguran Kandungan:</span>
+                    <span className="font-semibold text-slate-900 block">Cuti Keguguran Kandungan:</span>
                     <p className="text-slate-600">Diberikan 14 hari istirahat pemulihan: <b>3 hari pertama dibayar penuh, 11 hari sisanya berstatus unpaid</b>.</p>
                   </div>
                   <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
-                    <span className="font-extrabold text-slate-900 block">🕋 Ibadah Umroh ke Tanah Suci:</span>
+                    <span className="font-semibold text-slate-900 block">Ibadah Umroh ke Tanah Suci:</span>
                     <p className="text-slate-600">Diberikan izin maksimal 14 hari kalender dengan status <b>Unpaid Penuh (14 hari tidak dibayar)</b>.</p>
                   </div>
                   <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
-                    <span className="font-extrabold text-slate-900 block">🚫 Istirahat Haid:</span>
+                    <span className="font-semibold text-slate-900 block">Istirahat Haid:</span>
                     <p className="text-slate-600"><b>Tidak diberlakukan</b> istirahat haid berbayar dalam sistem operasional restoran Barokah Group.</p>
                   </div>
                 </div>
@@ -13392,8 +13264,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 5: RUMUS PEMOTONGAN PRORATA UPAH POKOK */}
               <section id="sop-unp-pasal5" className="space-y-3 p-4 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <span className="bg-slate-900 text-sky-300 font-black px-2 py-0.5 rounded text-[10px]">PASAL 5</span>
-                  <h4 className="font-black text-slate-950 text-sm uppercase">FORMULA RUMUS PEMOTONGAN PRORATA UPAH POKOK (PEMBAGI 30 HARI)</h4>
+                  <span className="bg-slate-900 text-sky-300 font-semibold px-2 py-0.5 rounded text-xs">PASAL 5</span>
+                  <h4 className="font-semibold text-slate-950 text-sm uppercase">FORMULA RUMUS PEMOTONGAN PRORATA UPAH POKOK (PEMBAGI 30 HARI)</h4>
                 </div>
                 <p>
                   1. Sesuai revisi penetapan Manajemen 2026, rumus baku perhitungan pemotongan upah pokok untuk setiap hari izin/cuti tidak dibayar (unpaid) menggunakan dasar <b>pembagi 30 (tiga puluh) hari kalender</b>:
@@ -13401,7 +13273,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <div className="p-3 bg-white rounded-lg border border-sky-300 font-mono text-center font-bold text-sky-950 text-xs">
                   Potongan Prorata Harian = Gaji Pokok / 30 Hari
                 </div>
-                <div className="p-3 bg-sky-50 rounded-xl border border-sky-200 text-[11px] space-y-1">
+                <div className="p-3 bg-sky-50 rounded-xl border border-sky-200 text-xs space-y-1">
                   <p className="font-bold text-sky-950">Contoh Simulasi Staf Operasional (Gaji Pokok Rp 1.200.000,-):</p>
                   <p>• Upah harian prorata = Rp 1.200.000 / 30 hari = <b>Rp 40.000,- per hari</b>.</p>
                   <p>• Jika staf mengambil cuti melahirkan unpaid 27 hari: Potongan = 27 × Rp 40.000 = Rp 1.080.000,-.</p>
@@ -13416,46 +13288,46 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* PASAL 6: LEMBAR PENGESAHAN DIREKSI */}
               <section id="sop-unp-pasal6" className="space-y-4 pt-2 border-t border-slate-200">
                 <div className="text-center space-y-1">
-                  <h4 className="font-black text-slate-950 text-xs uppercase tracking-wide">LEMBAR PENGESAHAN DOKUMEN RESMI</h4>
-                  <p className="text-[11px] text-slate-500">
+                  <h4 className="font-semibold text-slate-950 text-xs ">LEMBAR PENGESAHAN DOKUMEN RESMI</h4>
+                  <p className="text-xs text-slate-500">
                     Ditetapkan di Jakarta pada tanggal 22 Oktober 2026. Menjadi rujukan mutlak klausul Perjanjian Kerja Waktu Tertentu (PKWT) dan sistem HRIS Payroll Barokah Group.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
                   <div className="p-3 bg-white rounded-xl border border-slate-200 text-center space-y-2">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">Dibuat Oleh,</p>
+                    <p className="text-xs font-medium text-slate-600">Dibuat Oleh,</p>
                     <div className="h-12 flex items-center justify-center">
                       <span className="font-serif italic font-bold text-slate-600 text-sm">Hendra Pratama</span>
                     </div>
                     <div className="border-t border-slate-200 pt-1">
-                      <p className="font-bold text-slate-900 text-[11px]">Hendra Pratama, S.E.</p>
-                      <p className="text-[10px] text-slate-500">Head of Payroll &amp; Compensation</p>
+                      <p className="font-bold text-slate-900 text-xs">Hendra Pratama, S.E.</p>
+                      <p className="text-xs text-slate-500">Head of Payroll &amp; Compensation</p>
                     </div>
                   </div>
 
                   <div className="p-3 bg-white rounded-xl border border-slate-200 text-center space-y-2">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">Diverifikasi Oleh,</p>
+                    <p className="text-xs font-medium text-slate-600">Diverifikasi Oleh,</p>
                     <div className="h-12 flex items-center justify-center">
                       <span className="font-serif italic font-bold text-slate-600 text-sm">Siti Rahmawati</span>
                     </div>
                     <div className="border-t border-slate-200 pt-1">
-                      <p className="font-bold text-slate-900 text-[11px]">Siti Rahmawati, M.M.</p>
-                      <p className="text-[10px] text-slate-500">General Manager HRD</p>
+                      <p className="font-bold text-slate-900 text-xs">Siti Rahmawati, M.M.</p>
+                      <p className="text-xs text-slate-500">General Manager HRD</p>
                     </div>
                   </div>
 
                   <div className="p-3 bg-white rounded-xl border-2 border-sky-400 text-center space-y-2 relative overflow-hidden bg-sky-50/20">
-                    <span className="absolute top-1 right-1 text-[8px] font-black bg-sky-600 text-white px-1.5 py-0.5 rounded uppercase">
+                    <span className="absolute top-1 right-1 text-[8px] font-semibold bg-sky-600 text-white px-1.5 py-0.5 rounded uppercase">
                       TERVERIFIKASI
                     </span>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">Disetujui &amp; Disahkan,</p>
+                    <p className="text-xs font-medium text-slate-600">Disetujui &amp; Disahkan,</p>
                     <div className="h-12 flex items-center justify-center">
-                      <span className="font-serif italic font-black text-sky-950 text-sm">H. Bambang Sutrisno</span>
+                      <span className="font-serif italic font-semibold text-sky-950 text-sm">H. Bambang Sutrisno</span>
                     </div>
                     <div className="border-t border-slate-200 pt-1">
-                      <p className="font-black text-slate-950 text-[11px]">H. Bambang Sutrisno</p>
-                      <p className="text-[10px] text-sky-800 font-bold">Managing Director - Barokah F&amp;B Group</p>
+                      <p className="font-semibold text-slate-950 text-xs">H. Bambang Sutrisno</p>
+                      <p className="text-xs text-sky-800 font-bold">Managing Director - Barokah F&amp;B Group</p>
                     </div>
                   </div>
                 </div>
@@ -13465,7 +13337,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
             {/* Modal Footer Actions */}
             <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3">
-              <span className="text-[11px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 Dokumen ini merupakan acuan resmi pemotongan upah prorata dan cuti khusus kru seluruh unit Barokah Group.
               </span>
               <div className="flex space-x-2">
@@ -13482,7 +13354,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     setActiveMenu('payroll');
                     showToast('Navigasi ke Modul Penggajian (Payroll) dengan kalkulator pemotongan prorata aktif!');
                   }}
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-500 text-white flex items-center space-x-1 shadow-sm"
+                  className="px-4 py-2 rounded-xl text-xs font-bold bg-ink-800 hover:bg-ink-700 text-white flex items-center space-x-1 shadow-sm"
                 >
                   <Wallet className="h-3.5 w-3.5 text-sky-100" />
                   <span>Buka Modul Penggajian</span>
@@ -13536,7 +13408,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isAdminCreateCorrectionModalOpen && (
         <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 my-8 border border-slate-200">
+          <div className="bg-white rounded-lg max-w-xl w-full p-6 shadow-xl space-y-4 my-8 border border-slate-200">
             {/* Header Modal */}
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2.5">
@@ -13544,10 +13416,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   <Clock className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-sm tracking-tight flex items-center gap-1.5">
+                  <h3 className="font-semibold text-slate-900 text-sm tracking-tight flex items-center gap-1.5">
                     Penerbitan Berita Acara Koreksi Presensi (BAKP)
                   </h3>
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-xs text-slate-500">
                     Otoritas Sentralisasi Web Admin • Penyelamatan Upah SOP-HR-008
                   </p>
                 </div>
@@ -13723,12 +13595,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
                       )}
                       <div>
-                        <p className="font-extrabold text-[11px]">
+                        <p className="font-semibold text-xs">
                           Audit Kuota Toleransi SOP-HR-008: Koreksi ke-{nextCount} di Bulan Ini
                         </p>
-                        <p className="text-[10px] mt-0.5 leading-relaxed">
+                        <p className="text-xs mt-0.5 leading-relaxed">
                           {isOver
-                            ? '⚠️ KUOTA TOLERANSI TERLAMPAUI (>2x). Sesuai Pasal 4 SOP-HR-008: Gaji pokok harian tetap terlindungi & dibayar penuh, namun Uang Makan Dinas Rp 20.000 pada hari ini HANGUS sebagai sanksi kedisiplinan berulang.'
+                            ? 'KUOTA TOLERANSI TERLAMPAUI (>2x). Sesuai Pasal 4 SOP-HR-008: Gaji pokok harian tetap terlindungi & dibayar penuh, namun Uang Makan Dinas Rp 20.000 pada hari ini HANGUS sebagai sanksi kedisiplinan berulang.'
                             : '✓ KUOTA AMAN (Maks 2x/bulan). Hak Gaji Pokok Harian dan Uang Makan Dinas Rp 20.000 tetap cair 100% utuh.'}
                         </p>
                       </div>
@@ -13739,11 +13611,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* Direct Admin Decision */}
               <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                <label className="block text-slate-800 font-extrabold text-[11px]">
+                <label className="block text-slate-800 font-semibold text-xs">
                   Keputusan Langsung Admin (Otoritas Mutlak):
                 </label>
                 <div className="grid grid-cols-3 gap-2">
-                  <label className="flex items-center gap-2 p-2 bg-white rounded-lg border border-slate-200 cursor-pointer font-bold text-[11px]">
+                  <label className="flex items-center gap-2 p-2 bg-white rounded-lg border border-slate-200 cursor-pointer font-bold text-xs">
                     <input
                       type="radio"
                       name="corrDecision"
@@ -13752,7 +13624,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     />
                     <span>Disetujui Sah</span>
                   </label>
-                  <label className="flex items-center gap-2 p-2 bg-white rounded-lg border border-slate-200 cursor-pointer font-bold text-[11px]">
+                  <label className="flex items-center gap-2 p-2 bg-white rounded-lg border border-slate-200 cursor-pointer font-bold text-xs">
                     <input
                       type="radio"
                       name="corrDecision"
@@ -13761,7 +13633,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     />
                     <span>ACC Bersyarat</span>
                   </label>
-                  <label className="flex items-center gap-2 p-2 bg-white rounded-lg border border-slate-200 cursor-pointer font-bold text-[11px]">
+                  <label className="flex items-center gap-2 p-2 bg-white rounded-lg border border-slate-200 cursor-pointer font-bold text-xs">
                     <input
                       type="radio"
                       name="corrDecision"
@@ -13773,7 +13645,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-600 mb-0.5">Catatan Keputusan Admin:</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-0.5">Catatan Keputusan Admin:</label>
                   <input
                     type="text"
                     value={adminCorrDecisionNote}
@@ -13813,9 +13685,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {viewingSanctionDoc && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 space-y-6 shadow-2xl border border-slate-200 my-8">
+          <div className="bg-white rounded-lg max-w-3xl w-full p-6 space-y-6 shadow-xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-              <span className="text-[10px] font-black uppercase tracking-wider text-rose-800 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full">
+              <span className="text-xs font-semibold  text-rose-800 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full">
                 DOKUMEN RESMI SURAT PERINGATAN (SP) KARYAWAN
               </span>
               <button
@@ -13832,33 +13704,33 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Kop Surat Barokah Enterprise */}
               <div className="border-b-2 border-slate-900 pb-3 text-center space-y-1">
                 <div className="flex items-center justify-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 font-black flex items-center justify-center text-sm font-sans">
+                  <div className="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 font-semibold flex items-center justify-center text-sm font-sans">
                     B
                   </div>
                   <div className="text-left font-sans">
-                    <h2 className="text-sm font-black tracking-widest text-slate-950 uppercase">
+                    <h2 className="text-sm font-semibold  text-slate-950 uppercase">
                       BAROKAH ENTERPRISE GRUP
                     </h2>
-                    <p className="text-[10px] text-slate-600 font-bold tracking-wider">
+                    <p className="text-xs text-slate-600 font-bold ">
                       PT BAROKAH RESTO NUSANTARA • AYAM PECAK 2001 SEAFOOD
                     </p>
                   </div>
                 </div>
-                <p className="text-[9px] text-slate-500 font-sans font-medium">
+                <p className="text-xs text-slate-500 font-sans font-medium">
                   Kantor Pusat: Jl. Senopati No. 88, Kebayoran Baru, Jakarta Selatan • Divisi Sumber Daya Manusia (HRD)
                 </p>
               </div>
 
               {/* Title & Document Number */}
               <div className="text-center space-y-0.5 font-sans">
-                <h3 className="text-base font-black text-slate-950 uppercase tracking-wide">
+                <h3 className="text-base font-semibold text-slate-950 ">
                   SURAT PERINGATAN (SP)
                 </h3>
                 <p className="text-xs font-mono font-bold text-slate-700">
                   Nomor: {viewingSanctionDoc.id}
                 </p>
-                <p className="text-[11px] text-slate-500">
-                  Perihal: Pemberian Sanksi Disiplin Kerja — <strong>{viewingSanctionDoc.type}</strong>
+                <p className="text-xs text-slate-500">
+                  Perihal: Pemberian Sanksi Disiplin Kerja:<strong>{viewingSanctionDoc.type}</strong>
                 </p>
               </div>
 
@@ -13878,14 +13750,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Legal Clauses & Violation */}
               <div className="font-sans text-xs space-y-3 text-slate-800 leading-relaxed">
                 <div>
-                  <h4 className="font-bold text-slate-900 uppercase text-[11px]">1. Dasar &amp; Kronologi Pelanggaran:</h4>
+                  <h4 className="font-bold text-slate-900 uppercase text-xs">1. Dasar &amp; Kronologi Pelanggaran:</h4>
                   <p className="mt-1 text-slate-700 bg-slate-50/50 p-3 rounded-lg border border-slate-100">
                     {viewingSanctionDoc.violation}
                   </p>
                 </div>
 
                 <div>
-                  <h4 className="font-bold text-slate-900 uppercase text-[11px]">2. Tindakan Disiplin &amp; Konsekuensi:</h4>
+                  <h4 className="font-bold text-slate-900 uppercase text-xs">2. Tindakan Disiplin &amp; Konsekuensi:</h4>
                   <p className="mt-1 text-slate-700">
                     {viewingSanctionDoc.disciplinaryAction || 'Karyawan diwajibkan memperbaiki kinerja dan mematuhi seluruh tata tertib restoran.'}
                   </p>
@@ -13897,7 +13769,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 </div>
 
                 <div>
-                  <h4 className="font-bold text-slate-900 uppercase text-[11px]">3. Masa Berlaku Sanksi:</h4>
+                  <h4 className="font-bold text-slate-900 uppercase text-xs">3. Masa Berlaku Sanksi:</h4>
                   <p className="mt-1 text-slate-700">
                     Surat Peringatan ini berlaku terhitung sejak tanggal diterbitkan sampai dengan <strong>{viewingSanctionDoc.validUntil}</strong> (6 bulan). Apabila selama masa berlakunya Surat Peringatan ini yang bersangkutan melakukan pelanggaran disiplin kembali, maka pihak manajemen akan meningkatkan sanksi ke tingkat yang lebih berat hingga Pemutusan Hubungan Kerja (PHK).
                   </p>
@@ -13907,26 +13779,26 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Signatures */}
               <div className="pt-6 border-t border-slate-200 grid grid-cols-3 gap-4 text-center font-sans text-xs">
                 <div className="space-y-12">
-                  <p className="text-slate-500 text-[10px]">Karyawan Penerima SP,</p>
+                  <p className="text-slate-500 text-xs">Karyawan Penerima SP,</p>
                   <div>
                     <p className="font-bold text-slate-900 underline">{viewingSanctionDoc.employeeName}</p>
-                    <p className="text-[10px] text-slate-400">Staf Operasional</p>
+                    <p className="text-xs text-slate-400">Staf Operasional</p>
                   </div>
                 </div>
 
                 <div className="space-y-12">
-                  <p className="text-slate-500 text-[10px]">Saksi / Shift Leader,</p>
+                  <p className="text-slate-500 text-xs">Saksi / Shift Leader,</p>
                   <div>
                     <p className="font-bold text-slate-900 underline">{viewingSanctionDoc.witnessName || 'Shift Leader'}</p>
-                    <p className="text-[10px] text-slate-400">Atasan Stasiun Resto</p>
+                    <p className="text-xs text-slate-400">Atasan Stasiun Resto</p>
                   </div>
                 </div>
 
                 <div className="space-y-12">
-                  <p className="text-slate-500 text-[10px]">Mengetahui &amp; Mengesahkan,</p>
+                  <p className="text-slate-500 text-xs">Mengetahui &amp; Mengesahkan,</p>
                   <div>
                     <p className="font-bold text-slate-900 underline">Arif Gunawan Panggabean</p>
-                    <p className="text-[10px] text-slate-400">Direktur Utama Barokah Grup</p>
+                    <p className="text-xs text-slate-400">Direktur Utama Barokah Grup</p>
                   </div>
                 </div>
               </div>
@@ -13959,9 +13831,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {viewingBapDoc && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 space-y-6 shadow-2xl border border-slate-200 my-8">
+          <div className="bg-white rounded-lg max-w-3xl w-full p-6 space-y-6 shadow-xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-              <span className="text-[10px] font-black uppercase tracking-wider text-indigo-800 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full">
+              <span className="text-xs font-semibold  text-slate-800 bg-slate-50 border border-slate-200 px-2.5 py-0.5 rounded-full">
                 ARSIP BERITA ACARA PELANGGARAN (BAP) RESMI
               </span>
               <button
@@ -13978,26 +13850,26 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Kop Surat Barokah Enterprise */}
               <div className="border-b-2 border-slate-900 pb-3 text-center space-y-1">
                 <div className="flex items-center justify-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 font-black flex items-center justify-center text-sm font-sans">
+                  <div className="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 font-semibold flex items-center justify-center text-sm font-sans">
                     B
                   </div>
                   <div className="text-left font-sans">
-                    <h2 className="text-sm font-black tracking-widest text-slate-950 uppercase">
+                    <h2 className="text-sm font-semibold  text-slate-950 uppercase">
                       BAROKAH ENTERPRISE GRUP
                     </h2>
-                    <p className="text-[10px] text-slate-600 font-bold tracking-wider">
+                    <p className="text-xs text-slate-600 font-bold ">
                       PT BAROKAH RESTO NUSANTARA • AYAM PECAK 2001 SEAFOOD
                     </p>
                   </div>
                 </div>
-                <p className="text-[9px] text-slate-500 font-sans font-medium">
+                <p className="text-xs text-slate-500 font-sans font-medium">
                   Divisi Manajemen Operasional &amp; Kepatuhan Standar Kerja
                 </p>
               </div>
 
               {/* Title & Document Number */}
               <div className="text-center space-y-0.5 font-sans">
-                <h3 className="text-base font-black text-slate-950 uppercase tracking-wide">
+                <h3 className="text-base font-semibold text-slate-950 ">
                   BERITA ACARA PEMERIKSAAN &amp; PELANGGARAN (BAP)
                 </h3>
                 <p className="text-xs font-mono font-bold text-slate-700">
@@ -14021,21 +13893,21 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Investigation Q&A */}
               <div className="font-sans text-xs space-y-3 text-slate-800 leading-relaxed">
                 <div>
-                  <h4 className="font-bold text-slate-900 uppercase text-[11px]">A. KRONOLOGI FAKTA &amp; TEMUAN INVESTIGASI:</h4>
+                  <h4 className="font-bold text-slate-900 uppercase text-xs">A. KRONOLOGI FAKTA &amp; TEMUAN INVESTIGASI:</h4>
                   <p className="mt-1 text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100">
                     {viewingBapDoc.violation}
                   </p>
                 </div>
 
                 <div>
-                  <h4 className="font-bold text-slate-900 uppercase text-[11px]">B. KETERANGAN &amp; PENGAKUAN TERPERIKSA:</h4>
+                  <h4 className="font-bold text-slate-900 uppercase text-xs">B. KETERANGAN &amp; PENGAKUAN TERPERIKSA:</h4>
                   <p className="mt-1 text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100 italic">
                     "{viewingBapDoc.employeeStatement || 'Karyawan mengakui kelalaian dan menyatakan siap menerima konsekuensi pembinaan.'}"
                   </p>
                 </div>
 
                 <div>
-                  <h4 className="font-bold text-slate-900 uppercase text-[11px]">C. KESIMPULAN &amp; TINDAK LANJUT MANAJEMEN:</h4>
+                  <h4 className="font-bold text-slate-900 uppercase text-xs">C. KESIMPULAN &amp; TINDAK LANJUT MANAJEMEN:</h4>
                   <p className="mt-1 text-slate-700">
                     Berdasarkan hasil pemeriksaan faktual dan bukti pendukung, terperiksa dinyatakan sah melanggar tata tertib kerja Barokah Grup dan dijatuhi sanksi <strong>{viewingBapDoc.type}</strong>.
                   </p>
@@ -14045,18 +13917,18 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Signatures */}
               <div className="pt-6 border-t border-slate-200 grid grid-cols-2 gap-8 text-center font-sans text-xs">
                 <div className="space-y-12">
-                  <p className="text-slate-500 text-[10px]">Yang Diperiksa (Karyawan),</p>
+                  <p className="text-slate-500 text-xs">Yang Diperiksa (Karyawan),</p>
                   <div>
                     <p className="font-bold text-slate-900 underline">{viewingBapDoc.employeeName}</p>
-                    <p className="text-[10px] text-slate-400">Staf Operasional</p>
+                    <p className="text-xs text-slate-400">Staf Operasional</p>
                   </div>
                 </div>
 
                 <div className="space-y-12">
-                  <p className="text-slate-500 text-[10px]">Pemeriksa / Saksi Shift,</p>
+                  <p className="text-slate-500 text-xs">Pemeriksa / Saksi Shift,</p>
                   <div>
                     <p className="font-bold text-slate-900 underline">{viewingBapDoc.witnessName || 'Shift Leader'}</p>
-                    <p className="text-[10px] text-slate-400">Atasan Stasiun Resto</p>
+                    <p className="text-xs text-slate-400">Atasan Stasiun Resto</p>
                   </div>
                 </div>
               </div>
@@ -14074,7 +13946,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center space-x-1.5 shadow-sm transition"
+                className="px-5 py-2 bg-ink-800 hover:bg-ink-700 text-white text-xs font-bold rounded-xl flex items-center space-x-1.5 shadow-sm transition"
               >
                 <Printer className="h-4 w-4" />
                 <span>Cetak Berkas BAP</span>
@@ -14086,10 +13958,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
       {viewingCorrectionDoc && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-5 my-8 border border-slate-200">
+          <div className="bg-white rounded-lg max-w-2xl w-full p-6 shadow-xl space-y-5 my-8 border border-slate-200">
             {/* Header Dialog Controls */}
             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-              <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
+              <span className="text-xs font-semibold  text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
                 ARSIP BERITA ACARA KOREKSI PRESENSI RESMI (SOP-HR-008)
               </span>
               <button
@@ -14106,32 +13978,32 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Kop Surat Barokah Grup */}
               <div className="border-b-2 border-slate-900 pb-3 text-center space-y-1">
                 <div className="flex items-center justify-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 font-black flex items-center justify-center text-sm font-sans">
+                  <div className="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 font-semibold flex items-center justify-center text-sm font-sans">
                     B
                   </div>
                   <div className="text-left font-sans">
-                    <h2 className="text-sm font-black tracking-widest text-slate-950 uppercase">
+                    <h2 className="text-sm font-semibold  text-slate-950 uppercase">
                       BAROKAH ENTERPRISE GRUP
                     </h2>
-                    <p className="text-[10px] text-slate-600 font-bold tracking-wider">
+                    <p className="text-xs text-slate-600 font-bold ">
                       PT BAROKAH RESTO NUSANTARA • AYAM PECAK 2001 SEAFOOD
                     </p>
                   </div>
                 </div>
-                <p className="text-[9px] text-slate-500 font-sans font-medium">
+                <p className="text-xs text-slate-500 font-sans font-medium">
                   Divisi Sumber Daya Manusia &amp; Operasional Multi-Outlet Resto
                 </p>
               </div>
 
               {/* Title & Document Number */}
               <div className="text-center space-y-0.5">
-                <h3 className="text-sm font-black text-slate-950 uppercase tracking-wide font-sans">
+                <h3 className="text-sm font-semibold text-slate-950  font-sans">
                   BERITA ACARA KOREKSI PRESENSI &amp; PERLINDUNGAN UPAH (BAKP)
                 </h3>
-                <p className="text-[11px] font-mono text-slate-600">
+                <p className="text-xs font-mono text-slate-600">
                   Nomor: <span className="font-bold">BAKP/HR-ATT/2026/X/{viewingCorrectionDoc.id}</span>
                 </p>
-                <p className="text-[10px] text-slate-500 font-sans">
+                <p className="text-xs text-slate-500 font-sans">
                   Rujukan Kebijakan: SK Direksi No. 008/HR-ATT/2026/BAROKAH
                 </p>
               </div>
@@ -14189,14 +14061,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* SOP Audit Panel */}
               <div className="font-sans p-3 bg-amber-50/60 rounded-xl border border-amber-200/80 space-y-1.5 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="font-extrabold text-amber-900 uppercase text-[10px] tracking-wider">
+                  <span className="font-semibold text-amber-900 uppercase text-xs ">
                     HASIL AUDIT &amp; IMPLIKASI PAYROLL (SOP-HR-008):
                   </span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-100 text-emerald-800">
+                  <span className="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800">
                     GAJI POKOK: 100% TERLINDUNGI &amp; DIBAYAR
                   </span>
                 </div>
-                <div className="text-[11px] text-slate-700 space-y-1">
+                <div className="text-xs text-slate-700 space-y-1">
                   <p>
                     • <strong>Status Kuota Bulanan:</strong> Koreksi ke-
                     <strong>{viewingCorrectionDoc.monthlyCorrectionCount}</strong> pada bulan berjalan{' '}
@@ -14207,11 +14079,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   <p>
                     • <strong>Status Uang Makan Dinas (Rp 20.000):</strong>{' '}
                     {viewingCorrectionDoc.mealAllowanceImpact === 'HANGUS_SOP008' ? (
-                      <span className="text-rose-700 font-extrabold">
+                      <span className="text-rose-700 font-semibold">
                         HANGUS (Rp 0) sesuai Pasal 4 SOP-HR-008 akibat kelalaian berulang
                       </span>
                     ) : (
-                      <span className="text-emerald-700 font-extrabold">
+                      <span className="text-emerald-700 font-semibold">
                         DIBAYAR LENGKAP (Rp 20.000) - Toleransi Human Error Wajar
                       </span>
                     )}
@@ -14228,7 +14100,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   <p className="font-bold">Pemohon (Karyawan),</p>
                   <div>
                     <p className="font-bold text-slate-900 underline">{viewingCorrectionDoc.employeeName}</p>
-                    <p className="text-[10px] font-mono text-slate-500">NIK: {viewingCorrectionDoc.nik}</p>
+                    <p className="text-xs font-mono text-slate-500">NIK: {viewingCorrectionDoc.nik}</p>
                   </div>
                 </div>
 
@@ -14236,7 +14108,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   <p className="font-bold">Saksi Shift Leader,</p>
                   <div>
                     <p className="font-bold text-slate-900 underline">{viewingCorrectionDoc.shiftLeaderWitness}</p>
-                    <p className="text-[10px] font-mono text-slate-500">Verifikator Fisik Outlet</p>
+                    <p className="text-xs font-mono text-slate-500">Verifikator Fisik Outlet</p>
                   </div>
                 </div>
 
@@ -14246,7 +14118,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     <p className="font-bold text-slate-900 underline">
                       {viewingCorrectionDoc.approvedBy || 'Admin HR Pusat'}
                     </p>
-                    <p className="text-[10px] font-mono text-slate-500">Otoritas Barokah Grup</p>
+                    <p className="text-xs font-mono text-slate-500">Otoritas Barokah Grup</p>
                   </div>
                 </div>
               </div>
@@ -14254,7 +14126,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
             {/* Modal Footer Controls */}
             <div className="flex justify-between items-center pt-2 border-t border-slate-100">
-              <span className="text-[11px] text-slate-500 font-medium">
+              <span className="text-xs text-slate-500 font-medium">
                 SK: 008/HR-ATT/2026/BAROKAH • Berlaku di seluruh cabang
               </span>
               <div className="flex space-x-2">
@@ -14284,7 +14156,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {viewingOfficialSop008Doc && (
         <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-white rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
+          <div className="bg-white rounded-lg max-w-4xl w-full p-6 sm:p-8 shadow-xl space-y-6 max-h-[92vh] overflow-y-auto border border-slate-200 font-sans text-slate-900">
             {/* Header / Kop Surat Resmi Barokah Grup */}
             <div className="relative mb-3">
               <button
@@ -14303,37 +14175,37 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             </div>
 
             {/* Document Metadata Bar */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-200 text-xs">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-amber-50 p-4 rounded-xl border border-amber-200 text-xs">
               <div>
-                <p className="font-extrabold text-slate-900 text-sm">
+                <p className="font-semibold text-slate-900 text-sm">
                   SURAT KEPUTUSAN DIREKSI &amp; STANDAR OPERASIONAL PROSEDUR (SOP)
                 </p>
-                <p className="font-black text-amber-950 text-base">
+                <p className="font-semibold text-amber-950 text-base">
                   SOP-HR-008: PROSEDUR PENGAJUAN &amp; VERIFIKASI KOREKSI PRESENSI (KELUPAAN CLOCK-IN/CLOCK-OUT) SERTA BATAS TOLERANSI KELALAIAN
                 </p>
-                <p className="text-slate-600 font-mono text-[11px] mt-0.5">
+                <p className="text-slate-600 font-mono text-xs mt-0.5">
                   Nomor Dokumen: <span className="font-bold text-amber-800">008/HR-ATT/2026/BAROKAH</span> | Klasifikasi: Presensi &amp; Perlindungan Upah Resto
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <span className="bg-amber-700 text-white px-3 py-1 rounded-full font-black text-[10px] uppercase shadow-xs inline-block">
+                <span className="bg-amber-700 text-white px-3 py-1 rounded-full font-semibold text-xs uppercase shadow-xs inline-block">
                   BERLAKU: 25 OKTOBER 2026
                 </span>
-                <p className="text-[10px] text-slate-500 font-mono mt-1">Otoritas Mutlak Web Admin</p>
+                <p className="text-xs text-slate-500 font-mono mt-1">Otoritas Mutlak Web Admin</p>
               </div>
             </div>
 
             {/* Body of SOP-008 */}
             <div className="space-y-5 text-xs text-slate-800 leading-relaxed">
               <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                <h4 className="font-extrabold text-slate-900 text-sm uppercase">PASAL 1: MUKADIMAH &amp; DEFINISI</h4>
+                <h4 className="font-semibold text-slate-900 text-sm uppercase">PASAL 1: MUKADIMAH &amp; DEFINISI</h4>
                 <p>
                   Dalam operasional restoran multi-outlet dengan beban persiapan dapur (*prepping BOH*) dan penutupan malam (*closing deep cleaning*), kelupaan absensi merupakan kejadian manusiawi. SOP ini dibentuk untuk menjamin hak upah staf yang hadir fisik tetap terlindungi, serta menutup celah manipulasi kehadiran lisan (*fraud*).
                 </p>
               </div>
 
               <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                <h4 className="font-extrabold text-slate-900 text-sm uppercase">PASAL 2: BATAS WAKTU PENGAJUAN (SLA 24 JAM)</h4>
+                <h4 className="font-semibold text-slate-900 text-sm uppercase">PASAL 2: BATAS WAKTU PENGAJUAN (SLA 24 JAM)</h4>
                 <p>
                   1. Pengajuan koreksi lupa absen wajib dilaporkan maksimal <strong>H+1 (1x24 jam)</strong> setelah shift kerja berakhir.<br />
                   2. Seluruh pengajuan bulan berjalan wajib selesai sebelum pukul 23:59 WIB pada <strong>Tanggal 5 (Batas Cut-Off Payroll)</strong>. Pengajuan yang melewati batas cut-off terkunci permanen sebagai status Mangkir / Unpaid.
@@ -14341,7 +14213,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               </div>
 
               <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                <h4 className="font-extrabold text-slate-900 text-sm uppercase">PASAL 3: VERIFIKASI DUA LAPIS (ANTI-FRAUD)</h4>
+                <h4 className="font-semibold text-slate-900 text-sm uppercase">PASAL 3: VERIFIKASI DUA LAPIS (ANTI-FRAUD)</h4>
                 <p>
                   1. Wajib mencantumkan nama 1 orang <strong>Saksi Fisik Lapangan</strong> (Shift Leader / Rekan Stasiun Resto).<br />
                   2. Admin HR dan Pimpinan Cabang berhak memvalidasi via log transaksi kasir POS atau rekaman CCTV area outlet.<br />
@@ -14350,10 +14222,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               </div>
 
               <div className="p-4 bg-amber-50/70 rounded-xl border border-amber-200 space-y-3">
-                <h4 className="font-extrabold text-amber-950 text-sm uppercase">PASAL 4: KUOTA TOLERANSI BULANAN &amp; DAMPAK UPAH</h4>
+                <h4 className="font-semibold text-amber-950 text-sm uppercase">PASAL 4: KUOTA TOLERANSI BULANAN &amp; DAMPAK UPAH</h4>
                 <div className="border border-amber-200 rounded-lg overflow-hidden bg-white">
                   <table className="w-full text-left text-xs divide-y divide-amber-200">
-                    <thead className="bg-amber-100/75 text-amber-900 font-bold text-[11px]">
+                    <thead className="bg-amber-100/75 text-amber-900 font-bold text-xs">
                       <tr>
                         <th className="p-2">Frekuensi Koreksi / Bln</th>
                         <th className="p-2">Status Kehadiran</th>
@@ -14377,13 +14249,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     </tbody>
                   </table>
                 </div>
-                <p className="text-[11px] text-amber-900 font-semibold">
-                  📌 <strong>Prinsip Utama:</strong> Gaji pokok staf TIDAK PERNAH DIPOTONG selama kehadiran fisik terbukti benar. Yang ditiadakan pada kelalaian ke-3 dan seterusnya hanyalah uang makan harian dinas sebagai penegakan kedisiplinan biometrik.
+                <p className="text-xs text-amber-900 font-semibold">
+                  <strong>Prinsip Utama:</strong> Gaji pokok staf TIDAK PERNAH DIPOTONG selama kehadiran fisik terbukti benar. Yang ditiadakan pada kelalaian ke-3 dan seterusnya hanyalah uang makan harian dinas sebagai penegakan kedisiplinan biometrik.
                 </p>
               </div>
 
               <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                <h4 className="font-extrabold text-slate-900 text-sm uppercase">PASAL 5: SANKSI KECURANGAN (FRAUD)</h4>
+                <h4 className="font-semibold text-slate-900 text-sm uppercase">PASAL 5: SANKSI KECURANGAN (FRAUD)</h4>
                 <p>
                   Karyawan yang terbukti merekayasa kehadiran atau mengajukan koreksi palsu dikenakan sanksi minimum <strong>Surat Peringatan 3 (SP3)</strong> atau <strong>PHK Seketika</strong>. Saksi yang terbukti berkolusi dikenakan sanksi minimum <strong>SP2</strong>.
                 </p>
@@ -14423,7 +14295,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isKudosModalOpen && (
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl space-y-4">
             <div className="flex justify-between items-start border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2.5">
                 <div className="p-2 bg-amber-100 text-amber-700 rounded-xl">
@@ -14502,10 +14374,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {is1to1ModalOpen && (
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl space-y-4">
             <div className="flex justify-between items-start border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2.5">
-                <div className="p-2 bg-indigo-100 text-indigo-700 rounded-xl">
+                <div className="p-2 bg-slate-100 text-slate-700 rounded-xl">
                   <MessageCircle className="h-5 w-5" />
                 </div>
                 <div>
@@ -14530,7 +14402,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <select
                   value={new1to1Employee}
                   onChange={(e) => setNew1to1Employee(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 >
                   <option value="">-- Pilih Karyawan --</option>
                   {employeesMasterList.map((emp) => (
@@ -14551,7 +14423,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   value={new1to1Topic}
                   onChange={(e) => setNew1to1Topic(e.target.value)}
                   placeholder="Contoh: Review Kecepatan Saji &amp; Higienitas Station"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 />
               </div>
 
@@ -14565,7 +14437,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     required
                     value={new1to1Date}
                     onChange={(e) => setNew1to1Date(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
                 <div>
@@ -14577,7 +14449,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     required
                     value={new1to1Time}
                     onChange={(e) => setNew1to1Time(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
               </div>
@@ -14592,7 +14464,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5"
+                  className="px-4 py-2 bg-ink-800 hover:bg-ink-700 text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5"
                 >
                   <Calendar className="h-4 w-4" />
                   <span>Simpan &amp; Jadwalkan</span>
@@ -14611,17 +14483,17 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isExportPdfModalOpen && (
         <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-5 my-8 max-h-[92vh] overflow-y-auto border border-slate-200">
+          <div className="bg-white rounded-lg max-w-2xl w-full p-6 shadow-xl space-y-5 my-8 max-h-[92vh] overflow-y-auto border border-slate-200">
             {/* Header */}
             <div className="flex justify-between items-start border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-3">
-                <div className="p-2.5 bg-gradient-to-br from-amber-500 to-amber-600 text-slate-950 rounded-xl font-bold shadow-sm">
+                <div className="p-2.5 bg-brand-400 text-slate-950 rounded-xl font-bold shadow-sm">
                   <FileDown className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                  <h3 className="font-semibold text-slate-900 text-base flex items-center gap-2">
                     <span>Pusat Cetak &amp; Unduh PDF Laporan Payroll</span>
-                    <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                    <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
                       Print-Ready
                     </span>
                   </h3>
@@ -14652,15 +14524,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   onChange={(e) => setExportPdfOutlet(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
                 >
-                  <option value="SEMUA">🌐 Semua Cabang (Konsolidasi Multi-Outlet - {employeesMasterList.length} Kru)</option>
+                  <option value="SEMUA">Semua Cabang (Konsolidasi Multi-Outlet - {employeesMasterList.length} Kru)</option>
                   {outletsConfigList.map((out) => {
                     const cnt = employeesMasterList.filter(e => e.outlet.toLowerCase().includes(out.name.toLowerCase()) || out.name.toLowerCase().includes(e.outlet.toLowerCase()) || e.outlet.toLowerCase().includes(out.city.toLowerCase())).length;
                     return (
-                      <option key={out.id} value={out.name}>🏢 {out.name} • {cnt} Kru (Leader: {out.managerName})</option>
+                      <option key={out.id} value={out.name}>{out.name} • {cnt} Kru (Leader: {out.managerName})</option>
                     );
                   })}
                 </select>
-                <span className="text-[11px] text-slate-400">
+                <span className="text-xs text-slate-400">
                   {exportPdfOutlet === 'SEMUA'
                     ? 'Menghasilkan laporan konsolidasi seluruh cabang lengkap dengan subtotal per unit outlet.'
                     : `Menghasilkan laporan khusus unit ${exportPdfOutlet} lengkap dengan alamat dan kepala cabang.`}
@@ -14678,11 +14550,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   onChange={(e) => setExportPdfMonth(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
                 >
-                  <option value="Oktober 2026">📅 Oktober 2026 (Periode Aktif • Cut-Off 25 Okt 2026)</option>
-                  <option value="September 2026">📅 September 2026 (Cut-Off 25 Sep 2026 • Arsip)</option>
-                  <option value="Agustus 2026">📅 Agustus 2026 (Cut-Off 25 Agu 2026 • Arsip)</option>
-                  <option value="Juli 2026">📅 Juli 2026 (Cut-Off 25 Jul 2026 • Arsip)</option>
-                  <option value="Juni 2026">📅 Juni 2026 (Cut-Off 25 Jun 2026 • Arsip)</option>
+                  <option value="Oktober 2026">Oktober 2026 (Periode Aktif • Cut-Off 25 Okt 2026)</option>
+                  <option value="September 2026">September 2026 (Cut-Off 25 Sep 2026 • Arsip)</option>
+                  <option value="Agustus 2026">Agustus 2026 (Cut-Off 25 Agu 2026 • Arsip)</option>
+                  <option value="Juli 2026">Juli 2026 (Cut-Off 25 Jul 2026 • Arsip)</option>
+                  <option value="Juni 2026">Juni 2026 (Cut-Off 25 Jun 2026 • Arsip)</option>
                 </select>
               </div>
 
@@ -14695,49 +14567,49 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     onChange={(e) => setExportPdfIncludeEmployeeDetails(e.target.checked)}
                     className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 cursor-pointer"
                   />
-                  <span className="text-xs font-extrabold text-slate-900">
+                  <span className="text-xs font-semibold text-slate-900">
                     Sertakan Rincian Tabel Nama-Nama Seluruh Karyawan
                   </span>
                 </label>
-                <p className="text-[11px] text-slate-500 pl-6 leading-relaxed">
+                <p className="text-xs text-slate-500 pl-6 leading-relaxed">
                   Mencantumkan nama lengkap setiap kru, jabatan stasiun kerja (Cook, Kasir, Waiter), rincian Gaji Pokok, Uang Makan (20k/hr), Insentif Libur SOP 001 (+75k/hr), potongan kasbon/denda, dan Take Home Pay (THP) siap transfer.
                 </p>
               </div>
 
               {/* Dynamic Preview Summary Box */}
-              <div className="p-4 bg-gradient-to-r from-amber-50 via-emerald-50 to-amber-50 rounded-2xl border border-amber-200/80 space-y-2.5">
+              <div className="p-4 bg-amber-50 rounded-lg border border-amber-200/80 space-y-2.5">
                 <div className="flex items-center justify-between text-xs font-bold text-slate-800">
                   <span className="flex items-center gap-1.5">
                     <Sparkles className="h-4 w-4 text-amber-600" />
                     Preview Ringkasan Dokumen PDF:
                   </span>
-                  <span className="text-[10px] font-mono bg-amber-200 text-amber-950 px-2 py-0.5 rounded font-black">
+                  <span className="text-xs font-mono bg-amber-200 text-amber-950 px-2 py-0.5 rounded font-semibold">
                     Cut-Off: 25 {exportPdfMonth.split(' ')[0]}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                   <div className="p-2 bg-white rounded-lg border border-slate-200">
-                    <span className="text-[10px] text-slate-400 block font-bold">Outlet:</span>
-                    <span className="font-extrabold text-slate-900 truncate block">
+                    <span className="text-xs text-slate-500 block font-medium">Outlet:</span>
+                    <span className="font-semibold text-slate-900 truncate block">
                       {exportPdfOutlet === 'SEMUA' ? 'Semua Cabang (4)' : exportPdfOutlet.split(',')[0]}
                     </span>
                   </div>
                   <div className="p-2 bg-white rounded-lg border border-slate-200">
-                    <span className="text-[10px] text-slate-400 block font-bold">Bulan:</span>
-                    <span className="font-extrabold text-slate-900">{exportPdfMonth}</span>
+                    <span className="text-xs text-slate-500 block font-medium">Bulan:</span>
+                    <span className="font-semibold text-slate-900">{exportPdfMonth}</span>
                   </div>
                   <div className="p-2 bg-white rounded-lg border border-slate-200">
-                    <span className="text-[10px] text-slate-400 block font-bold">Total Kru:</span>
-                    <span className="font-extrabold text-emerald-700">
+                    <span className="text-xs text-slate-500 block font-medium">Total Kru:</span>
+                    <span className="font-semibold text-emerald-700">
                       {exportPdfOutlet === 'SEMUA'
                         ? `${employeesMasterList.length} Karyawan`
                         : `${employeesMasterList.filter(e => e.outlet.toLowerCase().includes(exportPdfOutlet.toLowerCase()) || exportPdfOutlet.toLowerCase().includes(e.outlet.toLowerCase())).length} Karyawan`}
                     </span>
                   </div>
                   <div className="p-2 bg-white rounded-lg border border-slate-200">
-                    <span className="text-[10px] text-slate-400 block font-bold">Estimasi THP:</span>
-                    <span className="font-extrabold text-amber-700">
+                    <span className="text-xs text-slate-500 block font-medium">Estimasi THP:</span>
+                    <span className="font-semibold text-amber-700">
                       {exportPdfOutlet === 'SEMUA'
                         ? `Rp ${employeesMasterList.reduce((acc, curr) => acc + (curr.positionKey === 'koki' ? 3000000 : curr.positionKey === 'kasir' ? 2600000 : 2400000), 0).toLocaleString('id-ID')}`
                         : `Rp ${employeesMasterList.filter(e => e.outlet.toLowerCase().includes(exportPdfOutlet.toLowerCase()) || exportPdfOutlet.toLowerCase().includes(e.outlet.toLowerCase())).reduce((acc, curr) => acc + (curr.positionKey === 'koki' ? 3000000 : curr.positionKey === 'kasir' ? 2600000 : 2400000), 0).toLocaleString('id-ID')}`}
@@ -14766,7 +14638,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   );
                   setIsExportPdfModalOpen(false);
                 }}
-                className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs rounded-xl shadow-md shadow-amber-500/20 transition flex items-center justify-center space-x-2"
+                className="w-full sm:w-auto px-5 py-2.5 bg-brand-400 hover:bg-brand-300 text-slate-950 font-semibold text-xs rounded-xl shadow-sm shadow-amber-500/20 transition flex items-center justify-center space-x-2"
               >
                 <Printer className="h-4 w-4" />
                 <span>Cetak &amp; Unduh PDF Resmi</span>
@@ -14797,17 +14669,17 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {selectedEmployeeDetail && (
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-xl w-full p-6 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-slate-900 text-amber-400 font-extrabold text-sm flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-slate-900 text-amber-400 font-semibold text-sm flex items-center justify-center">
                   {selectedEmployeeDetail.avatar}
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-sm">
+                  <h3 className="font-semibold text-slate-900 text-sm">
                     {selectedEmployeeDetail.fullName} ({selectedEmployeeDetail.nickname})
                   </h3>
-                  <p className="text-[10px] text-amber-700 font-bold uppercase font-mono">
+                  <p className="text-xs text-amber-800 font-medium">
                     {selectedEmployeeDetail.id} • KTP: {selectedEmployeeDetail.nikKtp}
                   </p>
                 </div>
@@ -14822,31 +14694,31 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
-                <span className="text-[10px] text-slate-400 uppercase font-bold">Usia Riil Karyawan</span>
-                <p className="font-extrabold text-slate-900 text-sm">
-                  🎂 {calculateAge(selectedEmployeeDetail.birthDate).text}
+                <span className="text-xs text-slate-500 font-medium">Usia Riil Karyawan</span>
+                <p className="font-semibold text-slate-900 text-sm">
+                  {calculateAge(selectedEmployeeDetail.birthDate).text}
                 </p>
-                <p className="text-[10px] text-slate-500">
+                <p className="text-xs text-slate-500">
                   Lahir: {selectedEmployeeDetail.birthPlace}, {selectedEmployeeDetail.birthDate}
                 </p>
               </div>
 
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-slate-400 uppercase font-bold">Masa Kerja &amp; Kategori Gaji</span>
-                  <span className="text-[9px] font-mono font-bold text-slate-500">
+                  <span className="text-xs text-slate-500 font-medium">Masa Kerja &amp; Kategori Gaji</span>
+                  <span className="text-xs font-mono font-bold text-slate-500">
                     Join: {selectedEmployeeDetail.joinDate || '-'}
                   </span>
                 </div>
-                <p className="font-extrabold text-slate-900 text-sm">
+                <p className="font-semibold text-slate-900 text-sm">
                   ⏳ {calculateTenure(selectedEmployeeDetail.joinDate).text}
                 </p>
                 <div className="flex flex-wrap gap-1 items-center pt-0.5">
-                  <span className="inline-block text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                  <span className="inline-block text-xs font-semibold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
                     {calculateTenure(selectedEmployeeDetail.joinDate).categoryLabel}
                   </span>
-                  <span className="inline-block text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
-                    🎁 {calculateTenure(selectedEmployeeDetail.joinDate).tenureAllowanceLabel}
+                  <span className="inline-block text-xs font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
+                    {calculateTenure(selectedEmployeeDetail.joinDate).tenureAllowanceLabel}
                   </span>
                 </div>
               </div>
@@ -14857,25 +14729,25 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <span className="text-slate-500">Cabang Penempatan:</span>
                 <div className="text-right">
                   <span className="font-bold text-slate-900 block">{selectedEmployeeDetail.outlet}</span>
-                  <span className="text-[9px] text-emerald-700 font-semibold block">
+                  <span className="text-xs text-emerald-700 font-semibold block">
                     ✓ Status Mutasi: Masa kerja akumulatif Barokah Grup (tidak pernah reset)
                   </span>
                 </div>
               </div>
 
               {/* Seksi Riwayat Mutasi Antar-Outlet Restoran */}
-              <div className="p-3 bg-blue-50/70 rounded-xl border border-blue-200/70 space-y-2">
+              <div className="p-3 bg-sky-50/70 rounded-xl border border-sky-200/70 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <ArrowLeftRight className="h-3.5 w-3.5 text-blue-700" />
-                    <span className="text-[10px] font-black uppercase tracking-wider text-blue-950">
+                    <ArrowLeftRight className="h-3.5 w-3.5 text-sky-700" />
+                    <span className="text-xs font-semibold  text-sky-950">
                       Riwayat Penempatan &amp; Mutasi Cabang
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={() => openQuickMutationModal(selectedEmployeeDetail)}
-                    className="text-[9px] font-black bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-xs transition"
+                    className="text-xs font-semibold bg-ink-800 hover:bg-ink-700 text-white px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-xs transition"
                   >
                     <ArrowLeftRight className="h-3 w-3" />
                     <span>Mutasi Karyawan Ini</span>
@@ -14885,22 +14757,22 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 {selectedEmployeeDetail.mutationHistory && selectedEmployeeDetail.mutationHistory.length > 0 ? (
                   <div className="space-y-1.5 pt-1">
                     {selectedEmployeeDetail.mutationHistory.map((m, idx) => (
-                      <div key={idx} className="bg-white p-2.5 rounded-xl border border-blue-100 text-[10px] space-y-1 shadow-2xs">
+                      <div key={idx} className="bg-white p-2.5 rounded-xl border border-sky-100 text-xs space-y-1 shadow-2xs">
                         <div className="flex justify-between font-bold text-slate-900">
                           <span className="flex items-center gap-1 text-slate-800">
                             <span>{m.fromOutlet.split(',')[0]}</span>
-                            <span className="text-blue-500 font-bold">➜</span>
-                            <span className="text-blue-700 font-black">{m.toOutlet.split(',')[0]}</span>
+                            <span className="text-sky-500 font-bold">➜</span>
+                            <span className="text-sky-700 font-semibold">{m.toOutlet.split(',')[0]}</span>
                           </span>
-                          <span className="text-blue-800 font-mono font-bold bg-blue-50 px-1.5 py-0.5 rounded">
+                          <span className="text-sky-800 font-mono font-bold bg-sky-50 px-1.5 py-0.5 rounded">
                             {m.date}
                           </span>
                         </div>
-                        <div className="flex justify-between text-[9px] text-slate-500">
+                        <div className="flex justify-between text-xs text-slate-500">
                           <span className="font-mono font-semibold text-slate-600">No. SK: {m.skNumber}</span>
                           <span className="italic text-slate-500">Alasan: {m.reason}</span>
                         </div>
-                        <div className="text-[9px] text-emerald-700 font-semibold pt-0.5 border-t border-slate-50 flex items-center gap-1">
+                        <div className="text-xs text-emerald-700 font-semibold pt-0.5 border-t border-slate-50 flex items-center gap-1">
                           <CheckCircle2 className="h-2.5 w-2.5" />
                           <span>Masa kerja dihitung akumulatif sejak {selectedEmployeeDetail.joinDate} (SOP-HR-005 berjalan penuh)</span>
                         </div>
@@ -14908,9 +14780,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     ))}
                   </div>
                 ) : (
-                  <div className="bg-white/80 p-2 rounded-lg border border-blue-100/60 text-[10px] text-slate-600 flex items-center justify-between">
+                  <div className="bg-white/80 p-2 rounded-lg border border-sky-100/60 text-xs text-slate-600 flex items-center justify-between">
                     <span>Penempatan Pertama sejak {selectedEmployeeDetail.joinDate || 'awal'} (Belum pernah dimutasi).</span>
-                    <span className="text-[9px] font-bold text-slate-400">Status Asli</span>
+                    <span className="text-xs font-medium text-slate-500">Status Asli</span>
                   </div>
                 )}
               </div>
@@ -14921,14 +14793,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-slate-500">Pencairan Gaji:</span>
                 <span className="font-bold text-slate-900">
-                  {selectedEmployeeDetail.paymentMethod === 'E_WALLET' ? '📱 E-Wallet' : '🏛️ Bank'}{' '}
+                  {selectedEmployeeDetail.paymentMethod === 'E_WALLET' ? 'E-Wallet' : 'Bank'}{' '}
                   {selectedEmployeeDetail.bankOrWalletProvider} - {selectedEmployeeDetail.accountNumber} (a.n {selectedEmployeeDetail.accountHolderName})
                 </span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-slate-500">Status Pernikahan:</span>
-                <span className="font-bold text-purple-700">
-                  {selectedEmployeeDetail.isMarried ? '💍 Menikah (+Tunjangan Rp 200k)' : 'Belum Menikah'}
+                <span className="font-bold text-slate-700">
+                  {selectedEmployeeDetail.isMarried ? 'Menikah (+Tunjangan Rp 200k)' : 'Belum Menikah'}
                 </span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100">
@@ -14949,32 +14821,32 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               const isGradeA = report.grade === 'A';
               const isGradeB = report.grade === 'B+' || report.grade === 'B';
               return (
-                <div className="p-3.5 rounded-xl border border-indigo-200 bg-gradient-to-r from-indigo-50/80 via-blue-50/40 to-white flex items-center justify-between gap-3 shadow-2xs">
+                <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-3 shadow-2xs">
                   <div className="flex items-center space-x-3">
-                    <div className="p-2.5 bg-indigo-600 text-white rounded-xl shadow-xs shrink-0">
+                    <div className="p-2.5 bg-slate-100 text-slate-700 rounded-lg shrink-0">
                       <Award className="h-5 w-5" />
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-indigo-700">
+                        <span className="text-xs font-semibold  text-slate-700">
                           Rapor Kinerja: {report.period.split('(')[0].trim()}
                         </span>
                         <span
-                          className={`text-[9px] font-black px-1.5 py-0.5 rounded ${
+                          className={`text-xs font-semibold px-1.5 py-0.5 rounded ${
                             isGradeA
                               ? 'bg-emerald-100 text-emerald-800'
                               : isGradeB
-                              ? 'bg-blue-100 text-blue-800'
+                              ? 'bg-sky-100 text-sky-800'
                               : 'bg-amber-100 text-amber-800'
                           }`}
                         >
                           Grade {report.grade} ({report.totalScore})
                         </span>
                       </div>
-                      <p className="text-xs font-extrabold text-slate-900 mt-0.5">
+                      <p className="text-xs font-semibold text-slate-900 mt-0.5">
                         {report.gradeLabel}
                       </p>
-                      <p className="text-[10px] text-slate-500 line-clamp-1">
+                      <p className="text-xs text-slate-500 line-clamp-1">
                         Rekomendasi: {report.recommendationLabel}
                       </p>
                     </div>
@@ -14985,7 +14857,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     onClick={() => {
                       setSelectedReportCardEmp(selectedEmployeeDetail);
                     }}
-                    className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0 shadow-xs"
+                    className="px-3 py-2 bg-ink-800 hover:bg-ink-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0 shadow-xs"
                   >
                     <Award className="h-3.5 w-3.5" />
                     <span>Buka Rapor</span>
@@ -15011,18 +14883,18 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isQuickMutationModalOpen && mutationTargetEmp && (
         <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto border border-blue-100">
+          <div className="bg-white rounded-lg max-w-lg w-full p-6 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto border border-sky-100">
             {/* Modal Header */}
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2.5">
-                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center">
                   <ArrowLeftRight className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-sm">
+                  <h3 className="font-semibold text-slate-900 text-sm">
                     Formulir Mutasi Cabang Restoran
                   </h3>
-                  <p className="text-[10px] text-blue-700 font-semibold">
+                  <p className="text-xs text-sky-700 font-semibold">
                     Surat Keputusan Mutasi Cabang Operasional (SK-MUT)
                   </p>
                 </div>
@@ -15039,13 +14911,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/80 text-xs space-y-1.5">
               <div className="flex justify-between items-center">
                 <span className="font-bold text-slate-900">{mutationTargetEmp.fullName} ({mutationTargetEmp.id})</span>
-                <span className="font-mono text-[10px] text-slate-500">KTP: {mutationTargetEmp.nikKtp}</span>
+                <span className="font-mono text-xs text-slate-500">KTP: {mutationTargetEmp.nikKtp}</span>
               </div>
-              <div className="flex justify-between text-slate-600 text-[11px]">
+              <div className="flex justify-between text-slate-600 text-xs">
                 <span>Outlet Asal: <strong className="text-slate-900">{mutationTargetEmp.outlet}</strong></span>
                 <span>Posisi: <strong className="text-slate-900">{mutationTargetEmp.positionTitle}</strong></span>
               </div>
-              <div className="pt-1 border-t border-slate-200/60 flex items-center justify-between text-[10px]">
+              <div className="pt-1 border-t border-slate-200/60 flex items-center justify-between text-xs">
                 <span className="text-slate-500">Masa Kerja (Akumulatif): <strong>{calculateTenure(mutationTargetEmp.joinDate).text}</strong></span>
                 <span className="text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
                   ✓ Hak SOP-HR-005 Tidak Reset
@@ -15062,7 +14934,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <select
                   value={mutationTargetOutlet}
                   onChange={(e) => setMutationTargetOutlet(e.target.value)}
-                  className="w-full p-2.5 border border-slate-200 rounded-xl font-semibold text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full p-2.5 border border-slate-200 rounded-xl font-semibold text-slate-900 focus:ring-2 focus:ring-brand-500 focus:outline-none"
                 >
                   <option value="Cabang Senopati, Jaksel">Cabang Senopati, Jaksel (Ayam Bakar Surabaya)</option>
                   <option value="Cabang Kemang, Jaksel">Cabang Kemang, Jaksel (Pecel Lele Pak Haji)</option>
@@ -15081,7 +14953,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     value={mutationNewRole}
                     onChange={(e) => setMutationNewRole(e.target.value)}
                     placeholder="Contoh: Koki (Cook Station)"
-                    className="w-full p-2 border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs"
+                    className="w-full p-2 border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs"
                   />
                 </div>
                 <div>
@@ -15092,7 +14964,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     type="text"
                     value={mutationEffectiveDate}
                     onChange={(e) => setMutationEffectiveDate(e.target.value)}
-                    className="w-full p-2 border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs"
+                    className="w-full p-2 border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs"
                   />
                 </div>
               </div>
@@ -15105,7 +14977,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   type="text"
                   value={mutationSkNumber}
                   onChange={(e) => setMutationSkNumber(e.target.value)}
-                  className="w-full p-2 border border-slate-200 rounded-xl font-mono text-slate-800 font-bold focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs"
+                  className="w-full p-2 border border-slate-200 rounded-xl font-mono text-slate-800 font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs"
                 />
               </div>
 
@@ -15116,7 +14988,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <select
                   value={mutationReason}
                   onChange={(e) => setMutationReason(e.target.value)}
-                  className="w-full p-2 border border-slate-200 rounded-xl font-medium text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs"
+                  className="w-full p-2 border border-slate-200 rounded-xl font-medium text-slate-800 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs"
                 >
                   <option value="Pemerataan Tenaga Ahli BOH Kitchen & Kebutuhan Operasional Cabang">
                     Pemerataan Tenaga Ahli BOH Kitchen &amp; Kebutuhan Operasional Cabang
@@ -15134,7 +15006,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               </div>
 
               {/* Legal Notice */}
-              <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[10px] text-amber-900 space-y-1">
+              <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1">
                 <div className="flex items-center gap-1 font-bold">
                   <ShieldCheck className="h-3.5 w-3.5 text-amber-700 shrink-0" />
                   <span>Jaminan Legal Ketenagakerjaan &amp; SOP Restoran:</span>
@@ -15157,7 +15029,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               <button
                 type="button"
                 onClick={handleProcessMutation}
-                className="px-5 py-2.5 rounded-xl text-xs font-extrabold bg-blue-600 hover:bg-blue-700 text-white shadow-md transition flex items-center gap-1.5"
+                className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-ink-800 hover:bg-ink-700 text-white shadow-sm transition flex items-center gap-1.5"
               >
                 <ArrowLeftRight className="h-3.5 w-3.5" />
                 <span>Proses Mutasi &amp; Terbitkan SK</span>
@@ -15172,7 +15044,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {viewingDocModal && (
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+          <div className="bg-white rounded-lg max-w-lg w-full p-6 shadow-xl space-y-4">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2.5">
                 <div className="p-2 bg-amber-50 text-amber-700 rounded-xl">
@@ -15182,7 +15054,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   <h3 className="font-bold text-slate-900 text-sm">
                     {viewingDocModal.title}
                   </h3>
-                  <p className="text-[10px] text-slate-400 uppercase font-semibold">
+                  <p className="text-xs text-slate-500 font-medium">
                     Staf: {viewingDocModal.employee.fullName} ({viewingDocModal.employee.id})
                   </p>
                 </div>
@@ -15201,7 +15073,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <FileCheck2 className="h-7 w-7 text-emerald-600" />
               </div>
               <div className="space-y-1">
-                <h4 className="font-extrabold text-sm text-slate-900">
+                <h4 className="font-semibold text-sm text-slate-900">
                   {viewingDocModal.docType === 'KTP' && 'KARTU TANDA PENDUDUK (KTP REPUBLIK INDONESIA)'}
                   {viewingDocModal.docType === 'KK' && 'KARTU KELUARGA RESMI (VERIFIKASI TUNJANGAN)'}
                   {viewingDocModal.docType === 'KONTRAK' && 'SURAT PERJANJIAN KERJA WAKTU TERTENTU (BAROKAH GRUP)'}
@@ -15209,7 +15081,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <p className="text-xs text-slate-600">
                   Terverifikasi Sah oleh HRD Pusat Barokah Grup • NIK: {viewingDocModal.employee.nikKtp}
                 </p>
-                <span className="inline-block text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">
+                <span className="inline-block text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">
                   ✓ Berkas Digital Terarsip
                 </span>
               </div>
@@ -15237,15 +15109,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL DETAIL LOG PRESENSI HARIAN (TIMESHEET DRILL-DOWN) */}
       {selectedTimesheetCell && (
         <div className="fixed inset-0 bg-slate-950/60 flex items-center justify-center p-4 z-50 duration-150">
-          <div className="bg-white rounded-2xl max-w-lg w-full border border-slate-200 shadow-2xl p-6 space-y-5 duration-150 font-sans">
+          <div className="bg-white rounded-lg max-w-lg w-full border border-slate-200 shadow-xl p-6 space-y-5 duration-150 font-sans">
             {/* Header */}
             <div className="flex items-start justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-slate-900 text-amber-400 font-black text-sm flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-slate-900 text-amber-400 font-semibold text-sm flex items-center justify-center">
                   {selectedTimesheetCell.staff.avatar}
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-base">
+                  <h3 className="font-semibold text-slate-900 text-base">
                     {selectedTimesheetCell.staff.name}
                   </h3>
                   <p className="text-xs text-slate-500 font-medium">
@@ -15265,39 +15137,39 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tanggal Presensi:</span>
-                  <p className="font-extrabold text-sm text-slate-800">
+                  <span className="text-xs font-bold  text-slate-400">Tanggal Presensi:</span>
+                  <p className="font-semibold text-sm text-slate-800">
                     {selectedTimesheetCell.dayObj.dayName}, {selectedTimesheetCell.dayObj.day} Oktober 2026
                   </p>
                 </div>
                 <div>
                   {selectedTimesheetCell.record.status === 'H' ? (
-                    <span className="bg-emerald-100 text-emerald-800 text-xs font-black px-2.5 py-1 rounded-full border border-emerald-300 flex items-center gap-1">
+                    <span className="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-300 flex items-center gap-1">
                       <CheckCircle2 className="h-3.5 w-3.5" />
                       HADIR TEPAT WAKTU
                     </span>
                   ) : selectedTimesheetCell.record.status === 'T' ? (
-                    <span className="bg-amber-100 text-amber-900 text-xs font-black px-2.5 py-1 rounded-full border border-amber-300 flex items-center gap-1">
+                    <span className="bg-amber-100 text-amber-900 text-xs font-semibold px-2.5 py-1 rounded-full border border-amber-300 flex items-center gap-1">
                       <Clock className="h-3.5 w-3.5" />
                       TERLAMBAT ({selectedTimesheetCell.record.lateMinutes} MENIT)
                     </span>
                   ) : selectedTimesheetCell.record.status === 'L' ? (
-                    <span className="bg-blue-100 text-blue-800 text-xs font-black px-2.5 py-1 rounded-full border border-blue-300 flex items-center gap-1">
+                    <span className="bg-sky-100 text-sky-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-sky-300 flex items-center gap-1">
                       <Coffee className="h-3.5 w-3.5" />
                       LIBUR RESMI SOP-001
                     </span>
                   ) : selectedTimesheetCell.record.status === 'S' ? (
-                    <span className="bg-purple-100 text-purple-800 text-xs font-black px-2.5 py-1 rounded-full border border-purple-300 flex items-center gap-1">
+                    <span className="bg-slate-100 text-slate-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-slate-300 flex items-center gap-1">
                       <FileText className="h-3.5 w-3.5" />
                       SAKIT (SURAT DOKTER)
                     </span>
                   ) : selectedTimesheetCell.record.status === 'I' ? (
-                    <span className="bg-orange-100 text-orange-800 text-xs font-black px-2.5 py-1 rounded-full border border-orange-300 flex items-center gap-1">
+                    <span className="bg-orange-100 text-orange-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-orange-300 flex items-center gap-1">
                       <CalendarDays className="h-3.5 w-3.5" />
                       IZIN RESMI DISAHKAN
                     </span>
                   ) : selectedTimesheetCell.record.status === 'A' ? (
-                    <span className="bg-rose-100 text-rose-800 text-xs font-black px-2.5 py-1 rounded-full border border-rose-300 flex items-center gap-1">
+                    <span className="bg-rose-100 text-rose-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-rose-300 flex items-center gap-1">
                       <XCircle className="h-3.5 w-3.5" />
                       ALPA / MANGKIR KERJA
                     </span>
@@ -15312,20 +15184,20 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Detail Waktu & Uang Makan */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2 border-t border-slate-200 text-xs">
                 <div>
-                  <span className="text-[10px] text-slate-500 font-medium">Jam Masuk (Clock In):</span>
+                  <span className="text-xs text-slate-500 font-medium">Jam Masuk (Clock In):</span>
                   <p className="font-mono font-bold text-slate-900">
                     {selectedTimesheetCell.record.clockIn || '-'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-500 font-medium">Jam Pulang (Clock Out):</span>
+                  <span className="text-xs text-slate-500 font-medium">Jam Pulang (Clock Out):</span>
                   <p className="font-mono font-bold text-slate-900">
                     {selectedTimesheetCell.record.clockOut || '-'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-500 font-medium">Uang Makan Harian:</span>
-                  <p className="font-mono font-extrabold text-emerald-700">
+                  <span className="text-xs text-slate-500 font-medium">Uang Makan Harian:</span>
+                  <p className="font-mono font-semibold text-emerald-700">
                     {selectedTimesheetCell.record.status === 'H' || selectedTimesheetCell.record.status === 'T'
                       ? '+Rp 20.000'
                       : 'Rp 0'}
@@ -15341,14 +15213,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   <ScanFace className="h-4 w-4" />
                   Verifikasi Biometrik Kontur Wajah
                 </span>
-                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-black px-2 py-0.5 rounded">
+                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-semibold px-2 py-0.5 rounded">
                   Skor: {selectedTimesheetCell.record.faceScore || 99}%
                 </span>
               </div>
-              <p className="text-slate-300 text-[11px] leading-relaxed">
+              <p className="text-slate-300 text-xs leading-relaxed">
                 {selectedTimesheetCell.record.landmarks || 'Oval Wajah, 2 Mata Simetris, Hidung & Celah Bibir Terdeteksi Sempurna.'}
               </p>
-              <div className="flex items-center justify-between pt-1 border-t border-slate-800 text-[10px] text-slate-400">
+              <div className="flex items-center justify-between pt-1 border-t border-slate-800 text-xs text-slate-400">
                 <span>Metode: Tanpa Geofence (Anti-Spoofing Non-Face)</span>
                 <span className="text-amber-400 font-bold">Lokasi: {selectedTimesheetCell.staff.outlet.split(',')[0]}</span>
               </div>
@@ -15359,7 +15231,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-950 font-medium flex items-start gap-2">
                 <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold block text-[10px] uppercase text-amber-800">Catatan Sistem / Supervisor:</span>
+                  <span className="font-bold block text-xs uppercase text-amber-800">Catatan Sistem / Supervisor:</span>
                   <span>{selectedTimesheetCell.record.note}</span>
                 </div>
               </div>
@@ -15391,21 +15263,21 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL HISTORI SLIP GAJI DIGITAL MULTI-BULAN (SELECTED SLIP STAFF) */}
       {selectedSlipStaff && (
         <div className="fixed inset-0 bg-slate-950/60 flex items-center justify-center p-4 z-50 duration-150">
-          <div className="bg-white rounded-2xl max-w-2xl w-full border border-slate-200 shadow-2xl p-6 space-y-5 duration-150 font-sans max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-2xl w-full border border-slate-200 shadow-xl p-6 space-y-5 duration-150 font-sans max-h-[90vh] overflow-y-auto">
             {/* Header Profil Karyawan */}
             <div className="flex items-start justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center space-x-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-slate-900 text-amber-400 font-black text-base flex items-center justify-center shadow-md">
+                <div className="w-12 h-12 rounded-lg bg-slate-900 text-amber-400 font-semibold text-base flex items-center justify-center shadow-sm">
                   {selectedSlipStaff.avatar}
                 </div>
                 <div>
                   <div className="flex items-center space-x-2">
-                    <h3 className="font-extrabold text-slate-900 text-base">
+                    <h3 className="font-semibold text-slate-900 text-base">
                       {selectedSlipStaff.name}
                     </h3>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                       selectedSlipStaff.paymentMethod === 'BANK'
-                        ? 'bg-blue-100 text-blue-800'
+                        ? 'bg-sky-100 text-sky-800'
                         : 'bg-emerald-100 text-emerald-800'
                     }`}>
                       {selectedSlipStaff.paymentMethod === 'BANK'
@@ -15428,15 +15300,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
             {/* Banner Catatan Masa Kerja & Status */}
             <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-950 font-semibold flex items-center justify-between">
-              <span>📌 {selectedSlipStaff.tenureNote}</span>
-              <span className="text-[10px] bg-white border border-amber-300 text-amber-900 px-2 py-0.5 rounded-md font-bold">
+              <span>{selectedSlipStaff.tenureNote}</span>
+              <span className="text-xs bg-white border border-amber-300 text-amber-900 px-2 py-0.5 rounded-md font-bold">
                 {selectedSlipStaff.isMarried ? 'Menikah (+Rp 200k)' : 'Lajang'}
               </span>
             </div>
 
             {/* Grid 4 Kartu Slip Gaji Multi-Bulan */}
             <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              <h4 className="text-xs font-bold  text-slate-400">
                 Riwayat Penggajian 4 Bulan Terakhir (Juli s/d Oktober 2026):
               </h4>
 
@@ -15451,8 +15323,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   if (!pay || pay.thp === 0) {
                     return (
                       <div key={m.key} className="p-4 rounded-xl border border-dashed border-slate-200 bg-slate-50 text-center space-y-1">
-                        <span className="text-[11px] font-bold text-slate-400 uppercase">{m.label}</span>
-                        <p className="text-xs text-slate-400 italic">Belum Bergabung / Tidak Aktif</p>
+                        <span className="text-xs font-medium text-slate-500">{m.label}</span>
+                        <p className="text-xs text-slate-500 italic">Belum Bergabung / Tidak Aktif</p>
                       </div>
                     );
                   }
@@ -15470,10 +15342,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     >
                       <div className="flex items-center justify-between pb-2 border-b border-current/10">
                         <div>
-                          <span className="font-extrabold text-xs text-slate-900 block">{m.label}</span>
-                          <span className="text-[10px] text-slate-500 font-medium">{pay.daysWorked} Hari Kerja</span>
+                          <span className="font-semibold text-xs text-slate-900 block">{m.label}</span>
+                          <span className="text-xs text-slate-500 font-medium">{pay.daysWorked} Hari Kerja</span>
                         </div>
-                        <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
                           pay.status === 'PAID'
                             ? 'bg-emerald-100 text-emerald-800'
                             : 'bg-amber-100 text-amber-900'
@@ -15483,26 +15355,26 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       </div>
 
                       <div className="space-y-1 text-xs">
-                        <div className="flex justify-between text-slate-600 text-[11px]">
+                        <div className="flex justify-between text-slate-600 text-xs">
                           <span>Gaji Pokok:</span>
                           <span className="font-mono font-bold text-slate-800">Rp {pay.base.toLocaleString('id-ID')}</span>
                         </div>
-                        <div className="flex justify-between text-slate-600 text-[11px]">
+                        <div className="flex justify-between text-slate-600 text-xs">
                           <span>Uang Makan:</span>
                           <span className="font-mono text-slate-800">Rp {pay.meal.toLocaleString('id-ID')}</span>
                         </div>
-                        <div className="flex justify-between text-slate-600 text-[11px]">
+                        <div className="flex justify-between text-slate-600 text-xs">
                           <span>Lembur Tetap:</span>
                           <span className="font-mono text-slate-800">Rp {pay.overtime.toLocaleString('id-ID')}</span>
                         </div>
                         {pay.allowances > 0 && (
-                          <div className="flex justify-between text-emerald-700 text-[11px]">
+                          <div className="flex justify-between text-emerald-700 text-xs">
                             <span>Tunjangan:</span>
                             <span className="font-mono font-bold">+Rp {pay.allowances.toLocaleString('id-ID')}</span>
                           </div>
                         )}
                         {pay.deductions > 0 && (
-                          <div className="flex justify-between text-rose-600 text-[11px]">
+                          <div className="flex justify-between text-rose-600 text-xs">
                             <span>Potongan (Kasbon/SP):</span>
                             <span className="font-mono font-bold">-Rp {pay.deductions.toLocaleString('id-ID')}</span>
                           </div>
@@ -15511,8 +15383,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                       <div className="pt-2 border-t border-current/10 flex items-center justify-between">
                         <div>
-                          <span className="text-[9px] uppercase font-bold text-slate-400 block">Take Home Pay</span>
-                          <span className="font-mono font-black text-sm text-emerald-700">
+                          <span className="text-xs font-medium text-slate-500 block">Take Home Pay</span>
+                          <span className="font-mono font-semibold text-sm text-emerald-700">
                             Rp {pay.thp.toLocaleString('id-ID')}
                           </span>
                         </div>
@@ -15522,7 +15394,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           title="Unduh Slip Gaji PDF"
                         >
                           <Download className="h-3 w-3" />
-                          <span className="text-[10px]">Unduh</span>
+                          <span className="text-xs">Unduh</span>
                         </button>
                       </div>
                     </div>
@@ -15556,17 +15428,17 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isPermissionModalOpen && (
         <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-5xl w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] flex flex-col border border-slate-200">
+          <div className="bg-white rounded-lg max-w-5xl w-full p-5 sm:p-6 shadow-xl space-y-4 my-auto max-h-[92vh] flex flex-col border border-slate-200">
             {/* Modal Header */}
             <div className="flex justify-between items-start border-b border-slate-100 pb-3 shrink-0">
               <div className="flex items-center space-x-3">
-                <div className="p-2.5 bg-emerald-500 text-slate-950 rounded-xl font-bold shadow-md shadow-emerald-500/20">
+                <div className="p-2.5 bg-emerald-500 text-slate-950 rounded-xl font-bold shadow-sm shadow-emerald-500/20">
                   <KeyRound className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                  <h3 className="font-semibold text-slate-900 text-base flex items-center gap-2">
                     <span>Matriks Permission Aplikasi (RBAC)</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold uppercase">
+                    <span className="badge badge-success">
                       6 Role Restoran
                     </span>
                   </h3>
@@ -15627,15 +15499,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             {/* Modal Matrix Table Body */}
             <div className="flex-1 overflow-y-auto border border-slate-200 rounded-xl">
               <table className="w-full text-left text-xs border-collapse">
-                <thead className="sticky top-0 z-10 bg-slate-900 text-white text-[11px] font-bold">
+                <thead className="sticky top-0 z-10 bg-slate-900 text-white text-xs font-bold">
                   <tr>
                     <th className="p-3 min-w-[260px]">Otoritas &amp; Fitur Operasional</th>
                     {roleDefinitions
                       .filter((r) => selectedRoleFilter === 'ALL' || selectedRoleFilter === r.key)
                       .map((r) => (
                         <th key={r.key} className="p-2.5 text-center min-w-[100px]">
-                          <span className="block text-amber-400 text-xs font-black">{r.badge}</span>
-                          <span className="text-[10px] text-slate-300 font-normal truncate block max-w-[110px] mx-auto">
+                          <span className="block text-amber-400 text-xs font-semibold">{r.badge}</span>
+                          <span className="text-xs text-slate-300 font-normal truncate block max-w-[110px] mx-auto">
                             {r.name.split('(')[0]}
                           </span>
                         </th>
@@ -15665,11 +15537,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               1 +
                               roleDefinitions.filter((r) => selectedRoleFilter === 'ALL' || selectedRoleFilter === r.key).length
                             }
-                            className="px-3.5 py-1.5 text-[11px] uppercase tracking-wider text-slate-700 flex items-center gap-1.5"
+                            className="px-3.5 py-1.5 text-xs  text-slate-700 flex items-center gap-1.5"
                           >
                             <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                             <span>{cat}</span>
-                            <span className="text-[10px] font-normal text-slate-400 font-mono">({items.length})</span>
+                            <span className="text-xs font-normal text-slate-500">({items.length})</span>
                           </td>
                         </tr>
 
@@ -15677,7 +15549,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           <tr key={perm.key} className="hover:bg-slate-50/80 transition-colors">
                             <td className="p-3">
                               <span className="font-bold text-slate-900 block">{perm.label}</span>
-                              <span className="text-[10px] text-slate-500 leading-tight block">{perm.description}</span>
+                              <span className="text-xs text-slate-500 leading-tight block">{perm.description}</span>
                             </td>
 
                             {roleDefinitions
@@ -15744,18 +15616,18 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isTrainingQuizModalOpen && selectedTrainingModule && (
         <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-5 my-auto border border-slate-200">
+          <div className="bg-white rounded-lg max-w-2xl w-full p-6 shadow-xl space-y-5 my-auto border border-slate-200">
             {/* Header */}
             <div className="flex justify-between items-start border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-3">
-                <div className="p-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-md shadow-indigo-600/20">
+                <div className="p-2.5 bg-slate-100 text-slate-700 rounded-lg">
                   <Award className="h-5 w-5 text-amber-300" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 uppercase">
+                  <span className="text-xs font-medium px-2 py-0.5 rounded bg-slate-100 text-slate-700">
                     {selectedTrainingModule.code} • KKM {selectedTrainingModule.passingScore}%
                   </span>
-                  <h3 className="font-extrabold text-slate-900 text-base mt-0.5">
+                  <h3 className="font-semibold text-slate-900 text-base mt-0.5">
                     {selectedTrainingModule.title}
                   </h3>
                 </div>
@@ -15775,13 +15647,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   <span className="text-slate-500 font-bold">
                     Pertanyaan {activeQuizQuestionIndex + 1} dari {selectedTrainingModule.sampleQuiz.length}
                   </span>
-                  <span className="text-indigo-600 font-bold">
+                  <span className="text-slate-600 font-bold">
                     Standar Kelulusan: Minimal {selectedTrainingModule.passingScore}%
                   </span>
                 </div>
                 <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                   <div
-                    className="h-2 rounded-full bg-indigo-600 transition-all duration-300"
+                    className="h-2 rounded-full bg-emerald-600 transition-all duration-300"
                     style={{
                       width: `${((activeQuizQuestionIndex + 1) / selectedTrainingModule.sampleQuiz.length) * 100}%`,
                     }}
@@ -15809,13 +15681,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           }}
                           className={`p-3 rounded-xl border text-xs font-semibold cursor-pointer transition-all flex items-center space-x-2.5 ${
                             isSelected
-                              ? 'bg-indigo-50 border-indigo-400 text-indigo-900 shadow-xs'
+                              ? 'bg-slate-50 border-slate-400 text-slate-900 shadow-xs'
                               : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'
                           }`}
                         >
                           <span
-                            className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-[11px] shrink-0 ${
-                              isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'
+                            className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
+                              isSelected ? 'bg-ink-800 text-white' : 'bg-slate-100 text-slate-600'
                             }`}
                           >
                             {String.fromCharCode(65 + optIdx)}
@@ -15841,7 +15713,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     <button
                       disabled={quizUserAnswers[activeQuizQuestionIndex] === undefined}
                       onClick={() => setActiveQuizQuestionIndex((prev) => prev + 1)}
-                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs disabled:opacity-50"
+                      className="px-4 py-2 bg-ink-800 hover:bg-ink-700 text-white text-xs font-bold rounded-xl shadow-xs disabled:opacity-50"
                     >
                       Soal Berikutnya →
                     </button>
@@ -15869,7 +15741,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               /* Quiz Result Screen */
               <div className="text-center py-4 space-y-4">
                 <div
-                  className={`w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl font-black ${
+                  className={`w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl font-semibold ${
                     quizResultScore >= selectedTrainingModule.passingScore
                       ? 'bg-emerald-100 text-emerald-600 border-2 border-emerald-300'
                       : 'bg-rose-100 text-rose-600 border-2 border-rose-300'
@@ -15879,7 +15751,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 </div>
 
                 <div className="space-y-1">
-                  <h4 className="font-black text-xl text-slate-900">
+                  <h4 className="font-semibold text-xl text-slate-900">
                     {quizResultScore >= selectedTrainingModule.passingScore
                       ? 'Selamat, Lulus Kualifikasi!'
                       : 'Belum Mencapai KKM'}
@@ -15891,7 +15763,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                 {/* Explanation Review */}
                 <div className="text-left bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-2.5 max-h-56 overflow-y-auto">
-                  <span className="font-bold text-slate-700 uppercase text-[10px] block">
+                  <span className="font-bold text-slate-700 uppercase text-xs block">
                     Kunci Jawaban &amp; Pembahasan SOP:
                   </span>
                   {selectedTrainingModule.sampleQuiz.map((q: any, idx: number) => (
@@ -15900,7 +15772,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       <p className="text-emerald-700 font-semibold mt-0.5">
                         Kunci Jawaban: {String.fromCharCode(65 + q.correctIndex)}. {q.options[q.correctIndex]}
                       </p>
-                      <p className="text-slate-500 text-[11px] mt-0.5">{q.explanation}</p>
+                      <p className="text-slate-500 text-xs mt-0.5">{q.explanation}</p>
                     </div>
                   ))}
                 </div>
@@ -15970,7 +15842,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold flex items-center space-x-1.5 shadow-sm"
                     >
                       <Award className="h-4 w-4" />
-                      <span>🎓 Generate &amp; Unduh Sertifikat PDF</span>
+                      <span>Generate &amp; Unduh Sertifikat PDF</span>
                     </button>
                   )}
                   <button
@@ -15991,15 +15863,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isModuleEditorOpen && editingModuleData && (
         <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-4xl w-full p-6 shadow-2xl space-y-6 my-auto border border-slate-200 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-4xl w-full p-6 shadow-xl space-y-6 my-auto border border-slate-200 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex justify-between items-start border-b border-slate-100 pb-4">
               <div className="flex items-center space-x-3">
-                <div className="p-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-md shadow-indigo-600/20">
+                <div className="p-2.5 bg-slate-100 text-slate-700 rounded-lg">
                   <Edit2 className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-lg">
+                  <h3 className="font-semibold text-slate-900 text-lg">
                     {editingModuleData.id && trainingModules.some((m) => m.id === editingModuleData.id)
                       ? 'Edit Modul Pelatihan & Bank Soal Kuis'
                       : 'Buat Modul Pelatihan Baru'}
@@ -16026,7 +15898,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   value={editingModuleData.title}
                   onChange={(e) => setEditingModuleData({ ...editingModuleData, title: e.target.value })}
                   placeholder="Contoh: Resep Rahasia & Standar Marinasi Sambal Pecak 2001 (BOH)"
-                  className="w-full text-xs font-semibold px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full text-xs font-semibold px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none"
                 />
               </div>
 
@@ -16037,7 +15909,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   value={editingModuleData.code}
                   onChange={(e) => setEditingModuleData({ ...editingModuleData, code: e.target.value })}
                   placeholder="Contoh: LMS-BOH-05"
-                  className="w-full text-xs font-mono font-semibold px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none uppercase"
+                  className="w-full text-xs font-mono font-semibold px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none uppercase"
                 />
               </div>
 
@@ -16059,7 +15931,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       categoryLabel: catMap[e.target.value] || 'Umum',
                     });
                   }}
-                  className="w-full text-xs font-semibold px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full text-xs font-semibold px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-brand-500 outline-none"
                 >
                   <option value="RESEP_BOH">Resep Standar BOH (Dapur)</option>
                   <option value="SERVICE_FOH">Layanan FOH (Service/Waiter)</option>
@@ -16076,7 +15948,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   value={editingModuleData.targetRole}
                   onChange={(e) => setEditingModuleData({ ...editingModuleData, targetRole: e.target.value })}
                   placeholder="Contoh: Cook Station 1-3 & Helper"
-                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none"
                 />
               </div>
 
@@ -16088,7 +15960,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   max="100"
                   value={editingModuleData.passingScore}
                   onChange={(e) => setEditingModuleData({ ...editingModuleData, passingScore: Number(e.target.value) })}
-                  className="w-full text-xs font-bold px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full text-xs font-bold px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none"
                 />
               </div>
             </div>
@@ -16101,18 +15973,18 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 value={editingModuleData.description}
                 onChange={(e) => setEditingModuleData({ ...editingModuleData, description: e.target.value })}
                 placeholder="Ringkasan kompetensi yang akan dicapai oleh kru resto..."
-                className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+                className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none"
               />
             </div>
 
             {/* Material / SOP Instructions Textarea */}
-            <div className="space-y-2 bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+            <div className="space-y-2 bg-slate-50/50 p-4 rounded-xl border border-slate-200">
               <div className="flex justify-between items-center">
-                <label className="text-xs font-extrabold text-indigo-950 flex items-center gap-1.5">
-                  <BookOpen className="h-4 w-4 text-indigo-600" />
+                <label className="text-xs font-semibold text-slate-950 flex items-center gap-1.5">
+                  <BookOpen className="h-4 w-4 text-slate-600" />
                   <span>Teks Materi Pembelajaran &amp; Standar SOP Baku (Sumber Soal Kuis) *</span>
                 </label>
-                <span className="text-[10px] text-indigo-600 font-medium">
+                <span className="text-xs text-slate-600 font-medium">
                   Materi ini menjadi basis penurunan butir soal evaluasi
                 </span>
               </div>
@@ -16121,7 +15993,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 value={editingModuleData.content || ''}
                 onChange={(e) => setEditingModuleData({ ...editingModuleData, content: e.target.value })}
                 placeholder="Tuliskan materi SOP, gramatur bahan, standar temperatur minyak/chiller, alur pelayanan tamu, atau langkah kerja di sini..."
-                className="w-full text-xs leading-relaxed p-3 bg-white border border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-mono"
+                className="w-full text-xs leading-relaxed p-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none font-mono"
               ></textarea>
             </div>
 
@@ -16129,9 +16001,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             <div className="space-y-4 pt-2">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
                 <div>
-                  <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                  <h4 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
                     <span>Daftar Soal Kuis Evaluasi Berdasarkan Materi</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200">
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200">
                       {editingModuleData.sampleQuiz?.length || 0} Soal
                     </span>
                   </h4>
@@ -16157,12 +16029,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         sampleQuiz: [...(editingModuleData.sampleQuiz || []), ...generatedQuestions],
                         quizQuestions: (editingModuleData.sampleQuiz?.length || 0) + generatedQuestions.length,
                       });
-                      showToast('✨ 3 Soal evaluasi berhasil di-generate dari teks materi! Anda dapat mengeditnya di bawah.');
+                      showToast('3 Soal evaluasi berhasil di-generate dari teks materi! Anda dapat mengeditnya di bawah.');
                     }}
                     className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-3 py-1.5 rounded-xl flex items-center space-x-1.5 shadow-xs transition-all"
                   >
                     <Sparkles className="h-3.5 w-3.5 text-slate-950" />
-                    <span>✨ Generate Soal dari Materi</span>
+                    <span>Generate Soal dari Materi</span>
                   </button>
 
                   <button
@@ -16191,14 +16063,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Editable Question Cards */}
               <div className="space-y-4 max-h-80 overflow-y-auto pr-1">
                 {(editingModuleData.sampleQuiz || []).length === 0 ? (
-                  <div className="text-center py-6 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 text-xs">
-                    Belum ada butir soal. Klik <strong>"✨ Generate Soal dari Materi"</strong> atau <strong>"Tambah Soal Manual"</strong> untuk menyusun evaluasi.
+                  <div className="text-center py-6 border border-dashed border-slate-300 rounded-lg text-slate-500 text-xs">
+                    Belum ada butir soal. Klik <strong>"Generate Soal dari Materi"</strong> atau <strong>"Tambah Soal Manual"</strong> untuk menyusun evaluasi.
                   </div>
                 ) : (
                   editingModuleData.sampleQuiz.map((q: any, qIdx: number) => (
                     <div key={qIdx} className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
                       <div className="flex justify-between items-start gap-2">
-                        <span className="text-xs font-black text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-md">
+                        <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-md">
                           Soal #{qIdx + 1}
                         </span>
                         <button
@@ -16219,7 +16091,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-slate-600">Kalimat Pertanyaan:</label>
+                        <label className="text-xs font-bold text-slate-600">Kalimat Pertanyaan:</label>
                         <input
                           type="text"
                           value={q.question}
@@ -16228,13 +16100,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             updated[qIdx].question = e.target.value;
                             setEditingModuleData({ ...editingModuleData, sampleQuiz: updated });
                           }}
-                          className="w-full text-xs font-semibold px-3 py-1.5 bg-white border border-slate-200 rounded-lg outline-none focus:border-indigo-500"
+                          className="w-full text-xs font-semibold px-3 py-1.5 bg-white border border-slate-200 rounded-lg outline-none focus:border-slate-500"
                         />
                       </div>
 
                       {/* Options A, B, C, D */}
                       <div className="space-y-1.5 pt-1">
-                        <label className="text-[11px] font-bold text-slate-600">
+                        <label className="text-xs font-bold text-slate-600">
                           Pilihan Jawaban (Pilih radio untuk jawaban yang benar):
                         </label>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -16258,7 +16130,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                   }}
                                   className="w-3.5 h-3.5 text-emerald-600 focus:ring-emerald-500"
                                 />
-                                <span className="font-bold text-[11px] text-slate-500 shrink-0">
+                                <span className="font-bold text-xs text-slate-500 shrink-0">
                                   {String.fromCharCode(65 + optIdx)}.
                                 </span>
                                 <input
@@ -16278,7 +16150,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       </div>
 
                       <div className="space-y-1 pt-1">
-                        <label className="text-[11px] font-bold text-slate-500">Penjelasan &amp; Rujukan SOP:</label>
+                        <label className="text-xs font-bold text-slate-500">Penjelasan &amp; Rujukan SOP:</label>
                         <input
                           type="text"
                           value={q.explanation}
@@ -16324,7 +16196,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   }
                   setIsModuleEditorOpen(false);
                 }}
-                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center space-x-1.5"
+                className="px-5 py-2.5 bg-ink-800 hover:bg-ink-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center space-x-1.5"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 <span>Simpan Modul &amp; Bank Soal</span>
@@ -16339,14 +16211,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isGenerateModuleModalOpen && (
         <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-5 my-auto border border-slate-200">
+          <div className="bg-white rounded-lg max-w-xl w-full p-6 shadow-xl space-y-5 my-auto border border-slate-200">
             <div className="flex justify-between items-start border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-3">
-                <div className="p-2.5 bg-amber-500 text-slate-950 rounded-xl font-bold shadow-md shadow-amber-500/20">
+                <div className="p-2.5 bg-amber-500 text-slate-950 rounded-xl font-bold shadow-sm shadow-amber-500/20">
                   <Sparkles className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-base">
+                  <h3 className="font-semibold text-slate-900 text-base">
                     Auto-Generate Modul Pelatihan &amp; Kuis
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -16382,7 +16254,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   key: 'service_3s',
                   title: 'Standar Service Excellence 3S & Upselling Meja Tamu (FOH)',
                   badge: 'Layanan FOH',
-                  badgeColor: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+                  badgeColor: 'bg-slate-100 text-slate-800 border-slate-200',
                   desc: 'Penerapan 3S, SLA minuman 5 menit, upselling pelengkap, dan penanganan keluhan LAST.',
                 },
               ].map((preset) => (
@@ -16393,15 +16265,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     setEditingModuleData(draft);
                     setIsGenerateModuleModalOpen(false);
                     setIsModuleEditorOpen(true);
-                    showToast('✨ Draf modul berhasil di-generate! Anda dapat mengedit materi dan soal kuis.');
+                    showToast('Draf modul berhasil di-generate! Anda dapat mengedit materi dan soal kuis.');
                   }}
-                  className="p-4 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/40 cursor-pointer transition-all space-y-1.5 group"
+                  className="p-4 rounded-xl border border-slate-200 hover:border-slate-500 hover:bg-slate-50/40 cursor-pointer transition-all space-y-1.5 group"
                 >
                   <div className="flex justify-between items-center">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${preset.badgeColor}`}>
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${preset.badgeColor}`}>
                       {preset.badge}
                     </span>
-                    <span className="text-xs text-indigo-600 font-bold group-hover:translate-x-0.5 transition-transform">
+                    <span className="text-xs text-slate-600 font-bold group-hover:translate-x-0.5 transition-transform">
                       Pilih &amp; Generate Draft →
                     </span>
                   </div>
@@ -16428,12 +16300,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isDeleteModuleModalOpen && moduleToDelete && (
         <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 my-auto border border-slate-200 text-center">
+          <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl space-y-4 my-auto border border-slate-200 text-center">
             <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
               <Trash2 className="h-6 w-6" />
             </div>
             <div className="space-y-1">
-              <h3 className="font-extrabold text-slate-900 text-base">Hapus Modul Pelatihan?</h3>
+              <h3 className="font-semibold text-slate-900 text-base">Hapus Modul Pelatihan?</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
                 Apakah Anda yakin ingin menghapus modul <strong className="text-slate-800">"{moduleToDelete.title}"</strong> ({moduleToDelete.code})? Seluruh data silabus dan bank soal kuis akan terhapus.
               </p>
@@ -16466,15 +16338,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isAddScheduleModalOpen && (
         <div className="fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 my-auto border border-slate-200 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-xl w-full p-6 shadow-xl space-y-4 my-auto border border-slate-200 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3 sticky top-0 bg-white z-10">
               <div className="flex items-center space-x-2">
                 <span className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
                   <CalendarDays className="h-5 w-5" />
                 </span>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-sm">Jadwalkan Sesi Training Baru</h3>
-                  <p className="text-[11px] text-slate-500">Terkoneksi langsung ke Cabang Outlet, Jabatan, &amp; Database Karyawan Resto.</p>
+                  <h3 className="font-semibold text-slate-900 text-sm">Jadwalkan Sesi Training Baru</h3>
+                  <p className="text-xs text-slate-500">Terkoneksi langsung ke Cabang Outlet, Jabatan, &amp; Database Karyawan Resto.</p>
                 </div>
               </div>
               <button
@@ -16489,7 +16361,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             <div className="space-y-3.5 text-xs">
               {/* 1. OPSI METODE PELATIHAN: OFFLINE vs ONLINE */}
               <div className="space-y-1.5 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                <label className="font-black text-slate-800 block text-[11px] uppercase tracking-wider">
+                <label className="font-semibold text-slate-800 block text-xs ">
                   1. Metode Pelaksanaan Pelatihan *
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -16505,15 +16377,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     }
                     className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1 transition ${
                       newScheduleFormData.deliveryMode === 'OFFLINE'
-                        ? 'bg-amber-500 text-slate-950 border-amber-600 font-black shadow-xs'
+                        ? 'bg-amber-500 text-slate-950 border-amber-600 font-semibold shadow-xs'
                         : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
                     }`}
                   >
                     <div className="flex items-center gap-1.5">
                       <Building2 className="h-4 w-4" />
-                      <span className="font-extrabold text-xs">🏢 OFFLINE</span>
+                      <span className="font-semibold text-xs">OFFLINE</span>
                     </div>
-                    <span className="text-[10px] opacity-90">Tatap Muka Onsite di Resto</span>
+                    <span className="text-xs opacity-90">Tatap Muka Onsite di Resto</span>
                   </button>
 
                   <button
@@ -16529,15 +16401,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     }
                     className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1 transition ${
                       newScheduleFormData.deliveryMode === 'ONLINE'
-                        ? 'bg-indigo-600 text-white border-indigo-700 font-black shadow-xs'
+                        ? 'bg-ink-800 text-white border-ink-800 font-semibold shadow-xs'
                         : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
                     }`}
                   >
                     <div className="flex items-center gap-1.5">
                       <Video className="h-4 w-4" />
-                      <span className="font-extrabold text-xs">💻 ONLINE</span>
+                      <span className="font-semibold text-xs">ONLINE</span>
                     </div>
-                    <span className="text-[10px] opacity-90">Webinar Zoom / Google Meet</span>
+                    <span className="text-xs opacity-90">Webinar Zoom / Google Meet</span>
                   </button>
                 </div>
               </div>
@@ -16563,9 +16435,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     onChange={(e) => setNewScheduleFormData({ ...newScheduleFormData, outlet: e.target.value })}
                     className="w-full border border-slate-200 rounded-xl p-2 text-xs font-semibold text-slate-900"
                   >
-                    <option value="Semua Cabang (Hybrid)">🌐 Semua Cabang (Multi-Outlet)</option>
+                    <option value="Semua Cabang (Hybrid)">Semua Cabang (Multi-Outlet)</option>
                     {outletsConfigList.map((o) => (
-                      <option key={o.id} value={o.name}>📍 {o.name}</option>
+                      <option key={o.id} value={o.name}>{o.name}</option>
                     ))}
                   </select>
                 </div>
@@ -16593,13 +16465,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     }}
                     className="w-full border border-slate-200 rounded-xl p-2 text-xs font-semibold text-slate-900"
                   >
-                    <option value="ALL">👥 Semua Jabatan Kru Resto</option>
-                    <option value="koki">👨‍🍳 Koki &amp; Cook Station (BOH)</option>
-                    <option value="helper">🥣 Kitchen Helper &amp; Stewarding</option>
-                    <option value="waiters">🍽️ Waiters, Runner &amp; Greeting (FOH)</option>
-                    <option value="kasir">💳 Kasir POS &amp; Billing</option>
-                    <option value="kepalaProduksi">⭐ Kepala Produksi / SPV Dapur</option>
-                    <option value="kepalaCabang">👔 Kepala Cabang &amp; SPV Shift</option>
+                    <option value="ALL">Semua Jabatan Kru Resto</option>
+                    <option value="koki">Koki &amp; Cook Station (BOH)</option>
+                    <option value="helper">Kitchen Helper &amp; Stewarding</option>
+                    <option value="waiters">Waiters, Runner &amp; Greeting (FOH)</option>
+                    <option value="kasir">Kasir POS &amp; Billing</option>
+                    <option value="kepalaProduksi">Kepala Produksi / SPV Dapur</option>
+                    <option value="kepalaCabang">Kepala Cabang &amp; SPV Shift</option>
                   </select>
                 </div>
               </div>
@@ -16630,13 +16502,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* Lokasi / Format Online (Tergantung Mode) */}
               {newScheduleFormData.deliveryMode === 'ONLINE' ? (
-                <div className="space-y-3 bg-indigo-50/70 p-3.5 rounded-xl border border-indigo-200">
+                <div className="space-y-3 bg-slate-50/70 p-3.5 rounded-xl border border-slate-200">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-slate-800 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
-                      <Video className="h-4 w-4 text-indigo-600" />
+                    <span className="font-bold text-slate-800 text-xs  flex items-center gap-1.5">
+                      <Video className="h-4 w-4 text-slate-600" />
                       Format Pelatihan Online *
                     </span>
-                    <span className="text-[10px] text-indigo-600 font-bold bg-indigo-100 px-2 py-0.5 rounded-md">
+                    <span className="text-xs text-slate-600 font-bold bg-slate-100 px-2 py-0.5 rounded-md">
                       Fleksibel Tanpa Wajib Zoom
                     </span>
                   </div>
@@ -16654,12 +16526,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       }
                       className={`p-2 rounded-xl border text-left flex flex-col gap-0.5 transition ${
                         (newScheduleFormData.onlineFormat || 'WEBINAR') === 'WEBINAR'
-                          ? 'bg-indigo-600 text-white border-indigo-700 font-bold shadow-xs'
+                          ? 'bg-ink-800 text-white border-ink-800 font-bold shadow-xs'
                           : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
-                      <span className="text-xs">📹 Webinar Live (Zoom/Meet)</span>
-                      <span className="text-[9px] opacity-80">Sesi tatap muka online interaktif</span>
+                      <span className="text-xs">Webinar Live (Zoom/Meet)</span>
+                      <span className="text-xs opacity-80">Sesi tatap muka online interaktif</span>
                     </button>
 
                     <button
@@ -16677,36 +16549,36 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       }
                       className={`p-2 rounded-xl border text-left flex flex-col gap-0.5 transition ${
                         newScheduleFormData.onlineFormat === 'SELF_STUDY'
-                          ? 'bg-indigo-600 text-white border-indigo-700 font-bold shadow-xs'
+                          ? 'bg-ink-800 text-white border-ink-800 font-bold shadow-xs'
                           : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
-                      <span className="text-xs">📖 Mandiri: Modul &amp; Tugas</span>
-                      <span className="text-[9px] opacity-80">Cukup baca modul SOP &amp; tugas</span>
+                      <span className="text-xs">Mandiri: Modul &amp; Tugas</span>
+                      <span className="text-xs opacity-80">Cukup baca modul SOP &amp; tugas</span>
                     </button>
                   </div>
 
                   {newScheduleFormData.onlineFormat === 'SELF_STUDY' ? (
-                    <div className="space-y-2 pt-1 border-t border-indigo-200/80">
+                    <div className="space-y-2 pt-1 border-t border-slate-200/80">
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1 text-[11px]">
+                        <label className="font-bold text-slate-700 block mb-1 text-xs">
                           Tautkan Modul SOP yang Wajib Dibaca *
                         </label>
                         <select
                           value={newScheduleFormData.moduleId || 'TRN-001'}
                           onChange={(e) => setNewScheduleFormData({ ...newScheduleFormData, moduleId: e.target.value })}
-                          className="w-full border border-indigo-300 rounded-xl p-2 text-xs text-slate-900 bg-white font-semibold"
+                          className="w-full border border-slate-300 rounded-xl p-2 text-xs text-slate-900 bg-white font-semibold"
                         >
                           {trainingModules.map((m) => (
                             <option key={m.id} value={m.id}>
-                              📚 {m.code} - {m.title} ({m.lessonsCount} Sesi)
+                              {m.code} - {m.title} ({m.lessonsCount} Sesi)
                             </option>
                           ))}
                         </select>
                       </div>
 
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1 text-[11px]">
+                        <label className="font-bold text-slate-700 block mb-1 text-xs">
                           Instruksi Tugas Mandiri untuk Kru *
                         </label>
                         <textarea
@@ -16716,13 +16588,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           onChange={(e) =>
                             setNewScheduleFormData({ ...newScheduleFormData, taskInstructions: e.target.value })
                           }
-                          className="w-full border border-indigo-300 rounded-xl p-2 text-xs text-slate-900 bg-white leading-relaxed resize-none"
+                          className="w-full border border-slate-300 rounded-xl p-2 text-xs text-slate-900 bg-white leading-relaxed resize-none"
                         />
                       </div>
                     </div>
                   ) : (
                     <div>
-                      <label className="font-bold text-slate-700 block mb-1 text-[11px]">
+                      <label className="font-bold text-slate-700 block mb-1 text-xs">
                         URL Google Meet / Zoom Link *
                       </label>
                       <input
@@ -16732,9 +16604,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         onChange={(e) =>
                           setNewScheduleFormData({ ...newScheduleFormData, meetingLink: e.target.value })
                         }
-                        className="w-full border border-indigo-300 rounded-xl p-2 text-xs text-slate-900 font-mono"
+                        className="w-full border border-slate-300 rounded-xl p-2 text-xs text-slate-900 font-mono"
                       />
-                      <span className="text-[10px] text-indigo-700 mt-0.5 block">
+                      <span className="text-xs text-slate-700 mt-0.5 block">
                         Tombol &quot;Masuk Ruang Meeting&quot; akan otomatis aktif di HP kru terdaftar.
                       </span>
                     </div>
@@ -16796,11 +16668,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* 3. KONEKSI KE KARYAWAN: TARGET PESERTA */}
               <div className="space-y-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <div className="flex items-center justify-between">
-                  <label className="font-black text-slate-800 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                  <label className="font-semibold text-slate-800 text-xs  flex items-center gap-1.5">
                     <Users className="h-4 w-4 text-emerald-600" />
                     <span>3. Penugasan Karyawan Peserta</span>
                   </label>
-                  <span className="text-[10px] text-slate-500 font-bold">
+                  <span className="text-xs text-slate-500 font-bold">
                     Database Master SDM
                   </span>
                 </div>
@@ -16850,7 +16722,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                   return (
                     <div className="space-y-2 pt-1 border-t border-slate-200">
-                      <div className="flex items-center justify-between text-[11px]">
+                      <div className="flex items-center justify-between text-xs">
                         <span className="text-slate-600 font-bold">
                           Daftar Karyawan di {newScheduleFormData.outlet} ({eligibleStaff.length} Staf Relevan):
                         </span>
@@ -16865,7 +16737,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               assignedStaffNiks: isAllSelected ? [] : allNiks,
                             });
                           }}
-                          className="text-emerald-700 hover:text-emerald-800 font-bold text-[10px]"
+                          className="text-emerald-700 hover:text-emerald-800 font-bold text-xs"
                         >
                           Pilih / Hapus Semua
                         </button>
@@ -16873,7 +16745,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                       <div className="max-h-36 overflow-y-auto space-y-1 pr-1 border border-slate-200 rounded-xl bg-white p-2">
                         {eligibleStaff.length === 0 ? (
-                          <p className="text-[10px] text-slate-400 text-center py-2">
+                          <p className="text-xs text-slate-500 text-center py-2">
                             Tidak ada karyawan dengan kombinasi outlet &amp; jabatan ini.
                           </p>
                         ) : (
@@ -16909,9 +16781,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                     className="rounded text-emerald-600 focus:ring-emerald-500"
                                   />
                                   <span>{emp.fullName}</span>
-                                  <span className="text-[10px] text-slate-400 font-mono">({emp.id})</span>
+                                  <span className="text-xs text-slate-400 font-mono">({emp.id})</span>
                                 </div>
-                                <span className="text-[10px] text-slate-500 font-normal">
+                                <span className="text-xs text-slate-500 font-normal">
                                   {emp.positionTitle}
                                 </span>
                               </label>
@@ -16982,7 +16854,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     `Sesi training "${created.title}" (${created.deliveryMode}) berhasil dijadwalkan untuk ${created.targetRoleLabel} di ${created.outlet}!`
                   );
                 }}
-                className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition flex items-center gap-1.5"
+                className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-1.5"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 <span>Simpan &amp; Terbitkan Jadwal</span>
@@ -16997,13 +16869,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {selectedScheduleAttendees && (
         <div className="fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 my-auto border border-slate-200">
+          <div className="bg-white rounded-lg max-w-lg w-full p-6 shadow-xl space-y-4 my-auto border border-slate-200">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase">
+                <span className="badge badge-success">
                   {selectedScheduleAttendees.id} • {selectedScheduleAttendees.outlet}
                 </span>
-                <h3 className="font-extrabold text-slate-900 text-sm mt-1 leading-snug">
+                <h3 className="font-semibold text-slate-900 text-sm mt-1 leading-snug">
                   {selectedScheduleAttendees.title}
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -17032,7 +16904,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {selectedScheduleAttendees.confirmedStaff.length === 0 ? (
                 <div className="p-6 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 space-y-1">
                   <p className="text-xs text-slate-500">Belum ada staf kru yang mengonfirmasi kehadiran.</p>
-                  <p className="text-[10px] text-slate-400">Kru dapat konfirmasi langsung dari menu LMS di HP masing-masing.</p>
+                  <p className="text-xs text-slate-400">Kru dapat konfirmasi langsung dari menu LMS di HP masing-masing.</p>
                 </div>
               ) : (
                 <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
@@ -17072,19 +16944,19 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             </span>
                           </button>
                         ) : (
-                          <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs shrink-0">
+                          <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-xs shrink-0">
                             {staff.name.slice(0, 2).toUpperCase()}
                           </div>
                         )}
                         <div>
                           <p className="font-bold text-slate-900">{staff.name}</p>
-                          <p className="text-[10px] text-slate-500 font-mono">
+                          <p className="text-xs text-slate-500 font-mono">
                             {staff.nik} • {staff.role}
                           </p>
                         </div>
                       </div>
                       <div className="text-right flex flex-col items-end gap-1">
-                        <span className="text-[9px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                        <span className="text-xs font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
                           <CheckCircle2 className="h-2.5 w-2.5 text-emerald-600" />
                           <span>Hadir Onsite</span>
                         </span>
@@ -17105,13 +16977,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                 outlet: selectedScheduleAttendees.outlet,
                               })
                             }
-                            className="text-[9px] font-bold text-indigo-600 hover:text-indigo-800 underline flex items-center gap-1"
+                            className="text-xs font-bold text-slate-600 hover:text-slate-800 underline flex items-center gap-1"
                           >
                             <Camera className="h-2.5 w-2.5" />
                             <span>Lihat Foto Watermark</span>
                           </button>
                         )}
-                        <p className="text-[9px] text-slate-400">{staff.confirmedAt}</p>
+                        <p className="text-xs text-slate-400">{staff.confirmedAt}</p>
                       </div>
                     </div>
                   ))}
@@ -17120,7 +16992,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             </div>
 
             <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
-              <span className="text-slate-400 text-[11px]">Audit foto selfie ter-watermark otomatis oleh AI</span>
+              <span className="text-slate-500 text-xs">Foto selfie diberi watermark waktu dan lokasi</span>
               <button
                 type="button"
                 onClick={() => setSelectedScheduleAttendees(null)}
@@ -17138,17 +17010,17 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isCreateWeeklyQuizModalOpen && (
         <div className="fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 my-auto border border-slate-200 max-h-[92vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-2xl w-full p-6 shadow-xl space-y-4 my-auto border border-slate-200 max-h-[92vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3 sticky top-0 bg-white z-10">
               <div className="flex items-center space-x-2">
                 <span className="p-2 bg-amber-50 text-amber-600 rounded-xl">
                   <Award className="h-5 w-5" />
                 </span>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-sm">
+                  <h3 className="font-semibold text-slate-900 text-sm">
                     Buat Kuis Mingguan Wajib (10 Soal Rutin Resto)
                   </h3>
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-xs text-slate-500">
                     Evaluasi retensi SOP berkala mingguan tanpa kewajiban membaca modul terlebih dahulu.
                   </p>
                 </div>
@@ -17202,7 +17074,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Tema Generator & Target Role */}
               <div className="grid grid-cols-2 gap-3 bg-amber-50/60 p-3 rounded-xl border border-amber-200">
                 <div>
-                  <label className="font-bold text-slate-800 block mb-1 text-[11px]">
+                  <label className="font-bold text-slate-800 block mb-1 text-xs">
                     Tema Soal Operasional Resto *
                   </label>
                   <select
@@ -17219,14 +17091,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     }}
                     className="w-full border border-amber-300 rounded-xl p-2 text-xs font-bold text-slate-900 bg-white"
                   >
-                    <option value="BOH_HYGIENE">🍳 Dapur BOH: Gramasi, Resep &amp; Higienitas</option>
-                    <option value="FOH_HOSPITALITY">🍽️ Layanan FOH: 3S, Upselling &amp; SLA Tamu</option>
-                    <option value="FOOD_SAFETY">🛡️ Food Safety, HACCP &amp; Bahaya Kontaminasi</option>
+                    <option value="BOH_HYGIENE">Dapur BOH: Gramasi, Resep &amp; Higienitas</option>
+                    <option value="FOH_HOSPITALITY">Layanan FOH: 3S, Upselling &amp; SLA Tamu</option>
+                    <option value="FOOD_SAFETY">Food Safety, HACCP &amp; Bahaya Kontaminasi</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-800 block mb-1 text-[11px]">
+                  <label className="font-bold text-slate-800 block mb-1 text-xs">
                     Target Jabatan Kru Resto *
                   </label>
                   <select
@@ -17247,10 +17119,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     }}
                     className="w-full border border-amber-300 rounded-xl p-2 text-xs font-bold text-slate-900 bg-white"
                   >
-                    <option value="ALL">👥 Seluruh Kru Restoran (BOH &amp; FOH)</option>
-                    <option value="koki">👨‍🍳 Koki &amp; Cook Station (BOH)</option>
-                    <option value="waiters">🍽️ Waiters &amp; Greeting (FOH)</option>
-                    <option value="kasir">💳 Kasir POS &amp; Billing</option>
+                    <option value="ALL">Seluruh Kru Restoran (BOH &amp; FOH)</option>
+                    <option value="koki">Koki &amp; Cook Station (BOH)</option>
+                    <option value="waiters">Waiters &amp; Greeting (FOH)</option>
+                    <option value="kasir">Kasir POS &amp; Billing</option>
                   </select>
                 </div>
               </div>
@@ -17258,10 +17130,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Generator Action Banner */}
               <div className="flex items-center justify-between bg-slate-900 text-white p-3 rounded-xl">
                 <div>
-                  <p className="font-extrabold text-xs text-amber-400 flex items-center gap-1.5">
-                    <span>✨ Bank Soal Otomatis (10 Butir)</span>
+                  <p className="font-semibold text-xs text-amber-400 flex items-center gap-1.5">
+                    <span>Bank Soal Otomatis (10 Butir)</span>
                   </p>
-                  <p className="text-[10px] text-slate-300">
+                  <p className="text-xs text-slate-300">
                     {newWeeklyQuizForm.questions?.length || 0} butir soal skenario riil resto telah disiapkan.
                   </p>
                 </div>
@@ -17277,7 +17149,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     });
                     showToast('10 Butir Soal Kuis Mingguan Resto berhasil di-generate!');
                   }}
-                  className="px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs rounded-lg transition shadow-xs flex items-center gap-1"
+                  className="px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold text-xs rounded-lg transition shadow-xs flex items-center gap-1"
                 >
                   <span>Regenerate 10 Soal</span>
                 </button>
@@ -17288,15 +17160,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 {(newWeeklyQuizForm.questions || []).map((q, idx) => (
                   <div key={idx} className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="font-black text-xs text-amber-800 bg-amber-100 px-2 py-0.5 rounded">
+                      <span className="font-semibold text-xs text-amber-800 bg-amber-100 px-2 py-0.5 rounded">
                         Soal #{idx + 1}
                       </span>
-                      <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      <span className="text-xs text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                         Kunci: Opsi {String.fromCharCode(65 + q.correctIndex)}
                       </span>
                     </div>
                     <p className="font-bold text-slate-900 text-xs">{q.question}</p>
-                    <div className="grid grid-cols-2 gap-1.5 text-[11px] text-slate-600 pt-1">
+                    <div className="grid grid-cols-2 gap-1.5 text-xs text-slate-600 pt-1">
                       {q.options.map((opt, optIdx) => (
                         <div
                           key={optIdx}
@@ -17312,8 +17184,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       ))}
                     </div>
                     {q.explanation && (
-                      <p className="text-[10px] text-slate-500 italic pt-0.5">
-                        💡 Penjelasan SOP: {q.explanation}
+                      <p className="text-xs text-slate-500 italic pt-0.5">
+                        Penjelasan SOP: {q.explanation}
                       </p>
                     )}
                   </div>
@@ -17356,7 +17228,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   setIsCreateWeeklyQuizModalOpen(false);
                   showToast(`Kuis mingguan "${createdQuiz.weekLabel}" (10 Soal) berhasil diterbitkan untuk seluruh kru!`);
                 }}
-                className="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black rounded-xl shadow-md transition flex items-center gap-1.5"
+                className="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-semibold rounded-xl shadow-sm transition flex items-center gap-1.5"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 <span>Terbitkan Kuis Mingguan (10 Soal)</span>
@@ -17371,15 +17243,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {selectedAttendeeDetailPhoto && (
         <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4 my-auto border border-slate-200">
+          <div className="bg-white rounded-lg max-w-md w-full p-5 shadow-xl space-y-4 my-auto border border-slate-200">
             <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
               <div className="flex items-center gap-2">
                 <span className="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg">
                   <ShieldCheck className="h-4 w-4" />
                 </span>
                 <div>
-                  <h4 className="font-extrabold text-xs text-slate-900">Inspeksi Foto Kehadiran Ber-Watermark</h4>
-                  <p className="text-[10px] text-slate-500">Bukti Fisik Kehadiran Staf di Restoran</p>
+                  <h4 className="font-semibold text-xs text-slate-900">Inspeksi Foto Kehadiran Ber-Watermark</h4>
+                  <p className="text-xs text-slate-500">Bukti Fisik Kehadiran Staf di Restoran</p>
                 </div>
               </div>
               <button
@@ -17392,7 +17264,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             </div>
 
             {/* Foto Ber-Watermark Container */}
-            <div className="relative rounded-2xl overflow-hidden border-2 border-slate-900 shadow-lg bg-slate-950">
+            <div className="relative rounded-lg overflow-hidden border-2 border-slate-900 shadow-sm bg-slate-950">
               <img
                 src={selectedAttendeeDetailPhoto.photoUrl}
                 alt={selectedAttendeeDetailPhoto.name}
@@ -17401,19 +17273,19 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* Watermark Security Overlay Banner */}
               <div className="absolute bottom-0 inset-x-0 bg-slate-950/90 text-white p-3 border-t border-amber-500/60 font-mono space-y-1">
-                <div className="flex items-center justify-between text-[9px] text-amber-400 font-extrabold uppercase tracking-wider border-b border-slate-800 pb-0.5">
-                  <span>🛡️ BAROKAH GRUP HRIS • SECURITY ATTENDANCE STAMP</span>
+                <div className="flex items-center justify-between text-xs text-amber-400 font-semibold  border-b border-slate-800 pb-0.5">
+                  <span>BAROKAH GRUP HRIS • SECURITY ATTENDANCE STAMP</span>
                   <span>VERIFIED</span>
                 </div>
-                <div className="text-[10px] text-slate-100 leading-tight">
+                <div className="text-xs text-slate-100 leading-tight">
                   <p className="font-bold">
-                    👤 {selectedAttendeeDetailPhoto.name} ({selectedAttendeeDetailPhoto.nik}) • {selectedAttendeeDetailPhoto.role}
+                    {selectedAttendeeDetailPhoto.name} ({selectedAttendeeDetailPhoto.nik}) • {selectedAttendeeDetailPhoto.role}
                   </p>
                   <p className="text-slate-300">
-                    📍 {selectedAttendeeDetailPhoto.outlet} • {selectedAttendeeDetailPhoto.sessionTitle}
+                    {selectedAttendeeDetailPhoto.outlet} • {selectedAttendeeDetailPhoto.sessionTitle}
                   </p>
                   <p className="text-amber-300">
-                    🕒 {selectedAttendeeDetailPhoto.confirmedAt} • GPS MATCH RESTO
+                    {selectedAttendeeDetailPhoto.confirmedAt} • GPS MATCH RESTO
                   </p>
                   <p className="text-[8px] text-emerald-400">
                     STATUS: KONTUR WAJAH VALID 98.8% • ANTI-SPOOF PASSED
@@ -17423,11 +17295,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             </div>
 
             <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs space-y-1 text-slate-600">
-              <div className="flex justify-between text-[11px]">
+              <div className="flex justify-between text-xs">
                 <span className="text-slate-500">Kesesuaian Atribut SOP:</span>
                 <span className="font-bold text-emerald-700">✓ Seragam &amp; Apron Lengkap</span>
               </div>
-              <div className="flex justify-between text-[11px]">
+              <div className="flex justify-between text-xs">
                 <span className="text-slate-500">Tipe Kamera:</span>
                 <span className="font-mono text-slate-800">Front Camera HP (Live Capture)</span>
               </div>
@@ -17451,7 +17323,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {attendanceCameraModal && (
         <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-md w-full p-5 shadow-2xl space-y-4 my-auto border border-slate-200 max-h-[92vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-md w-full p-5 shadow-xl space-y-4 my-auto border border-slate-200 max-h-[92vh] overflow-y-auto">
             {/* Header Modal Kamera */}
             <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
               <div className="flex items-center gap-2">
@@ -17459,10 +17331,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   <Camera className="h-5 w-5" />
                 </span>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-sm leading-tight">
+                  <h3 className="font-semibold text-slate-900 text-sm leading-tight">
                     {attendanceCameraModal.title}
                   </h3>
-                  <p className="text-[11px] text-slate-500 truncate max-w-[260px]">
+                  <p className="text-xs text-slate-500 truncate max-w-[260px]">
                     {attendanceCameraModal.subtitle}
                   </p>
                 </div>
@@ -17483,7 +17355,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             {!capturedPhotoPreview ? (
               /* 1. TAMPILAN KAMERA VIEWFINDER LIVE */
               <div className="space-y-3">
-                <div className="relative rounded-2xl overflow-hidden aspect-[4/3] bg-slate-950 border-2 border-slate-900 shadow-inner flex flex-col items-center justify-center">
+                <div className="relative rounded-lg overflow-hidden aspect-[4/3] bg-slate-950 border-2 border-slate-900 shadow-inner flex flex-col items-center justify-center">
                   {/* Gambar Simulasi Feed Kamera */}
                   <img
                     src={
@@ -17513,17 +17385,17 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         </div>
                         <div className="w-2 h-3 mx-auto rounded-full bg-emerald-400" />
                         <div className="w-8 h-1.5 mx-auto rounded-full bg-emerald-400" />
-                        <span className="text-[10px] font-black font-mono text-emerald-300 bg-slate-950/80 px-2 py-0.5 rounded-full block border border-emerald-500/40">
+                        <span className="text-xs font-semibold font-mono text-emerald-300 bg-slate-950/80 px-2 py-0.5 rounded-full block border border-emerald-500/40">
                           98.8% MATCH • VALID
                         </span>
                       </div>
                     ) : (
                       <div className="text-center p-2 text-rose-300 space-y-1">
                         <AlertTriangle className="h-7 w-7 mx-auto text-rose-400 animate-bounce" />
-                        <span className="text-[10px] font-black uppercase bg-slate-950/90 px-2 py-0.5 rounded border border-rose-500/40 block">
+                        <span className="text-xs font-semibold uppercase bg-slate-950/90 px-2 py-0.5 rounded border border-rose-500/40 block">
                           NON-FACE DETECTED
                         </span>
-                        <span className="text-[9px] text-rose-200 block">
+                        <span className="text-xs text-rose-200 block">
                           {cameraScanMode === 'FLAT_WALL' ? 'Foto Dinding Polos' : 'Foto Ubin / Meja'}
                         </span>
                       </div>
@@ -17531,59 +17403,59 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   {/* HUD Overlay Kamera */}
-                  <div className="absolute top-2 inset-x-3 flex items-center justify-between z-10 text-[9px] text-white font-mono bg-slate-950/70 px-2.5 py-1 rounded-lg">
+                  <div className="absolute top-2 inset-x-3 flex items-center justify-between z-10 text-xs text-white font-mono bg-slate-950/70 px-2.5 py-1 rounded-lg">
                     <span className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                       LIVE FRONT CAM
                     </span>
-                    <span>AI ANTI-SPOOF: AKTIF</span>
+                    <span>Simulasi cek wajah</span>
                   </div>
 
                   {/* Watermark Live Bar */}
-                  <div className="absolute bottom-2 inset-x-3 z-10 text-[9px] text-amber-300 font-mono bg-slate-950/85 px-2.5 py-1 rounded-lg truncate border border-slate-800">
-                    📍 {attendanceCameraModal.outletName} • 🕒 {new Date().toLocaleTimeString('id-ID')} WIB
+                  <div className="absolute bottom-2 inset-x-3 z-10 text-xs text-amber-300 font-mono bg-slate-950/85 px-2.5 py-1 rounded-lg truncate border border-slate-800">
+                    {attendanceCameraModal.outletName} • {new Date().toLocaleTimeString('id-ID')} WIB
                   </div>
                 </div>
 
                 {/* Switch Simulasi Uji Deteksi Kamera */}
                 <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1.5">
-                  <div className="flex items-center justify-between text-[10px] font-bold text-slate-600">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-600">
                     <span>Uji Deteksi Kamera (Anti-Spoofing):</span>
-                    <span className="text-indigo-600">Simulator AI</span>
+                    <span className="text-slate-700">Simulator</span>
                   </div>
                   <div className="grid grid-cols-3 gap-1.5">
                     <button
                       type="button"
                       onClick={() => setCameraScanMode('VALID_FACE')}
-                      className={`p-1.5 rounded-lg border text-center text-[10px] font-bold transition ${
+                      className={`p-1.5 rounded-lg border text-center text-xs font-bold transition ${
                         cameraScanMode === 'VALID_FACE'
                           ? 'bg-emerald-500 text-white border-emerald-600 shadow-xs'
                           : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
-                      🟢 Wajah Asli
+                      Wajah Asli
                     </button>
                     <button
                       type="button"
                       onClick={() => setCameraScanMode('FLAT_WALL')}
-                      className={`p-1.5 rounded-lg border text-center text-[10px] font-bold transition ${
+                      className={`p-1.5 rounded-lg border text-center text-xs font-bold transition ${
                         cameraScanMode === 'FLAT_WALL'
                           ? 'bg-rose-500 text-white border-rose-600 shadow-xs'
                           : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
-                      🔴 Foto Tembok
+                      Foto Tembok
                     </button>
                     <button
                       type="button"
                       onClick={() => setCameraScanMode('FLOOR_TILE')}
-                      className={`p-1.5 rounded-lg border text-center text-[10px] font-bold transition ${
+                      className={`p-1.5 rounded-lg border text-center text-xs font-bold transition ${
                         cameraScanMode === 'FLOOR_TILE'
                           ? 'bg-rose-500 text-white border-rose-600 shadow-xs'
                           : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
-                      🔴 Foto Ubin
+                      Foto Ubin
                     </button>
                   </div>
                 </div>
@@ -17621,7 +17493,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       showToast('Foto berhasil diambil & watermark resmi telah dibubuhkan!');
                     }, 650);
                   }}
-                  className={`w-full py-3 px-4 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 shadow-md ${
+                  className={`w-full py-3 px-4 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-2 shadow-sm ${
                     cameraScanMode !== 'VALID_FACE'
                       ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
                       : 'bg-emerald-600 hover:bg-emerald-700 text-white active:scale-98'
@@ -17633,14 +17505,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       ? 'Memproses Watermark...'
                       : cameraScanMode !== 'VALID_FACE'
                       ? 'Wajah Belum Terdeteksi'
-                      : '📸 Ambil Foto & Stempel Watermark'}
+                      : 'Ambil Foto & Stempel Watermark'}
                   </span>
                 </button>
               </div>
             ) : (
               /* 2. HASIL PRATINJAU FOTO DENGAN WATERMARK PERMANEN */
               <div className="space-y-3">
-                <div className="relative rounded-2xl overflow-hidden aspect-[4/3] bg-slate-950 border-2 border-emerald-500 shadow-xl">
+                <div className="relative rounded-lg overflow-hidden aspect-[4/3] bg-slate-950 border-2 border-emerald-500 shadow-xl">
                   <img
                     src={capturedPhotoPreview.photoUrl}
                     alt="Captured Watermarked Photo"
@@ -17649,19 +17521,19 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                   {/* Watermark Security Banner Permanen */}
                   <div className="absolute bottom-0 inset-x-0 bg-slate-950/92 text-white p-3 border-t border-amber-500/60 font-mono space-y-1">
-                    <div className="flex items-center justify-between text-[9px] text-amber-400 font-extrabold uppercase tracking-wider border-b border-slate-800 pb-0.5">
-                      <span>🛡️ BAROKAH GRUP • OFFICIAL ATTENDANCE STAMP</span>
+                    <div className="flex items-center justify-between text-xs text-amber-400 font-semibold  border-b border-slate-800 pb-0.5">
+                      <span>BAROKAH GRUP • OFFICIAL ATTENDANCE STAMP</span>
                       <span>SECURE</span>
                     </div>
-                    <div className="text-[10px] text-slate-100 leading-tight">
+                    <div className="text-xs text-slate-100 leading-tight">
                       <p className="font-bold">
-                        👤 {attendanceCameraModal.staffName} ({attendanceCameraModal.staffNik}) • {attendanceCameraModal.staffRole}
+                        {attendanceCameraModal.staffName} ({attendanceCameraModal.staffNik}) • {attendanceCameraModal.staffRole}
                       </p>
                       <p className="text-slate-300">
-                        📍 {attendanceCameraModal.outletName} • {attendanceCameraModal.activityTitle}
+                        {attendanceCameraModal.outletName} • {attendanceCameraModal.activityTitle}
                       </p>
                       <p className="text-amber-300">
-                        🕒 {capturedPhotoPreview.timestamp} WIB • GPS VERIFIED
+                        {capturedPhotoPreview.timestamp} WIB • GPS VERIFIED
                       </p>
                       <p className="text-[8px] text-emerald-400">
                         STATUS: BIOMETRIC MATCH 98.8% • WATERMARK HASH VERIFIED
@@ -17682,7 +17554,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     onClick={() => setCapturedPhotoPreview(null)}
                     className="flex-1 py-2.5 px-3 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-50 transition text-center"
                   >
-                    🔄 Ambil Ulang
+                    Ambil Ulang
                   </button>
 
                   <button
@@ -17833,14 +17705,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           detail: `Wajah master karyawan (${attendanceCameraModal.staffName}) berhasil direkam & disimpan ke dalam database aplikasi. Karyawan kini dapat melakukan absensi mandiri.`,
                         };
                         setFaceAuditLogList([newAudit, ...faceAuditLogList]);
-                        showToast(`🎉 Foto wajah berhasil disimpan di aplikasi! Sekarang kamu sudah bisa melakukan absensi mandiri.`);
+                        showToast(`Foto wajah berhasil disimpan di aplikasi! Sekarang kamu sudah bisa melakukan absensi mandiri.`);
                       }
 
                       // Tutup Modal
                       setAttendanceCameraModal(null);
                       setCapturedPhotoPreview(null);
                     }}
-                    className="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl transition shadow-md flex items-center justify-center gap-1.5"
+                    className="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition shadow-sm flex items-center justify-center gap-1.5"
                   >
                     <CheckCircle2 className="h-4 w-4" />
                     <span>Gunakan &amp; Konfirmasi</span>
@@ -17857,7 +17729,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {prayerAlarmState && prayerAlarmState.active && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border-2 border-amber-500/80 rounded-3xl max-w-md w-full p-6 text-white shadow-2xl relative overflow-hidden space-y-4">
+          <div className="bg-slate-900 border-2 border-amber-500/80 rounded-lg max-w-md w-full p-6 text-white shadow-xl relative overflow-hidden space-y-4">
             {/* Background glowing circle */}
             <div className="absolute -top-12 -right-12 w-40 h-40 bg-amber-500/20 rounded-full blur-2xl pointer-events-none"></div>
 
@@ -17865,8 +17737,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <span className={`w-3 h-3 rounded-full ${prayerAlarmState.type === 'ADHAN' ? 'bg-emerald-400 animate-ping' : 'bg-amber-400 animate-bounce'}`}></span>
-                <span className="text-[10px] font-black uppercase tracking-wider text-amber-400">
-                  {prayerAlarmState.type === 'PRE_10_MIN' ? '🔔 Peringatan T-10 Menit Pra-Sholat' : '📢 Kumandang Azan Waktu Sholat'}
+                <span className="text-xs font-semibold  text-amber-400">
+                  {prayerAlarmState.type === 'PRE_10_MIN' ? 'Peringatan T-10 Menit Pra-Sholat' : 'Kumandang Azan Waktu Sholat'}
                 </span>
               </div>
               <div className="flex items-center gap-1">
@@ -17890,16 +17762,16 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
             {/* Content Body */}
             <div className="text-center space-y-2 py-2">
-              <div className="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-amber-600 to-emerald-600 flex items-center justify-center text-3xl shadow-lg ring-4 ring-amber-500/30">
+              <div className="w-16 h-16 mx-auto rounded-lg bg-ink flex items-center justify-center text-3xl shadow-sm ring-4 ring-amber-500/30">
                 🕌
               </div>
-              <h3 className="text-xl font-black text-white">
+              <h3 className="text-xl font-semibold text-white">
                 {prayerAlarmState.type === 'PRE_10_MIN'
                   ? `Waktu Sholat ${prayerAlarmState.prayerLabel} Masuk 10 Menit Lagi`
                   : `Waktu Sholat ${prayerAlarmState.prayerLabel} Telah Masuk!`}
               </h3>
-              <div className="inline-block px-3 py-1 bg-amber-500/20 border border-amber-400/40 rounded-full text-xs font-extrabold text-amber-300 font-mono">
-                📍 {prayerAlarmState.cityLabel} • 🕒 {prayerAlarmState.prayerTime}
+              <div className="inline-block px-3 py-1 bg-amber-500/20 border border-amber-400/40 rounded-full text-xs font-semibold text-amber-300 font-mono">
+                {prayerAlarmState.cityLabel} • {prayerAlarmState.prayerTime}
               </div>
               <p className="text-xs text-slate-300 leading-relaxed max-w-sm mx-auto">
                 {prayerAlarmState.type === 'PRE_10_MIN'
@@ -17917,11 +17789,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   setKruPrayerTurnMinutesRemaining(15);
                   setKruPrayerTurnCurrentName(prayerAlarmState.prayerLabel);
                   setPrayerAlarmState(null);
-                  showToast(`🕌 Giliran sholat ${prayerAlarmState.prayerLabel} dimulai! Timer 15 menit berjalan.`);
+                  showToast(`Giliran sholat ${prayerAlarmState.prayerLabel} dimulai! Timer 15 menit berjalan.`);
                 }}
-                className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs rounded-xl shadow-lg transition flex items-center justify-center gap-2"
+                className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-2"
               >
-                <span>🕌 Ambil Wudhu &amp; Mulai Giliran Sholat (Timer 15 Menit)</span>
+                <span>Ambil Wudhu &amp; Mulai Giliran Sholat (Timer 15 Menit)</span>
               </button>
               <button
                 type="button"
@@ -17940,11 +17812,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isCertificateModalOpen && certificateData && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto print:p-0 print:bg-white">
-          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl space-y-6 my-auto border border-amber-200 relative print:shadow-none print:border-none print:m-0 print:p-4">
+          <div className="bg-white rounded-lg max-w-3xl w-full p-6 sm:p-8 shadow-xl space-y-6 my-auto border border-amber-200 relative print:shadow-none print:border-none print:m-0 print:p-4">
             {/* Top Toolbar (Hidden on Print) */}
             <div className="flex justify-between items-center border-b border-slate-100 pb-3 print:hidden">
               <div className="flex items-center space-x-2">
-                <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded border border-amber-300 uppercase">
+                <span className="badge badge-warning">
                   {certificateData.certNumber}
                 </span>
                 <span className="text-xs font-bold text-slate-700">Preview Sertifikat Kelulusan Modul</span>
@@ -17954,10 +17826,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   onClick={() => {
                     window.print();
                   }}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl flex items-center space-x-1.5 shadow-sm"
+                  className="bg-ink-800 hover:bg-ink-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl flex items-center space-x-1.5 shadow-sm"
                 >
                   <Printer className="h-3.5 w-3.5" />
-                  <span>🖨️ Cetak / Unduh PDF</span>
+                  <span>Cetak / Unduh PDF</span>
                 </button>
                 <button
                   onClick={() => setIsCertificateModalOpen(false)}
@@ -17969,7 +17841,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             </div>
 
             {/* Printable Certificate Sheet (Luxury Border Layout) */}
-            <div className="border-4 border-double border-amber-600/70 p-6 sm:p-8 rounded-xl bg-gradient-to-b from-amber-50/30 via-white to-amber-50/20 text-center space-y-5 relative overflow-hidden print:border-4 print:p-8">
+            <div className="border-4 border-double border-amber-600/70 p-6 sm:p-8 rounded-xl bg-white text-center space-y-5 relative overflow-hidden print:border-4 print:p-8">
               {/* Corner Watermarks */}
               <div className="absolute top-2 left-2 text-amber-500/20 font-serif text-3xl font-bold select-none">✦</div>
               <div className="absolute top-2 right-2 text-amber-500/20 font-serif text-3xl font-bold select-none">✦</div>
@@ -17980,11 +17852,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               <div className="space-y-1">
                 <div className="flex items-center justify-center space-x-2">
                   <ChefHat className="h-7 w-7 text-amber-600" />
-                  <span className="text-sm font-black tracking-widest text-slate-900 uppercase">
+                  <span className="text-sm font-semibold  text-slate-900 uppercase">
                     BAROKAH GRUP • RESTORAN AYAM PECAK 2001
                   </span>
                 </div>
-                <p className="text-[10px] tracking-wider text-slate-500 uppercase font-semibold">
+                <p className="text-xs  text-slate-500 uppercase font-semibold">
                   Divisi Manajemen Sumber Daya Manusia &amp; Akademi Keahlian Kuliner
                 </p>
                 <div className="w-32 h-0.5 bg-amber-500 mx-auto mt-2"></div>
@@ -17992,13 +17864,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* Title */}
               <div className="space-y-1 pt-1">
-                <h2 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 tracking-wide uppercase">
+                <h2 className="text-2xl sm:text-3xl font-serif font-semibold text-slate-900 ">
                   SERTIFIKAT KELULUSAN
                 </h2>
                 <p className="text-xs font-serif italic text-amber-800 font-bold">
                   Certificate of Competence &amp; Training Module Completion
                 </p>
-                <p className="text-[10px] font-mono text-slate-400">
+                <p className="text-xs text-slate-500">
                   Nomor Sertifikasi: {certificateData.certNumber}
                 </p>
               </div>
@@ -18006,14 +17878,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Recipient */}
               <div className="space-y-1 py-1">
                 <p className="text-xs text-slate-500 font-serif italic">Dengan bangga dianugerahkan kepada:</p>
-                <h3 className="text-xl sm:text-2xl font-serif font-black text-slate-950 underline decoration-amber-500 decoration-2 underline-offset-4 tracking-wide uppercase">
+                <h3 className="text-xl sm:text-2xl font-serif font-semibold text-slate-950 underline decoration-amber-500 decoration-2 underline-offset-4 ">
                   {certificateData.staffName}
                 </h3>
                 <p className="text-xs text-slate-600 font-medium pt-0.5">
                   NIK: <strong className="font-mono text-slate-900">{certificateData.nik}</strong> • Jabatan:{' '}
-                  <strong className="text-indigo-900">{certificateData.role}</strong>
+                  <strong className="text-slate-900">{certificateData.role}</strong>
                 </p>
-                <p className="text-[11px] text-slate-500 font-medium">Unit Kerja: {certificateData.outlet}</p>
+                <p className="text-xs text-slate-500 font-medium">Unit Kerja: {certificateData.outlet}</p>
               </div>
 
               {/* Module Achievement Details */}
@@ -18022,10 +17894,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   Telah menyelesaikan seluruh rangkaian silabus materi serta dinyatakan <strong>LULUS</strong> dalam
                   evaluasi kuis kompetensi standar operasional restoran pada modul:
                 </p>
-                <h4 className="text-sm font-extrabold text-indigo-950">
+                <h4 className="text-sm font-semibold text-slate-950">
                   "{certificateData.moduleTitle}"
                 </h4>
-                <div className="flex flex-wrap justify-center items-center gap-3 pt-1 text-[11px]">
+                <div className="flex flex-wrap justify-center items-center gap-3 pt-1 text-xs">
                   <span className="font-mono font-bold bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded">
                     Skor Evaluasi: {certificateData.score} / 100
                   </span>
@@ -18041,34 +17913,34 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Signatures & Verification Stamp */}
               <div className="grid grid-cols-3 gap-4 pt-4 items-end max-w-xl mx-auto text-xs text-slate-700">
                 <div className="text-center space-y-1">
-                  <div className="h-10 border-b border-slate-400 mx-4 flex items-end justify-center font-serif italic text-slate-400 text-[11px]">
+                  <div className="h-10 border-b border-slate-400 mx-4 flex items-end justify-center font-serif italic text-slate-400 text-xs">
                     (Digital Signature)
                   </div>
                   <p className="font-bold text-slate-900 text-xs">Bambang Sudiro</p>
-                  <p className="text-[10px] text-slate-500">Executive Chef / Head Kitchen</p>
+                  <p className="text-xs text-slate-500">Executive Chef / Head Kitchen</p>
                 </div>
 
                 <div className="text-center space-y-1">
                   <div className="w-12 h-12 bg-white border border-slate-300 rounded p-1 mx-auto flex items-center justify-center shadow-xs">
                     <QrCode className="h-10 w-10 text-slate-800" />
                   </div>
-                  <p className="text-[9px] text-slate-400 uppercase font-mono">Verifikasi Resmi HRIS</p>
-                  <p className="text-[9px] text-slate-400">{certificateData.completedDate}</p>
+                  <p className="text-xs text-slate-500">Verifikasi Resmi HRIS</p>
+                  <p className="text-xs text-slate-400">{certificateData.completedDate}</p>
                 </div>
 
                 <div className="text-center space-y-1">
-                  <div className="h-10 border-b border-slate-400 mx-4 flex items-end justify-center font-serif italic text-slate-400 text-[11px]">
+                  <div className="h-10 border-b border-slate-400 mx-4 flex items-end justify-center font-serif italic text-slate-400 text-xs">
                     (Digital Signature)
                   </div>
                   <p className="font-bold text-slate-900 text-xs">Hendrawan Putra, S.E.</p>
-                  <p className="text-[10px] text-slate-500">Head of People &amp; Culture</p>
+                  <p className="text-xs text-slate-500">Head of People &amp; Culture</p>
                 </div>
               </div>
             </div>
 
             {/* Modal Bottom Close (Hidden on Print) */}
             <div className="flex justify-between items-center pt-2 print:hidden">
-              <span className="text-xs text-slate-400 flex items-center gap-1">
+              <span className="text-xs text-slate-500 flex items-center gap-1">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
                 <span>Format layout A4 standar cetak sertifikat &amp; PDF</span>
               </span>
@@ -18088,15 +17960,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isReportCardModalOpen && selectedReportCardStaff && (
         <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-2xl space-y-5 my-auto border border-slate-200 max-h-[92vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-3xl w-full p-6 shadow-xl space-y-5 my-auto border border-slate-200 max-h-[92vh] overflow-y-auto">
             {/* Header */}
             <div className="flex justify-between items-start border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-3">
-                <div className="p-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-md shadow-indigo-600/20">
+                <div className="p-2.5 bg-slate-100 text-slate-700 rounded-lg">
                   <GraduationCap className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-base">
+                  <h3 className="font-semibold text-slate-900 text-base">
                     Transkrip Rapor &amp; Riwayat Evaluasi Staf
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -18119,13 +17991,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <p className="text-xs text-slate-500">
                   {selectedReportCardStaff.role} • {selectedReportCardStaff.outlet}
                 </p>
-                <span className="text-[10px] font-mono text-slate-400 mt-0.5 block">
+                <span className="text-xs text-slate-500 mt-0.5 block">
                   NIK: {selectedReportCardStaff.nik}
                 </span>
               </div>
               <div className="text-right">
-                <span className="text-[10px] font-bold uppercase text-slate-400 block">IPK Rata-Rata:</span>
-                <span className="text-xl font-black text-indigo-700 font-mono">
+                <span className="text-xs font-medium text-slate-500 block">IPK Rata-Rata:</span>
+                <span className="text-xl font-semibold text-slate-700 font-mono">
                   {selectedReportCardStaff.gpaScore} / 100
                 </span>
                 <span className="text-xs font-bold text-emerald-700 block">
@@ -18142,23 +18014,23 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               if (staffDisc) {
                 return (
-                  <div className="p-4 rounded-2xl border border-purple-200 bg-gradient-to-br from-purple-50/70 via-indigo-50/40 to-white space-y-4 shadow-xs">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-purple-100 pb-3">
+                  <div className="p-4 rounded-lg border border-slate-200 bg-slate-50 space-y-4 shadow-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                       <div className="flex items-center space-x-2.5">
-                        <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-black text-base shadow-xs">
+                        <div className="w-10 h-10 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold text-base">
                           {staffDisc.dominantTrait}
                         </div>
                         <div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full border border-purple-200 flex items-center gap-1">
+                            <span className="text-xs font-semibold  text-slate-700 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200 flex items-center gap-1">
                               <BrainCircuit className="h-3 w-3" />
                               Profil Asesmen DISC 20 Soal
                             </span>
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${staffDisc.badgeColor}`}>
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${staffDisc.badgeColor}`}>
                               {staffDisc.profileCode} • {staffDisc.dominantTrait} Dominan
                             </span>
                           </div>
-                          <h4 className="font-black text-slate-900 text-sm mt-0.5">{staffDisc.profileTitle}</h4>
+                          <h4 className="font-semibold text-slate-900 text-sm mt-0.5">{staffDisc.profileTitle}</h4>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 self-start sm:self-auto">
@@ -18180,7 +18052,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             setIsReportCardModalOpen(false);
                             setIsDiscTestModalOpen(true);
                           }}
-                          className="px-2.5 py-1 text-[10px] font-bold text-purple-700 hover:text-purple-900 bg-white hover:bg-purple-50 border border-purple-200 rounded-lg transition flex items-center gap-1 shadow-xs"
+                          className="px-2.5 py-1 text-xs font-bold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition flex items-center gap-1 shadow-xs"
                         >
                           <RotateCcw className="h-3 w-3" />
                           <span>Uji Ulang Asesmen</span>
@@ -18190,7 +18062,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                     {/* Visualisasi Grafik Radar & Donut Chart DISC */}
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                      <div className="md:col-span-5 bg-white p-3 rounded-xl border border-purple-100 shadow-xs flex justify-center">
+                      <div className="md:col-span-5 bg-white p-3 rounded-xl border border-slate-200 shadow-xs flex justify-center">
                         <DiscChartVisualizer
                           percentages={staffDisc.percentages}
                           dominantTrait={staffDisc.dominantTrait}
@@ -18202,13 +18074,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       </div>
 
                       <div className="md:col-span-7 space-y-2.5">
-                        <p className="text-xs text-slate-600 leading-relaxed bg-white/80 p-3 rounded-xl border border-purple-100/70">
+                        <p className="text-xs text-slate-600 leading-relaxed bg-white/80 p-3 rounded-xl border border-slate-200/70">
                           "{staffDisc.summary}"
                         </p>
 
-                        <div className="p-3 bg-purple-100/60 rounded-xl border border-purple-200 text-xs space-y-1">
-                          <span className="text-[10px] font-black uppercase tracking-wider text-purple-900 flex items-center gap-1">
-                            <TrendingUp className="h-3.5 w-3.5 text-purple-700" />
+                        <div className="p-3 bg-slate-100/60 rounded-xl border border-slate-200 text-xs space-y-1">
+                          <span className="text-xs font-semibold  text-slate-900 flex items-center gap-1">
+                            <TrendingUp className="h-3.5 w-3.5 text-slate-700" />
                             Rekomendasi Jalur Karir &amp; Hirarki Operasional:
                           </span>
                           <p className="font-bold text-slate-900 leading-snug">
@@ -18216,13 +18088,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           </p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                           <div className="bg-white/90 p-2 rounded-lg border border-emerald-200">
-                            <span className="font-bold text-emerald-800 text-[10px] block">Kekuatan Utama:</span>
+                            <span className="font-bold text-emerald-800 text-xs block">Kekuatan Utama:</span>
                             <span className="text-slate-700">{staffDisc.strengths?.[0] || 'Tegas & Bertanggung Jawab'}</span>
                           </div>
                           <div className="bg-white/90 p-2 rounded-lg border border-amber-200">
-                            <span className="font-bold text-amber-800 text-[10px] block">Area Pengembangan:</span>
+                            <span className="font-bold text-amber-800 text-xs block">Area Pengembangan:</span>
                             <span className="text-slate-700">{staffDisc.developmentAreas?.[0] || 'Delegasi & Kesabaran'}</span>
                           </div>
                         </div>
@@ -18233,13 +18105,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               }
 
               return (
-                <div className="p-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 text-center space-y-2.5">
-                  <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center mx-auto">
+                <div className="p-4 rounded-lg border border-dashed border-slate-300 bg-slate-50/70 text-center space-y-2.5">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center mx-auto">
                     <BrainCircuit className="h-5 w-5" />
                   </div>
                   <div className="space-y-1">
                     <h5 className="font-bold text-xs text-slate-900">Belum Mengikuti Asesmen DISC 20 Soal</h5>
-                    <p className="text-[11px] text-slate-500 max-w-md mx-auto">
+                    <p className="text-xs text-slate-500 max-w-md mx-auto">
                       Karyawan ini belum memiliki pemetaan karakter DISC untuk penempatan stasiun kerja dan rekomendasi promosi berjenjang.
                     </p>
                   </div>
@@ -18261,7 +18133,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       setIsReportCardModalOpen(false);
                       setIsDiscTestModalOpen(true);
                     }}
-                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-xs inline-flex items-center gap-1.5"
+                    className="px-4 py-2 bg-ink-800 hover:bg-ink-700 text-white rounded-xl text-xs font-bold transition shadow-xs inline-flex items-center gap-1.5"
                   >
                     <Sparkles className="h-3.5 w-3.5" />
                     <span>Mulai Tes DISC 20 Soal Sekarang</span>
@@ -18272,13 +18144,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
             {/* Modules Evaluation Table */}
             <div className="space-y-2">
-              <h5 className="font-bold text-xs text-slate-900 uppercase tracking-wider">
+              <h5 className="font-bold text-xs text-slate-900 ">
                 Rincian Evaluasi Modul &amp; Kelulusan Kuis:
               </h5>
               <div className="border border-slate-200 rounded-xl overflow-hidden">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="bg-slate-100 text-slate-600 font-bold uppercase text-[10px]">
+                    <tr className="bg-slate-100 text-slate-600 font-medium text-xs">
                       <th className="p-2.5">Modul Pelatihan</th>
                       <th className="p-2.5 text-center">Skor Kuis</th>
                       <th className="p-2.5 text-center">Status</th>
@@ -18290,13 +18162,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       <tr key={idx} className="hover:bg-slate-50/80">
                         <td className="p-2.5">
                           <p className="font-bold text-slate-900">{m.moduleTitle}</p>
-                          <p className="text-[10px] text-slate-400 font-mono">{m.moduleCode} • Diselesaikan: {m.completedDate}</p>
+                          <p className="text-xs text-slate-400 font-mono">{m.moduleCode} • Diselesaikan: {m.completedDate}</p>
                         </td>
-                        <td className="p-2.5 text-center font-mono font-bold text-indigo-700">
+                        <td className="p-2.5 text-center font-mono font-bold text-slate-700">
                           {m.score} / 100
                         </td>
                         <td className="p-2.5 text-center">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                          <span className="text-xs font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
                             LULUS
                           </span>
                         </td>
@@ -18318,7 +18190,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               setIsReportCardModalOpen(false);
                               setIsCertificateModalOpen(true);
                             }}
-                            className="text-[10px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-2.5 py-1 rounded-md"
+                            className="text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-2.5 py-1 rounded-md"
                           >
                             Unduh Sertifikat
                           </button>
@@ -18332,7 +18204,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
             {/* Career Recommendation Box */}
             <div className="bg-amber-50/50 p-3.5 rounded-xl border border-amber-200 text-xs space-y-1">
-              <span className="font-bold text-amber-900 uppercase text-[10px] block">
+              <span className="font-bold text-amber-900 uppercase text-xs block">
                 Rekomendasi Karir &amp; Evaluasi Probation SDM:
               </span>
               <p className="text-slate-700 leading-relaxed">
@@ -18358,23 +18230,23 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {selectedArticleForReading && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+          <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] flex flex-col shadow-xl overflow-hidden border border-slate-200">
             {/* Modal Header */}
-            <div className="p-6 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white flex justify-between items-start">
+            <div className="p-6 bg-ink text-white flex justify-between items-start">
               <div className="space-y-2 max-w-2xl">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                  <span className="text-xs font-semibold  text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                     <Award className="h-3 w-3" />
                     {selectedArticleForReading.category}
                   </span>
-                  <span className="text-[10px] text-slate-300 bg-slate-800 px-2 py-0.5 rounded font-medium">
+                  <span className="text-xs text-slate-300 bg-slate-800 px-2 py-0.5 rounded font-medium">
                     ⏱️ {selectedArticleForReading.readTime}
                   </span>
-                  <span className="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded font-bold">
+                  <span className="text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded font-bold">
                     {selectedArticleForReading.targetQualification}
                   </span>
                 </div>
-                <h3 className="text-xl font-black text-white leading-snug">
+                <h3 className="text-xl font-semibold text-white leading-snug">
                   {selectedArticleForReading.title}
                 </h3>
                 <p className="text-xs text-slate-400">
@@ -18392,8 +18264,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             {/* Modal Body */}
             <div className="p-6 overflow-y-auto space-y-6 text-slate-700 text-xs sm:text-sm">
               {/* Executive Summary Box */}
-              <div className="bg-amber-50 rounded-2xl border border-amber-200 p-4 space-y-1.5">
-                <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 flex items-center gap-1">
+              <div className="bg-amber-50 rounded-lg border border-amber-200 p-4 space-y-1.5">
+                <span className="text-xs font-semibold  text-amber-900 flex items-center gap-1">
                   <Sparkles className="h-3.5 w-3.5 text-amber-600" />
                   Ringkasan Eksekutif Materi:
                 </span>
@@ -18403,20 +18275,20 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               </div>
 
               {/* Full Content */}
-              <div className="space-y-3 leading-relaxed whitespace-pre-line text-slate-800 bg-slate-50/50 p-4 rounded-2xl border border-slate-100 font-sans">
+              <div className="space-y-3 leading-relaxed whitespace-pre-line text-slate-800 bg-slate-50/50 p-4 rounded-lg border border-slate-100 font-sans">
                 {selectedArticleForReading.content}
               </div>
 
               {/* Key Takeaways */}
               {selectedArticleForReading.keyTakeaways && selectedArticleForReading.keyTakeaways.length > 0 && (
-                <div className="bg-indigo-50/60 rounded-2xl border border-indigo-100 p-4 space-y-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-indigo-900 block">
+                <div className="bg-slate-50/60 rounded-lg border border-slate-200 p-4 space-y-2">
+                  <span className="text-xs font-semibold  text-slate-900 block">
                     Poin Kunci &amp; Kaidah Lapangan yang Wajib Diingat:
                   </span>
                   <div className="space-y-1.5">
                     {selectedArticleForReading.keyTakeaways.map((point: string, idx: number) => (
-                      <div key={idx} className="flex items-start space-x-2 text-xs text-indigo-950">
-                        <CheckCircle2 className="h-4 w-4 text-indigo-600 shrink-0 mt-0.5" />
+                      <div key={idx} className="flex items-start space-x-2 text-xs text-slate-950">
+                        <CheckCircle2 className="h-4 w-4 text-slate-600 shrink-0 mt-0.5" />
                         <span>{point}</span>
                       </div>
                     ))}
@@ -18426,9 +18298,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* Tags */}
               <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
-                <span className="text-[10px] font-bold text-slate-400">Topik Terkait:</span>
+                <span className="text-xs font-medium text-slate-500">Topik Terkait:</span>
                 {selectedArticleForReading.tags?.map((tag: string, tIdx: number) => (
-                  <span key={tIdx} className="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
+                  <span key={tIdx} className="text-xs font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
                     #{tag}
                   </span>
                 ))}
@@ -18437,7 +18309,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
             {/* Modal Footer */}
             <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3">
-              <span className="text-[11px] text-slate-500 font-medium">
+              <span className="text-xs text-slate-500 font-medium">
                 Selesaikan kuis 10 butir soal evaluasi untuk merekam skor ke Rapor Karyawan.
               </span>
               <div className="flex items-center space-x-2 w-full sm:w-auto">
@@ -18459,7 +18331,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     setArticleQuizResultScore(null);
                     setIsArticleQuizModalOpen(true);
                   }}
-                  className="flex-1 sm:flex-none px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md"
+                  className="flex-1 sm:flex-none px-5 py-2 bg-brand-400 hover:bg-brand-300 text-slate-950 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-sm"
                 >
                   <Award className="h-4 w-4 text-slate-950" />
                   Mulai Kuis (10 Soal)
@@ -18475,14 +18347,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isArticleEditorOpen && editingArticleData && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[92vh] flex flex-col shadow-xl overflow-hidden border border-slate-200">
             {/* Header */}
-            <div className="p-5 bg-gradient-to-r from-slate-900 to-indigo-950 text-white flex justify-between items-center">
+            <div className="p-5 bg-ink text-white flex justify-between items-center">
               <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2.5 py-0.5 rounded-full">
+                <span className="text-xs font-semibold  text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2.5 py-0.5 rounded-full">
                   Editor Modul &amp; Artikel Kepemimpinan
                 </span>
-                <h3 className="text-lg font-black text-white mt-1">
+                <h3 className="text-lg font-semibold text-white mt-1">
                   {editingArticleData.id?.startsWith('ART-LEAD-') && !leadershipArticles.some(a => a.id === editingArticleData.id)
                     ? 'Buat Artikel Kepemimpinan Baru'
                     : `Edit Artikel: ${editingArticleData.title}`}
@@ -18594,18 +18466,18 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* 10-Question Generator & Quiz Editor Section */}
               <div className="pt-4 border-t border-slate-200 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-50 p-4 rounded-2xl border border-amber-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-50 p-4 rounded-lg border border-amber-200">
                   <div>
                     <div className="flex items-center space-x-2">
-                      <span className="font-black text-xs text-amber-900 uppercase tracking-wider flex items-center gap-1">
+                      <span className="font-semibold text-xs text-amber-900  flex items-center gap-1">
                         <Award className="h-4 w-4 text-amber-600" />
                         Evaluasi Kuis (Tepat 10 Butir Soal Skenario)
                       </span>
-                      <span className="text-[10px] font-black bg-amber-200 text-amber-950 px-2 py-0.5 rounded-full">
+                      <span className="text-xs font-semibold bg-amber-200 text-amber-950 px-2 py-0.5 rounded-full">
                         {editingArticleData.quizQuestions?.length || 0} / 10 Soal Terisi
                       </span>
                     </div>
-                    <p className="text-[11px] text-amber-800 mt-0.5">
+                    <p className="text-xs text-amber-800 mt-0.5">
                       Setiap soal berisi studi kasus situasi nyata di restoran dan 4 pilihan jawaban yang langsung menguji integritas kepemimpinan.
                     </p>
                   </div>
@@ -18617,29 +18489,29 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         ...editingArticleData,
                         quizQuestions: questions,
                       });
-                      showToast('✨ 10 Butir Soal Skenario Kepemimpinan Berhasil Di-generate Otomatis!');
+                      showToast('10 Butir Soal Skenario Kepemimpinan Berhasil Di-generate Otomatis!');
                     }}
-                    className="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1.5 shadow-xs shrink-0"
+                    className="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-xs shrink-0"
                   >
                     <Sparkles className="h-3.5 w-3.5" />
-                    <span>✨ Regenerate 10 Soal AI</span>
+                    <span>Buat ulang 10 soal</span>
                   </button>
                 </div>
 
                 {/* Question List Accordion */}
                 <div className="space-y-4">
                   {editingArticleData.quizQuestions?.map((q: any, qIdx: number) => (
-                    <div key={qIdx} className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                    <div key={qIdx} className="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="font-black text-xs text-indigo-900 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-lg">
+                        <span className="font-semibold text-xs text-slate-900 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg">
                           Soal #{qIdx + 1} dari 10
                         </span>
-                        <span className="text-[10px] text-slate-500 font-mono">Skenario Lapangan &amp; Solusi Manajerial</span>
+                        <span className="text-xs text-slate-500 font-mono">Skenario Lapangan &amp; Solusi Manajerial</span>
                       </div>
 
                       {/* Question Text */}
                       <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-slate-700">Pertanyaan Kasus:</label>
+                        <label className="text-xs font-bold text-slate-700">Pertanyaan Kasus:</label>
                         <textarea
                           rows={2}
                           value={q.question || ''}
@@ -18654,7 +18526,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                       {/* 4 Options */}
                       <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-slate-700">Pilihan Jawaban (A-D) &amp; Kunci Jawaban Benar:</label>
+                        <label className="text-xs font-bold text-slate-700">Pilihan Jawaban (A-D) &amp; Kunci Jawaban Benar:</label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           {q.options?.map((opt: string, optIdx: number) => {
                             const optLetter = ['A', 'B', 'C', 'D'][optIdx];
@@ -18673,7 +18545,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                     newQuestions[qIdx] = { ...newQuestions[qIdx], correctIndex: optIdx };
                                     setEditingArticleData({ ...editingArticleData, quizQuestions: newQuestions });
                                   }}
-                                  className={`w-6 h-6 rounded-lg text-xs font-black flex items-center justify-center shrink-0 mt-0.5 transition ${
+                                  className={`w-6 h-6 rounded-lg text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5 transition ${
                                     isCorrect ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                   }`}
                                   title={isCorrect ? 'Kunci Jawaban Benar' : 'Klik untuk jadikan jawaban benar'}
@@ -18701,7 +18573,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                       {/* Explanation */}
                       <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-emerald-800">Penjelasan &amp; Dasar Kepemimpinan (Feedback Hasil):</label>
+                        <label className="text-xs font-bold text-emerald-800">Penjelasan &amp; Dasar Kepemimpinan (Feedback Hasil):</label>
                         <input
                           type="text"
                           value={q.explanation || ''}
@@ -18758,7 +18630,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   setEditingArticleData(null);
                   showToast('Artikel Kepemimpinan & 10 Soal Evaluasi Berhasil Disimpan!');
                 }}
-                className="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5"
+                className="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-xs font-semibold transition shadow-sm flex items-center gap-1.5"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 Simpan Artikel &amp; 10 Soal
@@ -18773,12 +18645,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isDeleteArticleModalOpen && articleToDelete && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center">
+          <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4">
+            <div className="w-12 h-12 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center">
               <Trash2 className="h-6 w-6" />
             </div>
             <div className="space-y-1">
-              <h4 className="text-base font-black text-slate-900">
+              <h4 className="text-base font-semibold text-slate-900">
                 Hapus Artikel Kepemimpinan?
               </h4>
               <p className="text-xs text-slate-500 leading-relaxed">
@@ -18818,21 +18690,21 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isArticleQuizModalOpen && activeArticleForQuiz && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[92vh] flex flex-col shadow-xl overflow-hidden border border-slate-200">
             {/* Header */}
-            <div className="p-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex justify-between items-center">
+            <div className="p-5 bg-ink text-white flex justify-between items-center">
               <div className="space-y-1">
                 <div className="flex items-center space-x-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                  <span className="text-xs font-semibold  text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                     <Award className="h-3 w-3" />
                     Ujian Evaluasi Kepemimpinan
                   </span>
-                  <span className="text-[10px] text-slate-300 font-mono">10 Butir Soal • KKM 85%</span>
+                  <span className="text-xs text-slate-300 font-mono">10 Butir Soal • KKM 85%</span>
                 </div>
-                <h3 className="text-base font-black text-white">
+                <h3 className="text-base font-semibold text-white">
                   {activeArticleForQuiz.title}
                 </h3>
-                <p className="text-[11px] text-slate-400">
+                <p className="text-xs text-slate-400">
                   Peserta Ujian: <strong className="text-amber-300">{currentKruStaff.name}</strong> ({currentKruStaff.role}) • {currentKruStaff.outlet}
                 </p>
               </div>
@@ -18863,16 +18735,16 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   {/* Progress Bar & Indicators */}
                   <div className="space-y-2">
                     <div className="flex justify-between items-center text-xs">
-                      <span className="font-extrabold text-slate-900">
+                      <span className="font-semibold text-slate-900">
                         Soal {articleQuizActiveQuestionIdx + 1} dari {activeArticleForQuiz.quizQuestions.length}
                       </span>
-                      <span className="text-[11px] font-mono text-slate-500">
+                      <span className="text-xs font-mono text-slate-500">
                         Dijawab: {Object.keys(articleQuizUserAnswers).length} / {activeArticleForQuiz.quizQuestions.length}
                       </span>
                     </div>
                     <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                       <div
-                        className="bg-gradient-to-r from-amber-500 to-amber-600 h-2 transition-all duration-300"
+                        className="bg-brand-400 h-2 transition-all duration-300"
                         style={{
                           width: `${((articleQuizActiveQuestionIdx + 1) / activeArticleForQuiz.quizQuestions.length) * 100}%`,
                         }}
@@ -18894,7 +18766,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             isActive
                               ? 'bg-slate-900 text-amber-400 ring-2 ring-amber-400'
                               : isAnswered
-                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 font-extrabold'
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold'
                               : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                           }`}
                         >
@@ -18905,12 +18777,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   {/* Active Question Scenario Box */}
-                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                  <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-2">
                     <div className="flex items-center space-x-2">
-                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 bg-amber-100 px-2 py-0.5 rounded">
+                      <span className="text-xs font-semibold  text-amber-800 bg-amber-100 px-2 py-0.5 rounded">
                         Studi Kasus Skenario
                       </span>
-                      <span className="text-[10px] text-slate-400 font-mono">Taraf Kesulitan: Managerial</span>
+                      <span className="text-xs text-slate-400 font-mono">Taraf Kesulitan: Managerial</span>
                     </div>
                     <p className="text-xs sm:text-sm font-bold text-slate-900 leading-relaxed">
                       {activeArticleForQuiz.quizQuestions[articleQuizActiveQuestionIdx]?.question}
@@ -18932,14 +18804,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               [articleQuizActiveQuestionIdx]: optIdx,
                             });
                           }}
-                          className={`w-full p-3.5 rounded-2xl border text-left text-xs transition-all flex items-start gap-3 ${
+                          className={`w-full p-3.5 rounded-lg border text-left text-xs transition-all flex items-start gap-3 ${
                             isSelected
                               ? 'bg-amber-500/10 border-amber-500 text-slate-900 shadow-xs'
                               : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300'
                           }`}
                         >
                           <div
-                            className={`w-6 h-6 rounded-lg font-black text-xs flex items-center justify-center shrink-0 mt-0.5 transition ${
+                            className={`w-6 h-6 rounded-lg font-semibold text-xs flex items-center justify-center shrink-0 mt-0.5 transition ${
                               isSelected ? 'bg-amber-500 text-slate-950 shadow-xs' : 'bg-slate-100 text-slate-600'
                             }`}
                           >
@@ -18958,29 +18830,29 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <div className="space-y-6">
                   {/* Score Hero Card */}
                   <div
-                    className={`p-6 rounded-3xl border text-center space-y-3 ${
+                    className={`p-6 rounded-lg border text-center space-y-3 ${
                       articleQuizResultScore >= 85
-                        ? 'bg-gradient-to-b from-emerald-500/10 to-teal-500/5 border-emerald-300'
-                        : 'bg-gradient-to-b from-rose-500/10 to-amber-500/5 border-rose-300'
+                        ? 'bg-emerald-50 border-emerald-300'
+                        : 'bg-rose-50 border-rose-300'
                     }`}
                   >
-                    <div className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl shadow-sm bg-white border border-slate-100">
+                    <div className="w-16 h-16 rounded-lg mx-auto flex items-center justify-center text-3xl shadow-sm bg-white border border-slate-100">
                       {articleQuizResultScore >= 85 ? '🏆' : '📚'}
                     </div>
                     <div>
-                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                      <span className="text-xs font-bold text-slate-500  block">
                         Skor Akhir Evaluasi Kepemimpinan:
                       </span>
                       <h2
-                        className={`text-4xl font-black mt-1 ${
+                        className={`text-4xl font-semibold mt-1 ${
                           articleQuizResultScore >= 85 ? 'text-emerald-700' : 'text-rose-600'
                         }`}
                       >
-                        {articleQuizResultScore} <span className="text-xl text-slate-400 font-normal">/ 100</span>
+                        {articleQuizResultScore} <span className="text-xl text-slate-500 font-normal">/ 100</span>
                       </h2>
                     </div>
 
-                    <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-black">
+                    <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold">
                       {articleQuizResultScore >= 85 ? (
                         <span className="bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1 rounded-full flex items-center gap-1.5">
                           <CheckCircle2 className="h-4 w-4 text-emerald-600" />
@@ -18995,12 +18867,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     </div>
 
                     {/* Auto-sync to report card message */}
-                    <div className="bg-white/80 p-3 rounded-2xl border border-slate-200/80 text-xs text-slate-700 space-y-1 mt-2">
+                    <div className="bg-white/80 p-3 rounded-lg border border-slate-200/80 text-xs text-slate-700 space-y-1 mt-2">
                       <p className="font-bold text-slate-900 flex items-center justify-center gap-1.5">
                         <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                         Otomatis Tersinkronisasi ke Rapor Karyawan ({currentKruStaff.name})
                       </p>
-                      <p className="text-[11px] text-slate-500">
+                      <p className="text-xs text-slate-500">
                         Hasil ujian 10 butir soal ini telah dicatat dalam dossier evaluasi promosi internal SDM &amp; perhitungan IPK karyawan.
                       </p>
                     </div>
@@ -19008,7 +18880,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                   {/* Review of all 10 Questions */}
                   <div className="space-y-3">
-                    <h5 className="font-extrabold text-xs text-slate-900 uppercase tracking-wider">
+                    <h5 className="font-semibold text-xs text-slate-900 ">
                       Ulasan &amp; Pembahasan 10 Soal Kepemimpinan:
                     </h5>
                     <div className="space-y-3">
@@ -19018,16 +18890,16 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         return (
                           <div
                             key={idx}
-                            className={`p-3.5 rounded-2xl border text-xs space-y-2 ${
+                            className={`p-3.5 rounded-lg border text-xs space-y-2 ${
                               isCorrect ? 'bg-emerald-50/40 border-emerald-200' : 'bg-rose-50/40 border-rose-200'
                             }`}
                           >
                             <div className="flex items-center justify-between">
-                              <span className="font-black text-[11px] text-slate-700">
+                              <span className="font-semibold text-xs text-slate-700">
                                 Soal #{idx + 1}
                               </span>
                               <span
-                                className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                                className={`text-xs font-bold px-2 py-0.5 rounded ${
                                   isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
                                 }`}
                               >
@@ -19035,7 +18907,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               </span>
                             </div>
                             <p className="font-bold text-slate-900">{q.question}</p>
-                            <div className="space-y-1 text-[11px]">
+                            <div className="space-y-1 text-xs">
                               <p className="text-slate-600">
                                 Jawaban Anda:{' '}
                                 <strong className={isCorrect ? 'text-emerald-700' : 'text-rose-600'}>
@@ -19048,7 +18920,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                                 </p>
                               )}
                               <p className="text-slate-500 italic bg-white/80 p-2 rounded-xl border border-slate-100">
-                                💡 {q.explanation}
+                                {q.explanation}
                               </p>
                             </div>
                           </div>
@@ -19174,7 +19046,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                         showToast(`Kuis Selesai! Skor ${finalScore}/100 berhasil disimpan ke Rapor Karyawan!`);
                       }}
-                      className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-md"
+                      className="w-full sm:w-auto px-5 py-2.5 bg-brand-400 hover:bg-brand-300 text-slate-950 font-semibold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm"
                     >
                       <CheckCircle2 className="h-4 w-4" />
                       Kumpulkan &amp; Nilai Ujian
@@ -19216,7 +19088,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           setIsArticleQuizModalOpen(false);
                           setIsCertificateModalOpen(true);
                         }}
-                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-xs font-black transition flex items-center gap-1.5 shadow-sm"
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm"
                       >
                         <Award className="h-4 w-4" />
                         Unduh Sertifikat Kelulusan
@@ -19235,7 +19107,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           setIsArticleQuizModalOpen(false);
                         }
                       }}
-                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition"
+                      className="px-4 py-2 bg-ink-800 hover:bg-ink-700 text-white rounded-xl text-xs font-bold transition"
                     >
                       Buka Rapor Karyawan
                     </button>
@@ -19263,17 +19135,17 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isDiscTestModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm duration-200">
-          <div className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden max-h-[92vh] flex flex-col">
+          <div className="bg-white w-full max-w-3xl rounded-lg shadow-xl border border-slate-200 overflow-hidden max-h-[92vh] flex flex-col">
             {/* Header Modal */}
-            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-purple-50 via-indigo-50 to-white">
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center shadow-md shadow-purple-500/20">
+                <div className="w-10 h-10 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center">
                   <BrainCircuit className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-black text-slate-900 text-sm sm:text-base flex items-center gap-2">
+                  <h3 className="font-semibold text-slate-900 text-sm sm:text-base flex items-center gap-2">
                     <span>Asesmen Kepribadian DISC Restoran</span>
-                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-200">
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-800 border border-slate-200">
                       20 Soal Situasional
                     </span>
                   </h3>
@@ -19306,13 +19178,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   {/* Progress Header & Number Pager */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-extrabold text-purple-700 uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="font-semibold text-slate-700  flex items-center gap-1.5">
                         <Sparkles className="h-3.5 w-3.5" />
                         Soal #{discActiveQuestionIdx + 1} dari 20
                       </span>
                       <span className="text-slate-500 font-semibold">
                         Terjawab:{' '}
-                        <span className="font-black text-purple-600">
+                        <span className="font-semibold text-slate-600">
                           {Object.keys(discUserAnswers).length}
                         </span>{' '}
                         / 20 Butir
@@ -19322,7 +19194,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     {/* Progress Bar */}
                     <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                       <div
-                        className="bg-gradient-to-r from-purple-600 to-indigo-600 h-full transition-all duration-300 rounded-full"
+                        className="bg-emerald-600 h-full transition-all duration-300 rounded-full"
                         style={{
                           width: `${((Object.keys(discUserAnswers).length) / 20) * 100}%`,
                         }}
@@ -19339,11 +19211,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                             key={idx}
                             type="button"
                             onClick={() => setDiscActiveQuestionIdx(idx)}
-                            className={`w-7 h-7 rounded-lg text-[11px] font-black transition-all flex items-center justify-center ${
+                            className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all flex items-center justify-center ${
                               isCurrent
-                                ? 'bg-purple-600 text-white shadow-sm ring-2 ring-purple-300'
+                                ? 'bg-ink-800 text-white'
                                 : isAnswered
-                                ? 'bg-purple-100 text-purple-800 border border-purple-200 hover:bg-purple-200'
+                                ? 'bg-slate-100 text-slate-800 border border-slate-200 hover:bg-slate-200'
                                 : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                             }`}
                           >
@@ -19355,12 +19227,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   {/* Skenario Soal Situasional Restoran */}
-                  <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-50 to-purple-50/30 border border-slate-200/80 space-y-2">
+                  <div className="p-5 rounded-lg bg-slate-50 border border-slate-200/80 space-y-2">
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded-md bg-purple-600 text-white font-black text-[10px] uppercase tracking-wider">
+                      <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-medium text-xs">
                         Skenario Lapangan #{discQuestionsDataset[discActiveQuestionIdx]?.id}
                       </span>
-                      <span className="text-[11px] text-slate-400 font-medium">
+                      <span className="text-xs text-slate-400 font-medium">
                         Pilih satu tindakan yang paling mencerminkan respon spontan Anda:
                       </span>
                     </div>
@@ -19384,16 +19256,16 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               [discActiveQuestionIdx]: opt.trait,
                             });
                           }}
-                          className={`w-full p-4 rounded-2xl border text-left text-xs sm:text-sm transition-all flex items-start gap-3.5 ${
+                          className={`w-full p-4 rounded-lg border text-left text-xs sm:text-sm transition-all flex items-start gap-3.5 ${
                             isSelected
-                              ? 'bg-purple-50/80 border-purple-500 text-slate-900 shadow-sm ring-1 ring-purple-400'
+                              ? 'bg-slate-50/80 border-slate-500 text-slate-900 shadow-sm ring-1 ring-brand-500'
                               : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300'
                           }`}
                         >
                           <div
-                            className={`w-7 h-7 rounded-xl font-black text-xs flex items-center justify-center shrink-0 mt-0.5 transition ${
+                            className={`w-7 h-7 rounded-xl font-semibold text-xs flex items-center justify-center shrink-0 mt-0.5 transition ${
                               isSelected
-                                ? 'bg-purple-600 text-white shadow-xs'
+                                ? 'bg-ink-800 text-white'
                                 : 'bg-slate-100 text-slate-600'
                             }`}
                           >
@@ -19404,7 +19276,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                               {opt.text}
                             </span>
                             {isSelected && (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">
+                              <span className="inline-flex items-center gap-1 text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-full">
                                 <CheckCircle2 className="h-3 w-3" />
                                 Terpilih: Orientasi {opt.trait}
                               </span>
@@ -19432,7 +19304,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         <button
                           type="button"
                           onClick={() => setDiscActiveQuestionIdx((prev) => Math.min(19, prev + 1))}
-                          className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-black transition flex items-center gap-1.5 shadow-sm"
+                          className="px-5 py-2 bg-ink-800 hover:bg-ink-700 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm"
                         >
                           Berikutnya
                           <ChevronRight className="h-4 w-4" />
@@ -19500,7 +19372,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                             showToast(`Tes DISC selesai! Profil ${result.profileCode} & rekomendasi karir tersimpan ke rapor.`);
                           }}
-                          className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl text-xs font-black transition flex items-center gap-2 shadow-md"
+                          className="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-semibold transition flex items-center gap-2 shadow-sm"
                         >
                           <Sparkles className="h-4 w-4" />
                           Selesai &amp; Analisis Karakter DISC
@@ -19513,32 +19385,32 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 /* RESULT & CAREER ROADMAP INTEGRATION SCREEN */
                 <div className="space-y-6">
                   {/* Hero Profil Result Card */}
-                  <div className="p-6 rounded-3xl bg-gradient-to-br from-purple-900 via-indigo-900 to-slate-900 text-white space-y-4 shadow-xl relative overflow-hidden">
+                  <div className="p-6 rounded-lg bg-ink text-white space-y-4 shadow-xl relative overflow-hidden">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="flex items-center gap-3.5">
-                        <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center font-black text-2xl text-purple-200">
+                        <div className="w-16 h-16 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center font-semibold text-2xl text-slate-200">
                           {discTestResult.profileCode}
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-purple-400/20 text-purple-300 border border-purple-400/30 uppercase tracking-wider">
+                            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-400/20 text-slate-300 border border-slate-400/30 ">
                               Hasil Asesmen 20 Soal
                             </span>
-                            <span className="text-xs text-purple-200">
+                            <span className="text-xs text-slate-200">
                               Dominan: <strong>{discTestResult.primaryTrait}</strong> (Sekunder: {discTestResult.secondaryTrait})
                             </span>
                           </div>
-                          <h2 className="text-xl sm:text-2xl font-black text-white mt-1">
+                          <h2 className="text-xl sm:text-2xl font-semibold text-white mt-1">
                             {discTestResult.profileTitle}
                           </h2>
-                          <p className="text-xs text-purple-200/80">
+                          <p className="text-xs text-slate-200/80">
                             Peserta: {discSelectedStaffForTest?.name || currentKruStaff.name} ({discSelectedStaffForTest?.role || currentKruStaff.role})
                           </p>
                         </div>
                       </div>
 
                       <div className="text-right">
-                        <span className="text-[10px] text-purple-300 font-bold uppercase tracking-wider block">
+                        <span className="text-xs text-slate-300 font-bold  block">
                           Tanggal Uji:
                         </span>
                         <span className="text-xs font-bold text-white">
@@ -19547,67 +19419,67 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       </div>
                     </div>
 
-                    <p className="text-xs text-purple-100/90 leading-relaxed bg-white/5 p-3.5 rounded-2xl border border-white/10">
+                    <p className="text-xs text-slate-100/90 leading-relaxed bg-white/5 p-3.5 rounded-lg border border-white/10">
                       "{discTestResult.summary}"
                     </p>
 
                     {/* 4 Kuadran Bar Persentase */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                      <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20">
+                      <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20">
                         <div className="flex items-center justify-between text-xs mb-1">
-                          <span className="font-extrabold text-rose-300">Dominance (D)</span>
-                          <span className="font-black text-rose-200">{discTestResult.percentages.D}%</span>
+                          <span className="font-semibold text-rose-300">Dominance (D)</span>
+                          <span className="font-semibold text-rose-200">{discTestResult.percentages.D}%</span>
                         </div>
                         <div className="w-full bg-rose-950/40 h-2 rounded-full overflow-hidden">
                           <div className="bg-rose-500 h-full rounded-full" style={{ width: `${discTestResult.percentages.D}%` }} />
                         </div>
-                        <span className="text-[10px] text-rose-300/80 mt-1 block font-medium">
+                        <span className="text-xs text-rose-300/80 mt-1 block font-medium">
                           {discTestResult.scores.D} dari 20 Soal
                         </span>
                       </div>
 
-                      <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+                      <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
                         <div className="flex items-center justify-between text-xs mb-1">
-                          <span className="font-extrabold text-amber-300">Influence (I)</span>
-                          <span className="font-black text-amber-200">{discTestResult.percentages.I}%</span>
+                          <span className="font-semibold text-amber-300">Influence (I)</span>
+                          <span className="font-semibold text-amber-200">{discTestResult.percentages.I}%</span>
                         </div>
                         <div className="w-full bg-amber-950/40 h-2 rounded-full overflow-hidden">
                           <div className="bg-amber-500 h-full rounded-full" style={{ width: `${discTestResult.percentages.I}%` }} />
                         </div>
-                        <span className="text-[10px] text-amber-300/80 mt-1 block font-medium">
+                        <span className="text-xs text-amber-300/80 mt-1 block font-medium">
                           {discTestResult.scores.I} dari 20 Soal
                         </span>
                       </div>
 
-                      <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                      <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
                         <div className="flex items-center justify-between text-xs mb-1">
-                          <span className="font-extrabold text-emerald-300">Steadiness (S)</span>
-                          <span className="font-black text-emerald-200">{discTestResult.percentages.S}%</span>
+                          <span className="font-semibold text-emerald-300">Steadiness (S)</span>
+                          <span className="font-semibold text-emerald-200">{discTestResult.percentages.S}%</span>
                         </div>
                         <div className="w-full bg-emerald-950/40 h-2 rounded-full overflow-hidden">
                           <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${discTestResult.percentages.S}%` }} />
                         </div>
-                        <span className="text-[10px] text-emerald-300/80 mt-1 block font-medium">
+                        <span className="text-xs text-emerald-300/80 mt-1 block font-medium">
                           {discTestResult.scores.S} dari 20 Soal
                         </span>
                       </div>
 
-                      <div className="p-3 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
+                      <div className="p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
                         <div className="flex items-center justify-between text-xs mb-1">
-                          <span className="font-extrabold text-indigo-300">Conscientiousness (C)</span>
-                          <span className="font-black text-indigo-200">{discTestResult.percentages.C}%</span>
+                          <span className="font-semibold text-slate-300">Conscientiousness (C)</span>
+                          <span className="font-semibold text-indigo-200">{discTestResult.percentages.C}%</span>
                         </div>
-                        <div className="w-full bg-indigo-950/40 h-2 rounded-full overflow-hidden">
+                        <div className="w-full bg-ink-800/40 h-2 rounded-full overflow-hidden">
                           <div className="bg-indigo-500 h-full rounded-full" style={{ width: `${discTestResult.percentages.C}%` }} />
                         </div>
-                        <span className="text-[10px] text-indigo-300/80 mt-1 block font-medium">
+                        <span className="text-xs text-slate-300/80 mt-1 block font-medium">
                           {discTestResult.scores.C} dari 20 Soal
                         </span>
                       </div>
                     </div>
 
                     {/* Visualisasi Grafik Radar & Donut Chart DISC */}
-                    <div className="bg-white/5 p-4 rounded-2xl border border-white/10 flex flex-col md:flex-row items-center justify-around gap-6">
+                    <div className="bg-white/5 p-4 rounded-lg border border-white/10 flex flex-col md:flex-row items-center justify-around gap-6">
                       <div className="flex-1 flex justify-center w-full">
                         <DiscChartVisualizer
                           percentages={discTestResult.percentages}
@@ -19623,20 +19495,20 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   {/* Rekomendasi Karir & Penempatan Sesuai Hirarki Baru */}
-                  <div className="p-5 rounded-2xl bg-purple-50/70 border border-purple-200 space-y-3">
+                  <div className="p-5 rounded-lg bg-slate-50/70 border border-slate-200 space-y-3">
                     <div className="flex items-center gap-2">
-                      <span className="p-1.5 rounded-lg bg-purple-600 text-white">
+                      <span className="p-1.5 rounded-lg bg-slate-100 text-slate-700">
                         <TrendingUp className="h-4 w-4" />
                       </span>
-                      <h4 className="font-black text-purple-900 text-xs sm:text-sm uppercase tracking-wider">
+                      <h4 className="font-semibold text-slate-900 text-xs sm:text-sm ">
                         Rekomendasi Jalur Karir &amp; Hirarki Kepemimpinan Resto
                       </h4>
                     </div>
-                    <div className="p-3.5 rounded-xl bg-white border border-purple-100 space-y-1.5">
-                      <p className="text-xs font-black text-slate-900">
+                    <div className="p-3.5 rounded-xl bg-white border border-slate-200 space-y-1.5">
+                      <p className="text-xs font-semibold text-slate-900">
                         {discTestResult.careerRecommendation}
                       </p>
-                      <p className="text-[11px] text-slate-500 leading-relaxed">
+                      <p className="text-xs text-slate-500 leading-relaxed">
                         Struktur Hirarki Pengawasan Operasional: <strong>Supervisor Operasional Area</strong> (Tertinggi) ➔ <strong>Asisten Supervisor</strong> (Field &amp; Audit) ➔ <strong>Kepala Cabang</strong> (Branch Resto Manager) ➔ <strong>Supervisor Stasiun (BOH/FOH)</strong>.
                       </p>
                     </div>
@@ -19644,8 +19516,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                   {/* Kekuatan & Area Pengembangan */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 rounded-2xl border border-emerald-200 bg-emerald-50/50 space-y-2.5">
-                      <h5 className="font-extrabold text-xs text-emerald-900 flex items-center gap-1.5">
+                    <div className="p-4 rounded-lg border border-emerald-200 bg-emerald-50/50 space-y-2.5">
+                      <h5 className="font-semibold text-xs text-emerald-900 flex items-center gap-1.5">
                         <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                         Kekuatan Utama di Lapangan (Superpower):
                       </h5>
@@ -19659,8 +19531,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       </ul>
                     </div>
 
-                    <div className="p-4 rounded-2xl border border-amber-200 bg-amber-50/50 space-y-2.5">
-                      <h5 className="font-extrabold text-xs text-amber-900 flex items-center gap-1.5">
+                    <div className="p-4 rounded-lg border border-amber-200 bg-amber-50/50 space-y-2.5">
+                      <h5 className="font-semibold text-xs text-amber-900 flex items-center gap-1.5">
                         <AlertTriangle className="h-4 w-4 text-amber-600" />
                         Area Pengembangan Diri (Blindspot):
                       </h5>
@@ -19676,11 +19548,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   </div>
 
                   {/* Sinkronisasi Rapor Badge */}
-                  <div className="p-3.5 rounded-2xl bg-emerald-100/60 border border-emerald-300 text-xs text-emerald-900 flex items-center gap-3">
+                  <div className="p-3.5 rounded-lg bg-emerald-100/60 border border-emerald-300 text-xs text-emerald-900 flex items-center gap-3">
                     <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
                     <div>
-                      <span className="font-black">Otomatis Tersinkronisasi ke Rapor Karyawan!</span>
-                      <p className="text-[11px] text-emerald-800">
+                      <span className="font-semibold">Otomatis Tersinkronisasi ke Rapor Karyawan!</span>
+                      <p className="text-xs text-emerald-800">
                         Hasil profil DISC ({discTestResult.profileCode}) dan rekomendasi hirarki telah disimpan ke profil staf {discSelectedStaffForTest?.name || currentKruStaff.name} untuk dossier promosi kepemimpinan.
                       </p>
                     </div>
@@ -19725,7 +19597,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         setIsDiscTestModalOpen(false);
                       }
                     }}
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                    className="px-4 py-2 bg-ink-800 hover:bg-ink-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
                   >
                     <FileText className="h-4 w-4" />
                     Buka di Rapor Karyawan
@@ -19753,13 +19625,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isDocViewModalOpen && selectedDocForView && (
         <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-3xl w-full shadow-2xl border border-slate-200 overflow-hidden my-8">
+          <div className="bg-white rounded-lg max-w-3xl w-full shadow-xl border border-slate-200 overflow-hidden my-8">
             {/* Modal Control Bar (Non-Printable Header) */}
             <div className="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
               <div className="flex items-center space-x-2">
-                <FileSignature className="h-5 w-5 text-blue-400" />
-                <span className="font-extrabold text-xs uppercase tracking-wide">
-                  Pratinjau Dokumen Hukum Resmi — {selectedDocForView.docNumber}
+                <FileSignature className="h-5 w-5 text-sky-400" />
+                <span className="font-semibold text-xs ">
+                  Pratinjau Dokumen Hukum Resmi:{selectedDocForView.docNumber}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
@@ -19778,7 +19650,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5"
+                  className="px-3 py-1.5 bg-ink-800 hover:bg-ink-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5"
                 >
                   <Printer className="h-3.5 w-3.5" />
                   Cetak PDF
@@ -19806,7 +19678,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* Title & Number */}
               <div className="text-center space-y-1">
-                <h3 className="text-sm font-extrabold uppercase tracking-tight text-slate-900 underline underline-offset-4">
+                <h3 className="text-sm font-semibold uppercase tracking-tight text-slate-900 underline underline-offset-4">
                   {selectedDocForView.docCategory === 'SK'
                     ? 'SURAT KEPUTUSAN DIREKSI'
                     : selectedDocForView.docCategory === 'PKWT'
@@ -19826,7 +19698,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Considerations (Menimbang & Mengingat) */}
               {selectedDocForView.considerations && selectedDocForView.considerations.length > 0 && (
                 <div className="text-xs space-y-2 border-y border-slate-100 py-3">
-                  <div className="font-bold text-slate-900 uppercase text-[11px]">MENIMBANG &amp; MENGINGAT:</div>
+                  <div className="font-bold text-slate-900 uppercase text-xs">MENIMBANG &amp; MENGINGAT:</div>
                   <ul className="list-disc list-inside space-y-1 text-slate-600">
                     {selectedDocForView.considerations.map((item, idx) => (
                       <li key={idx}>{item}</li>
@@ -19846,7 +19718,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     </div>
                     <div className="grid grid-cols-3">
                       <span className="text-slate-500 font-semibold">Sasaran / Penerima</span>
-                      <span className="col-span-2 font-bold text-blue-700">: {selectedDocForView.staffName}</span>
+                      <span className="col-span-2 font-bold text-sky-700">: {selectedDocForView.staffName}</span>
                     </div>
                     <div className="grid grid-cols-3">
                       <span className="text-slate-500 font-semibold">Wilayah Penempatan / Cabang</span>
@@ -19882,7 +19754,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     </div>
                     <div className="grid grid-cols-3">
                       <span className="text-slate-500 font-semibold">Jabatan / Station</span>
-                      <span className="col-span-2 font-bold text-blue-700">
+                      <span className="col-span-2 font-bold text-sky-700">
                         : {selectedDocForView.newRole || selectedDocForView.staffRole}
                       </span>
                     </div>
@@ -19912,7 +19784,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Decisions / Decisions List */}
               {selectedDocForView.decisions && selectedDocForView.decisions.length > 0 && (
                 <div className="text-xs space-y-2">
-                  <div className="font-bold text-slate-900 uppercase text-[11px]">MEMUTUSKAN:</div>
+                  <div className="font-bold text-slate-900 uppercase text-xs">MEMUTUSKAN:</div>
                   <ol className="list-decimal list-inside space-y-1.5 text-slate-700 leading-relaxed">
                     {selectedDocForView.decisions.map((dec, idx) => (
                       <li key={idx}>{dec}</li>
@@ -19924,7 +19796,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               {/* Content Body / Special Clauses */}
               {selectedDocForView.contentBody && (
                 <div className="text-xs space-y-1 leading-relaxed text-slate-700">
-                  <div className="font-bold text-slate-900 uppercase text-[11px]">KETENTUAN KHUSUS &amp; KERAHASIAAN:</div>
+                  <div className="font-bold text-slate-900 uppercase text-xs">KETENTUAN KHUSUS &amp; KERAHASIAAN:</div>
                   <p className="bg-amber-50/50 p-3 rounded-xl border border-amber-200/80 text-slate-800">
                     {selectedDocForView.contentBody}
                   </p>
@@ -19938,13 +19810,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     <p className="font-semibold text-slate-600">Pihak Penerima (Pimpinan Cabang),</p>
                     <div>
                       <p className="font-bold text-slate-900 underline">Kepala Cabang &amp; SPV Resto</p>
-                      <p className="text-[10px] text-slate-500">{selectedDocForView.outlet}</p>
+                      <p className="text-xs text-slate-500">{selectedDocForView.outlet}</p>
                     </div>
                   </div>
                   <div className="space-y-12 relative">
                     <p className="font-semibold text-slate-600">Ditetapkan Oleh (Direksi),</p>
                     <div className="absolute top-4 left-1/2 -translate-x-1/2 opacity-75 pointer-events-none">
-                      <div className="border-2 border-dashed border-rose-600 rounded-full w-20 h-20 flex flex-col items-center justify-center text-rose-600 text-[8px] font-black rotate-[-12deg]">
+                      <div className="border-2 border-dashed border-rose-600 rounded-full w-20 h-20 flex flex-col items-center justify-center text-rose-600 text-[8px] font-semibold rotate-[-12deg]">
                         <span>PT BKN</span>
                         <span>SAH RESMI</span>
                         <span>JAKARTA</span>
@@ -19952,7 +19824,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     </div>
                     <div>
                       <p className="font-bold text-slate-900 underline">{selectedDocForView.signatoryName}</p>
-                      <p className="text-[10px] text-slate-500">{selectedDocForView.signatoryRole}</p>
+                      <p className="text-xs text-slate-500">{selectedDocForView.signatoryRole}</p>
                     </div>
                   </div>
                 </div>
@@ -19964,13 +19836,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       <p className="font-bold text-slate-900 underline">
                         {selectedDocForView.employeeName || selectedDocForView.staffName}
                       </p>
-                      <p className="text-[10px] text-slate-500">Karyawan Penerima Keputusan</p>
+                      <p className="text-xs text-slate-500">Karyawan Penerima Keputusan</p>
                     </div>
                   </div>
                   <div className="space-y-12 relative">
                     <p className="font-semibold text-slate-600">Pihak Pertama (Direksi),</p>
                     <div className="absolute top-4 left-1/2 -translate-x-1/2 opacity-75 pointer-events-none">
-                      <div className="border-2 border-dashed border-rose-600 rounded-full w-20 h-20 flex flex-col items-center justify-center text-rose-600 text-[8px] font-black rotate-[-12deg]">
+                      <div className="border-2 border-dashed border-rose-600 rounded-full w-20 h-20 flex flex-col items-center justify-center text-rose-600 text-[8px] font-semibold rotate-[-12deg]">
                         <span>PT BKN</span>
                         <span>SAH RESMI</span>
                         <span>JAKARTA</span>
@@ -19978,7 +19850,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     </div>
                     <div>
                       <p className="font-bold text-slate-900 underline">{selectedDocForView.signatoryName}</p>
-                      <p className="text-[10px] text-slate-500">{selectedDocForView.signatoryRole}</p>
+                      <p className="text-xs text-slate-500">{selectedDocForView.signatoryRole}</p>
                     </div>
                   </div>
                 </div>
@@ -19987,7 +19859,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
             {/* Modal Footer */}
             <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-[11px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 Arsip Terdaftar Legalitas Restoran Barokah Grup
               </span>
               <button
@@ -20007,12 +19879,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isDocEditorModalOpen && editingDocData && (
         <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden my-8">
+          <div className="bg-white rounded-lg max-w-2xl w-full shadow-xl border border-slate-200 overflow-hidden my-8">
             <div className="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
               <div className="flex items-center space-x-2">
                 <Edit2 className="h-4 w-4 text-amber-400" />
-                <span className="font-bold text-xs uppercase tracking-wide">
-                  Edit Dokumen Surat — {editingDocData.docNumber}
+                <span className="font-bold text-xs ">
+                  Edit Dokumen Surat:{editingDocData.docNumber}
                 </span>
               </div>
               <button
@@ -20031,7 +19903,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   type="text"
                   value={editingDocData.title}
                   onChange={(e) => setEditingDocData({ ...editingDocData, title: e.target.value })}
-                  className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:outline-none"
                 />
               </div>
 
@@ -20042,7 +19914,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     type="text"
                     value={editingDocData.docNumber}
                     onChange={(e) => setEditingDocData({ ...editingDocData, docNumber: e.target.value })}
-                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-mono focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -20057,7 +19929,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         staffName: e.target.value,
                       })
                     }
-                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -20075,7 +19947,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         staffRole: e.target.value,
                       })
                     }
-                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -20090,7 +19962,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         outlet: e.target.value,
                       })
                     }
-                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -20108,7 +19980,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         salaryAgreement: Number(e.target.value),
                       })
                     }
-                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -20117,7 +19989,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     type="text"
                     value={editingDocData.effectiveDate}
                     onChange={(e) => setEditingDocData({ ...editingDocData, effectiveDate: e.target.value })}
-                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -20129,7 +20001,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     type="text"
                     value={editingDocData.expiredDate || ''}
                     onChange={(e) => setEditingDocData({ ...editingDocData, expiredDate: e.target.value })}
-                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               )}
@@ -20141,7 +20013,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     type="text"
                     value={editingDocData.signatoryName}
                     onChange={(e) => setEditingDocData({ ...editingDocData, signatoryName: e.target.value })}
-                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -20150,7 +20022,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     type="text"
                     value={editingDocData.signatoryRole}
                     onChange={(e) => setEditingDocData({ ...editingDocData, signatoryRole: e.target.value })}
-                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -20163,7 +20035,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   rows={4}
                   value={editingDocData.contentBody || ''}
                   onChange={(e) => setEditingDocData({ ...editingDocData, contentBody: e.target.value })}
-                  className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -20187,7 +20059,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   setIsDocViewModalOpen(true);
                   showToast(`Perubahan pada dokumen ${editingDocData.docNumber} berhasil disimpan!`);
                 }}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                className="px-4 py-2 bg-ink-800 hover:bg-ink-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 Simpan &amp; Lihat Hasil
@@ -20201,18 +20073,18 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isAiClauseModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden my-8">
+          <div className="bg-white rounded-lg max-w-2xl w-full shadow-xl border border-slate-200 overflow-hidden my-8">
             {/* Modal Header */}
-            <div className="p-5 bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white flex items-center justify-between border-b border-indigo-950">
+            <div className="p-5 bg-ink text-white flex items-center justify-between border-b border-slate-950">
               <div className="flex items-center space-x-2.5">
-                <div className="p-2 bg-purple-500/20 text-purple-300 rounded-xl border border-purple-500/30">
+                <div className="p-2 bg-white/10 text-slate-200 rounded-lg border border-white/15">
                   <Sparkles className="h-5 w-5 text-amber-300" />
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-sm tracking-wide">
-                    AI Smart Clause Generator F&amp;B
+                  <h4 className="font-semibold text-sm tracking-wide">
+                    Template klausul F&amp;B
                   </h4>
-                  <p className="text-[11px] text-purple-200">
+                  <p className="text-xs text-slate-200">
                     Formulasi klausul otomatis berstandar hukum ketenagakerjaan RI &amp; SOP Restoran
                   </p>
                 </div>
@@ -20232,20 +20104,20 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               <div>
                 <label className="block text-xs font-bold text-slate-800 mb-1.5 flex items-center justify-between">
                   <span>Topik atau Kebutuhan Klausul Restoran:</span>
-                  <span className="text-[10px] text-purple-600 font-semibold">Bahasa Bebas / Prompting</span>
+                  <span className="text-xs text-slate-600 font-semibold">Bahasa Bebas / Prompting</span>
                 </label>
                 <textarea
                   rows={3}
                   value={aiClausePrompt}
                   onChange={(e) => setAiClausePrompt(e.target.value)}
                   placeholder="Contoh: Buatkan klausul larangan kasir menerima tips pribadi dan gratifikasi dari vendor supplier sayur/daging..."
-                  className="w-full p-3 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                  className="w-full p-3 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                 />
               </div>
 
               {/* Preset Quick Prompt Buttons */}
               <div className="space-y-1.5">
-                <span className="text-[11px] font-bold text-slate-500">Pilih Cepat Kebutuhan Restoran (1-Klik):</span>
+                <span className="text-xs font-bold text-slate-500">Pilih Cepat Kebutuhan Restoran (1-Klik):</span>
                 <div className="flex flex-wrap gap-1.5">
                   {[
                     { label: 'Gratifikasi & Suap Supplier', prompt: 'Klausul integritas larangan gratifikasi dan komisi terselubung dari vendor supplier bahan makanan restoran' },
@@ -20262,9 +20134,9 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         setAiClausePrompt(preset.prompt);
                         setGeneratedClausePreview(null);
                       }}
-                      className="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 rounded-lg text-[11px] font-semibold transition"
+                      className="px-2.5 py-1 bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200 rounded-lg text-xs font-semibold transition"
                     >
-                      ⚡ {preset.label}
+                      {preset.label}
                     </button>
                   ))}
                 </div>
@@ -20277,7 +20149,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   <select
                     value={aiClauseCategory}
                     onChange={(e) => setAiClauseCategory(e.target.value)}
-                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   >
                     <option value="BOH Kitchen & Resep">BOH Kitchen &amp; Resep</option>
                     <option value="Hygiene & Food Safety">Hygiene &amp; Food Safety</option>
@@ -20292,7 +20164,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   <select
                     value={aiClauseTone}
                     onChange={(e) => setAiClauseTone(e.target.value)}
-                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   >
                     <option value="UU_DISNAKER">Standar UU Cipta Kerja &amp; Disnaker (Kepatuhan Penuh)</option>
                     <option value="ZERO_TOLERANCE">Ketat &amp; Disiplin Tinggi (Zero Tolerance Resto)</option>
@@ -20319,7 +20191,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       let generatedTitle = 'Klausul Kepatuhan Tata Tertib Operasional Restoran';
                       let generatedCategory = aiClauseCategory;
                       let generatedBadge = 'Disiplin Kerja';
-                      let generatedBadgeColor = 'bg-blue-50 text-blue-700 border-blue-200';
+                      let generatedBadgeColor = 'bg-sky-50 text-sky-700 border-sky-200';
                       let generatedLegalRef = 'UU No. 13 Tahun 2003 jo. UU No. 6 Tahun 2023 tentang Ketenagakerjaan';
                       let generatedText = '';
 
@@ -20341,14 +20213,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         generatedTitle = 'Klausul Prosedur Pengunduran Diri (30 Hari) & Ganti Rugi Pelanggaran Kontrak';
                         generatedCategory = 'Status Ketenagakerjaan';
                         generatedBadge = 'Kepastian Hukum';
-                        generatedBadgeColor = 'bg-purple-50 text-purple-700 border-purple-200';
+                        generatedBadgeColor = 'bg-slate-50 text-slate-700 border-slate-200';
                         generatedLegalRef = 'Pasal 62 UU No. 13 Tahun 2003 jo. PP No. 35 Tahun 2021';
                         generatedText = 'Karyawan yang berkehendak mengakhiri masa kerja sebelum jangka waktu perjanjian berakhir wajib mengajukan pemberitahuan tertulis sekurang-kurangnya 30 (tiga puluh) hari kalender sebelumnya dan menyelesaikan berita acara serah terima tugas (handover). Apabila salah satu pihak mengakhiri hubungan kerja sepihak sebelum berakhirnya masa kontrak tanpa alasan sah, pihak yang bersangkutan wajib membayar ganti rugi sebesar upah hingga batas waktu berakhirnya kontrak kerja.';
                       } else if (q.includes('seragam') || q.includes('pisau') || q.includes('inventaris') || q.includes('celemek') || q.includes('apron') || q.includes('aset') || q.includes('alat')) {
                         generatedTitle = 'Klausul Pemeliharaan Aset Kerja, Pisau Koki & Atribut Seragam Restoran';
                         generatedCategory = 'Fasilitas & Inventaris';
                         generatedBadge = 'Aset Perusahaan';
-                        generatedBadgeColor = 'bg-indigo-50 text-indigo-700 border-indigo-200';
+                        generatedBadgeColor = 'bg-slate-50 text-slate-700 border-slate-200';
                         generatedLegalRef = 'Pasal 1365 KUHPerdata & SOP Pengelolaan Inventaris Restoran';
                         generatedText = 'Setiap karyawan bertanggung jawab penuh atas pemeliharaan dan kelayakan seluruh fasilitas kerja yang dipinjamkan oleh perusahaan, termasuk seragam kerja, celemek (apron), topi koki, sepatu safety, kartu identitas karyawan (ID Card), pisau chef, dan tablet operasional kasir. Karyawan wajib mengembalikan seluruh inventaris dalam keadaan utuh dan terawat pada hari terakhir bertugas.';
                       } else if (q.includes('waste') || q.includes('basi') || q.includes('limbah') || q.includes('rusak') || q.includes('stok') || q.includes('opname')) {
@@ -20369,7 +20241,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         generatedTitle = `Klausul Baku Kepatuhan: ${aiClausePrompt.charAt(0).toUpperCase() + aiClausePrompt.slice(1)}`;
                         generatedCategory = aiClauseCategory;
                         generatedBadge = 'Regulasi Resto';
-                        generatedBadgeColor = 'bg-blue-50 text-blue-700 border-blue-200';
+                        generatedBadgeColor = 'bg-sky-50 text-sky-700 border-sky-200';
                         generatedLegalRef = 'Peraturan Perusahaan Barokah Grup & UU Cipta Kerja No. 6/2023';
                         generatedText = `Karyawan wajib tunduk dan patuh terhadap ketentuan ${aiClausePrompt}, menjunjung tinggi prinsip kejujuran, keselamatan kerja, serta memelihara nama baik dan rahasia operasional PT Barokah Kuliner Nusantara dalam setiap pelaksanaan tugas sehari-hari di outlet restoran.`;
                       }
@@ -20383,25 +20255,25 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         text: generatedText,
                         legalReference: generatedLegalRef,
                         isAiGenerated: true,
-                        createdAt: 'Dihasilkan oleh AI Barokah',
+                        createdAt: 'Dibuat dari template',
                       };
 
                       setGeneratedClausePreview(generated);
                       setIsAiClauseGenerating(false);
-                      showToast('Klausul hukum berhasil digenerate oleh AI!');
+                      showToast('Klausul hukum dibuat dari template.');
                     }, 800);
                   }}
-                  className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-extrabold text-xs rounded-xl shadow-md flex items-center justify-center space-x-2 transition"
+                  className="w-full py-3 bg-ink-800 hover:bg-ink-700 text-white font-semibold text-xs rounded-xl shadow-sm flex items-center justify-center space-x-2 transition"
                 >
                   {isAiClauseGenerating ? (
                     <>
                       <RotateCcw className="h-4 w-4 animate-spin" />
-                      <span>Sedang Merumuskan Klausul Hukum AI...</span>
+                      <span>Menyusun klausul…</span>
                     </>
                   ) : (
                     <>
                       <Sparkles className="h-4 w-4 text-amber-300" />
-                      <span>Generate Klausul Hukum AI Sekarang</span>
+                      <span>Buat klausul</span>
                     </>
                   )}
                 </button>
@@ -20409,52 +20281,52 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* Live Result Preview */}
               {generatedClausePreview && (
-                <div className="bg-purple-50/70 border border-purple-200 rounded-2xl p-4 space-y-3">
+                <div className="bg-slate-50/70 border border-slate-200 rounded-lg p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <span className="text-[10px] font-bold text-purple-700 uppercase">{generatedClausePreview.category}</span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${generatedClausePreview.badgeColor}`}>
+                      <span className="text-xs font-medium text-slate-600">{generatedClausePreview.category}</span>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-md border ${generatedClausePreview.badgeColor}`}>
                         {generatedClausePreview.badge}
                       </span>
                     </div>
-                    <span className="text-[10px] font-extrabold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-full flex items-center gap-1">
                       <Sparkles className="h-3 w-3" />
-                      Hasil Rumusan AI
+                      Hasil rumusan
                     </span>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-700 mb-1">Judul Klausul:</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Judul Klausul:</label>
                     <input
                       type="text"
                       value={generatedClausePreview.title}
                       onChange={(e) => setGeneratedClausePreview({ ...generatedClausePreview, title: e.target.value })}
-                      className="w-full p-2 bg-white border border-purple-200 rounded-lg text-xs font-bold text-slate-900 focus:outline-none"
+                      className="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-900 focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-700 mb-1">Rujukan Hukum:</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Rujukan Hukum:</label>
                     <input
                       type="text"
                       value={generatedClausePreview.legalReference || ''}
                       onChange={(e) => setGeneratedClausePreview({ ...generatedClausePreview, legalReference: e.target.value })}
-                      className="w-full p-2 bg-white border border-purple-200 rounded-lg text-xs font-mono text-slate-700 focus:outline-none"
+                      className="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-mono text-slate-700 focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-700 mb-1">Isi Redaksi Klausul Resmi:</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Isi Redaksi Klausul Resmi:</label>
                     <textarea
                       rows={4}
                       value={generatedClausePreview.text}
                       onChange={(e) => setGeneratedClausePreview({ ...generatedClausePreview, text: e.target.value })}
-                      className="w-full p-2.5 bg-white border border-purple-200 rounded-lg text-xs text-slate-800 leading-relaxed italic focus:outline-none"
+                      className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 leading-relaxed italic focus:outline-none"
                     />
                   </div>
 
                   <div className="pt-2 flex items-center justify-between">
-                    <span className="text-[10px] text-slate-500">Anda dapat menyunting teks di atas sebelum menyimpannya.</span>
+                    <span className="text-xs text-slate-500">Anda dapat menyunting teks di atas sebelum menyimpannya.</span>
                     <button
                       type="button"
                       onClick={() => {
@@ -20462,7 +20334,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         setIsAiClauseModalOpen(false);
                         showToast(`Klausul "${generatedClausePreview.title}" berhasil ditambahkan ke pustaka!`);
                       }}
-                      className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                      className="px-4 py-2 bg-ink-800 hover:bg-ink-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
                     >
                       <CheckCircle2 className="h-4 w-4" />
                       <span>Simpan ke Pustaka Klausul</span>
@@ -20491,12 +20363,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isEditClauseModalOpen && editingClauseData && (
         <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden my-8">
+          <div className="bg-white rounded-lg max-w-2xl w-full shadow-xl border border-slate-200 overflow-hidden my-8">
             <div className="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
               <div className="flex items-center space-x-2">
                 <Edit2 className="h-4 w-4 text-amber-400" />
-                <span className="font-bold text-xs uppercase tracking-wide">
-                  Edit Klausul Pustaka — {editingClauseData.title}
+                <span className="font-bold text-xs ">
+                  Edit Klausul Pustaka:{editingClauseData.title}
                 </span>
               </div>
               <button
@@ -20515,7 +20387,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   type="text"
                   value={editingClauseData.title}
                   onChange={(e) => setEditingClauseData({ ...editingClauseData, title: e.target.value })}
-                  className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none"
                 />
               </div>
 
@@ -20526,7 +20398,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     type="text"
                     value={editingClauseData.category}
                     onChange={(e) => setEditingClauseData({ ...editingClauseData, category: e.target.value })}
-                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -20535,7 +20407,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     type="text"
                     value={editingClauseData.badge}
                     onChange={(e) => setEditingClauseData({ ...editingClauseData, badge: e.target.value })}
-                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -20547,7 +20419,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   value={editingClauseData.legalReference || ''}
                   onChange={(e) => setEditingClauseData({ ...editingClauseData, legalReference: e.target.value })}
                   placeholder="Contoh: UU No. 13 Tahun 2003 jo. UU No. 6 Tahun 2023"
-                  className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-mono focus:ring-2 focus:ring-brand-500 focus:outline-none"
                 />
               </div>
 
@@ -20567,24 +20439,24 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           isAiGenerated: true,
                         });
                         setIsAiRefiningClause(false);
-                        showToast('Redaksi klausul berhasil diperkuat dengan formulasi hukum AI!');
+                        showToast('Redaksi klausul diperbarui dari template.');
                       }, 700);
                     }}
-                    className="text-[11px] font-bold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 px-2.5 py-1 rounded-lg transition flex items-center gap-1"
+                    className="text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 px-2.5 py-1 rounded-lg transition flex items-center gap-1"
                   >
                     {isAiRefiningClause ? (
                       <RotateCcw className="h-3 w-3 animate-spin" />
                     ) : (
-                      <Sparkles className="h-3 w-3 text-purple-600" />
+                      <Sparkles className="h-3 w-3 text-slate-600" />
                     )}
-                    <span>Perhalus Redaksi dengan AI</span>
+                    <span>Perhalus redaksi</span>
                   </button>
                 </div>
                 <textarea
                   rows={5}
                   value={editingClauseData.text}
                   onChange={(e) => setEditingClauseData({ ...editingClauseData, text: e.target.value })}
-                  className="w-full p-3 border border-slate-200 rounded-xl text-xs leading-relaxed italic text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full p-3 border border-slate-200 rounded-xl text-xs leading-relaxed italic text-slate-800 focus:ring-2 focus:ring-brand-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -20612,7 +20484,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   }
                   setIsEditClauseModalOpen(false);
                 }}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                className="px-4 py-2 bg-ink-800 hover:bg-ink-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 Simpan Klausul
@@ -20625,18 +20497,18 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* MODAL: KEBERATAN KLAUSUL & PERMINTAAN DIALOG BIPARTIT DENGAN MANAJEMEN */}
       {kruContractDisagreementModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden duration-150">
+          <div className="bg-white rounded-lg max-w-lg w-full shadow-xl border border-slate-200 overflow-hidden duration-150">
             {/* Modal Header */}
-            <div className="p-5 bg-gradient-to-r from-rose-900 via-slate-900 to-rose-950 text-white flex items-center justify-between">
+            <div className="p-5 bg-ink text-white flex items-center justify-between">
               <div className="flex items-center space-x-2.5">
                 <div className="p-2 bg-rose-500/20 text-rose-300 rounded-xl border border-rose-500/40">
                   <Users className="h-5 w-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-extrabold text-white">
+                  <h4 className="text-sm font-semibold text-white">
                     Pengajuan Dialog Bipartit dengan Manajemen
                   </h4>
-                  <p className="text-[11px] text-rose-200">
+                  <p className="text-xs text-rose-200">
                     Sampaikan masukan / ketidaksepahaman klausul kerja Anda
                   </p>
                 </div>
@@ -20654,13 +20526,13 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             <div className="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
               {/* Klausul Yang Menjadi Sorotan */}
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                <span className="text-xs font-bold text-slate-500  block">
                   Klausul yang Sedang Ditinjau:
                 </span>
-                <p className="font-extrabold text-slate-900 text-sm">
+                <p className="font-semibold text-slate-900 text-sm">
                   {kruContractClauses[kruContractStepIndex]?.title}
                 </p>
-                <p className="text-[11px] text-slate-600 line-clamp-2 italic">
+                <p className="text-xs text-slate-600 line-clamp-2 italic">
                   &quot;{kruContractClauses[kruContractStepIndex]?.description}&quot;
                 </p>
               </div>
@@ -20681,7 +20553,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       key={idx}
                       type="button"
                       onClick={() => setKruContractDisagreementReason(preset)}
-                      className={`text-left p-2.5 rounded-xl border text-[11px] font-medium transition ${
+                      className={`text-left p-2.5 rounded-xl border text-xs font-medium transition ${
                         kruContractDisagreementReason === preset
                           ? 'bg-rose-50 border-rose-300 text-rose-900 font-bold'
                           : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'
@@ -20708,7 +20580,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
               </div>
 
               {/* Legal Notice */}
-              <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900 space-y-1">
+              <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1">
                 <div className="flex items-center gap-1.5 font-bold text-amber-950">
                   <AlertTriangle className="h-3.5 w-3.5 text-amber-600 shrink-0" />
                   <span>Proses Musyawarah Bipartit (UU Ketenagakerjaan)</span>
@@ -20772,22 +20644,22 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
         return (
           <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-3 sm:p-5 overflow-y-auto print:p-0 print:bg-white print:static">
-            <div className="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col my-auto max-h-[92vh] print:max-h-none print:border-none print:shadow-none duration-150">
+            <div className="bg-white rounded-lg max-w-4xl w-full shadow-xl border border-slate-200 overflow-hidden flex flex-col my-auto max-h-[92vh] print:max-h-none print:border-none print:shadow-none duration-150">
               
               {/* Header Modal Bar (Non-Printable) */}
               <div className="p-4 bg-slate-900 text-white flex items-center justify-between print:hidden border-b border-slate-800">
                 <div className="flex items-center space-x-2.5">
-                  <div className="p-2 bg-indigo-500/20 text-indigo-300 rounded-xl border border-indigo-500/30">
+                  <div className="p-2 bg-white/10 text-slate-200 rounded-lg border border-white/15">
                     <Award className="h-5 w-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-extrabold text-white flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-white flex items-center gap-2">
                       <span>Rapor Penilaian Kinerja Karyawan</span>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-700">
+                      <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-700">
                         {report.docNumber}
                       </span>
                     </h4>
-                    <p className="text-[11px] text-slate-300">
+                    <p className="text-xs text-slate-300">
                       Evaluasi berkala SDM Barokah Grup • {report.period}
                     </p>
                   </div>
@@ -20808,7 +20680,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   <button
                     type="button"
                     onClick={() => window.print()}
-                    className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs"
+                    className="px-3 py-1.5 bg-ink-800 hover:bg-ink-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs"
                   >
                     <Printer className="h-3.5 w-3.5" />
                     <span>Cetak Rapor (PDF)</span>
@@ -20838,93 +20710,93 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 {/* Sub-Header Metadata Rapor */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-900 gap-2">
                   <div>
-                    <h2 className="text-sm sm:text-base font-black tracking-tight text-slate-900 uppercase flex items-center gap-2">
+                    <h2 className="text-sm sm:text-base font-semibold tracking-tight text-slate-900 uppercase flex items-center gap-2">
                       <span>LEMBAR EVALUASI RAPOR KINERJA KRU RESTORAN</span>
-                      <span className="text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 px-2 py-0.5 rounded border border-amber-300 font-mono">
+                      <span className="text-xs font-semibold  bg-amber-100 text-amber-900 px-2 py-0.5 rounded border border-amber-300 font-mono">
                         DOKUMEN RESMI
                       </span>
                     </h2>
-                    <p className="text-[10px] text-slate-500">
+                    <p className="text-xs text-slate-500">
                       Standar Operasional Penilaian 360° &amp; Manajemen Mutu PT Barokah Kuliner Nusantara
                     </p>
                   </div>
                   <div className="sm:text-right text-xs">
-                    <p className="font-mono text-slate-800 font-bold text-[11px]">No: {report.docNumber}</p>
-                    <p className="text-slate-500 text-[10px]">Tgl Evaluasi: {report.evaluationDate}</p>
+                    <p className="font-mono text-slate-800 font-bold text-xs">No: {report.docNumber}</p>
+                    <p className="text-slate-500 text-xs">Tgl Evaluasi: {report.evaluationDate}</p>
                   </div>
                 </div>
 
                 {/* Info Biodata Karyawan */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs">
                   <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase block">Nama Karyawan</span>
-                    <p className="font-extrabold text-slate-900 text-sm">{selectedReportCardEmp.fullName}</p>
-                    <p className="text-[10px] font-mono text-slate-500 font-bold">{selectedReportCardEmp.id} • NIK: {selectedReportCardEmp.nikKtp}</p>
+                    <span className="text-xs font-medium text-slate-500 block">Nama Karyawan</span>
+                    <p className="font-semibold text-slate-900 text-sm">{selectedReportCardEmp.fullName}</p>
+                    <p className="text-xs font-mono text-slate-500 font-bold">{selectedReportCardEmp.id} • NIK: {selectedReportCardEmp.nikKtp}</p>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase block">Posisi &amp; Stasiun</span>
-                    <p className="font-extrabold text-blue-800">{selectedReportCardEmp.positionTitle}</p>
-                    <p className="text-[10px] text-slate-500">Stasiun: {selectedReportCardEmp.stationKey.toUpperCase()}</p>
+                    <span className="text-xs font-medium text-slate-500 block">Posisi &amp; Stasiun</span>
+                    <p className="font-semibold text-sky-800">{selectedReportCardEmp.positionTitle}</p>
+                    <p className="text-xs text-slate-500">Stasiun: {selectedReportCardEmp.stationKey.toUpperCase()}</p>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase block">Outlet Penempatan</span>
-                    <p className="font-extrabold text-slate-900">{selectedReportCardEmp.outlet}</p>
-                    <p className="text-[10px] text-slate-500">Masa Kerja: {tenureData.text}</p>
+                    <span className="text-xs font-medium text-slate-500 block">Outlet Penempatan</span>
+                    <p className="font-semibold text-slate-900">{selectedReportCardEmp.outlet}</p>
+                    <p className="text-xs text-slate-500">Masa Kerja: {tenureData.text}</p>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase block">Periode Evaluasi</span>
-                    <p className="font-extrabold text-purple-800">{report.period}</p>
-                    <p className="text-[10px] text-slate-500">Evaluator: {report.evaluatorName.split('&')[0]}</p>
+                    <span className="text-xs font-medium text-slate-500 block">Periode Evaluasi</span>
+                    <p className="font-semibold text-slate-800">{report.period}</p>
+                    <p className="text-xs text-slate-500">Evaluator: {report.evaluatorName.split('&')[0]}</p>
                   </div>
                 </div>
 
                 {/* Hero Summary Nilai & Rekomendasi */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Card Skor Akhir */}
-                  <div className={`p-5 rounded-2xl border-2 flex items-center space-x-4 ${
+                  <div className={`p-5 rounded-lg border-2 flex items-center space-x-4 ${
                     isGradeA
                       ? 'bg-emerald-50/70 border-emerald-300'
                       : isGradeB
-                      ? 'bg-blue-50/70 border-blue-300'
+                      ? 'bg-sky-50/70 border-sky-300'
                       : 'bg-amber-50/70 border-amber-300'
                   }`}>
-                    <div className={`w-16 h-16 rounded-2xl flex flex-col items-center justify-center font-black shrink-0 shadow-sm ${
+                    <div className={`w-16 h-16 rounded-lg flex flex-col items-center justify-center font-semibold shrink-0 shadow-sm ${
                       isGradeA
                         ? 'bg-emerald-600 text-white'
                         : isGradeB
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-ink-800 text-white'
                         : 'bg-amber-500 text-slate-950'
                     }`}>
                       <span className="text-xl leading-none">{report.grade}</span>
-                      <span className="text-[9px] font-mono opacity-80 mt-0.5">{report.totalScore}</span>
+                      <span className="text-xs font-mono opacity-80 mt-0.5">{report.totalScore}</span>
                     </div>
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                      <span className="text-xs font-bold  text-slate-500">
                         Predikat Nilai Akhir
                       </span>
-                      <h4 className="text-base font-extrabold text-slate-900 mt-0.5">
+                      <h4 className="text-base font-semibold text-slate-900 mt-0.5">
                         {report.gradeLabel}
                       </h4>
-                      <p className="text-[11px] text-slate-600">
+                      <p className="text-xs text-slate-600">
                         Akumulasi 6 pilar kinerja berbobot 100%
                       </p>
                     </div>
                   </div>
 
                   {/* Card Rekomendasi Manajemen */}
-                  <div className="md:col-span-2 p-5 rounded-2xl border-2 border-indigo-200 bg-gradient-to-r from-indigo-50/70 via-purple-50/40 to-white flex flex-col justify-center space-y-1.5">
+                  <div className="md:col-span-2 p-5 rounded-lg border-2 border-slate-200 bg-slate-50 flex flex-col justify-center space-y-1.5">
                     <div className="flex items-center space-x-2">
-                      <span className="text-[10px] font-black uppercase tracking-wider bg-indigo-600 text-white px-2 py-0.5 rounded">
+                      <span className="text-xs font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
                         REKOMENDASI MANAJEMEN HRD
                       </span>
-                      <span className="text-[10px] font-bold text-indigo-700">
+                      <span className="text-xs font-bold text-slate-700">
                         Keputusan Evaluasi Berkala
                       </span>
                     </div>
-                    <h4 className="text-sm sm:text-base font-black text-indigo-950">
+                    <h4 className="text-sm sm:text-base font-semibold text-slate-950">
                       {report.recommendationLabel}
                     </h4>
-                    <p className="text-[11px] text-slate-600 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       Berdasarkan data performa presensi, sanitasi HACCP, kepatuhan resep, kelulusan kuis materi training LMS, dan kepuasan pelanggan periode {report.period}.
                     </p>
                   </div>
@@ -20932,8 +20804,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                 {/* 6 Komponen Rincian Evaluasi */}
                 <div className="space-y-3">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                    <Activity className="h-4 w-4 text-indigo-600" />
+                  <h4 className="text-xs font-semibold  text-slate-500 flex items-center gap-1.5">
+                    <Activity className="h-4 w-4 text-slate-600" />
                     <span>Rincian Nilai 6 Aspek Kinerja &amp; Pembelajaran F&amp;B</span>
                   </h4>
 
@@ -20941,19 +20813,19 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     {/* 1. Kedisiplinan & Presensi */}
                     <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="font-extrabold text-slate-900 flex items-center gap-1.5">
-                          <Clock className="h-4 w-4 text-blue-600" />
+                        <span className="font-semibold text-slate-900 flex items-center gap-1.5">
+                          <Clock className="h-4 w-4 text-sky-600" />
                           <span>1. Kedisiplinan &amp; Presensi</span>
-                          <span className="text-[10px] font-normal text-slate-400">(Bobot 20%)</span>
+                          <span className="text-xs font-normal text-slate-500">(Bobot 20%)</span>
                         </span>
-                        <span className="font-mono font-black text-sm text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                        <span className="font-mono font-semibold text-sm text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
                           {report.attendanceScore} / 100
                         </span>
                       </div>
                       <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                        <div className="bg-blue-600 h-full rounded-full" style={{ width: `${report.attendanceScore}%` }}></div>
+                        <div className="bg-emerald-600 h-full rounded-full" style={{ width: `${report.attendanceScore}%` }}></div>
                       </div>
-                      <div className="text-[11px] text-slate-600 space-y-0.5 pt-1">
+                      <div className="text-xs text-slate-600 space-y-0.5 pt-1">
                         <div className="flex justify-between">
                           <span>Tingkat Presensi:</span>
                           <span className="font-bold text-slate-800">{report.attendanceDetails.presenceRate}</span>
@@ -20966,7 +20838,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           <span>Kepatuhan Timer Break:</span>
                           <span className="font-bold text-slate-800">{report.attendanceDetails.breakCompliance}</span>
                         </div>
-                        <p className="text-[10px] text-slate-500 italic pt-1 border-t border-slate-100">
+                        <p className="text-xs text-slate-500 italic pt-1 border-t border-slate-100">
                           &quot;{report.attendanceNotes}&quot;
                         </p>
                       </div>
@@ -20975,19 +20847,19 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     {/* 2. Standar SOP & Kebersihan */}
                     <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="font-extrabold text-slate-900 flex items-center gap-1.5">
+                        <span className="font-semibold text-slate-900 flex items-center gap-1.5">
                           <ShieldCheck className="h-4 w-4 text-emerald-600" />
                           <span>2. Standar SOP &amp; Higienitas</span>
-                          <span className="text-[10px] font-normal text-slate-400">(Bobot 20%)</span>
+                          <span className="text-xs font-normal text-slate-500">(Bobot 20%)</span>
                         </span>
-                        <span className="font-mono font-black text-sm text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        <span className="font-mono font-semibold text-sm text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                           {report.sopScore} / 100
                         </span>
                       </div>
                       <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                         <div className="bg-emerald-600 h-full rounded-full" style={{ width: `${report.sopScore}%` }}></div>
                       </div>
-                      <div className="text-[11px] text-slate-600 space-y-0.5 pt-1">
+                      <div className="text-xs text-slate-600 space-y-0.5 pt-1">
                         <div className="flex justify-between">
                           <span>Standar Grooming &amp; Seragam:</span>
                           <span className="font-bold text-slate-800">{report.sopDetails.grooming}</span>
@@ -21000,7 +20872,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           <span>Efisiensi / Food Waste:</span>
                           <span className="font-bold text-slate-800">{report.sopDetails.foodWasteEfficiency}</span>
                         </div>
-                        <p className="text-[10px] text-slate-500 italic pt-1 border-t border-slate-100">
+                        <p className="text-xs text-slate-500 italic pt-1 border-t border-slate-100">
                           &quot;{report.sopNotes}&quot;
                         </p>
                       </div>
@@ -21009,19 +20881,19 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     {/* 3. Pelayanan & Hospitality */}
                     <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="font-extrabold text-slate-900 flex items-center gap-1.5">
-                          <Users className="h-4 w-4 text-purple-600" />
+                        <span className="font-semibold text-slate-900 flex items-center gap-1.5">
+                          <Users className="h-4 w-4 text-slate-600" />
                           <span>3. Pelayanan &amp; Hospitality</span>
-                          <span className="text-[10px] font-normal text-slate-400">(Bobot 15%)</span>
+                          <span className="text-xs font-normal text-slate-500">(Bobot 15%)</span>
                         </span>
-                        <span className="font-mono font-black text-sm text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+                        <span className="font-mono font-semibold text-sm text-slate-700 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
                           {report.hospitalityScore} / 100
                         </span>
                       </div>
                       <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                        <div className="bg-purple-600 h-full rounded-full" style={{ width: `${report.hospitalityScore}%` }}></div>
+                        <div className="bg-emerald-600 h-full rounded-full" style={{ width: `${report.hospitalityScore}%` }}></div>
                       </div>
-                      <div className="text-[11px] text-slate-600 space-y-0.5 pt-1">
+                      <div className="text-xs text-slate-600 space-y-0.5 pt-1">
                         <div className="flex justify-between">
                           <span>Rating Ulasan Tamu / Meja:</span>
                           <span className="font-bold text-slate-800">{report.hospitalityDetails.guestRating}</span>
@@ -21034,7 +20906,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           <span>Kekompakan Tim Shift:</span>
                           <span className="font-bold text-slate-800">{report.hospitalityDetails.teamCooperation}</span>
                         </div>
-                        <p className="text-[10px] text-slate-500 italic pt-1 border-t border-slate-100">
+                        <p className="text-xs text-slate-500 italic pt-1 border-t border-slate-100">
                           &quot;{report.hospitalityNotes}&quot;
                         </p>
                       </div>
@@ -21043,19 +20915,19 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     {/* 4. Kompetensi & Kecepatan Output */}
                     <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="font-extrabold text-slate-900 flex items-center gap-1.5">
+                        <span className="font-semibold text-slate-900 flex items-center gap-1.5">
                           <TrendingUp className="h-4 w-4 text-amber-600" />
                           <span>4. Kompetensi &amp; Output</span>
-                          <span className="text-[10px] font-normal text-slate-400">(Bobot 15%)</span>
+                          <span className="text-xs font-normal text-slate-500">(Bobot 15%)</span>
                         </span>
-                        <span className="font-mono font-black text-sm text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                        <span className="font-mono font-semibold text-sm text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
                           {report.competencyScore} / 100
                         </span>
                       </div>
                       <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                         <div className="bg-amber-600 h-full rounded-full" style={{ width: `${report.competencyScore}%` }}></div>
                       </div>
-                      <div className="text-[11px] text-slate-600 space-y-0.5 pt-1">
+                      <div className="text-xs text-slate-600 space-y-0.5 pt-1">
                         <div className="flex justify-between">
                           <span>Kecepatan Saji / Transaksi:</span>
                           <span className="font-bold text-slate-800">{report.competencyDetails.speedOfService}</span>
@@ -21068,42 +20940,42 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                           <span>Konsistensi Standar Resep:</span>
                           <span className="font-bold text-slate-800">{report.competencyDetails.recipeConsistency}</span>
                         </div>
-                        <p className="text-[10px] text-slate-500 italic pt-1 border-t border-slate-100">
+                        <p className="text-xs text-slate-500 italic pt-1 border-t border-slate-100">
                           &quot;{report.competencyNotes}&quot;
                         </p>
                       </div>
                     </div>
 
                     {/* 5. Knowledge, Training & Hasil Kuis LMS */}
-                    <div className="p-4 rounded-xl border border-indigo-200 bg-indigo-50/20 space-y-2 md:col-span-2">
+                    <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/20 space-y-2 md:col-span-2">
                       <div className="flex items-center justify-between">
-                        <span className="font-extrabold text-slate-900 flex items-center gap-1.5">
-                          <GraduationCap className="h-4 w-4 text-indigo-600" />
+                        <span className="font-semibold text-slate-900 flex items-center gap-1.5">
+                          <GraduationCap className="h-4 w-4 text-slate-600" />
                           <span>5. Knowledge &amp; Training LMS (Kirkpatrick Level 2 Learning)</span>
-                          <span className="text-[10px] font-normal text-slate-400">(Bobot 15%)</span>
+                          <span className="text-xs font-normal text-slate-500">(Bobot 15%)</span>
                         </span>
-                        <span className="font-mono font-black text-sm text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded border border-indigo-200">
+                        <span className="font-mono font-semibold text-sm text-slate-700 bg-slate-50 px-2.5 py-0.5 rounded border border-slate-200">
                           {report.knowledgeScore} / 100
                         </span>
                       </div>
                       <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                        <div className="bg-indigo-600 h-full rounded-full" style={{ width: `${report.knowledgeScore}%` }}></div>
+                        <div className="bg-emerald-600 h-full rounded-full" style={{ width: `${report.knowledgeScore}%` }}></div>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px] text-slate-600 pt-1">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600 pt-1">
                         <div>
-                          <span className="text-[10px] text-slate-400 block font-semibold">Ketuntasan Modul Training:</span>
+                          <span className="text-xs text-slate-500 block font-medium">Ketuntasan Modul Training:</span>
                           <span className="font-bold text-slate-800">{report.knowledgeDetails.trainingCompletionRate}</span>
                         </div>
                         <div>
-                          <span className="text-[10px] text-slate-400 block font-semibold">Rata-rata Skor Kuis:</span>
-                          <span className="font-bold text-indigo-700 font-mono">{report.knowledgeDetails.quizAverageScore} / 100</span>
+                          <span className="text-xs text-slate-500 block font-medium">Rata-rata Skor Kuis:</span>
+                          <span className="font-bold text-slate-700 font-mono">{report.knowledgeDetails.quizAverageScore} / 100</span>
                         </div>
                         <div>
-                          <span className="text-[10px] text-slate-400 block font-semibold">Ujian Terakhir Lulus:</span>
+                          <span className="text-xs text-slate-500 block font-medium">Ujian Terakhir Lulus:</span>
                           <span className="font-bold text-slate-800 truncate block">{report.knowledgeDetails.latestQuizPassed}</span>
                         </div>
                       </div>
-                      <p className="text-[10px] text-slate-500 italic pt-1 border-t border-indigo-100">
+                      <p className="text-xs text-slate-500 italic pt-1 border-t border-slate-200">
                         &quot;{report.knowledgeNotes}&quot;
                       </p>
                     </div>
@@ -21116,14 +20988,14 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         <Award className="h-4 w-4" />
                       </div>
                       <div>
-                        <span className="font-extrabold text-slate-900">6. Rekam Jejak Disiplin &amp; Penghargaan (Bobot 15%)</span>
-                        <p className="text-[11px] text-slate-500">
+                        <span className="font-semibold text-slate-900">6. Rekam Jejak Disiplin &amp; Penghargaan (Bobot 15%)</span>
+                        <p className="text-xs text-slate-500">
                           Riwayat Surat Peringatan (SP): <strong>{report.disciplineDetails.spCount} SP</strong> • Sanksi Denda: <strong>{report.disciplineDetails.penaltyCount}x</strong> • Piagam Penghargaan: <strong>{report.disciplineDetails.awardsCount} Piagam</strong>
                         </p>
                       </div>
                     </div>
                     <div className="text-right shrink-0">
-                      <span className="font-mono font-black text-sm text-slate-900 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+                      <span className="font-mono font-semibold text-sm text-slate-900 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
                         Skor: {report.disciplineScore} / 100
                       </span>
                     </div>
@@ -21131,37 +21003,37 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 </div>
 
                 {/* 7. Hasil Evaluasi Review Multi-Sumber 360° Bulanan (SOP-HR-003) */}
-                <div className="p-4 rounded-2xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50/70 via-white to-purple-50/40 space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-indigo-100 pb-2.5">
+                <div className="p-4 rounded-lg border-2 border-slate-200 bg-slate-50 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
                     <div className="flex items-center space-x-2.5">
-                      <div className="p-2 bg-indigo-600 text-white rounded-xl shadow-xs shrink-0">
+                      <div className="p-2 bg-slate-100 text-slate-700 rounded-lg shrink-0">
                         <Users className="h-4 w-4" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-black text-slate-900 text-xs uppercase tracking-wide">
+                          <span className="font-semibold text-slate-900 text-xs ">
                             7. Evaluasi Multi-Sumber 360° Bulanan (SOP-HR-003)
                           </span>
-                          <span className={`text-[9px] font-black px-2 py-0.5 rounded-full border ${
+                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${
                             emp360.completed 
                               ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
                               : 'bg-rose-100 text-rose-800 border-rose-300'
                           }`}>
-                            {emp360.completed ? '✓ Selesai & Terverifikasi' : '⚠️ Belum Mengisi (Gaji Tertunda)'}
+                            {emp360.completed ? '✓ Selesai & Terverifikasi' : 'Belum Mengisi (Gaji Tertunda)'}
                           </span>
                         </div>
-                        <p className="text-[10px] text-slate-500">
+                        <p className="text-xs text-slate-500">
                           Penilaian tertutup &amp; 100% anonim (Blind Tokenization) dari atasan, rekan selevel, &amp; penilaian mandiri
                         </p>
                       </div>
                     </div>
                     <div className="text-right shrink-0">
-                      <div className="inline-flex items-center gap-1.5 bg-indigo-950 text-white px-3 py-1.5 rounded-xl shadow-xs">
+                      <div className="inline-flex items-center gap-1.5 bg-ink-800 text-white px-3 py-1.5 rounded-xl shadow-xs">
                         <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                        <span className="font-mono font-black text-xs">
+                        <span className="font-mono font-semibold text-xs">
                           {emp360.averageScore.toFixed(2)} / 5.00
                         </span>
-                        <span className="text-[10px] text-indigo-300 font-bold">
+                        <span className="text-xs text-slate-300 font-bold">
                           ({Math.round((emp360.averageScore / 5) * 100)}%)
                         </span>
                       </div>
@@ -21170,62 +21042,62 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                   {/* Tri-Angle Breakdown Metrics */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                    <div className="p-2.5 bg-white rounded-xl border border-indigo-100 shadow-2xs">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                        👥 Rekan Selevel (Peers)
+                    <div className="p-2.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                      <span className="text-xs font-bold text-slate-400  block">
+                        Rekan Selevel (Peers)
                       </span>
                       <div className="flex items-baseline gap-1 mt-0.5">
-                        <span className="text-base font-black text-indigo-950 font-mono">
+                        <span className="text-base font-semibold text-slate-950 font-mono">
                           {emp360.peerScore.toFixed(1)}
                         </span>
-                        <span className="text-[10px] text-slate-500 font-bold">/ 5.0</span>
+                        <span className="text-xs text-slate-500 font-bold">/ 5.0</span>
                       </div>
-                      <span className="text-[9px] text-emerald-700 font-semibold block">
+                      <span className="text-xs text-emerald-700 font-semibold block">
                         Relasi &amp; Teamwork
                       </span>
                     </div>
 
-                    <div className="p-2.5 bg-white rounded-xl border border-indigo-100 shadow-2xs">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                        👔 Atasan (SPV / SM)
+                    <div className="p-2.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                      <span className="text-xs font-bold text-slate-400  block">
+                        Atasan (SPV / SM)
                       </span>
                       <div className="flex items-baseline gap-1 mt-0.5">
-                        <span className="text-base font-black text-indigo-950 font-mono">
+                        <span className="text-base font-semibold text-slate-950 font-mono">
                           {emp360.supervisorScore.toFixed(1)}
                         </span>
-                        <span className="text-[10px] text-slate-500 font-bold">/ 5.0</span>
+                        <span className="text-xs text-slate-500 font-bold">/ 5.0</span>
                       </div>
-                      <span className="text-[9px] text-blue-700 font-semibold block">
+                      <span className="text-xs text-sky-700 font-semibold block">
                         Kepatuhan &amp; Eksekusi
                       </span>
                     </div>
 
-                    <div className="p-2.5 bg-white rounded-xl border border-indigo-100 shadow-2xs">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                        🪞 Mandiri (Self-Review)
+                    <div className="p-2.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                      <span className="text-xs font-bold text-slate-400  block">
+                        Mandiri (Self-Review)
                       </span>
                       <div className="flex items-baseline gap-1 mt-0.5">
-                        <span className="text-base font-black text-indigo-950 font-mono">
+                        <span className="text-base font-semibold text-slate-950 font-mono">
                           {emp360.selfScore.toFixed(1)}
                         </span>
-                        <span className="text-[10px] text-slate-500 font-bold">/ 5.0</span>
+                        <span className="text-xs text-slate-500 font-bold">/ 5.0</span>
                       </div>
-                      <span className="text-[9px] text-purple-700 font-semibold block">
+                      <span className="text-xs text-slate-700 font-semibold block">
                         Refleksi Diri
                       </span>
                     </div>
 
-                    <div className="p-2.5 bg-white rounded-xl border border-indigo-100 shadow-2xs">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                        🔒 Panel Penilai
+                    <div className="p-2.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                      <span className="text-xs font-bold text-slate-400  block">
+                        Panel Penilai
                       </span>
                       <div className="flex items-baseline gap-1 mt-0.5">
-                        <span className="text-base font-black text-indigo-950 font-mono">
+                        <span className="text-base font-semibold text-slate-950 font-mono">
                           {emp360.respondentsCount}
                         </span>
-                        <span className="text-[10px] text-slate-500 font-bold">Responden</span>
+                        <span className="text-xs text-slate-500 font-bold">Responden</span>
                       </div>
-                      <span className="text-[9px] text-indigo-700 font-semibold block">
+                      <span className="text-xs text-slate-700 font-semibold block">
                         Blind Tokenized
                       </span>
                     </div>
@@ -21233,22 +21105,22 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                   {/* Catatan Ulasan Kualitatif Anonim Rekan Kerja */}
                   {emp360.anonymousNotes && emp360.anonymousNotes.length > 0 && (
-                    <div className="bg-white/90 p-3 rounded-xl border border-indigo-100 space-y-1.5">
+                    <div className="bg-white/90 p-3 rounded-xl border border-slate-200 space-y-1.5">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-indigo-950 uppercase tracking-wider flex items-center gap-1.5">
-                          <CheckCircle2 className="h-3 w-3 text-indigo-600" />
+                        <span className="text-xs font-bold text-slate-950  flex items-center gap-1.5">
+                          <CheckCircle2 className="h-3 w-3 text-slate-600" />
                           <span>Ulasan Kualitatif Anonim Rekan Shift (Tercatat Resmi):</span>
                         </span>
-                        <span className="text-[9px] text-slate-400 font-mono">
+                        <span className="text-xs text-slate-400 font-mono">
                           Identitas Penilai Dirahasiakan Mutlak
                         </span>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                         {emp360.anonymousNotes.map((note, idx) => (
-                          <div key={idx} className="p-2.5 bg-slate-50 rounded-lg border border-slate-200/80 italic text-slate-700 text-[11px] leading-relaxed flex items-start space-x-1.5">
-                            <span className="text-indigo-500 font-bold text-xs shrink-0">&ldquo;</span>
+                          <div key={idx} className="p-2.5 bg-slate-50 rounded-lg border border-slate-200/80 italic text-slate-700 text-xs leading-relaxed flex items-start space-x-1.5">
+                            <span className="text-slate-500 font-bold text-xs shrink-0">&ldquo;</span>
                             <span className="flex-1">{note}</span>
-                            <span className="text-indigo-500 font-bold text-xs shrink-0">&rdquo;</span>
+                            <span className="text-slate-500 font-bold text-xs shrink-0">&rdquo;</span>
                           </div>
                         ))}
                       </div>
@@ -21258,8 +21130,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
                 {/* Feedback Evaluator & Rencana Pengembangan */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                  <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-1.5">
+                    <span className="text-xs font-bold  text-slate-500 block">
                       Catatan &amp; Umpan Balik Store Manager / HRD:
                     </span>
                     <p className="text-slate-800 leading-relaxed italic bg-white p-3 rounded-xl border border-slate-200/80">
@@ -21267,11 +21139,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     </p>
                   </div>
 
-                  <div className="p-4 bg-indigo-50/60 rounded-2xl border border-indigo-200 space-y-1.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 block">
+                  <div className="p-4 bg-slate-50/60 rounded-lg border border-slate-200 space-y-1.5">
+                    <span className="text-xs font-bold  text-slate-700 block">
                       Rencana Pengembangan Karir (Development Plan):
                     </span>
-                    <p className="text-indigo-950 leading-relaxed bg-white p-3 rounded-xl border border-indigo-100">
+                    <p className="text-slate-950 leading-relaxed bg-white p-3 rounded-xl border border-slate-200">
                       {report.developmentPlan}
                     </p>
                   </div>
@@ -21280,22 +21152,22 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 {/* Lembar Tanda Tangan Digital Bipartit */}
                 <div className="pt-4 border-t border-slate-200 grid grid-cols-2 gap-8 text-center text-xs">
                   <div className="space-y-12">
-                    <span className="text-[10px] text-slate-500 uppercase font-bold block">
+                    <span className="text-xs text-slate-600 font-medium block">
                       Evaluator Penilai (Store Manager / HRD)
                     </span>
                     <div className="space-y-0.5">
-                      <p className="font-extrabold text-slate-900 underline">{report.evaluatorName}</p>
-                      <p className="text-[10px] text-slate-500 font-mono">Tanda Tangan Digital Resmi Terverifikasi</p>
+                      <p className="font-semibold text-slate-900 underline">{report.evaluatorName}</p>
+                      <p className="text-xs text-slate-500 font-mono">Tanda Tangan Digital Resmi Terverifikasi</p>
                     </div>
                   </div>
 
                   <div className="space-y-12">
-                    <span className="text-[10px] text-slate-500 uppercase font-bold block">
+                    <span className="text-xs text-slate-600 font-medium block">
                       Karyawan yang Dinilai (Pihak Kedua)
                     </span>
                     <div className="space-y-0.5">
-                      <p className="font-extrabold text-slate-900 underline">{selectedReportCardEmp.fullName}</p>
-                      <p className="text-[10px] text-slate-500 font-mono">NIK: {selectedReportCardEmp.nikKtp}</p>
+                      <p className="font-semibold text-slate-900 underline">{selectedReportCardEmp.fullName}</p>
+                      <p className="text-xs text-slate-500 font-mono">NIK: {selectedReportCardEmp.nikKtp}</p>
                     </div>
                   </div>
                 </div>
@@ -21304,7 +21176,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* Modal Footer Toolbar */}
               <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 print:hidden">
-                <span className="text-[11px] text-slate-500">
+                <span className="text-xs text-slate-500">
                   Dokumen evaluasi berkala tersimpan secara aman di database HRIS Barokah Grup.
                 </span>
                 <div className="flex items-center space-x-2">
@@ -21322,7 +21194,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   <button
                     type="button"
                     onClick={() => window.print()}
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                    className="px-4 py-2 bg-ink-800 hover:bg-ink-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
                   >
                     <Printer className="h-4 w-4" />
                     <span>Cetak PDF Resmi</span>
@@ -21347,18 +21219,18 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================= */}
       {isEditReportCardModalOpen && editingReportCardData && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col my-auto max-h-[90vh] duration-150">
+          <div className="bg-white rounded-lg max-w-xl w-full shadow-xl border border-slate-200 overflow-hidden flex flex-col my-auto max-h-[90vh] duration-150">
             {/* Header */}
-            <div className="p-5 bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white flex items-center justify-between">
+            <div className="p-5 bg-ink text-white flex items-center justify-between">
               <div className="flex items-center space-x-2.5">
-                <div className="p-2 bg-indigo-500/20 text-indigo-300 rounded-xl border border-indigo-500/30">
+                <div className="p-2 bg-white/10 text-slate-200 rounded-lg border border-white/15">
                   <Edit2 className="h-5 w-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-extrabold text-white">
+                  <h4 className="text-sm font-semibold text-white">
                     Edit &amp; Evaluasi Nilai Rapor Karyawan
                   </h4>
-                  <p className="text-[11px] text-indigo-200">
+                  <p className="text-xs text-slate-200">
                     {editingReportCardData.employeeName} ({editingReportCardData.employeeId}) • {editingReportCardData.positionTitle}
                   </p>
                 </div>
@@ -21375,26 +21247,26 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             {/* Body */}
             <div className="p-5 space-y-4 overflow-y-auto text-xs">
               {/* Live Preview Skor */}
-              <div className="p-4 bg-indigo-50/80 rounded-2xl border border-indigo-200 flex items-center justify-between">
+              <div className="p-4 bg-slate-50/80 rounded-lg border border-slate-200 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700">
+                  <span className="text-xs font-bold  text-slate-700">
                     Kalkulasi Skor Otomatis
                   </span>
-                  <h5 className="text-lg font-black text-slate-900">
+                  <h5 className="text-lg font-semibold text-slate-900">
                     {editingReportCardData.gradeLabel}
                   </h5>
                 </div>
                 <div className="text-right">
-                  <span className="text-2xl font-black text-indigo-700 font-mono">
+                  <span className="text-2xl font-semibold text-slate-700 font-mono">
                     {editingReportCardData.totalScore}
                   </span>
-                  <span className="block text-[10px] font-bold text-slate-500">Grade: {editingReportCardData.grade}</span>
+                  <span className="block text-xs font-bold text-slate-500">Grade: {editingReportCardData.grade}</span>
                 </div>
               </div>
 
               {/* 6 Input Skor Slider/Number */}
-              <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                <span className="text-[11px] font-black uppercase tracking-wider text-slate-600 block">
+              <div className="space-y-3 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <span className="text-xs font-semibold  text-slate-600 block">
                   Penilaian 6 Komponen Kinerja &amp; Pembelajaran (Skor 0 - 100):
                 </span>
 
@@ -21402,7 +21274,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <div className="space-y-1">
                   <div className="flex justify-between font-bold text-slate-800">
                     <span>1. Kedisiplinan &amp; Presensi (Bobot 20%)</span>
-                    <span className="font-mono text-blue-700">{editingReportCardData.attendanceScore}</span>
+                    <span className="font-mono text-sky-700">{editingReportCardData.attendanceScore}</span>
                   </div>
                   <input
                     type="range"
@@ -21468,7 +21340,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <div className="space-y-1">
                   <div className="flex justify-between font-bold text-slate-800">
                     <span>3. Pelayanan &amp; Hospitality (Bobot 15%)</span>
-                    <span className="font-mono text-purple-700">{editingReportCardData.hospitalityScore}</span>
+                    <span className="font-mono text-slate-700">{editingReportCardData.hospitalityScore}</span>
                   </div>
                   <input
                     type="range"
@@ -21534,7 +21406,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <div className="space-y-1">
                   <div className="flex justify-between font-bold text-slate-800">
                     <span>5. Knowledge &amp; Kuis LMS (Bobot 15%)</span>
-                    <span className="font-mono text-indigo-700">{editingReportCardData.knowledgeScore}</span>
+                    <span className="font-mono text-slate-700">{editingReportCardData.knowledgeScore}</span>
                   </div>
                   <input
                     type="range"
@@ -21620,12 +21492,12 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                       recommendationLabel: label,
                     });
                   }}
-                  className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 >
-                  <option value="PROMOSI_LEADER">🌟 Rekomendasi Promosi ke Senior / Leader Stasiun</option>
-                  <option value="PERPANJANG_PKWT">✅ Rekomendasi Perpanjang Kontrak Kerja (PKWT)</option>
-                  <option value="PEMBINAAN_RETRAINING">⚠️ Program Pembinaan &amp; Pelatihan Ulang (Retraining)</option>
-                  <option value="TIDAK_DIPERPANJANG">❌ Tidak Direkomendasikan Perpanjang Kontrak</option>
+                  <option value="PROMOSI_LEADER">Rekomendasi Promosi ke Senior / Leader Stasiun</option>
+                  <option value="PERPANJANG_PKWT">Rekomendasi Perpanjang Kontrak Kerja (PKWT)</option>
+                  <option value="PEMBINAAN_RETRAINING">Program Pembinaan &amp; Pelatihan Ulang (Retraining)</option>
+                  <option value="TIDAK_DIPERPANJANG">Tidak Direkomendasikan Perpanjang Kontrak</option>
                 </select>
               </div>
 
@@ -21638,7 +21510,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   rows={2}
                   value={editingReportCardData.evaluatorFeedback}
                   onChange={(e) => setEditingReportCardData({ ...editingReportCardData, evaluatorFeedback: e.target.value })}
-                  className="w-full p-2.5 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full p-2.5 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
 
@@ -21651,7 +21523,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   rows={2}
                   value={editingReportCardData.developmentPlan}
                   onChange={(e) => setEditingReportCardData({ ...editingReportCardData, developmentPlan: e.target.value })}
-                  className="w-full p-2.5 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full p-2.5 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
             </div>
@@ -21675,7 +21547,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                   setIsEditReportCardModalOpen(false);
                   showToast(`Rapor performa staf ${editingReportCardData.employeeName} berhasil diperbarui!`);
                 }}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                className="px-4 py-2 bg-ink-800 hover:bg-ink-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 <span>Simpan Perubahan Rapor</span>
@@ -21694,16 +21566,16 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
       {/* ========================================================================= */}
       {isDailyReportPhotoModalOpen && dailyReportActiveItem && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 select-none">
-          <div className="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 flex flex-col max-h-[92vh]">
+          <div className="bg-white rounded-lg max-w-lg w-full overflow-hidden shadow-xl border border-slate-200 flex flex-col max-h-[92vh]">
             {/* Modal Header */}
-            <div className="p-4 bg-gradient-to-r from-slate-900 via-amber-950/80 to-slate-900 text-white flex items-center justify-between border-b border-amber-500/40 shrink-0">
+            <div className="p-4 bg-ink text-white flex items-center justify-between border-b border-amber-500/40 shrink-0">
               <div className="flex items-center space-x-2.5">
                 <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/40">
                   <Camera className="h-5 w-5" />
                 </div>
                 <div>
-                  <h4 className="font-black text-sm text-white">Ambil Foto Bukti Operasional</h4>
-                  <p className="text-[10px] text-amber-300 font-bold">
+                  <h4 className="font-semibold text-sm text-white">Ambil Foto Bukti Operasional</h4>
+                  <p className="text-xs text-amber-300 font-bold">
                     Stempel Waktu Otomatis &amp; Anti-Fraud (Digital Watermark)
                   </p>
                 </div>
@@ -21720,25 +21592,25 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             {/* Modal Body */}
             <div className="p-4 overflow-y-auto space-y-3.5 text-xs">
               {/* Item Info Box */}
-              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+              <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 bg-amber-100 px-2 py-0.5 rounded">
+                  <span className="text-xs font-semibold  text-amber-800 bg-amber-100 px-2 py-0.5 rounded">
                     {dailyReportActiveItem.categoryLabel}
                   </span>
-                  <span className="text-[10px] font-bold text-amber-700">
+                  <span className="text-xs font-bold text-amber-700">
                     Target: {dailyReportActiveItem.targetTime}
                   </span>
                 </div>
-                <h5 className="font-extrabold text-sm text-slate-900 mt-1">
+                <h5 className="font-semibold text-sm text-slate-900 mt-1">
                   {dailyReportActiveItem.title}
                 </h5>
-                <p className="text-[11px] text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-600 leading-relaxed">
                   {dailyReportActiveItem.description}
                 </p>
               </div>
 
               {/* Viewport Kamera Live dengan Dynamic Watermark Overlay */}
-              <div className="relative rounded-2xl overflow-hidden border-2 border-slate-900 bg-slate-950 shadow-inner">
+              <div className="relative rounded-lg overflow-hidden border-2 border-slate-900 bg-slate-950 shadow-inner">
                 <img
                   src={
                     dailyReportPhotoPreview ||
@@ -21760,15 +21632,15 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent p-3 text-white">
                   <div className="border border-amber-400/50 bg-slate-950/80 rounded-xl p-2 space-y-0.5 text-[8.5px] font-mono">
                     <div className="flex items-center justify-between text-amber-300 font-bold border-b border-white/20 pb-0.5">
-                      <span>📍 {currentKruStaff.outlet}</span>
-                      <span>📅 18-Okt-2026 • {new Date().toLocaleTimeString('id-ID')} WIB</span>
+                      <span>{currentKruStaff.outlet}</span>
+                      <span>18-Okt-2026 • {new Date().toLocaleTimeString('id-ID')} WIB</span>
                     </div>
                     <div className="flex items-center justify-between text-slate-200 pt-0.5">
-                      <span>👤 Leader: {currentKruStaff.name} ({currentKruStaff.role.split('(')[0]})</span>
-                      <span className="text-emerald-400 font-black">● LIVE VERIFIED</span>
+                      <span>Leader: {currentKruStaff.name} ({currentKruStaff.role.split('(')[0]})</span>
+                      <span className="text-emerald-400 font-semibold">● LIVE VERIFIED</span>
                     </div>
                     <div className="text-[8px] text-amber-200/90 truncate">
-                      📌 Item: {dailyReportActiveItem.title}
+                      Item: {dailyReportActiveItem.title}
                     </div>
                   </div>
                 </div>
@@ -21776,7 +21648,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* Quick Shutter Simulate Buttons */}
               <div className="flex gap-2">
-                <label className="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-amber-300 rounded-xl font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer">
+                <label className="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-amber-300 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer">
                   <Camera className="h-4 w-4" />
                   <span>{dailyReportPhotoPreview ? 'Ganti Foto Bukti Riil (Kamera/Galeri)' : 'Ambil Foto Bukti Riil (Kamera/Galeri)'}</span>
                   <input
@@ -21791,7 +21663,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                         reader.onload = (event) => {
                           if (event.target?.result) {
                             setDailyReportPhotoPreview(event.target.result as string);
-                            showToast('📸 Foto bukti fisik riil berhasil diambil dari kamera/perangkat!');
+                            showToast('Foto bukti fisik riil berhasil diambil dari kamera/perangkat!');
                           }
                         };
                         reader.readAsDataURL(file);
@@ -21803,7 +21675,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
 
               {/* Catatan Lapangan Leader */}
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Catatan Leader Kondisi Fisik Lapangan:
                 </label>
                 <textarea
@@ -21850,10 +21722,10 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     )
                   );
 
-                  showToast(`🎉 Foto "${dailyReportActiveItem.title}" berhasil disimpan dengan stempel waktu ${timeStr}!`);
+                  showToast(`Foto "${dailyReportActiveItem.title}" berhasil disimpan dengan stempel waktu ${timeStr}!`);
                   setIsDailyReportPhotoModalOpen(false);
                 }}
-                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition flex items-center gap-1.5 shadow-sm"
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 <span>Simpan Foto Ber-Timestamp</span>

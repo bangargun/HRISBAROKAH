@@ -98,13 +98,13 @@ export default function EmployeeListModule({
     }
   }
 
-  const btn = 'inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 font-medium text-slate-700 hover:bg-slate-50';
+  const btn = 'btn btn-sm btn-secondary';
 
   return (
     <div className="space-y-4 text-sm">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex rounded-md border border-slate-300 bg-white p-0.5" role="group" aria-label="Status akun">
+          <div className="segmented" role="group" aria-label="Status akun">
             {(['active', 'inactive'] as const).map((v) => (
               <button
                 key={v}
@@ -114,13 +114,13 @@ export default function EmployeeListModule({
                   setView(v);
                   setOutletFilter('ALL');
                 }}
-                className={`rounded px-3 py-1.5 font-medium ${view === v ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'}`}
+                className="segmented-item"
               >
                 {v === 'active' ? 'Aktif' : `Nonaktif${inactiveCount ? ` (${inactiveCount})` : ''}`}
               </button>
             ))}
           </div>
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden />
             <label className="sr-only" htmlFor="emp-search">Cari karyawan</label>
             <input
@@ -129,7 +129,7 @@ export default function EmployeeListModule({
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="Cari nama, NIK, jabatan, username"
-              className="w-72 rounded-md border border-slate-300 bg-white py-2 pl-9 pr-3 text-slate-800 placeholder-slate-400 focus:border-amber-500"
+              className="input pl-9 sm:w-72"
             />
           </div>
           <label className="sr-only" htmlFor="emp-outlet">Cabang</label>
@@ -137,7 +137,7 @@ export default function EmployeeListModule({
             id="emp-outlet"
             value={outletFilter}
             onChange={(e) => setOutletFilter(e.target.value)}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-800"
+            className="input w-auto"
           >
             <option value="ALL">Semua cabang</option>
             {outletOptions.map((o) => (
@@ -152,7 +152,7 @@ export default function EmployeeListModule({
         )}
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+      <div className="card overflow-hidden">
         {loadError ? (
           <p role="alert" className="p-10 text-center text-rose-700">Gagal memuat karyawan: {loadError}</p>
         ) : employees === null ? (
@@ -176,7 +176,7 @@ export default function EmployeeListModule({
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase text-slate-600">
+                <tr className="table-head">
                   <th scope="col" className="px-4 py-3">Karyawan</th>
                   <th scope="col" className="px-4 py-3">Cabang &amp; jabatan</th>
                   <th scope="col" className="px-4 py-3">Status kerja</th>
@@ -221,7 +221,7 @@ export default function EmployeeListModule({
                                 setActionError(null);
                                 setConfirming(emp);
                               }}
-                              className={view === 'active' ? `${btn} text-rose-700 hover:bg-rose-50` : btn}
+                              className={view === 'active' ? 'btn btn-sm btn-danger-outline' : btn}
                             >
                               {view === 'active' ? 'Nonaktifkan' : 'Aktifkan lagi'}
                             </button>
@@ -261,19 +261,17 @@ export default function EmployeeListModule({
               : 'Akunnya bisa login lagi dengan username dan password yang lama, dan ikut dihitung gaji lagi.'}
           </p>
           {actionError && (
-            <p role="alert" className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-rose-800">{actionError}</p>
+            <p role="alert" className="alert-error">{actionError}</p>
           )}
           <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
-            <button type="button" disabled={busy} onClick={() => setConfirming(null)} className="rounded-md px-4 py-2 font-medium text-slate-700 hover:bg-slate-100">
+            <button type="button" disabled={busy} onClick={() => setConfirming(null)} className="btn btn-ghost px-4">
               Batal
             </button>
             <button
               type="button"
               disabled={busy}
               onClick={() => setActive(confirming, !confirming.user.isActive)}
-              className={`inline-flex items-center gap-1.5 rounded-md px-4 py-2 font-medium text-white disabled:opacity-50 ${
-                confirming.user.isActive ? 'bg-rose-700 hover:bg-rose-800' : 'bg-slate-900 hover:bg-slate-800'
-              }`}
+              className={`btn px-4 ${confirming.user.isActive ? 'btn-danger' : 'btn-primary'}`}
             >
               {busy && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
               {confirming.user.isActive ? 'Nonaktifkan' : 'Aktifkan lagi'}
