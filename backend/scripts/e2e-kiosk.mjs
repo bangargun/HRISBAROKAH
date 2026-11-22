@@ -787,6 +787,136 @@ checks.push(['tinjau: reject BREAK_END -> istirahat dihapus; reject CLOCK_OUT ->
   assert.equal(eventRow(eIn.id).split('|')[0], 'APPLIED');
 }]);
 
+// ---------- Task 6: blokir absen HP di cabang tablet, PIN absen ----------
+const setMode = (outletId, mode) => sql(`update "Outlet" set "attendanceMode"='${mode}' where id='${outletId}'`);
+
+checks.push(['HP: cabang tablet -> clock-in/out/istirahat 400 "Absen di tablet cabang"; today memuat mode; ditugaskan ke cabang HP -> boleh', async (ctx) => {
+  const sfx = Date.now().toString(36).toUpperCase();
+  const out1 = await createOutlet(ctx.admin, `${sfx}P1`);
+  const out2 = await createOutlet(ctx.admin, `${sfx}P2`);
+  setMode(out1.id, 'TABLET');
+  setMode(out2.id, 'MOBILE');
+  try {
+    const crew = await enrolledCrew(ctx.admin, out1.id, 'Wajah Blokir HP');
+    const token = await login(crew.username, crew.password);
+    const today = await http('GET', '/attendance/today', { token });
+    assert.equal(today.status, 200);
+    assert.equal(today.body.attendanceMode, 'TABLET');
+    assert.equal(today.body.workingOutletName, out1.name);
+    for (const [path, body] of [
+      ['/attendance/clock-in', { photoBase64: FACE_A }],
+      ['/attendance/clock-out', { photoBase64: FACE_A }],
+      ['/attendance/break/start', undefined],
+      ['/attendance/break/end', undefined],
+    ]) {
+      const r = await http('POST', path, { token, body });
+      assert.equal(r.status, 400, `${path}: ${JSON.stringify(r.body)}`);
+      assert.equal(r.body.message, 'Absen di tablet cabang', path);
+    }
+    assert.equal(sql(`select count(*) from "Attendance" where "employeeId"='${crew.id}'`), '0');
+
+    // ditugaskan hari ini ke cabang mode HP -> absen HP jalan
+    const sc = await schedule(ctx.admin, [{ employeeId: crew.id, date: jakartaYmd(0), working: true, outletId: out2.id }]);
+    assert.equal(sc.status, 200, JSON.stringify(sc.body));
+    const t2 = await http('GET', '/attendance/today', { token });
+    assert.equal(t2.body.attendanceMode, 'MOBILE');
+    assert.equal(t2.body.workingOutletName, out2.name);
+    const ok = await http('POST', '/attendance/clock-in', { token, body: { photoBase64: FACE_A } });
+    assert.equal(ok.status, 201, JSON.stringify(ok.body));
+    assert.equal(ok.body.source, 'MOBILE');
+
+    // kebalikan: kru cabang HP ditugaskan ke cabang tablet -> diblokir
+    const crew2 = await enrolledCrew(ctx.admin, out2.id, 'Wajah Tugas Tablet');
+    const token2 = await login(crew2.username, crew2.password);
+    await schedule(ctx.admin, [{ employeeId: crew2.id, date: jakartaYmd(0), working: true, outletId: out1.id }]);
+    const blocked = await http('POST', '/attendance/clock-in', { token: token2, body: { photoBase64: FACE_A } });
+    assert.equal(blocked.status, 400);
+    assert.equal(blocked.body.message, 'Absen di tablet cabang');
+  } finally {
+    setMode(out1.id, 'MOBILE');
+  }
+}]);
+
+checks.push(['PIN absen: kru atur sendiri (password salah 400, benar 200, format 6 digit); HR atur; hash tak bocor; PIN dipakai di tablet', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'N1');
+  const crew = await createCrew(ctx.admin, out.id, 'EMPLOYEE', 'Atur PIN');
+  const token = await login(crew.username, crew.password);
+  const put = (pin, password) => http('PUT', '/me/attendance-pin', { token, body: { pin, password } });
+
+  assert.equal((await http('PUT', '/me/attendance-pin', { body: { pin: '123456', password: crew.password } })).status, 401);
+  const wrong = await put('123456', 'salah-banget');
+  assert.equal(wrong.status, 400);
+  assert.equal(wrong.body.message, 'Password salah');
+  assert.equal(sql(`select ("attendancePinHash" is null) from "EmployeeProfile" where id='${crew.id}'`), 't');
+  for (const bad of ['12345', '1234567', 'abcdef', '12 456']) {
+    assert.equal((await put(bad, crew.password)).status, 400, bad);
+  }
+  assert.equal((await put(undefined, crew.password)).status, 400);
+  const ok = await put('123456', crew.password);
+  assert.equal(ok.status, 200, JSON.stringify(ok.body));
+  const hash = sql(`select "attendancePinHash" from "EmployeeProfile" where id='${crew.id}'`);
+  assert.ok(hash.startsWith('$2') && !hash.includes('123456'));
+  assert.ok(bcrypt.compareSync('123456', hash));
+  assert.ok(!JSON.stringify(ok.body).includes(hash));
+
+  // PIN dipakai di alur tablet
+  const e = ev(crew.id, 'CLOCK_IN', { method: 'PIN', pin: '123456' });
+  const r = await postEvents(dev.token, [e]);
+  assert.equal(r.body.results[0].status, 'NEEDS_REVIEW', JSON.stringify(r.body));
+
+  // admin melihat hasAttendancePin, tanpa hash
+  const detail = await http('GET', `/employees/${crew.id}`, { token: ctx.admin });
+  assert.equal(detail.status, 200);
+  assert.equal(detail.body.hasAttendancePin, true);
+  assert.equal(detail.body.attendancePinHash, undefined);
+  const list = await http('GET', `/employees?outletId=${out.id}`, { token: ctx.admin });
+  assert.ok(list.body.every((p) => p.attendancePinHash === undefined && typeof p.hasAttendancePin === 'boolean'));
+  assert.equal(list.body.find((p) => p.id === crew.id).hasAttendancePin, true);
+
+  // tidak ada endpoint yang membocorkan hash
+  const me = await http('GET', '/auth/me', { token });
+  assert.ok(!JSON.stringify(me.body).includes('attendancePinHash') && !JSON.stringify(me.body).includes(hash));
+  const login2 = await http('POST', '/auth/login', { body: { username: crew.username, password: crew.password } });
+  assert.ok(!JSON.stringify(login2.body).includes(hash));
+  const daily = await http('GET', `/attendance/admin/daily-report?outletId=${out.id}`, { token: ctx.admin });
+  assert.equal(daily.status, 200);
+  assert.ok(!JSON.stringify(daily.body).includes(hash) && !JSON.stringify(daily.body).includes('attendancePinHash'));
+}]);
+
+checks.push(['PIN absen: HR/Super Admin atur PIN kru; Store Manager & kru 403; akun admin hanya Super Admin; PIN tak valid 400', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'N2');
+  const crew = await createCrew(ctx.admin, out.id, 'EMPLOYEE', 'PIN oleh HR');
+  const hr = await createCrew(ctx.admin, out.id, 'HR_ADMIN', 'HR PIN');
+  const hrToken = await login(hr.username, hr.password);
+  const sm = await createCrew(ctx.admin, out.id, 'STORE_MANAGER', 'SM PIN');
+  const smToken = await login(sm.username, sm.password);
+  const crewToken = await login(crew.username, crew.password);
+  const url = `/employees/${crew.id}/attendance-pin`;
+
+  assert.equal((await http('PUT', url, { body: { pin: '246810' } })).status, 401);
+  assert.equal((await http('PUT', url, { token: smToken, body: { pin: '246810' } })).status, 403);
+  assert.equal((await http('PUT', url, { token: crewToken, body: { pin: '246810' } })).status, 403);
+  assert.equal((await http('PUT', url, { token: hrToken, body: { pin: '24681' } })).status, 400);
+  assert.equal((await http('PUT', url, { token: hrToken, body: { pin: 'abcdef' } })).status, 400);
+  assert.equal((await http('PUT', '/employees/00000000-0000-4000-8000-000000000000/attendance-pin', { token: hrToken, body: { pin: '246810' } })).status, 404);
+  assert.equal(sql(`select ("attendancePinHash" is null) from "EmployeeProfile" where id='${crew.id}'`), 't');
+
+  const ok = await http('PUT', url, { token: hrToken, body: { pin: '246810' } });
+  assert.equal(ok.status, 200, JSON.stringify(ok.body));
+  assert.ok(bcrypt.compareSync('246810', sql(`select "attendancePinHash" from "EmployeeProfile" where id='${crew.id}'`)));
+  const e = ev(crew.id, 'CLOCK_IN', { method: 'PIN', pin: '246810' });
+  assert.equal((await postEvents(dev.token, [e])).body.results[0].status, 'NEEDS_REVIEW');
+  // reset oleh Super Admin
+  assert.equal((await http('PUT', url, { token: ctx.admin, body: { pin: '135790' } })).status, 200);
+  assert.ok(bcrypt.compareSync('135790', sql(`select "attendancePinHash" from "EmployeeProfile" where id='${crew.id}'`)));
+
+  // akun admin: HR tidak boleh, Super Admin boleh
+  const hr2 = await createCrew(ctx.admin, out.id, 'HR_ADMIN', 'HR Lain');
+  const denied = await http('PUT', `/employees/${hr2.id}/attendance-pin`, { token: hrToken, body: { pin: '111222' } });
+  assert.equal(denied.status, 403);
+  assert.equal((await http('PUT', `/employees/${hr2.id}/attendance-pin`, { token: ctx.admin, body: { pin: '111222' } })).status, 200);
+}]);
+
 // ---------- runner ----------
 const isMain = import.meta.url === pathToFileURL(process.argv[1]).href;
 if (isMain) {

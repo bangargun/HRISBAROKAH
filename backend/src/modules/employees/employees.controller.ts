@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
-import { CreateEmployeeDto, ImportEmployeesDto, ResetPasswordDto, SetActiveDto, UpdateEmployeeDto } from './employees.dto';
+import { CreateEmployeeDto, ImportEmployeesDto, ResetPasswordDto, SetActiveDto, SetAttendancePinDto, UpdateEmployeeDto } from './employees.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -61,6 +61,12 @@ export class EmployeesController {
   @Post(':id/reset-password')
   async resetPassword(@CurrentUser() user, @Param('id') id: string, @Body() dto: ResetPasswordDto) {
     return this.employeesService.resetPassword(user, id, dto.newPassword);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN)
+  @Put(':id/attendance-pin')
+  async setAttendancePin(@CurrentUser() user, @Param('id') id: string, @Body() dto: SetAttendancePinDto) {
+    return this.employeesService.setAttendancePin(user, id, dto.pin);
   }
 
   @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN)

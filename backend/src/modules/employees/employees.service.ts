@@ -367,6 +367,17 @@ export class EmployeesService {
     return { message: `Password ${employee.fullName} sudah di-reset` };
   }
 
+  /** HR membuat atau mengatur ulang PIN absen tablet kru (mis. kru tanpa HP). Tidak wajib diganti kru. */
+  async setAttendancePin(actor: AuthUser, id: string, pin: string) {
+    const employee = await this.getOrThrow(id);
+    this.assertCanManageAdmin(actor, employee.user.role);
+    await this.prisma.employeeProfile.update({
+      where: { id },
+      data: { attendancePinHash: await bcrypt.hash(pin, 10) },
+    });
+    return { message: `PIN absen ${employee.fullName} sudah diatur` };
+  }
+
   /** Akun admin (HR, Keuangan, Super Admin) hanya boleh diubah oleh Super Admin. */
   private assertCanManageAdmin(actor: AuthUser, ...roles: (UserRole | undefined)[]) {
     if (actor.role !== UserRole.SUPER_ADMIN && roles.some((r) => r && ADMIN_ROLES.includes(r))) {

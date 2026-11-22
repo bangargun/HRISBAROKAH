@@ -2,7 +2,7 @@ import { Injectable, BadRequestException, NotFoundException } from '@nestjs/comm
 import { PrismaService } from '../../prisma/prisma.service';
 import { ClockInDto, ClockOutDto } from './attendance.dto';
 import { FaceEnrollmentService } from '../face/face-enrollment.service';
-import { AttendanceStatus, FaceCheckKind } from '@prisma/client';
+import { AttendanceMode, AttendanceStatus, FaceCheckKind } from '@prisma/client';
 import { calculateDistanceInMeters } from '../../common/utils/geofence.util';
 import { OutletHours, dayTypeFor, holidaysBetween, workWindow } from '../../common/utils/work-hours.util';
 import {
@@ -62,6 +62,31 @@ export class AttendanceService {
     return { lat, lng, distanceM: calculateDistanceInMeters(lat, lng, outlet.latitude, outlet.longitude) };
   }
 
+  /** Cabang tempat kru bertugas hari ini: jadwal hari itu bila menunjuk cabang, selain itu cabang asal. */
+  async workingOutletToday(employeeId: string) {
+    const schedule = await this.prisma.shiftSchedule.findUnique({
+      where: { employeeId_date: { employeeId, date: this.getTodayDate() } },
+      select: { outlet: true, employee: { select: { outlet: true } } },
+    });
+    if (!schedule) {
+      const profile = await this.prisma.employeeProfile.findUnique({
+        where: { id: employeeId },
+        select: { outlet: true },
+      });
+      if (!profile) throw new NotFoundException('Profil karyawan tidak ditemukan');
+      return profile.outlet;
+    }
+    return schedule.outlet ?? schedule.employee.outlet;
+  }
+
+  /** Cabang tablet menutup absen HP, supaya aplikasi versi lama pun tidak bisa dipakai absen. */
+  private async assertPhoneAllowed(employeeId: string) {
+    const outlet = await this.workingOutletToday(employeeId);
+    if (outlet.attendanceMode === AttendanceMode.TABLET) {
+      throw new BadRequestException('Absen di tablet cabang');
+    }
+  }
+
   async getTodayStatus(userId: string) {
     const profile = await this.prisma.employeeProfile.findUnique({
       where: { userId },
@@ -85,9 +110,12 @@ export class AttendanceService {
     });
 
     const activeBreak = attendance?.breaks.find((b) => b.endBreak === null) || null;
+    const workingOutlet = await this.workingOutletToday(profile.id);
 
     return {
       outlet: profile.outlet,
+      attendanceMode: workingOutlet.attendanceMode,
+      workingOutletName: workingOutlet.name,
       date: today,
       attendance: attendance || null,
       isOnBreak: !!activeBreak,
@@ -103,6 +131,7 @@ export class AttendanceService {
     if (!profile) {
       throw new NotFoundException('Profil karyawan tidak ditemukan');
     }
+    await this.assertPhoneAllowed(profile.id);
 
     const today = this.getTodayDate();
 
@@ -168,6 +197,7 @@ export class AttendanceService {
     if (!profile) {
       throw new NotFoundException('Profil karyawan tidak ditemukan');
     }
+    await this.assertPhoneAllowed(profile.id);
 
     const today = this.getTodayDate();
 
@@ -223,6 +253,7 @@ export class AttendanceService {
       where: { userId },
     });
     if (!profile) throw new NotFoundException('Profil karyawan tidak ditemukan');
+    await this.assertPhoneAllowed(profile.id);
 
     const today = this.getTodayDate();
     const attendance = await this.prisma.attendance.findFirst({
@@ -256,6 +287,7 @@ export class AttendanceService {
       where: { userId },
     });
     if (!profile) throw new NotFoundException('Profil karyawan tidak ditemukan');
+    await this.assertPhoneAllowed(profile.id);
 
     const today = this.getTodayDate();
     const attendance = await this.prisma.attendance.findFirst({

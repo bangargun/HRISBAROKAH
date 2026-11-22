@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException, BadRequestException, ConflictExcepti
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../prisma/prisma.service';
-import { LoginDto, ChangePasswordDto, ChangeUsernameDto } from './auth.dto';
+import { LoginDto, ChangePasswordDto, ChangeUsernameDto, SetAttendancePinDto } from './auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -111,6 +111,25 @@ export class AuthService {
     });
 
     return { message: 'Password berhasil diperbarui', accessToken: this.signFor(user) };
+  }
+
+  /** Kru mengatur PIN absen tablet sendiri; wajib memasukkan password akun. */
+  async setAttendancePin(userId: string, dto: SetAttendancePinDto) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { profile: true } });
+    if (!user) {
+      throw new BadRequestException('User tidak ditemukan');
+    }
+    if (!(await bcrypt.compare(dto.password, user.passwordHash))) {
+      throw new BadRequestException('Password salah');
+    }
+    if (!user.profile) {
+      throw new BadRequestException('Profil karyawan tidak ditemukan');
+    }
+    await this.prisma.employeeProfile.update({
+      where: { id: user.profile.id },
+      data: { attendancePinHash: await bcrypt.hash(dto.pin, 10) },
+    });
+    return { message: 'PIN absen berhasil disimpan' };
   }
 
   /** Ganti username sendiri; wajib memasukkan password saat ini. */

@@ -36,6 +36,16 @@ export class ChangeUsernameDto {
   newUsername: string;
 }
 
+export class SetAttendancePinDto {
+  @IsString()
+  @Matches(/^\d{6}$/, { message: 'PIN harus 6 digit angka' })
+  pin: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Masukkan password akun' })
+  password: string;
+}
+
 export class UpdateFcmTokenDto {
   @IsString()
   @IsNotEmpty()

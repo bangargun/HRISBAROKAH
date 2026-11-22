@@ -200,6 +200,12 @@ export class ResetPasswordDto {
   newPassword: string;
 }
 
+export class SetAttendancePinDto {
+  @IsString()
+  @Matches(/^\d{6}$/, { message: 'PIN harus 6 digit angka' })
+  pin: string;
+}
+
 export class SetActiveDto {
   @IsBoolean()
   isActive: boolean;
