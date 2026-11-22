@@ -27,7 +27,7 @@ export class DevicesController {
 
   @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN)
   @Post(':deviceId/revoke')
-  revoke(@Param('id') id: string, @Param('deviceId') deviceId: string) {
-    return this.devices.revoke(id, deviceId);
+  revoke(@CurrentUser() user, @Param('id') id: string, @Param('deviceId') deviceId: string) {
+    return this.devices.revoke(user, id, deviceId);
   }
 }

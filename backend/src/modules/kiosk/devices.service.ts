@@ -54,7 +54,8 @@ export class DevicesService {
     });
   }
 
-  async revoke(outletId: string, deviceId: string) {
+  async revoke(actor: AuthUser, outletId: string, deviceId: string) {
+    assertOutletAccess(actor, outletId, 'Anda tidak bisa mengelola tablet cabang lain');
     const device = await this.prisma.attendanceDevice.findFirst({ where: { id: deviceId, outletId } });
     if (!device) throw new NotFoundException('Tablet tidak ditemukan');
     if (!device.revokedAt) {
@@ -65,7 +66,8 @@ export class DevicesService {
 
   /** Tukar kode pairing dengan token perangkat (sekali pakai). */
   async pair(code: string, ip: string) {
-    if (this.pairLimiter.isBlocked(ip)) {
+    // Pesan jatah dulu secara sinkron agar tebakan paralel tidak lolos pemeriksaan
+    if (!this.pairLimiter.tryAcquire(ip)) {
       throw new HttpException('Terlalu banyak percobaan, coba lagi beberapa menit lagi', HttpStatus.TOO_MANY_REQUESTS);
     }
 
@@ -92,10 +94,8 @@ export class DevicesService {
       return { device, outlet: pairing.outlet };
     });
 
-    if (!result) {
-      this.pairLimiter.register(ip);
-      throw new BadRequestException(INVALID_CODE);
-    }
+    if (!result) throw new BadRequestException(INVALID_CODE); // percobaan gagal tetap terhitung
+    this.pairLimiter.release(ip);
     return {
       token,
       device: { id: result.device.id, name: result.device.name },

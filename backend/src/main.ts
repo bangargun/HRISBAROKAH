@@ -7,6 +7,8 @@ import { UPLOADS_ROOT } from './common/utils/attendance-photo.util';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  // Nginx berjalan di host yang sama; percaya X-Forwarded-For hanya dari loopback
+  app.set('trust proxy', 'loopback');
   app.setGlobalPrefix('api/v1');
   app.enableCors();
   // Foto selfie absensi dikirim sebagai base64 (maks 2 MB)

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Ip, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Ip, Post, UseGuards } from '@nestjs/common';
 import { CurrentDevice, DeviceAuthGuard, DeviceContext } from './device-auth.guard';
 import { DevicesService } from './devices.service';
 import { PairDeviceDto } from './kiosk.dto';
@@ -9,10 +9,9 @@ export class KioskController {
   constructor(private devices: DevicesService) {}
 
   @Post('pair')
-  pair(@Body() dto: PairDeviceDto, @Req() req, @Ip() ip: string) {
-    // Di belakang Nginx, entri terakhir X-Forwarded-For adalah alamat asli klien
-    const forwarded = String(req.headers['x-forwarded-for'] ?? '').split(',').pop()?.trim();
-    return this.devices.pair(dto.code, forwarded || ip);
+  pair(@Body() dto: PairDeviceDto, @Ip() ip: string) {
+    // `trust proxy` (main.ts) membuat req.ip jadi alamat klien asli di belakang Nginx
+    return this.devices.pair(dto.code, ip);
   }
 
   // Sementara; diisi lengkap di Task 3

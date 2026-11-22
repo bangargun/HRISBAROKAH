@@ -58,6 +58,12 @@ export async function pairDevice(admin, outletId, deviceName = 'Tablet Uji') {
   return { ...r.body, code: p.body.code };
 }
 
+// IP palsu unik (lewat X-Forwarded-For dari localhost, trust proxy 'loopback') supaya
+// check yang menghasilkan kegagalan tidak menghabiskan jatah IP check lain / run lain.
+export const freshIp = () => ({
+  'X-Forwarded-For': `10.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}.${1 + Math.floor(Math.random() * 250)}`,
+});
+
 // ---------- daftar check ----------
 export const checks = [];
 
@@ -78,7 +84,7 @@ checks.push(['pairing -> pair -> token berfungsi -> kode dipakai ulang ditolak -
   assert.equal(boot.status, 200);
   assert.equal(boot.body.outletId, ctx.outlet.id);
 
-  const again = await http('POST', '/kiosk/pair', { body: { code: p.body.code } });
+  const again = await http('POST', '/kiosk/pair', { body: { code: p.body.code }, headers: freshIp() });
   assert.equal(again.status, 400);
   assert.equal(again.body.message, 'Kode tidak berlaku');
 
@@ -106,7 +112,7 @@ checks.push(['token disimpan sebagai hash SHA-256 (bukan token asli)', async (ct
 checks.push(['kode kedaluwarsa ditolak 400', async (ctx) => {
   const p = await http('POST', `/outlets/${ctx.outlet.id}/devices/pairing`, { token: ctx.admin, body: { deviceName: 'Tablet Basi' } });
   sql(`update "AttendanceDevicePairing" set "expiresAt" = (now() at time zone 'utc') - interval '1 minute' where code='${p.body.code}'`);
-  const r = await http('POST', '/kiosk/pair', { body: { code: p.body.code } });
+  const r = await http('POST', '/kiosk/pair', { body: { code: p.body.code }, headers: freshIp() });
   assert.equal(r.status, 400);
   assert.equal(r.body.message, 'Kode tidak berlaku');
 }]);
@@ -131,11 +137,55 @@ checks.push(['attendanceMode bisa diubah lewat update outlet', async (ctx) => {
   const ok = await http('PUT', `/outlets/${ctx.outlet.id}`, { token: ctx.admin, body: { attendanceMode: 'TABLET' } });
   assert.equal(ok.status, 200);
   assert.equal(ok.body.attendanceMode, 'TABLET');
+  assert.equal(sql(`select "attendanceMode" from "Outlet" where id='${ctx.outlet.id}'`), 'TABLET', 'tersimpan di DB');
+  const back = await http('GET', `/outlets/${ctx.outlet.id}`, { token: ctx.admin });
+  assert.equal(back.body.attendanceMode, 'TABLET');
 }]);
 
-// Memakai IP palsu via X-Forwarded-For supaya kuota IP check lain tidak ikut habis.
+checks.push(['dua POST /kiosk/pair serentak dengan kode sama -> tepat satu berhasil', async (ctx) => {
+  const p = await http('POST', `/outlets/${ctx.outlet.id}/devices/pairing`, { token: ctx.admin, body: { deviceName: 'Tablet Balap' } });
+  const rs = await Promise.all([1, 2, 3].map(() => http('POST', '/kiosk/pair', { body: { code: p.body.code }, headers: freshIp() })));
+  assert.deepEqual(rs.map((r) => r.status).sort(), [201, 400, 400]);
+  assert.equal(sql(`select count(*) from "AttendanceDevice" where name='Tablet Balap' and "outletId"='${ctx.outlet.id}'`), '1');
+}]);
+
+checks.push(['tebakan paralel dari satu IP: jatah 10, sisanya 429 (tidak bocor)', async () => {
+  const headers = freshIp();
+  const rs = await Promise.all(Array.from({ length: 30 }, () => http('POST', '/kiosk/pair', { body: { code: 'ZZZZZZZZ' }, headers })));
+  const n400 = rs.filter((r) => r.status === 400).length;
+  const n429 = rs.filter((r) => r.status === 429).length;
+  assert.equal(n400, 10, `400=${n400}`);
+  assert.equal(n429, 20, `429=${n429}`);
+}]);
+
+checks.push(['Store Manager: lihat perangkat outlet sendiri, 403 outlet lain / pairing / revoke', async (ctx) => {
+  const other = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}X`);
+  const dev = await pairDevice(ctx.admin, ctx.outlet.id, 'Tablet SM');
+  const otherDev = await pairDevice(ctx.admin, other.id, 'Tablet Lain');
+  const positionId = sql(`select id from "Position" limit 1`);
+  const tag = Date.now().toString(36);
+  const uname = `sm.${tag}`;
+  const emp = await http('POST', '/employees', {
+    token: ctx.admin,
+    body: { username: uname, password: 'sm-pass-123', role: 'STORE_MANAGER', nik: `SM${tag}`, fullName: 'SM Uji', phone: '0800', outletId: ctx.outlet.id, positionId, joinDate: '2026-01-01' },
+  });
+  assert.ok(emp.status === 201, `buat SM gagal: ${JSON.stringify(emp.body)}`);
+  const login = await http('POST', '/auth/login', { body: { username: uname, password: 'sm-pass-123' } });
+  const sm = login.body.accessToken;
+
+  const own = await http('GET', `/outlets/${ctx.outlet.id}/devices`, { token: sm });
+  assert.equal(own.status, 200);
+  assert.ok(own.body.some((d) => d.id === dev.device.id));
+  assert.equal((await http('GET', `/outlets/${other.id}/devices`, { token: sm })).status, 403);
+  assert.equal((await http('POST', `/outlets/${ctx.outlet.id}/devices/pairing`, { token: sm, body: { deviceName: 'X' } })).status, 403);
+  assert.equal((await http('POST', `/outlets/${ctx.outlet.id}/devices/${dev.device.id}/revoke`, { token: sm })).status, 403);
+  assert.equal((await http('POST', `/outlets/${other.id}/devices/${otherDev.device.id}/revoke`, { token: sm })).status, 403);
+  // perangkat tidak ikut tercabut
+  assert.equal((await http('GET', '/kiosk/bootstrap', { token: dev.token })).status, 200);
+}]);
+
 checks.push(['percobaan kode salah beruntun -> 429', async () => {
-  const headers = { 'X-Forwarded-For': `10.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}.9` };
+  const headers = freshIp();
   let blocked = null;
   for (let i = 0; i < 15; i++) {
     const r = await http('POST', '/kiosk/pair', { body: { code: 'ZZZZZZZZ' }, headers });

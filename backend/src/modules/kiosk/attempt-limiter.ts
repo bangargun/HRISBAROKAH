@@ -12,7 +12,28 @@ export class AttemptLimiter {
     private readonly now: () => number = Date.now,
   ) {}
 
-  /** Catat satu kegagalan untuk kunci ini. */
+  /**
+   * Pesan satu percobaan SEBELUM pekerjaan async dimulai. Mengembalikan false bila
+   * jatah habis (jangan lanjut). Percobaan tetap terhitung kecuali `release` dipanggil
+   * (mis. saat berhasil); karena sinkron, permintaan paralel tidak bisa menyelinap.
+   */
+  tryAcquire(key: string): boolean {
+    const list = this.recent(key);
+    if (list.length >= this.maxFailures) return false;
+    list.push(this.now());
+    this.failures.set(key, list);
+    return true;
+  }
+
+  /** Kembalikan satu percobaan yang dipesan lewat tryAcquire (percobaan berhasil). */
+  release(key: string) {
+    const list = this.recent(key);
+    list.pop();
+    if (list.length) this.failures.set(key, list);
+    else this.failures.delete(key);
+  }
+
+  /** Catat satu kegagalan tanpa pemesanan. */
   register(key: string) {
     const list = this.recent(key);
     list.push(this.now());
