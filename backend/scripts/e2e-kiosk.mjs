@@ -644,6 +644,149 @@ checks.push(['regresi: absen HP (clock-in mobile) tetap berjalan', async (ctx) =
   assert.equal(sql(`select accepted from "FaceCheckLog" where "employeeId"='${wrong.id}'`), 'f');
 }]);
 
+// ---------- tinjauan absen meragukan ----------
+async function smOf(ctx, outletId) {
+  const sm = await createCrew(ctx.admin, outletId, 'STORE_MANAGER', 'SM Tinjau');
+  return login(sm.username, sm.password);
+}
+const attFlags = (empId) => sql(`select array_to_string(flags,',') from "Attendance" where "employeeId"='${empId}'`).split(',');
+const review = (token, id, action) => http('POST', `/attendance-review/${id}/${action}`, { token });
+
+checks.push(['tinjau: Store Manager hanya melihat/menyetujui event outletnya; peran lain 403; daftar berisi foto & skor', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'R1');
+  const { out: out2 } = await tabletOutlet(ctx, 'R2');
+  const crew = await enrolledCrew(ctx.admin, out.id);
+  const e = ev(crew.id, 'CLOCK_IN', { photo: FACE_B });
+  assert.equal((await postEvents(dev.token, [e])).body.results[0].status, 'NEEDS_REVIEW');
+  const sm1 = await smOf(ctx, out.id);
+  const sm2 = await smOf(ctx, out2.id);
+
+  const mine = await http('GET', '/attendance-review?status=NEEDS_REVIEW', { token: sm1 });
+  assert.equal(mine.status, 200, JSON.stringify(mine.body));
+  const item = mine.body.find((x) => x.id === e.id);
+  assert.ok(item, 'SM outlet sendiri melihat event');
+  assert.equal(item.type, 'CLOCK_IN');
+  assert.equal(item.applied, true);
+  assert.equal(item.employee.id, crew.id);
+  assert.equal(item.outlet.id, out.id);
+  assert.ok(item.photoUrl && item.photoUrl.startsWith('/uploads/'), item.photoUrl);
+  assert.ok(item.enrolledPhotoUrl, 'foto terdaftar ada');
+  assert.ok(item.serverScore !== null && item.localScore !== null);
+  assert.ok(item.flags.includes('FACE_REVIEW'));
+  assert.ok(mine.body.every((x) => x.outlet.id === out.id), 'hanya outlet sendiri');
+
+  const other = await http('GET', '/attendance-review', { token: sm2 });
+  assert.equal(other.status, 200);
+  assert.ok(!other.body.some((x) => x.id === e.id), 'SM outlet lain tidak melihat');
+  const forced = await http('GET', `/attendance-review?outletId=${out.id}`, { token: sm2 });
+  assert.ok(!forced.body.some((x) => x.id === e.id));
+  assert.equal((await review(sm2, e.id, 'accept')).status, 403);
+  assert.equal((await review(sm2, e.id, 'reject')).status, 403);
+  assert.equal(eventRow(e.id).split('|')[0], 'NEEDS_REVIEW');
+
+  const crewToken = await login(crew.username, crew.password);
+  assert.equal((await http('GET', '/attendance-review', { token: crewToken })).status, 403);
+  assert.equal((await review(crewToken, e.id, 'accept')).status, 403);
+  assert.equal((await http('GET', '/attendance-review')).status, 401);
+
+  const adminList = await http('GET', `/attendance-review?outletId=${out.id}&from=2000-01-01&to=2999-01-01`, { token: ctx.admin });
+  assert.ok(adminList.body.some((x) => x.id === e.id));
+  assert.equal((await http('GET', '/attendance-review?status=APPLIED', { token: ctx.admin })).status, 400);
+  const photo = await fetch(API.replace('/api/v1', '') + item.photoUrl);
+  assert.equal(photo.status, 200);
+  const enr = await fetch(API.replace('/api/v1', '') + item.enrolledPhotoUrl, { headers: { Authorization: `Bearer ${sm1}` } });
+  assert.equal(enr.status, 200);
+  const enrOther = await fetch(API.replace('/api/v1', '') + item.enrolledPhotoUrl, { headers: { Authorization: `Bearer ${sm2}` } });
+  assert.equal(enrOther.status, 403);
+}]);
+
+checks.push(['tinjau: accept -> APPLIED, PENDING_REVIEW hilang, reviewer tercatat; accept/reject lagi 400 "Sudah ditinjau"; serentak hanya satu menang', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'R3');
+  const crew = await enrolledCrew(ctx.admin, out.id);
+  const e = ev(crew.id, 'CLOCK_IN', { photo: FACE_B });
+  await postEvents(dev.token, [e]);
+  assert.ok(attFlags(crew.id).includes('PENDING_REVIEW'));
+  const a = await review(ctx.admin, e.id, 'accept');
+  assert.equal(a.status, 201, JSON.stringify(a.body));
+  const [status, applied] = eventRow(e.id).split('|');
+  assert.equal(status, 'APPLIED');
+  assert.equal(applied, 'true');
+  assert.ok(!attFlags(crew.id).includes('PENDING_REVIEW'), 'PENDING_REVIEW dihapus');
+  assert.equal(sql(`select ("reviewedById" is not null)||'|'||("reviewedAt" is not null) from "AttendanceEvent" where id='${e.id}'`), 'true|true');
+  const again = await review(ctx.admin, e.id, 'accept');
+  assert.equal(again.status, 400);
+  assert.equal(again.body.message, 'Sudah ditinjau');
+  assert.equal((await review(ctx.admin, e.id, 'reject')).status, 400);
+  assert.equal((await review(ctx.admin, randomUUID(), 'accept')).status, 404);
+
+  const crew2 = await enrolledCrew(ctx.admin, out.id);
+  const e2 = ev(crew2.id, 'CLOCK_IN', { photo: FACE_B });
+  await postEvents(dev.token, [e2]);
+  const rs = await Promise.all([review(ctx.admin, e2.id, 'accept'), review(ctx.admin, e2.id, 'reject'), review(ctx.admin, e2.id, 'accept')]);
+  assert.equal(rs.filter((r) => r.status === 201).length, 1, JSON.stringify(rs.map((r) => r.status)));
+  assert.equal(rs.filter((r) => r.status === 400).length, 2);
+}]);
+
+checks.push(['tinjau: accept satu dari dua event meragukan -> PENDING_REVIEW tetap sampai event terakhir ditinjau', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'R4');
+  const crew = await enrolledCrew(ctx.admin, out.id);
+  const e1 = ev(crew.id, 'CLOCK_IN', { agoMin: 60, photo: FACE_B });
+  const e2 = ev(crew.id, 'CLOCK_OUT', { agoMin: 5, photo: FACE_B });
+  await postEvents(dev.token, [e1, e2]);
+  assert.equal((await review(ctx.admin, e1.id, 'accept')).status, 201);
+  assert.ok(attFlags(crew.id).includes('PENDING_REVIEW'), 'masih ada satu menunggu');
+  assert.equal((await review(ctx.admin, e2.id, 'accept')).status, 201);
+  assert.ok(!attFlags(crew.id).includes('PENDING_REVIEW'));
+}]);
+
+checks.push(['tinjau: reject CLOCK_IN -> absen & istirahat terhapus, semua event hari itu REJECTED "Absen masuk ditolak"', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'R5');
+  const crew = await enrolledCrew(ctx.admin, out.id);
+  const e1 = ev(crew.id, 'CLOCK_IN', { agoMin: 60, photo: FACE_B });
+  const e2 = ev(crew.id, 'BREAK_START', { agoMin: 30 });
+  const e3 = ev(crew.id, 'CLOCK_IN', { agoMin: 10 }); // ganda: tidak diterapkan, menempel ke absen
+  const r = await postEvents(dev.token, [e1, e2, e3]);
+  assert.equal(r.status, 201, JSON.stringify(r.body));
+  assert.equal(sql(`select count(*) from "AttendanceBreak" b join "Attendance" a on a.id=b."attendanceId" where a."employeeId"='${crew.id}'`), '1');
+  const x = await review(ctx.admin, e1.id, 'reject');
+  assert.equal(x.status, 201, JSON.stringify(x.body));
+  assert.equal(sql(`select count(*) from "Attendance" where "employeeId"='${crew.id}'`), '0');
+  for (const id of [e1.id, e2.id, e3.id]) {
+    const [status, , reason] = eventRow(id).split('|');
+    assert.equal(status, 'REJECTED', id);
+    assert.equal(reason, 'Absen masuk ditolak');
+  }
+  assert.equal(sql(`select ("reviewedById" is not null) from "AttendanceEvent" where id='${e1.id}'`), 't');
+  const rejected = await http('GET', '/attendance-review?status=REJECTED', { token: ctx.admin });
+  assert.ok(rejected.body.some((i) => i.id === e1.id && i.status === 'REJECTED'));
+}]);
+
+checks.push(['tinjau: reject BREAK_END -> istirahat dihapus; reject CLOCK_OUT -> clockOut* kosong; reject tak diterapkan -> hanya REJECTED', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'R6');
+  const crew = await enrolledCrew(ctx.admin, out.id);
+  const eIn = ev(crew.id, 'CLOCK_IN', { agoMin: 90 });
+  const eBs = ev(crew.id, 'BREAK_START', { agoMin: 80 });
+  const eBe = ev(crew.id, 'BREAK_END', { agoMin: 70, photo: FACE_B });
+  const eOut = ev(crew.id, 'CLOCK_OUT', { agoMin: 5, photo: FACE_B });
+  const eDup = ev(crew.id, 'CLOCK_IN', { agoMin: 3 }); // ditolak urutan, tak diterapkan
+  assert.equal((await postEvents(dev.token, [eIn, eBs, eBe, eOut, eDup])).status, 201);
+  assert.equal(eventRow(eDup.id).split('|')[1], 'false');
+
+  assert.equal((await review(ctx.admin, eBe.id, 'reject')).status, 201);
+  assert.equal(sql(`select count(*) from "AttendanceBreak" b join "Attendance" a on a.id=b."attendanceId" where a."employeeId"='${crew.id}'`), '0');
+  assert.equal(eventRow(eBe.id).split('|')[0], 'REJECTED');
+  assert.ok(attFlags(crew.id).includes('PENDING_REVIEW'), 'CLOCK_OUT masih menunggu');
+
+  assert.equal((await review(ctx.admin, eOut.id, 'reject')).status, 201);
+  assert.equal(sql(`select ("clockOutTime" is null)||'|'||("clockOutPhotoUrl" is null)||'|'||("clockOutFaceScore" is null)||'|'||("clockInTime" is not null) from "Attendance" where "employeeId"='${crew.id}'`), 'true|true|true|true');
+  assert.ok(!attFlags(crew.id).includes('PENDING_REVIEW'));
+
+  assert.equal((await review(ctx.admin, eDup.id, 'reject')).status, 201);
+  assert.equal(eventRow(eDup.id).split('|')[0], 'REJECTED');
+  assert.equal(sql(`select count(*) from "Attendance" where "employeeId"='${crew.id}'`), '1');
+  assert.equal(eventRow(eIn.id).split('|')[0], 'APPLIED');
+}]);
+
 // ---------- runner ----------
 const isMain = import.meta.url === pathToFileURL(process.argv[1]).href;
 if (isMain) {
