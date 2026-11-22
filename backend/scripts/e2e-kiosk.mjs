@@ -542,13 +542,15 @@ checks.push(['events: kru tamu tidak terjadwal di cabang ini -> GUEST + UNSCHEDU
   for (const f of ['GUEST', 'UNSCHEDULED', 'PENDING_REVIEW']) assert.ok(flags.split(',').includes(f), flags);
 }]);
 
-checks.push(['events: validasi batch (kosong, >200, PIN bukan 6 digit, tanpa token)', async (ctx) => {
+checks.push(['events: validasi batch (kosong, >50, PIN bukan 6 digit, tanpa token)', async (ctx) => {
   const { out, dev } = await tabletOutlet(ctx, 'EV');
   const crew = await createCrew(ctx.admin, out.id);
   assert.equal((await postEvents(dev.token, [])).status, 400);
   assert.equal((await postEvents(dev.token, [ev(crew.id, 'CLOCK_IN', { method: 'PIN', pin: '12ab56' })])).status, 400);
-  const many = Array.from({ length: 201 }, () => ({ ...ev(crew.id, 'CLOCK_IN'), photoBase64: 'x' }));
-  assert.equal((await postEvents(dev.token, many)).status, 400);
+  const many = Array.from({ length: 51 }, () => ({ ...ev(crew.id, 'CLOCK_IN'), photoBase64: 'x' }));
+  const r51 = await postEvents(dev.token, many);
+  assert.equal(r51.status, 400);
+  assert.match(JSON.stringify(r51.body.message), /Maksimal 50 event/);
   assert.equal((await postEvents(undefined, [ev(crew.id, 'CLOCK_IN')])).status, 401);
 }]);
 
@@ -574,17 +576,51 @@ checks.push(['identify: wajah terdaftar -> kru itu; wajah asing -> 404; 11 gagal
   assert.equal(nf.body.message, 'Wajah tidak dikenali');
 }]);
 
-checks.push(['events: 11 PIN salah dari satu tablet dalam 10 menit -> ke-11 dst ditolak "Terlalu banyak PIN salah"', async (ctx) => {
+checks.push(['events: jatah PIN salah habis (10/10 menit per tablet) -> event ke-11 dst tidak dijawab & tidak disimpan (tablet mengulang)', async (ctx) => {
   const { out, dev } = await tabletOutlet(ctx, 'PL');
   const crew = await createCrew(ctx.admin, out.id, 'EMPLOYEE', 'Tebak PIN');
   setPin(crew.id, '123456');
-  const batch = Array.from({ length: 12 }, (_, i) => ev(crew.id, 'CLOCK_IN', { method: 'PIN', pin: '000000', agoMin: 12 - i }));
-  const r = await postEvents(dev.token, batch);
-  const reasons = r.body.results.map((x) => `${x.status}:${x.reason}`);
-  assert.deepEqual(reasons, [
-    ...Array(10).fill('REJECTED:PIN salah'),
-    ...Array(2).fill('REJECTED:Terlalu banyak PIN salah, coba lagi nanti'),
-  ]);
+  const wrong = Array.from({ length: 11 }, (_, i) => ev(crew.id, 'CLOCK_IN', { method: 'PIN', pin: '000000', agoMin: 12 - i }));
+  const right = ev(crew.id, 'CLOCK_IN', { method: 'PIN', pin: '123456' });
+  const r = await postEvents(dev.token, [...wrong, right]);
+  assert.equal(r.status, 201);
+  assert.deepEqual(r.body.results.map((x) => x.id), wrong.slice(0, 10).map((x) => x.id), 'ke-11 dan PIN benar sesudahnya tidak dijawab');
+  assert.ok(r.body.results.every((x) => x.status === 'REJECTED' && x.reason === 'PIN salah'));
+  assert.equal(sql(`select count(*) from "AttendanceEvent" where id in ('${wrong[10].id}','${right.id}')`), '0', 'tidak disimpan');
+  // Kiriman ulang event yang tidak dijawab tetap aman; jatah per tablet, jadi lewat tablet lain
+  // (pengganti menunggu 10 menit) PIN benar itu diterapkan
+  const dev2 = await pairDevice(ctx.admin, out.id, 'Tablet PL2');
+  const r2 = await postEvents(dev2.token, [right]);
+  assert.equal(r2.body.results[0].status, 'NEEDS_REVIEW', JSON.stringify(r2.body));
+  assert.match(eventRow(right.id), /^NEEDS_REVIEW\|true\|/);
+}]);
+
+checks.push(['events: CLOCK_OUT telat untuk hari D menempel ke absen D, bukan absen D+1 yang lebih baru', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'LT');
+  const crew = await enrolledCrew(ctx.admin, out.id);
+  const d = jakartaYmd(-3);
+  const d1 = jakartaYmd(-2);
+  const inD = ev(crew.id, 'CLOCK_IN', { at: `${d}T18:00:00+07:00` });
+  const inD1 = ev(crew.id, 'CLOCK_IN', { at: `${d1}T08:00:00+07:00` });
+  assert.equal((await postEvents(dev.token, [inD])).body.results[0].status, 'APPLIED');
+  assert.equal((await postEvents(dev.token, [inD1])).body.results[0].status, 'APPLIED');
+  const out23 = ev(crew.id, 'CLOCK_OUT', { at: `${d}T23:00:00+07:00` });
+  const r = await postEvents(dev.token, [out23]);
+  assert.equal(r.body.results[0].status, 'APPLIED', JSON.stringify(r.body));
+  const rows = sql(`select to_char(date,'YYYY-MM-DD')||'|'||("clockOutTime" is not null) from "Attendance" where "employeeId"='${crew.id}' order by date`);
+  assert.equal(rows, `${d}|true\n${d1}|false`);
+}]);
+
+checks.push(['events: foto tidak bisa dibaca (kesalahan event, deterministik) -> disimpan NEEDS_REVIEW tidak diterapkan, kiriman ulang sama', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'BP');
+  const crew = await enrolledCrew(ctx.admin, out.id);
+  const e = { ...ev(crew.id, 'CLOCK_IN'), photoBase64: Buffer.from('bukan gambar sama sekali').toString('base64') };
+  const r = await postEvents(dev.token, [e]);
+  assert.equal(r.body.results[0].status, 'NEEDS_REVIEW', JSON.stringify(r.body));
+  assert.match(r.body.results[0].reason, /^Foto absen tidak valid/);
+  assert.match(eventRow(e.id), /^NEEDS_REVIEW\|false\|Foto absen tidak valid/);
+  assert.equal(sql(`select count(*) from "Attendance" where "employeeId"='${crew.id}'`), '0');
+  assert.deepEqual((await postEvents(dev.token, [e])).body, r.body);
 }]);
 
 checks.push(['regresi: absen HP (clock-in mobile) tetap berjalan', async (ctx) => {

@@ -166,7 +166,7 @@ export class FaceEnrollmentService {
    * Cari kru aktif yang wajahnya paling mirip (minimal ambang cocok). Null bila tidak
    * ada wajah, lebih dari satu wajah, atau tidak ada yang cocok.
    */
-  async identify(photo: Buffer, excludeOutletId?: string): Promise<{ employeeId: string; score: number } | null> {
+  async identify(photo: Buffer): Promise<{ employeeId: string; score: number } | null> {
     let embedding: number[];
     try {
       embedding = await this.face.describe(photo);
@@ -175,10 +175,7 @@ export class FaceEnrollmentService {
     }
     const rows = await this.prisma.faceEnrollment.findMany({
       where: {
-        employee: {
-          user: { isActive: true, role: { notIn: ADMIN_ROLES } },
-          ...(excludeOutletId && { outletId: { not: excludeOutletId } }),
-        },
+        employee: { user: { isActive: true, role: { notIn: ADMIN_ROLES } } },
       },
       select: { employeeId: true, embedding: true },
     });

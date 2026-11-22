@@ -6,7 +6,7 @@ import { join } from 'path';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AttendanceService } from '../attendance/attendance.service';
 import { FaceEnrollmentService } from '../face/face-enrollment.service';
-import { UPLOADS_ROOT, decodePhoto, saveAttendancePhoto } from '../../common/utils/attendance-photo.util';
+import { DecodedPhoto, UPLOADS_ROOT, decodePhoto, saveAttendancePhoto } from '../../common/utils/attendance-photo.util';
 import { businessDateString, toDateOnly } from '../../common/utils/business-date.util';
 import { AttemptLimiter } from './attempt-limiter';
 import { DeviceContext } from './device-auth.guard';
@@ -30,9 +30,8 @@ import {
 } from './kiosk.rules';
 
 export const REASON_WRONG_PIN = 'PIN salah';
-export const REASON_TOO_MANY_PIN = 'Terlalu banyak PIN salah, coba lagi nanti';
 const REASON_EMPLOYEE_NOT_FOUND = 'Karyawan tidak ditemukan';
-const REASON_SERVER_ERROR = 'Gagal diproses server, perlu dicek';
+const REASON_BAD_PHOTO = 'Foto absen tidak valid';
 
 // Tanda yang membuat event tetap diterapkan tetapi menunggu tinjauan HR
 const REVIEW_FLAGS: Record<string, string> = {
@@ -55,6 +54,11 @@ export interface EventResult {
 
 type Tx = Prisma.TransactionClient;
 
+interface ClockInContext {
+  date: Date;
+  punctuality: Awaited<ReturnType<AttendanceService['punctuality']>>;
+}
+
 const isUniqueViolation = (e: unknown) => e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002';
 const ymd = (d: Date) => d.toISOString().slice(0, 10);
 
@@ -74,8 +78,11 @@ export class EventsService {
   ) {}
 
   /**
-   * Hasil dikembalikan sesuai urutan kiriman. Event yang gagal karena error server (mis. DB
-   * putus) tidak ikut di `results`; tablet menyimpannya di antrean dan mengirim ulang.
+   * Hasil dikembalikan sesuai urutan kiriman. Dua jenis kegagalan dibedakan:
+   * - kesalahan event itu sendiri yang akan sama setiap kali dikirim (mis. foto tidak bisa
+   *   dibaca) -> disimpan NEEDS_REVIEW, tidak diterapkan, dijawab (lihat applyOne);
+   * - error server/infrastruktur (DB putus, timeout transaksi, disk) dan jatah PIN habis ->
+   *   tidak ikut di `results`; tablet tetap mengantre dan mengirim ulang (aman: idempoten).
    */
   async ingest(device: DeviceContext, dto: KioskEventsDto): Promise<{ results: EventResult[] }> {
     const receivedAt = new Date();
@@ -89,8 +96,9 @@ export class EventsService {
       try {
         results[index] = await this.applyOne(device, e, effective, offsetNowMs, receivedAt);
       } catch (err) {
-        this.logger.error(`Event ${e.id} gagal diterapkan: ${err?.message}`, err?.stack);
-        results[index] = await this.recordFailure(device, e, effective, receivedAt);
+        // Error tak terduga = sementara: jangan disimpan permanen, biarkan tablet mengulang
+        this.logger.error(`Event ${e.id} gagal diproses, menunggu kiriman ulang: ${err?.message}`, err?.stack);
+        results[index] = null;
       }
     }
     return { results: results.filter((r): r is EventResult => r !== null) };
@@ -124,7 +132,7 @@ export class EventsService {
     effective: Date,
     offsetNowMs: number,
     receivedAt: Date,
-  ): Promise<EventResult> {
+  ): Promise<EventResult | null> {
     // 1. Sudah pernah diterima: kembalikan hasil tersimpan, tanpa kerja lain
     const stored = await this.findStored(e.id);
     if (stored) return stored;
@@ -158,42 +166,54 @@ export class EventsService {
       receivedAt,
     };
 
-    // 3. PIN diperiksa server; salah -> ditolak, tidak diterapkan
+    // 3. PIN diperiksa server; salah -> ditolak, tidak diterapkan.
+    //    Jatah PIN salah tablet ini habis -> tidak dijawab (diulang tablet setelah jendela lewat)
     if (e.method === KioskMethod.PIN) {
-      const pinError = await this.checkPin(device.deviceId, employee.attendancePinHash, e.pin);
-      if (pinError) return this.storeRejected(base, flags, pinError);
+      const pin = await this.checkPin(device.deviceId, employee.attendancePinHash, e.pin);
+      if (pin === 'budget') return null;
+      if (pin === 'wrong') return this.storeNotApplied(base, flags, AttendanceEventStatus.REJECTED, REASON_WRONG_PIN);
     }
 
-    // 4. Foto disimpan dan wajah dicocokkan ulang (di luar transaksi: berat)
-    let photoPath: string | null = null;
-    let serverScore: number | null = null;
+    // 4. Wajah dicocokkan ulang dan foto disimpan (di luar transaksi: berat)
+    let photo: DecodedPhoto;
     try {
-      const photo = decodePhoto(e.photoBase64, 'Foto absen');
-      const check = await this.faceEnrollment.scoreAgainst(e.employeeId, photo.buffer);
-      serverScore = check.score;
-      if (!check.enrolled) flags.add(FLAG_NO_FACE);
-      else if (check.reason) flags.add(FLAG_FACE_REVIEW);
-      photoPath = await saveAttendancePhoto(photo);
+      photo = decodePhoto(e.photoBase64, 'Foto absen');
     } catch (err) {
-      // Foto rusak/bukan gambar: absen tetap dicatat tetapi wajah perlu ditinjau
       if (!(err instanceof BadRequestException)) throw err;
-      flags.add(FLAG_FACE_REVIEW);
+      // Kesalahan deterministik event ini: kiriman ulang pasti gagal sama -> simpan, jangan ulang
+      return this.storeNotApplied(base, flags, AttendanceEventStatus.NEEDS_REVIEW, `${REASON_BAD_PHOTO}: ${err.message}`);
     }
+    const check = await this.faceEnrollment.scoreAgainst(e.employeeId, photo.buffer);
+    const serverScore = check.score;
+    if (!check.enrolled) flags.add(FLAG_NO_FACE);
+    else if (check.reason) flags.add(FLAG_FACE_REVIEW);
 
+    // Keterlambatan dihitung sebelum transaksi (kueri jadwal/libur tidak memegang koneksi transaksi)
+    const clockIn =
+      e.type === KioskEventType.CLOCK_IN ? await this.clockInContext(e.employeeId, device.outletId, effective) : null;
+
+    const photoPath = await saveAttendancePhoto(photo);
     try {
       return await this.prisma.$transaction(
-        (tx) => this.applyInTx(tx, device, e, effective, isGuest, flags, base, photoPath, serverScore),
+        (tx) => this.applyInTx(tx, device, e, effective, isGuest, flags, base, photoPath, serverScore, clockIn),
         { maxWait: 10_000, timeout: 20_000 },
       );
     } catch (err) {
+      // Percobaan ini tidak tersimpan: foto yang baru disimpan dibuang
+      await rm(join(UPLOADS_ROOT, photoPath.replace(/^\/uploads\//, '')), { force: true }).catch(() => undefined);
       // Kiriman ganda serentak: kunci primer menolak yang kalah, kembalikan hasil yang menang
       if (isUniqueViolation(err)) {
-        if (photoPath) await rm(join(UPLOADS_ROOT, photoPath.replace(/^\/uploads\//, '')), { force: true });
         const winner = await this.findStored(e.id);
         if (winner) return winner;
       }
       throw err;
     }
+  }
+
+  private async clockInContext(employeeId: string, outletId: string, effective: Date): Promise<ClockInContext> {
+    const date = toDateOnly(businessDateString(effective));
+    const outlet = await this.prisma.outlet.findUniqueOrThrow({ where: { id: outletId } });
+    return { date, punctuality: await this.attendance.punctuality(employeeId, outlet, date, effective) };
   }
 
   private async applyInTx(
@@ -204,8 +224,9 @@ export class EventsService {
     isGuest: boolean,
     flags: Set<string>,
     base: Omit<Prisma.AttendanceEventUncheckedCreateInput, 'status' | 'applied'>,
-    photoPath: string | null,
+    photoPath: string,
     serverScore: number | null,
+    clockIn: ClockInContext | null,
   ): Promise<EventResult> {
     // Event seorang kru diterapkan bergiliran (dua tablet / dua kiriman serentak)
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${e.employeeId}))`;
@@ -225,7 +246,9 @@ export class EventsService {
           where: {
             employeeId: e.employeeId,
             clockOutTime: null,
-            clockInTime: { gte: new Date(effective.getTime() - OPEN_ATTENDANCE_MAX_MS) },
+            // Hanya absen yang dimulai sebelum kejadian: event telat untuk hari D tidak
+            // menempel ke absen hari berikutnya
+            clockInTime: { gte: new Date(effective.getTime() - OPEN_ATTENDANCE_MAX_MS), lte: effective },
           },
           orderBy: { clockInTime: 'desc' },
           include,
@@ -271,9 +294,7 @@ export class EventsService {
     // 6. Terapkan ke Attendance / AttendanceBreak
     let attendanceId: string;
     if (isClockIn) {
-      const date = toDateOnly(dateYmd);
-      const outlet = await tx.outlet.findUniqueOrThrow({ where: { id: device.outletId } });
-      const punctuality = await this.attendance.punctuality(e.employeeId, outlet, date, effective);
+      const { date, punctuality } = clockIn!;
       const data = {
         outletId: device.outletId,
         clockInTime: effective,
@@ -331,9 +352,9 @@ export class EventsService {
   }
 
   /** Null bila PIN benar. Setiap percobaan memesan jatah lebih dulu; yang benar dikembalikan. */
-  private async checkPin(deviceId: string, pinHash: string | null, pin?: string): Promise<string | null> {
+  private async checkPin(deviceId: string, pinHash: string | null, pin?: string): Promise<'budget' | 'wrong' | null> {
     const key = `pin:${deviceId}`;
-    if (!this.limiter.tryAcquire(key)) return REASON_TOO_MANY_PIN;
+    if (!this.limiter.tryAcquire(key)) return 'budget';
     let ok = false;
     if (pinHash && pin) {
       try {
@@ -342,64 +363,27 @@ export class EventsService {
         ok = false; // hash rusak dianggap PIN salah
       }
     }
-    if (!ok) return REASON_WRONG_PIN;
+    if (!ok) return 'wrong';
     this.limiter.release(key);
     return null;
   }
 
-  private async storeRejected(
+  /** Simpan event yang tidak diterapkan (PIN salah, foto tidak terbaca); jawaban tetap untuk kiriman ulang. */
+  private async storeNotApplied(
     base: Omit<Prisma.AttendanceEventUncheckedCreateInput, 'status' | 'applied'>,
     flags: Set<string>,
+    status: AttendanceEventStatus,
     reason: string,
   ): Promise<EventResult> {
     try {
       await this.prisma.attendanceEvent.create({
-        data: { ...base, status: AttendanceEventStatus.REJECTED, applied: false, reason, flags: [...flags] },
+        data: { ...base, status, applied: false, reason, flags: [...flags] },
       });
     } catch (err) {
       if (!isUniqueViolation(err)) throw err;
       return (await this.findStored(base.id as string))!;
     }
-    return { id: base.id as string, status: AttendanceEventStatus.REJECTED, reason };
-  }
-
-  /**
-   * Error tak terduga: event disimpan sebagai NEEDS_REVIEW (tidak diterapkan) agar terlihat HR
-   * dan tidak dikirim ulang tanpa akhir. Bila penyimpanan pun gagal, tidak dijawab (tablet mengulang).
-   */
-  private async recordFailure(
-    device: DeviceContext,
-    e: KioskEventDto,
-    effective: Date,
-    receivedAt: Date,
-  ): Promise<EventResult | null> {
-    try {
-      const stored = await this.findStored(e.id);
-      if (stored) return stored;
-      await this.prisma.attendanceEvent.create({
-        data: {
-          id: e.id,
-          deviceId: device.deviceId,
-          employeeId: e.employeeId,
-          outletId: device.outletId,
-          type: e.type,
-          method: e.method,
-          deviceTime: new Date(e.deviceTime),
-          offsetAtEventMs: e.offsetAtEventMs,
-          effectiveTime: effective,
-          localScore: e.localScore ?? null,
-          receivedAt,
-          status: AttendanceEventStatus.NEEDS_REVIEW,
-          applied: false,
-          reason: REASON_SERVER_ERROR,
-        },
-      });
-      return { id: e.id, status: AttendanceEventStatus.NEEDS_REVIEW, reason: REASON_SERVER_ERROR };
-    } catch (err) {
-      if (isUniqueViolation(err)) return this.findStored(e.id).catch(() => null);
-      this.logger.error(`Event ${e.id} tidak bisa disimpan: ${err?.message}`);
-      return null;
-    }
+    return { id: base.id as string, status, reason };
   }
 
   private findStored(id: string): Promise<EventResult | null> {

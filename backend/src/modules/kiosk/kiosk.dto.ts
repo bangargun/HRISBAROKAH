@@ -35,11 +35,11 @@ export class PairDeviceDto {
   code: string;
 }
 
-// Foto absen tablet: JPEG sisi terpanjang 480 px (biasanya < 100 KB). Batas per foto dan
-// jumlah per batch dipilih agar satu batch 50 event (ukuran kiriman tablet) muat di batas
-// body rute ini (10 MB, sama dengan client_max_body_size Nginx).
+// Foto absen tablet: JPEG sisi terpanjang 480 px (biasanya < 100 KB). 50 event x foto
+// terbesar (180 ribu karakter) ~ 9 MB, muat di batas body rute ini (10 MB, sama dengan
+// client_max_body_size Nginx).
 export const MAX_KIOSK_PHOTO_BASE64_LENGTH = 180_000;
-export const MAX_KIOSK_EVENTS_PER_BATCH = 200;
+export const MAX_KIOSK_EVENTS_PER_BATCH = 50;
 export const KIOSK_EVENTS_BODY_LIMIT = '10mb';
 
 export class KioskEventDto {
