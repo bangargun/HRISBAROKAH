@@ -62,3 +62,26 @@ test('waktu sebelum absen masuk ditolak untuk semua jenis', () => {
     assert.deepEqual(checkTransition(s, t, at), { ok: false, reason: 'Waktu sebelum absen masuk' }, t);
   }
 });
+
+test('isOpen: kasus terbuka, tepat 16 jam masih terbuka, lewat sedikit tertutup', () => {
+  const s = state('2026-11-22T00:00:00Z');
+  assert.equal(isOpen(s, d('2026-11-22T05:00:00Z')), true);
+  assert.equal(isOpen(s, d('2026-11-22T16:00:00Z')), true);
+  assert.equal(isOpen(s, d('2026-11-22T16:00:00.001Z')), false);
+});
+
+test('wasOffline tepat 120 detik belum offline (batas ketat >)', () => {
+  assert.equal(wasOffline(d('2026-11-22T01:00:00Z'), d('2026-11-22T01:02:00Z')), false);
+  assert.equal(wasOffline(d('2026-11-22T01:00:00Z'), d('2026-11-22T01:02:00.001Z')), true);
+});
+
+test('clockChanged tepat di toleransi belum berubah (batas ketat >)', () => {
+  assert.equal(clockChanged(0, 120_000), false);
+  assert.equal(clockChanged(0, 120_001), true);
+  assert.equal(clockChanged(0, -120_001), true);
+});
+
+test('CLOCK_OUT pada absen yang sudah pulang ditolak', () => {
+  const s = state('2026-11-22T01:00:00Z', { clockOut: d('2026-11-22T09:00:00Z') });
+  assert.deepEqual(checkTransition(s, 'CLOCK_OUT', d('2026-11-22T10:00:00Z')), { ok: false, reason: 'Belum absen masuk' });
+});

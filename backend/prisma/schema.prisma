@@ -904,7 +904,7 @@ model AttendanceEvent {
   type            KioskEventType
   method          KioskMethod
   deviceTime      DateTime
-  offsetAtEventMs Int
+  offsetAtEventMs Float
   effectiveTime   DateTime
   localScore      Float?
   serverScore     Float?
@@ -912,7 +912,7 @@ model AttendanceEvent {
   status          AttendanceEventStatus
   applied         Boolean
   reason          String?
-  flags           String[]
+  flags           String[]              @default([])
   attendanceId    String?
   attendance      Attendance?           @relation(fields: [attendanceId], references: [id], onDelete: SetNull)
   reviewedById    String?
