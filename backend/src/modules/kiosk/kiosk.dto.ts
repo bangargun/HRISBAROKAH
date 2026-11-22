@@ -1,5 +1,21 @@
-import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
+  IsEnum,
+  IsISO8601,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Matches,
+  MaxLength,
+  ValidateNested,
+} from 'class-validator';
+import { KioskEventType, KioskMethod } from '@prisma/client';
 
 const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
 
@@ -17,4 +33,63 @@ export class PairDeviceDto {
   @IsNotEmpty({ message: 'Kode tidak berlaku' })
   @MaxLength(32, { message: 'Kode tidak berlaku' })
   code: string;
+}
+
+// Foto absen tablet: JPEG sisi terpanjang 480 px (biasanya < 100 KB). Batas per foto dan
+// jumlah per batch dipilih agar satu batch 50 event (ukuran kiriman tablet) muat di batas
+// body rute ini (10 MB, sama dengan client_max_body_size Nginx).
+export const MAX_KIOSK_PHOTO_BASE64_LENGTH = 180_000;
+export const MAX_KIOSK_EVENTS_PER_BATCH = 200;
+export const KIOSK_EVENTS_BODY_LIMIT = '10mb';
+
+export class KioskEventDto {
+  @IsUUID('all', { message: 'id event harus UUID' })
+  id: string;
+
+  @IsUUID('all', { message: 'employeeId harus UUID' })
+  employeeId: string;
+
+  @IsEnum(KioskEventType, { message: 'Jenis event tidak dikenal' })
+  type: KioskEventType;
+
+  @IsEnum(KioskMethod, { message: 'Metode absen tidak dikenal' })
+  method: KioskMethod;
+
+  @IsISO8601({ strict: true }, { message: 'deviceTime harus waktu ISO 8601' })
+  deviceTime: string;
+
+  @IsInt({ message: 'offsetAtEventMs harus bilangan bulat' })
+  offsetAtEventMs: number;
+
+  @IsOptional()
+  @IsNumber({ allowNaN: false, allowInfinity: false })
+  localScore?: number;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Foto absen wajib disertakan' })
+  @MaxLength(MAX_KIOSK_PHOTO_BASE64_LENGTH, { message: 'Ukuran foto absen terlalu besar' })
+  photoBase64: string;
+
+  @IsOptional()
+  @Matches(/^\d{6}$/, { message: 'PIN harus 6 digit angka' })
+  pin?: string;
+}
+
+export class KioskEventsDto {
+  @IsISO8601({ strict: true }, { message: 'deviceNow harus waktu ISO 8601' })
+  deviceNow: string;
+
+  @IsArray()
+  @ArrayMinSize(1, { message: 'Minimal 1 event' })
+  @ArrayMaxSize(MAX_KIOSK_EVENTS_PER_BATCH, { message: `Maksimal ${MAX_KIOSK_EVENTS_PER_BATCH} event per kiriman` })
+  @ValidateNested({ each: true })
+  @Type(() => KioskEventDto)
+  events: KioskEventDto[];
+}
+
+export class IdentifyDto {
+  @IsString()
+  @IsNotEmpty({ message: 'Foto wajib disertakan' })
+  @MaxLength(MAX_KIOSK_PHOTO_BASE64_LENGTH, { message: 'Ukuran foto terlalu besar' })
+  photoBase64: string;
 }

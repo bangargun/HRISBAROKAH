@@ -5,6 +5,9 @@
 import { execFileSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
+import { readFileSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
+import bcrypt from 'bcrypt';
 
 const API = process.env.E2E_API;
 const DB = (process.env.E2E_DATABASE_URL || '').split('?')[0];
@@ -351,6 +354,258 @@ checks.push(['jadwal: outletId disimpan, dikembalikan findRange, validasi outlet
   assert.equal((await schedule(smToken, [{ employeeId: mate.id, date, working: true, outletId: out1.id }])).status, 200);
   assert.equal((await schedule(smToken, [{ employeeId: mate.id, date, working: true, outletId: out2.id }])).status, 403);
   assert.equal((await schedule(smToken, [{ employeeId: crew.id, date, working: true, outletId: out1.id }])).status, 403);
+}]);
+
+// ---------- Task 4: ingest event, cek wajah server, identify ----------
+// face-a/face-b: potongan @vladmandic/human assets/samples.jpg (lisensi MIT), masing-masing satu wajah
+const FIXTURES = new URL('../test/fixtures/', import.meta.url);
+const FACE_A = readFileSync(new URL('face-a.jpg', FIXTURES)).toString('base64');
+const FACE_B = readFileSync(new URL('face-b.jpg', FIXTURES)).toString('base64');
+const MIN = 60_000;
+
+// Kru dengan wajah face-a terdaftar lewat endpoint pendaftaran wajah yang sudah ada
+async function enrolledCrew(admin, outletId, name = 'Wajah') {
+  const crew = await createCrew(admin, outletId, 'EMPLOYEE', name);
+  const r = await http('POST', `/face/employees/${crew.id}`, {
+    token: admin,
+    body: { photosBase64: [FACE_A, FACE_A, FACE_A], consentConfirmed: true },
+  });
+  assert.equal(r.status, 201, `daftar wajah gagal: ${JSON.stringify(r.body)}`);
+  return crew;
+}
+
+function setPin(employeeId, pin) {
+  sql(`update "EmployeeProfile" set "attendancePinHash"='${bcrypt.hashSync(pin, 10)}' where id='${employeeId}'`);
+}
+
+// Event tablet; default: jam tablet tepat (offset 0), kejadian `agoMin` menit lalu
+function ev(employeeId, type, { agoMin = 0, at, offset = 0, method = 'FACE_LOCAL', photo = FACE_A, pin } = {}) {
+  const effective = at ? new Date(at) : new Date(Date.now() - agoMin * MIN);
+  return {
+    id: randomUUID(),
+    employeeId,
+    type,
+    method,
+    deviceTime: new Date(effective.getTime() - offset).toISOString(),
+    offsetAtEventMs: offset,
+    localScore: 0.8,
+    photoBase64: photo,
+    ...(pin ? { pin } : {}),
+  };
+}
+const postEvents = (token, events, extra = {}) =>
+  http('POST', '/kiosk/events', { token, body: { deviceNow: new Date().toISOString(), events }, ...extra });
+const eventRow = (id) => sql(`select status||'|'||applied||'|'||coalesce(reason,'')||'|'||array_to_string(flags,',') from "AttendanceEvent" where id='${id}'`);
+
+async function tabletOutlet(ctx, tag) {
+  const out = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}${tag}`);
+  const dev = await pairDevice(ctx.admin, out.id, `Tablet ${tag}`);
+  return { out, dev };
+}
+
+checks.push(['events: CLOCK_IN wajah cocok -> APPLIED, Attendance source TABLET dari cabang tablet', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'E1');
+  const crew = await enrolledCrew(ctx.admin, out.id);
+  const e = ev(crew.id, 'CLOCK_IN');
+  const r = await postEvents(dev.token, [e]);
+  assert.equal(r.status, 201, JSON.stringify(r.body));
+  assert.deepEqual(r.body.results, [{ id: e.id, status: 'APPLIED', reason: null }]);
+  const row = sql(`select source||'|'||"outletId"||'|'||coalesce("deviceId",'')||'|'||"isGuest"||'|'||array_to_string(flags,',')||'|'||("clockInPhotoUrl" is not null)||'|'||("clockInFaceScore">0) from "Attendance" where "employeeId"='${crew.id}'`);
+  assert.equal(row, `TABLET|${out.id}|${dev.device.id}|false||true|true`);
+  const evRow = sql(`select "attendanceId" is not null and "serverScore" is not null and "photoPath" is not null from "AttendanceEvent" where id='${e.id}'`);
+  assert.equal(evRow, 't');
+}]);
+
+checks.push(['events: batch sama dikirim dua kali (dan serentak) -> hasil identik, satu Attendance, satu event', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'E2');
+  const crew = await enrolledCrew(ctx.admin, out.id);
+  const batch = [ev(crew.id, 'CLOCK_IN', { agoMin: 1 }), ev(crew.id, 'BREAK_START')];
+  const first = await postEvents(dev.token, batch);
+  assert.equal(first.status, 201, JSON.stringify(first.body));
+  const second = await postEvents(dev.token, batch);
+  assert.deepEqual(second.body, first.body);
+  assert.equal(sql(`select count(*) from "Attendance" where "employeeId"='${crew.id}'`), '1');
+  assert.equal(sql(`select count(*) from "AttendanceEvent" where "employeeId"='${crew.id}'`), '2');
+  assert.equal(sql(`select count(*) from "AttendanceBreak" b join "Attendance" a on a.id=b."attendanceId" where a."employeeId"='${crew.id}'`), '1');
+
+  // balapan: dua kiriman serentak dengan id yang sama
+  const crew2 = await enrolledCrew(ctx.admin, out.id);
+  const race = [ev(crew2.id, 'CLOCK_IN')];
+  const [a, b] = await Promise.all([postEvents(dev.token, race), postEvents(dev.token, race)]);
+  assert.equal(a.status, 201);
+  assert.deepEqual(a.body, b.body);
+  assert.equal(a.body.results[0].status, 'APPLIED');
+  assert.equal(sql(`select count(*) from "Attendance" where "employeeId"='${crew2.id}'`), '1');
+  assert.equal(sql(`select count(*) from "AttendanceEvent" where "employeeId"='${crew2.id}'`), '1');
+}]);
+
+checks.push(['events: BREAK_START lalu CLOCK_OUT saat istirahat -> istirahat ditutup pada jam pulang', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'E3');
+  const crew = await enrolledCrew(ctx.admin, out.id);
+  const batch = [ev(crew.id, 'CLOCK_OUT', { agoMin: 10 }), ev(crew.id, 'CLOCK_IN', { agoMin: 60 }), ev(crew.id, 'BREAK_START', { agoMin: 30 })];
+  const r = await postEvents(dev.token, batch);
+  assert.equal(r.status, 201, JSON.stringify(r.body));
+  assert.deepEqual(r.body.results.map((x) => x.id), batch.map((x) => x.id), 'hasil mengikuti urutan kiriman');
+  assert.deepEqual(r.body.results.map((x) => x.status), ['APPLIED', 'APPLIED', 'APPLIED']);
+  const row = sql(`select (b."endBreak" = a."clockOutTime")||'|'||b."totalMinutes"||'|'||(a."clockOutTime" is not null) from "AttendanceBreak" b join "Attendance" a on a.id=b."attendanceId" where a."employeeId"='${crew.id}'`);
+  assert.equal(row, 'true|20|true');
+}]);
+
+checks.push(['events: masuk 18:00 hari D, pulang 01:30 D+1, dikirim 3 hari kemudian -> satu absen tanggal D, terlambat, OFFLINE', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'E4');
+  sql(`update "Outlet" set "weekdayWorkStart"='09:00',"weekendWorkStart"='09:00',"holidayWorkStart"='09:00' where id='${out.id}'`);
+  const crew = await enrolledCrew(ctx.admin, out.id);
+  const d = jakartaYmd(-3);
+  const d1 = jakartaYmd(-2);
+  sql(`insert into "ShiftSchedule"(id,"employeeId",date) values (gen_random_uuid(),'${crew.id}','${d}')`);
+  const batch = [ev(crew.id, 'CLOCK_IN', { at: `${d}T18:00:00+07:00` }), ev(crew.id, 'CLOCK_OUT', { at: `${d1}T01:30:00+07:00` })];
+  const r = await postEvents(dev.token, batch);
+  assert.deepEqual(r.body.results.map((x) => x.status), ['APPLIED', 'APPLIED'], JSON.stringify(r.body));
+  const rows = sql(`select to_char(date,'YYYY-MM-DD')||'|'||"lateMinutes"||'|'||status||'|'||array_to_string(flags,',')||'|'||("scheduleId" is not null)||'|'||("clockOutTime" is not null) from "Attendance" where "employeeId"='${crew.id}'`);
+  assert.equal(rows, `${d}|540|LATE|OFFLINE|true|true`);
+  assert.match(eventRow(batch[1].id), /^APPLIED\|true\|\|OFFLINE$/);
+}]);
+
+checks.push(['events: CLOCK_IN kedua di hari sama -> NEEDS_REVIEW tidak diterapkan, "Sudah absen masuk"', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'E5');
+  const crew = await enrolledCrew(ctx.admin, out.id);
+  await postEvents(dev.token, [ev(crew.id, 'CLOCK_IN', { agoMin: 1 })]);
+  const e = ev(crew.id, 'CLOCK_IN');
+  const r = await postEvents(dev.token, [e]);
+  assert.deepEqual(r.body.results, [{ id: e.id, status: 'NEEDS_REVIEW', reason: 'Sudah absen masuk' }]);
+  assert.match(eventRow(e.id), /^NEEDS_REVIEW\|false\|Sudah absen masuk\|/);
+  assert.equal(sql(`select count(*) from "Attendance" where "employeeId"='${crew.id}'`), '1');
+}]);
+
+checks.push(['events: wajah lain -> NEEDS_REVIEW tetap diterapkan, FACE_REVIEW + PENDING_REVIEW', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'E6');
+  const crew = await enrolledCrew(ctx.admin, out.id);
+  const e = ev(crew.id, 'CLOCK_IN', { photo: FACE_B });
+  const r = await postEvents(dev.token, [e]);
+  assert.equal(r.body.results[0].status, 'NEEDS_REVIEW', JSON.stringify(r.body));
+  assert.ok(r.body.results[0].reason, 'alasan terisi');
+  const [status, applied, , flags] = eventRow(e.id).split('|');
+  assert.equal(status, 'NEEDS_REVIEW');
+  assert.equal(applied, 'true');
+  assert.ok(flags.split(',').includes('FACE_REVIEW'));
+  const att = sql(`select array_to_string(flags,',') from "Attendance" where "employeeId"='${crew.id}'`).split(',');
+  assert.ok(att.includes('FACE_REVIEW') && att.includes('PENDING_REVIEW'), att.join());
+}]);
+
+checks.push(['events: PIN benar tanpa wajah terdaftar -> NEEDS_REVIEW diterapkan (NO_FACE, PIN); PIN salah -> REJECTED', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'E7');
+  const crew = await createCrew(ctx.admin, out.id, 'EMPLOYEE', 'Tanpa Wajah');
+  setPin(crew.id, '123456');
+  const bad = ev(crew.id, 'CLOCK_IN', { method: 'PIN', pin: '654321', agoMin: 1 });
+  const rb = await postEvents(dev.token, [bad]);
+  assert.deepEqual(rb.body.results, [{ id: bad.id, status: 'REJECTED', reason: 'PIN salah' }]);
+  assert.match(eventRow(bad.id), /^REJECTED\|false\|PIN salah\|/);
+  assert.equal(sql(`select count(*) from "Attendance" where "employeeId"='${crew.id}'`), '0');
+
+  const good = ev(crew.id, 'CLOCK_IN', { method: 'PIN', pin: '123456' });
+  const rg = await postEvents(dev.token, [good]);
+  assert.equal(rg.body.results[0].status, 'NEEDS_REVIEW', JSON.stringify(rg.body));
+  const [, applied, , flags] = eventRow(good.id).split('|');
+  assert.equal(applied, 'true');
+  assert.ok(flags.includes('NO_FACE') && flags.includes('PIN'), flags);
+  const att = sql(`select array_to_string(flags,',') from "Attendance" where "employeeId"='${crew.id}'`).split(',');
+  assert.ok(att.includes('NO_FACE') && att.includes('PIN') && att.includes('PENDING_REVIEW'), att.join());
+
+  // kru tanpa PIN sama sekali -> PIN salah
+  const noPin = await createCrew(ctx.admin, out.id, 'EMPLOYEE', 'Tanpa PIN');
+  const np = ev(noPin.id, 'CLOCK_IN', { method: 'PIN', pin: '000000' });
+  assert.equal((await postEvents(dev.token, [np])).body.results[0].reason, 'PIN salah');
+}]);
+
+checks.push(['events: offsetAtEventMs beda 5 menit dari offset sekarang -> CLOCK_CHANGED', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'E8');
+  const crew = await enrolledCrew(ctx.admin, out.id);
+  const e = ev(crew.id, 'CLOCK_IN', { offset: 5 * MIN });
+  const r = await postEvents(dev.token, [e]);
+  assert.equal(r.body.results[0].status, 'NEEDS_REVIEW', JSON.stringify(r.body));
+  const [, applied, , flags] = eventRow(e.id).split('|');
+  assert.equal(applied, 'true');
+  assert.ok(flags.split(',').includes('CLOCK_CHANGED'), flags);
+  assert.ok(!flags.split(',').includes('OFFLINE'), 'waktu efektif = sekarang, bukan offline');
+}]);
+
+checks.push(['events: kru tamu tidak terjadwal di cabang ini -> GUEST + UNSCHEDULED', async (ctx) => {
+  const { dev } = await tabletOutlet(ctx, 'E9');
+  const home = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}E9H`);
+  const crew = await enrolledCrew(ctx.admin, home.id);
+  const e = ev(crew.id, 'CLOCK_IN');
+  const r = await postEvents(dev.token, [e]);
+  assert.equal(r.body.results[0].status, 'NEEDS_REVIEW', JSON.stringify(r.body));
+  const att = sql(`select "isGuest"||'|'||array_to_string(flags,',') from "Attendance" where "employeeId"='${crew.id}'`);
+  const [isGuest, flags] = att.split('|');
+  assert.equal(isGuest, 'true');
+  for (const f of ['GUEST', 'UNSCHEDULED', 'PENDING_REVIEW']) assert.ok(flags.split(',').includes(f), flags);
+}]);
+
+checks.push(['events: validasi batch (kosong, >200, PIN bukan 6 digit, tanpa token)', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'EV');
+  const crew = await createCrew(ctx.admin, out.id);
+  assert.equal((await postEvents(dev.token, [])).status, 400);
+  assert.equal((await postEvents(dev.token, [ev(crew.id, 'CLOCK_IN', { method: 'PIN', pin: '12ab56' })])).status, 400);
+  const many = Array.from({ length: 201 }, () => ({ ...ev(crew.id, 'CLOCK_IN'), photoBase64: 'x' }));
+  assert.equal((await postEvents(dev.token, many)).status, 400);
+  assert.equal((await postEvents(undefined, [ev(crew.id, 'CLOCK_IN')])).status, 401);
+}]);
+
+checks.push(['identify: wajah terdaftar -> kru itu; wajah asing -> 404; 11 gagal beruntun -> 429', async (ctx) => {
+  const { dev } = await tabletOutlet(ctx, 'ID');
+  const home = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}IDH`);
+  const crew = await enrolledCrew(ctx.admin, home.id, 'Wajah Identify');
+  // wajah face-a dari run/check lain disingkirkan agar hasilnya pasti kru ini
+  sql(`delete from "FaceEnrollment" where "employeeId" <> '${crew.id}' and "employeeId" in (select id from "EmployeeProfile" where "fullName" like 'Wajah%')`);
+  const ok = await http('POST', '/kiosk/identify', { token: dev.token, body: { photoBase64: FACE_A } });
+  assert.equal(ok.status, 201, JSON.stringify(ok.body));
+  assert.equal(ok.body.employeeId, crew.id);
+  assert.equal(ok.body.fullName, crew.fullName);
+  assert.equal(ok.body.homeOutletName, home.name);
+  assert.ok(ok.body.score >= 0.5);
+
+  const statuses = [];
+  for (let i = 0; i < 11; i++) {
+    statuses.push((await http('POST', '/kiosk/identify', { token: dev.token, body: { photoBase64: FACE_B } })).status);
+  }
+  assert.deepEqual(statuses, [...Array(10).fill(404), 429]);
+  const nf = await http('POST', '/kiosk/identify', { token: (await pairDevice(ctx.admin, home.id, 'Tablet ID2')).token, body: { photoBase64: FACE_B } });
+  assert.equal(nf.body.message, 'Wajah tidak dikenali');
+}]);
+
+checks.push(['events: 11 PIN salah dari satu tablet dalam 10 menit -> ke-11 dst ditolak "Terlalu banyak PIN salah"', async (ctx) => {
+  const { out, dev } = await tabletOutlet(ctx, 'PL');
+  const crew = await createCrew(ctx.admin, out.id, 'EMPLOYEE', 'Tebak PIN');
+  setPin(crew.id, '123456');
+  const batch = Array.from({ length: 12 }, (_, i) => ev(crew.id, 'CLOCK_IN', { method: 'PIN', pin: '000000', agoMin: 12 - i }));
+  const r = await postEvents(dev.token, batch);
+  const reasons = r.body.results.map((x) => `${x.status}:${x.reason}`);
+  assert.deepEqual(reasons, [
+    ...Array(10).fill('REJECTED:PIN salah'),
+    ...Array(2).fill('REJECTED:Terlalu banyak PIN salah, coba lagi nanti'),
+  ]);
+}]);
+
+checks.push(['regresi: absen HP (clock-in mobile) tetap berjalan', async (ctx) => {
+  const out = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}MB`);
+  const crew = await enrolledCrew(ctx.admin, out.id, 'Wajah HP');
+  const token = await login(crew.username, crew.password);
+  const r = await http('POST', '/attendance/clock-in', { token, body: { photoBase64: FACE_A } });
+  assert.equal(r.status, 201, JSON.stringify(r.body));
+  assert.equal(r.body.source, 'MOBILE');
+  assert.ok(r.body.clockInFaceScore >= 0.5);
+  const again = await http('POST', '/attendance/clock-in', { token, body: { photoBase64: FACE_A } });
+  assert.equal(again.status, 400);
+  const other = await createCrew(ctx.admin, out.id, 'EMPLOYEE', 'Belum Daftar');
+  const r2 = await http('POST', '/attendance/clock-in', { token: await login(other.username, other.password), body: { photoBase64: FACE_A } });
+  assert.equal(r2.status, 400);
+  assert.match(r2.body.message, /belum didaftarkan/);
+  const wrong = await enrolledCrew(ctx.admin, out.id, 'Wajah HP2');
+  const r3 = await http('POST', '/attendance/clock-in', { token: await login(wrong.username, wrong.password), body: { photoBase64: FACE_B } });
+  assert.equal(r3.status, 400);
+  assert.match(r3.body.message, /Absen ditolak: Wajah tidak cocok/);
+  assert.equal(sql(`select accepted from "FaceCheckLog" where "employeeId"='${wrong.id}'`), 'f');
 }]);
 
 // ---------- runner ----------

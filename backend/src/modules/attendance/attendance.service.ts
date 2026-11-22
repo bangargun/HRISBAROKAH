@@ -29,21 +29,21 @@ export class AttendanceService {
   }
 
   /**
-   * Jadwal hari ini menentukan keterlambatan: menit setelah jam mulai kerja cabang
-   * untuk jenis hari itu (weekday, weekend atau libur nasional).
+   * Jadwal pada `date` menentukan keterlambatan: menit dari jam mulai kerja cabang `outlet`
+   * (jenis hari: weekday, weekend atau libur nasional) sampai `at`.
    * Tanpa jadwal, absen tetap diterima sebagai hadir dan tidak dihitung terlambat.
    */
-  async punctuality(employeeId: string, outlet: OutletHours, today: Date, now: Date) {
+  async punctuality(employeeId: string, outlet: OutletHours, date: Date, at: Date) {
     const schedule = await this.prisma.shiftSchedule.findUnique({
-      where: { employeeId_date: { employeeId, date: today } },
+      where: { employeeId_date: { employeeId, date } },
     });
     if (!schedule) {
       return { scheduleId: null, lateMinutes: 0, status: AttendanceStatus.PRESENT };
     }
-    const ymd = today.toISOString().slice(0, 10);
+    const ymd = date.toISOString().slice(0, 10);
     const { start: startTime } = workWindow(outlet, dayTypeFor(ymd, await holidaysBetween(this.prisma, ymd, ymd)));
     const start = businessDateTime(ymd, startTime);
-    const lateMinutes = Math.max(0, Math.floor((now.getTime() - start.getTime()) / 60_000));
+    const lateMinutes = Math.max(0, Math.floor((at.getTime() - start.getTime()) / 60_000));
     return {
       scheduleId: schedule.id,
       lateMinutes,

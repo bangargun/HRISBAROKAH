@@ -12,6 +12,8 @@ export const FLAG_CLOCK_CHANGED = 'CLOCK_CHANGED';
 export const FLAG_FACE_REVIEW = 'FACE_REVIEW';
 export const FLAG_NO_FACE = 'NO_FACE';
 export const FLAG_PENDING_REVIEW = 'PENDING_REVIEW';
+// Pulang saat istirahat belum selesai: istirahat ditutup otomatis pada jam pulang
+export const FLAG_BREAK_AUTO_CLOSED = 'BREAK_AUTO_CLOSED';
 
 // Alasan penolakan urutan kejadian
 export const REASON_ALREADY_CLOCKED_IN = 'Sudah absen masuk';

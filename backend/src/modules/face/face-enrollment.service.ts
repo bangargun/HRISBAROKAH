@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { FaceCheckKind } from '@prisma/client';
+import { FaceCheckKind, UserRole } from '@prisma/client';
 import { AuthUser, assertOutletAccess, scopedOutletId } from '../../common/utils/outlet-scope.util';
 import { businessDateString, businessDayRange, parseDateParam } from '../../common/utils/business-date.util';
 import { rm } from 'fs/promises';
@@ -14,6 +14,8 @@ import {
 import { FaceRecognitionService } from './face-recognition.service';
 import { EnrollFaceDto } from './face.dto';
 
+// Peran admin bukan kru lapangan (sama dengan roster tablet)
+const ADMIN_ROLES: UserRole[] = [UserRole.SUPER_ADMIN, UserRole.HR_ADMIN, UserRole.FINANCE_ADMIN];
 
 export interface FaceVerification {
   photoUrl: string;
@@ -130,37 +132,81 @@ export class FaceEnrollmentService {
   }
 
   /**
-   * Cocokkan selfie absen dengan wajah terdaftar. Setiap percobaan dicatat di FaceCheckLog,
-   * termasuk yang ditolak, agar HR bisa memeriksa dugaan titip absen.
+   * Skor kemiripan foto dengan wajah terdaftar karyawan. Tidak melempar error dan tidak
+   * menulis FaceCheckLog; `reason` terisi bila tidak cocok atau wajah tidak terbaca.
    */
-  async verifyForAttendance(employeeId: string, photoBase64: string, kind: FaceCheckKind): Promise<FaceVerification> {
+  async scoreAgainst(
+    employeeId: string,
+    photo: Buffer,
+  ): Promise<{ score: number | null; enrolled: boolean; reason: string | null }> {
     const references = await this.prisma.faceEnrollment.findMany({
       where: { employeeId },
       select: { embedding: true },
     });
     if (references.length === 0) {
+      return { score: null, enrolled: false, reason: 'Wajah belum didaftarkan' };
+    }
+    try {
+      const embedding = await this.face.describe(photo);
+      const score = this.face.bestScore(
+        embedding,
+        references.map((r) => r.embedding),
+      );
+      return {
+        score,
+        enrolled: true,
+        reason: score < this.face.matchThreshold ? 'Wajah tidak cocok dengan wajah terdaftar' : null,
+      };
+    } catch (e) {
+      return { score: null, enrolled: true, reason: e.message };
+    }
+  }
+
+  /**
+   * Cari kru aktif yang wajahnya paling mirip (minimal ambang cocok). Null bila tidak
+   * ada wajah, lebih dari satu wajah, atau tidak ada yang cocok.
+   */
+  async identify(photo: Buffer, excludeOutletId?: string): Promise<{ employeeId: string; score: number } | null> {
+    let embedding: number[];
+    try {
+      embedding = await this.face.describe(photo);
+    } catch {
+      return null;
+    }
+    const rows = await this.prisma.faceEnrollment.findMany({
+      where: {
+        employee: {
+          user: { isActive: true, role: { notIn: ADMIN_ROLES } },
+          ...(excludeOutletId && { outletId: { not: excludeOutletId } }),
+        },
+      },
+      select: { employeeId: true, embedding: true },
+    });
+    let best: { employeeId: string; score: number } | null = null;
+    for (const r of rows) {
+      // Embedding dengan panjang berbeda (data lama/rusak) tidak bisa dibandingkan
+      if (r.embedding.length !== embedding.length) continue;
+      const score = this.face.similarity(embedding, r.embedding);
+      if (score >= this.face.matchThreshold && (!best || score > best.score)) {
+        best = { employeeId: r.employeeId, score };
+      }
+    }
+    return best;
+  }
+
+  /**
+   * Cocokkan selfie absen dengan wajah terdaftar. Setiap percobaan dicatat di FaceCheckLog,
+   * termasuk yang ditolak, agar HR bisa memeriksa dugaan titip absen.
+   */
+  async verifyForAttendance(employeeId: string, photoBase64: string, kind: FaceCheckKind): Promise<FaceVerification> {
+    const photo = decodePhoto(photoBase64);
+    const { score, enrolled, reason } = await this.scoreAgainst(employeeId, photo.buffer);
+    if (!enrolled) {
       throw new BadRequestException(
         'Wajah Anda belum didaftarkan. Minta HR atau Store Manager mendaftarkan wajah Anda.',
       );
     }
-
-    const photo = decodePhoto(photoBase64);
     const photoUrl = await saveAttendancePhoto(photo);
-
-    let score: number | null = null;
-    let reason: string | null = null;
-    try {
-      const embedding = await this.face.describe(photo.buffer);
-      score = this.face.bestScore(
-        embedding,
-        references.map((r) => r.embedding),
-      );
-      if (score < this.face.matchThreshold) {
-        reason = 'Wajah tidak cocok dengan wajah terdaftar';
-      }
-    } catch (e) {
-      reason = e.message;
-    }
 
     await this.prisma.faceCheckLog.create({
       data: {
@@ -176,7 +222,7 @@ export class FaceEnrollmentService {
     if (reason !== null) {
       throw new BadRequestException(`Absen ditolak: ${reason}.`);
     }
-    return { photoUrl, score };
+    return { photoUrl, score: score! };
   }
 
   async getCheckLogs(actor: AuthUser, outletId?: string, dateStr?: string, onlyRejected?: boolean) {
