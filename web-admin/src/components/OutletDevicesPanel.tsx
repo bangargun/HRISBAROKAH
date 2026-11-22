@@ -81,8 +81,15 @@ export default function OutletDevicesPanel({ outletId, canManage }: { outletId: 
     const tick = setInterval(() => setNow(Date.now()), 1000);
     const poll = setInterval(async () => {
       const list = await load();
-      // Hanya bila daftar awal berhasil dimuat; kalau tidak, semua tablet lama tampak "baru"
-      if (list && knownLoaded.current && list.some((d) => !knownIds.current.has(d.id))) {
+      if (!list) return;
+      // Daftar awal gagal dimuat: poll pertama yang berhasil menjadi acuan, tanpa pengumuman,
+      // supaya tablet lama tidak tampak "baru"
+      if (!knownLoaded.current) {
+        knownIds.current = new Set(list.map((d) => d.id));
+        knownLoaded.current = true;
+        return;
+      }
+      if (list.some((d) => !knownIds.current.has(d.id))) {
         knownIds.current = new Set(list.map((d) => d.id));
         setPairing(null);
         setNotice('Tablet terpasang.');
