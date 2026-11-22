@@ -29,6 +29,7 @@ interface ScheduleRow {
   employeeId: string;
   date: string;
   locked: boolean;
+  outletId?: string | null;
 }
 
 interface Holiday {

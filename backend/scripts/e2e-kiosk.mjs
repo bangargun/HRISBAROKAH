@@ -82,7 +82,7 @@ checks.push(['pairing -> pair -> token berfungsi -> kode dipakai ulang ditolak -
 
   const boot = await http('GET', '/kiosk/bootstrap', { token: pair.body.token });
   assert.equal(boot.status, 200);
-  assert.equal(boot.body.outletId, ctx.outlet.id);
+  assert.equal(boot.body.outlet.id, ctx.outlet.id);
 
   const again = await http('POST', '/kiosk/pair', { body: { code: p.body.code }, headers: freshIp() });
   assert.equal(again.status, 400);
@@ -194,6 +194,163 @@ checks.push(['percobaan kode salah beruntun -> 429', async () => {
   }
   assert.ok(blocked, 'harus kena 429');
   assert.match(blocked.body.message, /Terlalu banyak percobaan/);
+}]);
+
+// ---------- Task 3: bootstrap + jadwal bertugas di cabang ----------
+const jakartaYmd = (offsetDays = 0) => {
+  const d = new Date(Date.now() + offsetDays * 86_400_000);
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta' }).format(d);
+};
+
+let seq = 0;
+async function createCrew(admin, outletId, role = 'EMPLOYEE', name = 'Kru Uji') {
+  const positionId = sql(`select id from "Position" limit 1`);
+  const tag = `${Date.now().toString(36)}${seq++}`;
+  const username = `kru.${tag}`;
+  const r = await http('POST', '/employees', {
+    token: admin,
+    body: { username, password: 'kru-pass-123', role, nik: `K${tag}`, fullName: `${name} ${tag}`, phone: '0800', outletId, positionId, joinDate: '2026-01-01' },
+  });
+  assert.equal(r.status, 201, `buat kru gagal: ${JSON.stringify(r.body)}`);
+  return { id: r.body.id, username, fullName: r.body.fullName, password: 'kru-pass-123' };
+}
+async function login(username, password) {
+  const r = await http('POST', '/auth/login', { body: { username, password } });
+  assert.equal(r.status, 201);
+  return r.body.accessToken;
+}
+const schedule = (token, entries) => http('PUT', '/schedules', { token, body: { entries } });
+
+checks.push(['bootstrap: roster rumah + tamu terjadwal (hari ini..+3), direktori tanpa embeddings, recap hanya kru rumah', async (ctx) => {
+  const out1 = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}B1`);
+  const out2 = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}B2`);
+  const dev = await pairDevice(ctx.admin, out1.id, 'Tablet Boot');
+  const home = await createCrew(ctx.admin, out1.id, 'EMPLOYEE', 'Rumah');
+  const guest = await createCrew(ctx.admin, out2.id, 'EMPLOYEE', 'Tamu');
+  const far = await createCrew(ctx.admin, out2.id, 'EMPLOYEE', 'Jauh');
+  const none = await createCrew(ctx.admin, out2.id, 'EMPLOYEE', 'Tanpa Jadwal');
+  const admin2 = await createCrew(ctx.admin, out1.id, 'HR_ADMIN', 'Admin');
+  sql(`insert into "FaceEnrollment"(id,"employeeId",embedding,"photoPath","enrolledById") values (gen_random_uuid(),'${home.id}','{0.1,0.2}','x','x'),(gen_random_uuid(),'${home.id}','{0.3,0.4}','x','x')`);
+  sql(`update "EmployeeProfile" set "attendancePinHash"='hash' where id='${home.id}'`);
+
+  const tomorrow = jakartaYmd(1);
+  const s1 = await schedule(ctx.admin, [
+    { employeeId: guest.id, date: tomorrow, working: true, outletId: out1.id },
+    { employeeId: far.id, date: jakartaYmd(5), working: true, outletId: out1.id },
+  ]);
+  assert.equal(s1.status, 200, JSON.stringify(s1.body));
+
+  const b = await http('GET', '/kiosk/bootstrap', { token: dev.token });
+  assert.equal(b.status, 200);
+  const p = b.body;
+  assert.ok(!Number.isNaN(Date.parse(p.serverTime)));
+  assert.equal(typeof p.matchThreshold, 'number');
+  assert.equal(p.outlet.id, out1.id);
+  assert.equal(p.outlet.breakLimitMins, 60);
+  assert.equal(p.outlet.hours.weekdayWorkStart, '09:00');
+  assert.ok(Array.isArray(p.holidays));
+
+  const r = Object.fromEntries(p.roster.map((x) => [x.employeeId, x]));
+  assert.ok(r[home.id] && r[home.id].isGuest === false && r[home.id].hasPin === true);
+  assert.equal(r[home.id].embeddings.length, 2);
+  assert.deepEqual(r[home.id].embeddings.map((e) => e.length), [2, 2]);
+  assert.equal(r[home.id].homeOutletName, out1.name);
+  assert.ok(r[guest.id] && r[guest.id].isGuest === true && r[guest.id].hasPin === false);
+  assert.deepEqual(r[guest.id].embeddings, []);
+  assert.deepEqual(r[guest.id].guestDates, [tomorrow]);
+  assert.equal(r[guest.id].homeOutletName, out2.name);
+  assert.equal(r[far.id], undefined, 'jadwal +5 hari tidak masuk roster');
+  assert.equal(r[none.id], undefined);
+  assert.equal(r[admin2.id], undefined, 'admin tidak masuk roster');
+
+  const d = Object.fromEntries(p.directory.map((x) => [x.employeeId, x]));
+  assert.ok(d[none.id] && d[far.id] && d[home.id]);
+  assert.equal(d[admin2.id], undefined);
+  for (const x of p.directory) assert.equal(x.embeddings, undefined, 'direktori tanpa embeddings');
+  assert.ok(!JSON.stringify(p.directory).includes('embedding'));
+
+  const rc = p.recap.map((x) => x.employeeId);
+  assert.ok(rc.includes(home.id));
+  assert.ok(!rc.includes(guest.id), 'recap hanya kru rumah');
+}]);
+
+checks.push(['bootstrap: today (absen hari ini + terbuka kemarin) dan recap bulan ini', async (ctx) => {
+  const out = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}B3`);
+  const dev = await pairDevice(ctx.admin, out.id, 'Tablet Today');
+  const a = await createCrew(ctx.admin, out.id, 'EMPLOYEE', 'Hari Ini');
+  const b = await createCrew(ctx.admin, out.id, 'EMPLOYEE', 'Kemarin Terbuka');
+  const c = await createCrew(ctx.admin, out.id, 'EMPLOYEE', 'Kemarin Lama');
+  const today = jakartaYmd(0);
+  const yest = jakartaYmd(-1);
+  const ins = (emp, date, inExpr, outExpr, late = 0) => {
+    const id = sql(`insert into "Attendance"(id,"employeeId","outletId",date,"clockInTime","clockOutTime","lateMinutes") values (gen_random_uuid(),'${emp}','${out.id}','${date}',${inExpr},${outExpr},${late}) returning id`).split('\n')[0];
+    return id;
+  };
+  const aId = ins(a.id, today, `(now() at time zone 'utc') - interval '2 hours'`, 'null', 7);
+  sql(`insert into "AttendanceBreak"(id,"attendanceId","startBreak") values (gen_random_uuid(),'${aId}', (now() at time zone 'utc') - interval '10 minutes')`);
+  ins(b.id, yest, `(now() at time zone 'utc') - interval '5 hours'`, 'null');
+  ins(c.id, yest, `(now() at time zone 'utc') - interval '20 hours'`, 'null');
+
+  const p = (await http('GET', '/kiosk/bootstrap', { token: dev.token })).body;
+  const t = Object.fromEntries(p.today.map((x) => [x.employeeId, x]));
+  assert.ok(t[a.id] && t[a.id].clockIn && t[a.id].clockOut === null && t[a.id].openBreakStart && t[a.id].lateMinutes === 7);
+  assert.ok(t[b.id], 'absen terbuka kemarin (<16 jam) ikut');
+  assert.equal(t[c.id], undefined, 'kemarin >16 jam tidak ikut');
+
+  // recap: hari ini ada bila bulan sama (selalu, today di bulan berjalan)
+  const rc = Object.fromEntries(p.recap.map((x) => [x.employeeId, x]));
+  const day = rc[a.id].days.find((x) => x.date === today);
+  assert.ok(day && day.clockIn && day.clockOut === null && day.lateMinutes === 7);
+  assert.equal(day.workMinutes, 0);
+  assert.equal(day.breakMinutes, 0, 'istirahat yang masih terbuka tidak dihitung');
+}]);
+
+checks.push(['recap: breakMinutes dan workMinutes untuk hari yang sudah pulang', async (ctx) => {
+  const out = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}B4`);
+  const dev = await pairDevice(ctx.admin, out.id, 'Tablet Recap');
+  const a = await createCrew(ctx.admin, out.id, 'EMPLOYEE', 'Recap');
+  const today = jakartaYmd(0);
+  const id = sql(`insert into "Attendance"(id,"employeeId","outletId",date,"clockInTime","clockOutTime") values (gen_random_uuid(),'${a.id}','${out.id}','${today}', (now() at time zone 'utc') - interval '300 minutes', (now() at time zone 'utc') - interval '60 minutes') returning id`).split('\n')[0];
+  sql(`insert into "AttendanceBreak"(id,"attendanceId","startBreak","endBreak","totalMinutes") values (gen_random_uuid(),'${id}', (now() at time zone 'utc') - interval '200 minutes', (now() at time zone 'utc') - interval '170 minutes', 30), (gen_random_uuid(),'${id}', (now() at time zone 'utc') - interval '120 minutes', (now() at time zone 'utc') - interval '110 minutes', 10)`);
+  const p = (await http('GET', '/kiosk/bootstrap', { token: dev.token })).body;
+  const day = p.recap.find((x) => x.employeeId === a.id).days.find((x) => x.date === today);
+  assert.equal(day.breakMinutes, 40);
+  assert.equal(day.workMinutes, 240 - 40);
+}]);
+
+checks.push(['jadwal: outletId disimpan, dikembalikan findRange, validasi outlet & peran', async (ctx) => {
+  const out1 = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}S1`);
+  const out2 = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}S2`);
+  const crew = await createCrew(ctx.admin, out2.id, 'EMPLOYEE', 'Jadwal');
+  const mate = await createCrew(ctx.admin, out1.id, 'EMPLOYEE', 'Satu Outlet');
+  const sm = await createCrew(ctx.admin, out1.id, 'STORE_MANAGER', 'SM');
+  const smToken = await login(sm.username, sm.password);
+  const date = jakartaYmd(2);
+
+  const ok = await schedule(ctx.admin, [{ employeeId: crew.id, date, working: true, outletId: out1.id }]);
+  assert.equal(ok.status, 200, JSON.stringify(ok.body));
+  const list = await http('GET', `/schedules?from=${date}&to=${date}`, { token: ctx.admin });
+  const row = list.body.find((x) => x.employeeId === crew.id);
+  assert.equal(row.outletId, out1.id);
+  const plain = await http('GET', `/schedules?from=${date}&to=${date}`, { token: ctx.admin });
+  assert.equal(plain.body.find((x) => x.employeeId === crew.id).outletId, out1.id);
+
+  // tanpa outletId -> null
+  await schedule(ctx.admin, [{ employeeId: mate.id, date, working: true }]);
+  const l2 = await http('GET', `/schedules?from=${date}&to=${date}`, { token: ctx.admin });
+  assert.equal(l2.body.find((x) => x.employeeId === mate.id).outletId, null);
+
+  // outlet tidak ada / nonaktif / bukan UUID
+  assert.equal((await schedule(ctx.admin, [{ employeeId: crew.id, date, working: true, outletId: 'bukan-uuid' }])).status, 400);
+  assert.equal((await schedule(ctx.admin, [{ employeeId: crew.id, date, working: true, outletId: '00000000-0000-4000-8000-000000000000' }])).status, 400);
+  sql(`update "Outlet" set "isActive"=false where id='${out2.id}'`);
+  assert.equal((await schedule(ctx.admin, [{ employeeId: mate.id, date, working: true, outletId: out2.id }])).status, 400);
+  sql(`update "Outlet" set "isActive"=true where id='${out2.id}'`);
+
+  // Store Manager: outlet sendiri untuk kru outlet sendiri OK; outlet lain / kru outlet lain 403
+  assert.equal((await schedule(smToken, [{ employeeId: mate.id, date, working: true, outletId: out1.id }])).status, 200);
+  assert.equal((await schedule(smToken, [{ employeeId: mate.id, date, working: true, outletId: out2.id }])).status, 403);
+  assert.equal((await schedule(smToken, [{ employeeId: crew.id, date, working: true, outletId: out1.id }])).status, 403);
 }]);
 
 // ---------- runner ----------

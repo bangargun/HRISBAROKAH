@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsUUID, Matches, ValidateNested } from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsOptional, IsUUID, Matches, ValidateNested } from 'class-validator';
 
 export class ScheduleEntryDto {
   @IsUUID('4', { message: 'Karyawan tidak valid' })
@@ -11,6 +11,11 @@ export class ScheduleEntryDto {
   /** true = masuk (jam dari jam kerja cabang), false = libur */
   @IsBoolean({ message: 'Isi working dengan true (masuk) atau false (libur)' })
   working: boolean;
+
+  /** Cabang tempat bertugas hari itu (tablet); kosong = cabang asal */
+  @IsOptional()
+  @IsUUID('4', { message: 'Cabang tidak valid' })
+  outletId?: string;
 }
 
 export class SaveSchedulesDto {

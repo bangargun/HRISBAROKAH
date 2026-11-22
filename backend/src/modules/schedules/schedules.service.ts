@@ -43,6 +43,7 @@ export class SchedulesService {
       return {
         id: r.id,
         employeeId: r.employeeId,
+        outletId: r.outletId,
         date,
         dayType,
         startTime: hours.start,
@@ -70,6 +71,10 @@ export class SchedulesService {
         include: { _count: { select: { attendances: true } } },
       }),
     ]);
+    const targetOutletIds = Array.from(new Set(dto.entries.map((e) => e.outletId).filter((id): id is string => !!id)));
+    const activeOutlets = targetOutletIds.length
+      ? new Set((await this.prisma.outlet.findMany({ where: { id: { in: targetOutletIds }, isActive: true }, select: { id: true } })).map((o) => o.id))
+      : new Set<string>();
     const employeeById = new Map(employees.map((e) => [e.id, e]));
     const existingByKey = new Map(existing.map((s) => [`${s.employeeId}|${ymd(s.date)}`, s]));
 
@@ -77,6 +82,11 @@ export class SchedulesService {
       const employee = employeeById.get(e.employeeId);
       if (!employee) throw new NotFoundException('Ada karyawan yang tidak ditemukan');
       assertOutletAccess(actor, employee.outletId, 'Anda hanya bisa menyusun jadwal karyawan di outlet Anda');
+      if (e.outletId) {
+        if (!activeOutlets.has(e.outletId)) throw new BadRequestException('Cabang tujuan tidak ditemukan atau nonaktif');
+        // Store Manager hanya boleh menugaskan ke cabangnya sendiri
+        assertOutletAccess(actor, e.outletId, 'Anda hanya bisa menugaskan kru ke outlet Anda');
+      }
       const current = existingByKey.get(`${e.employeeId}|${e.date}`);
       if (current && current._count.attendances > 0 && !e.working) {
         throw new ConflictException(`${employee.fullName} sudah absen pada ${e.date}, jadi tanggal itu tidak bisa dijadikan libur`);
@@ -91,8 +101,9 @@ export class SchedulesService {
         if (e.working) {
           await tx.shiftSchedule.upsert({
             where: { employeeId_date: { employeeId: e.employeeId, date } },
-            create: { employeeId: e.employeeId, date },
-            update: {},
+            create: { employeeId: e.employeeId, date, outletId: e.outletId ?? null },
+            // outletId tidak dikirim = tidak mengubah penugasan cabang yang sudah ada
+            update: e.outletId !== undefined ? { outletId: e.outletId } : {},
           });
           saved++;
         } else {
