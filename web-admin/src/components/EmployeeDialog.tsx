@@ -28,6 +28,7 @@ export interface EmployeeRecord {
   joinDate: string;
   outletId: string;
   positionId: string;
+  hasAttendancePin?: boolean;
   user: { id: string; username: string; role: string; isActive: boolean };
   outlet: { id: string; name: string };
   position: { id: string; title: string; department: { name: string } };
@@ -68,6 +69,8 @@ export default function EmployeeDialog({
   const isEdit = !!employee;
   const roles = isSuperAdmin ? [...BASE_ROLES, ...ADMIN_ROLES] : BASE_ROLES;
   // Peran sendiri tidak bisa diubah (mencegah terkunci dari sistem)
+  // Sama dengan @Roles PUT /employees/:id/attendance-pin di backend
+  const canSetPin = session?.role === 'SUPER_ADMIN' || session?.role === 'HR_ADMIN';
   const roleLocked = isEdit && employee.user.id === session?.id;
 
   const [outlets, setOutlets] = useState<OutletOption[] | null>(null);
@@ -255,6 +258,8 @@ export default function EmployeeDialog({
             </div>
           )}
 
+          {isEdit && canSetPin && <AttendancePin employeeId={employee.id} name={employee.fullName} initiallySet={!!employee.hasAttendancePin} />}
+
           {isEdit && !roleLocked && <ResetPassword employeeId={employee.id} name={employee.fullName} />}
 
           {error && (
@@ -328,6 +333,82 @@ function ResetPassword({ employeeId, name }: { employeeId: string; name: string 
         <button type="button" onClick={() => { setOpen(true); setNotice(null); }} className="link">
           Reset password karyawan ini…
         </button>
+      )}
+      {notice && (
+        <p role={notice.ok ? 'status' : 'alert'} className={`rounded-md border px-3 py-2 ${notice.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-rose-200 bg-rose-50 text-rose-800'}`}>
+          {notice.text}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** PIN 6 digit untuk absen di tablet bila wajah belum terdaftar atau gagal dikenali. */
+function AttendancePin({ employeeId, name, initiallySet }: { employeeId: string; name: string; initiallySet: boolean }) {
+  const [isSet, setIsSet] = useState(initiallySet);
+  const [open, setOpen] = useState(false);
+  const [pin, setPin] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
+
+  async function save() {
+    if (!/^\d{6}$/.test(pin)) {
+      setNotice({ ok: false, text: 'PIN harus 6 digit angka' });
+      return;
+    }
+    setBusy(true);
+    setNotice(null);
+    try {
+      await apiFetch(`/employees/${employeeId}/attendance-pin`, { method: 'PUT', body: JSON.stringify({ pin }) });
+      setIsSet(true);
+      setOpen(false);
+      setPin('');
+      setNotice({ ok: true, text: `PIN absen ${name} disimpan. Sampaikan PIN ini langsung ke yang bersangkutan.` });
+    } catch (err) {
+      setNotice({ ok: false, text: (err as Error).message });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="space-y-2 border-t border-slate-100 pt-4">
+      <p className="text-sm font-semibold text-slate-900">PIN absen</p>
+      <div className="flex flex-wrap items-center gap-2">
+        <p className="text-slate-700">PIN absen: {isSet ? 'sudah diatur' : 'belum diatur'}</p>
+        {!open && (
+          <button type="button" onClick={() => { setOpen(true); setNotice(null); }} className="btn btn-secondary btn-sm">
+            Atur PIN
+          </button>
+        )}
+      </div>
+      {open && (
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            maxLength={6}
+            aria-label="PIN absen 6 digit"
+            placeholder="6 digit"
+            value={pin}
+            onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
+            onKeyDown={(e) => {
+              // Enter di sini tidak boleh ikut menyimpan form karyawan
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                save();
+              }
+            }}
+            className="input w-auto min-w-0 flex-1 font-mono tracking-widest"
+          />
+          <button type="button" disabled={busy || pin.length !== 6} onClick={save} className="btn btn-primary">
+            {busy ? 'Menyimpan…' : 'Simpan PIN'}
+          </button>
+          <button type="button" disabled={busy} onClick={() => { setOpen(false); setPin(''); }} className="btn btn-ghost">
+            Batal
+          </button>
+        </div>
       )}
       {notice && (
         <p role={notice.ok ? 'status' : 'alert'} className={`rounded-md border px-3 py-2 ${notice.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-rose-200 bg-rose-50 text-rose-800'}`}>

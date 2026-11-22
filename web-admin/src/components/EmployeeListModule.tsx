@@ -336,7 +336,11 @@ th,td{border:1px solid #cfd6de;padding:4px 5px;text-align:left;vertical-align:to
       {editing && (
         <EmployeeDialog
           employee={editing}
-          onClose={() => setEditing(null)}
+          // Dimuat ulang saat ditutup supaya status PIN absen yang baru diatur ikut terbaca
+          onClose={() => {
+            setEditing(null);
+            load();
+          }}
           onSaved={(name) => {
             setEditing(null);
             showToast(`Data ${name} tersimpan.`);

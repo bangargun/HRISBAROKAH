@@ -20,6 +20,7 @@ interface OutletOption {
 
 interface Employee {
   id: string;
+  outletId: string;
   fullName: string;
   position: { title: string };
   user: { isActive: boolean };
@@ -88,6 +89,8 @@ export default function WorkScheduleModule() {
   const [holidays, setHolidays] = useState<Map<string, string>>(new Map());
   // Perubahan yang belum disimpan: true = masuk, false = libur
   const [draft, setDraft] = useState<Map<string, boolean>>(new Map());
+  // Perubahan cabang tugas yang belum disimpan: null = kembali ke cabang asal
+  const [outletDraft, setOutletDraft] = useState<Map<string, string | null>>(new Map());
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
@@ -123,6 +126,7 @@ export default function WorkScheduleModule() {
       setSaved(new Map((sched as ScheduleRow[]).map((s) => [cellKey(s.employeeId, s.date), s])));
       setHolidays(new Map((hol as Holiday[][]).flat().map((h) => [h.date, h.name])));
       setDraft(new Map());
+      setOutletDraft(new Map());
     } catch (e) {
       setNotice({ kind: 'error', text: (e as Error).message });
     } finally {
@@ -134,12 +138,28 @@ export default function WorkScheduleModule() {
     load();
   }, [load]);
 
-  const dirty = draft.size > 0;
+  const changedKeys = useMemo(() => new Set(Array.from(draft.keys()).concat(Array.from(outletDraft.keys()))), [draft, outletDraft]);
+  const dirty = changedKeys.size > 0;
   const confirmDiscard = () => !dirty || window.confirm('Perubahan jadwal belum disimpan. Buang perubahan?');
 
   function isWorking(employeeId: string, date: string) {
     const key = cellKey(employeeId, date);
     return draft.has(key) ? draft.get(key)! : saved.has(key);
+  }
+
+  /** Cabang tempat bertugas pada sel itu; null = cabang asal. */
+  function assignedOutlet(employeeId: string, date: string): string | null {
+    const key = cellKey(employeeId, date);
+    return outletDraft.has(key) ? outletDraft.get(key)! : saved.get(key)?.outletId ?? null;
+  }
+
+  function assign(employeeId: string, date: string, value: string) {
+    const key = cellKey(employeeId, date);
+    const next = new Map(outletDraft);
+    const target = value || null;
+    if (target === (saved.get(key)?.outletId ?? null)) next.delete(key);
+    else next.set(key, target);
+    setOutletDraft(next);
   }
 
   function toggle(employeeId: string, date: string) {
@@ -149,15 +169,24 @@ export default function WorkScheduleModule() {
     if (value === saved.has(key)) next.delete(key);
     else next.set(key, value);
     setDraft(next);
+    if (!value && outletDraft.has(key)) {
+      const o = new Map(outletDraft);
+      o.delete(key);
+      setOutletDraft(o);
+    }
   }
 
   async function save() {
     setSaving(true);
     setNotice(null);
     try {
-      const entries = Array.from(draft.entries()).map(([key, working]) => {
+      const entries = Array.from(changedKeys).map((key) => {
         const [employeeId, date] = key.split('|');
-        return { employeeId, date, working };
+        const working = isWorking(employeeId, date);
+        // outletId hanya dikirim bila diubah; null mengembalikan ke cabang asal
+        return outletDraft.has(key) && working
+          ? { employeeId, date, working, outletId: outletDraft.get(key) }
+          : { employeeId, date, working };
       });
       await apiFetch('/schedules', { method: 'PUT', body: JSON.stringify({ entries }) });
       setNotice({ kind: 'ok', text: `${entries.length} perubahan jadwal disimpan.` });
@@ -219,7 +248,7 @@ export default function WorkScheduleModule() {
           {canEdit && (
             <>
               {dirty && (
-                <button type="button" onClick={() => setDraft(new Map())} className="btn btn-ghost">
+                <button type="button" onClick={() => { setDraft(new Map()); setOutletDraft(new Map()); }} className="btn btn-ghost">
                   Batalkan
                 </button>
               )}
@@ -230,7 +259,7 @@ export default function WorkScheduleModule() {
                 className="btn btn-primary"
               >
                 {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
-                Simpan{dirty ? ` (${draft.size})` : ''}
+                Simpan{dirty ? ` (${changedKeys.size})` : ''}
               </button>
             </>
           )}
@@ -292,6 +321,8 @@ export default function WorkScheduleModule() {
                       const locked = saved.get(key)?.locked ?? false;
                       const working = isWorking(emp.id, d);
                       const changed = draft.has(key);
+                      const guestId = working ? assignedOutlet(emp.id, d) : null;
+                      const guestOutlet = guestId && guestId !== emp.outletId ? outlets.find((o) => o.id === guestId) : undefined;
                       return (
                         <td key={d} className="px-2 py-2">
                           <button
@@ -312,6 +343,24 @@ export default function WorkScheduleModule() {
                             {locked && <Lock className="h-3 w-3" aria-hidden />}
                             {working ? 'Masuk' : 'Libur'}
                           </button>
+                          {working && (canEdit && !locked ? (
+                            <select
+                              aria-label={`Bertugas di, ${emp.fullName} ${dayFmt.format(new Date(`${d}T00:00:00Z`))}`}
+                              title="Bertugas di"
+                              value={guestId ?? ''}
+                              onChange={(e) => assign(emp.id, d, e.target.value)}
+                              className={`mt-1 block w-full truncate rounded border bg-white px-1 py-1 text-xs ${
+                                guestOutlet ? 'border-brand-500 font-medium text-slate-900' : 'border-slate-200 text-slate-500'
+                              }`}
+                            >
+                              <option value="">Cabang asal</option>
+                              {outlets.filter((o) => o.id !== outletId).map((o) => (
+                                <option key={o.id} value={o.id}>{o.name}</option>
+                              ))}
+                            </select>
+                          ) : (
+                            guestOutlet && <p className="mt-1 truncate text-center text-xs font-medium text-slate-700">di {guestOutlet.name}</p>
+                          ))}
                         </td>
                       );
                     })}
@@ -335,7 +384,7 @@ export default function WorkScheduleModule() {
       {canEdit && (
         <p className="text-xs text-slate-500">
           Klik sel untuk mengganti Masuk/Libur. Jam masuk mengikuti jam kerja cabang sesuai jenis hari. Sel yang sudah
-          dipakai absen dikunci.
+          dipakai absen dikunci. Pilih &quot;Bertugas di&quot; bila kru hari itu membantu di cabang lain; absennya tercatat di sana.
         </p>
       )}
     </div>

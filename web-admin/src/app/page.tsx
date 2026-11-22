@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { BACKEND_API, clearSession, getSessionUser, getToken } from '@/lib/auth';
+import { apiFetch } from '@/lib/api';
 import { LEAVE_TYPES, actionFor, isPending, useAdminRequests } from '@/lib/requests';
 import AppShell from '@/components/AppShell';
 import DashboardHome from '@/components/DashboardHome';
@@ -10,6 +11,7 @@ import EmployeeDialog from '@/components/EmployeeDialog';
 import EmployeeListModule from '@/components/EmployeeListModule';
 import CorrectionsModule from '@/components/CorrectionsModule';
 import DailyAttendanceModule from '@/components/DailyAttendanceModule';
+import AttendanceReviewModule from '@/components/AttendanceReviewModule';
 import DailyReportsModule from '@/components/DailyReportsModule';
 import CrewAppPreview from '@/components/CrewAppPreview';
 import KpiModule from '@/components/KpiModule';
@@ -166,6 +168,19 @@ export default function AdminDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [selectedOutlet, setSelectedOutlet] = useState<string>('ALL');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Jumlah absen tablet yang menunggu tinjauan, untuk angka di menu Presensi
+  const [reviewCount, setReviewCount] = useState(0);
+  const refreshReviewCount = useCallback(() => {
+    const role = getSessionUser()?.role;
+    if (role !== 'SUPER_ADMIN' && role !== 'HR_ADMIN' && role !== 'STORE_MANAGER') return;
+    apiFetch<unknown[]>('/attendance-review?status=NEEDS_REVIEW')
+      .then((list) => setReviewCount(Array.isArray(list) ? list.length : 0))
+      .catch(() => setReviewCount(0));
+  }, []);
+  useEffect(() => {
+    refreshReviewCount();
+  }, [refreshReviewCount]);
 
   // Berlian People Management States
   const [coachingTasks, setCoachingTasks] = useState<CoachingTaskItem[]>(INITIAL_COACHING_TASKS);
@@ -2722,7 +2737,7 @@ export default function AdminDashboard() {
       title: string;
       icon: React.ElementType;
       badge?: string;
-      subTabs: { id: string; label: string }[];
+      subTabs: { id: string; label: string; badge?: number }[];
     }
   > = {
     hub: {
@@ -2746,6 +2761,7 @@ export default function AdminDashboard() {
       subTabs: [
         { id: 'daily-timesheet', label: 'Presensi Harian' },
         { id: 'work-schedule', label: 'Jadwal Kerja' },
+        { id: 'attendance-review', label: 'Perlu ditinjau', badge: reviewCount },
         { id: 'attendance-corrections', label: 'Koreksi Absen' },
       ],
     },
@@ -6388,6 +6404,11 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
                     }`}
                   >
                     {sub.label}
+                    {sub.badge ? (
+                      <span className="ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full bg-brand-100 px-1.5 text-xs font-medium tabular-nums text-slate-900">
+                        <span className="sr-only">, </span>{sub.badge}
+                      </span>
+                    ) : null}
                   </button>
                 );
               })}
@@ -6463,6 +6484,8 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
             <div className="space-y-5">
               {activeSubTab === 'work-schedule' ? (
                 <WorkScheduleModule />
+              ) : activeSubTab === 'attendance-review' ? (
+                <AttendanceReviewModule onChanged={refreshReviewCount} />
               ) : activeSubTab === 'attendance-corrections' ? (
                 <CorrectionsModule showToast={showToast} />
               ) : (

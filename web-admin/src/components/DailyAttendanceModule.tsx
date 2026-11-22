@@ -5,9 +5,15 @@ import { Download, Loader2, RefreshCw } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { AdminRequest, REQUEST_TYPE_LABEL, RequestType } from '@/lib/requests';
 import type { EmployeeRecord } from '@/components/EmployeeDialog';
+import { flagClass, flagLabel, flagsOf } from '@/lib/attendanceFlags';
 
 interface AttendanceRow {
   employeeId: string;
+  source?: 'MOBILE' | 'TABLET';
+  isGuest?: boolean;
+  flags?: string[];
+  /** Dikirim backend bersama baris absen; dipakai untuk kru tamu yang bukan karyawan cabang ini */
+  employee?: Pick<EmployeeRecord, 'id' | 'nik' | 'fullName' | 'user' | 'outlet' | 'position'>;
   clockInTime: string | null;
   clockOutTime: string | null;
   clockInDistanceM: number | null;
@@ -63,6 +69,8 @@ const timeFmt = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-d
 const hhmm = (iso: string | null) => (iso ? timeFmt.format(new Date(iso)) : '');
 const minutesBetween = (from: string, to: string | null) =>
   Math.max(0, Math.round(((to ? new Date(to) : new Date()).getTime() - new Date(from).getTime()) / 60_000));
+
+const sourceLabel = (a: AttendanceRow) => (a.source === 'TABLET' ? 'Tablet' : 'HP');
 
 function statusLabel(r: Row) {
   switch (r.status) {
@@ -136,7 +144,12 @@ export default function DailyAttendanceModule({ requests }: { requests: AdminReq
         )
         .map((r) => [r.employee.id, r]),
     );
-    return data.employees
+    // Kru tamu: absen tercatat di cabang ini, tetapi karyawannya terdaftar di cabang lain
+    const known = new Set(data.employees.map((e) => e.id));
+    const guests = data.attendance
+      .filter((a) => a.employee && !known.has(a.employeeId))
+      .map((a) => a.employee as EmployeeRecord);
+    return [...data.employees, ...guests]
       // Karyawan nonaktif tetap tampil bila hari itu tercatat absen
       .filter((e) => e.user.isActive || attendanceOf.has(e.id))
       .map((employee) => {
@@ -181,11 +194,11 @@ export default function DailyAttendanceModule({ requests }: { requests: AdminReq
   const expected = rows?.filter((r) => r.schedule && r.status !== 'LEAVE') ?? [];
   const attended = expected.filter((r) => r.status === 'PRESENT' || r.status === 'LATE').length;
   const rate = expected.length ? Math.round((attended / expected.length) * 1000) / 10 : null;
-  const unscheduledIn = rows?.filter((r) => !r.schedule && (r.status === 'PRESENT' || r.status === 'LATE')).length ?? 0;
+  const unscheduledIn = rows?.filter((r) => !r.schedule && !r.attendance?.scheduleId && (r.status === 'PRESENT' || r.status === 'LATE')).length ?? 0;
 
   function exportCsv() {
     if (!rows) return;
-    const header = ['Tanggal', 'Nama', 'NIK', 'Cabang', 'Jadwal', 'Masuk', 'Pulang', 'Terlambat (mnt)', 'Istirahat (mnt)', 'Status'];
+    const header = ['Tanggal', 'Nama', 'NIK', 'Cabang', 'Jadwal', 'Masuk', 'Pulang', 'Terlambat (mnt)', 'Istirahat (mnt)', 'Status', 'Sumber', 'Penanda'];
     const lines = rows.map((r) => [
       date,
       r.employee.fullName,
@@ -197,6 +210,8 @@ export default function DailyAttendanceModule({ requests }: { requests: AdminReq
       r.attendance?.lateMinutes ?? '',
       r.attendance ? r.breakMins : '',
       statusLabel(r),
+      r.attendance ? sourceLabel(r.attendance) : '',
+      r.attendance ? flagsOf(r.attendance.flags, r.attendance.isGuest).map(flagLabel).join('; ') : '',
     ]);
     const csv = [header, ...lines]
       .map((cols) => cols.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(','))
@@ -301,6 +316,7 @@ export default function DailyAttendanceModule({ requests }: { requests: AdminReq
                   <th scope="col" className="px-4 py-3">Masuk</th>
                   <th scope="col" className="px-4 py-3">Pulang</th>
                   <th scope="col" className="px-4 py-3">Istirahat</th>
+                  <th scope="col" className="px-4 py-3">Sumber</th>
                   <th scope="col" className="px-4 py-3">Status</th>
                 </tr>
               </thead>
@@ -345,11 +361,21 @@ export default function DailyAttendanceModule({ requests }: { requests: AdminReq
                           <span className="text-slate-400">–</span>
                         )}
                       </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-slate-800">
+                        {a ? sourceLabel(a) : <span className="text-slate-400">–</span>}
+                      </td>
                       <td className="px-4 py-3">
                         <span className={`inline-block rounded border px-2 py-0.5 text-xs font-medium ${STATUS_STYLE[r.status]}`}>
                           {statusLabel(r)}
                         </span>
-                        {a?.clockInTime && !r.schedule && <p className="mt-1 text-xs text-slate-500">di luar jadwal</p>}
+                        {a?.clockInTime && !r.schedule && !a.scheduleId && <p className="mt-1 text-xs text-slate-500">di luar jadwal</p>}
+                        {a && flagsOf(a.flags, a.isGuest).length > 0 && (
+                          <div className="mt-1 flex max-w-[16rem] flex-wrap gap-1">
+                            {flagsOf(a.flags, a.isGuest).map((f) => (
+                              <span key={f} className={flagClass(f)}>{flagLabel(f)}</span>
+                            ))}
+                          </div>
+                        )}
                         {a?.notes?.includes('Koreksi presensi') && <p className="mt-1 text-xs text-slate-500">hasil koreksi</p>}
                       </td>
                     </tr>

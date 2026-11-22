@@ -6,6 +6,7 @@ import { apiFetch } from '@/lib/api';
 import { getSessionUser } from '@/lib/auth';
 import Dialog from '@/components/Dialog';
 import HolidayList from '@/components/HolidayList';
+import OutletDevicesPanel from '@/components/OutletDevicesPanel';
 
 type DayKey = 'weekday' | 'weekend' | 'holiday';
 
@@ -35,6 +36,7 @@ interface Outlet {
   holidayOpen: string | null;
   holidayClose: string | null;
   breakLimitMins: number;
+  attendanceMode?: 'MOBILE' | 'TABLET';
   payrollCutoffDay: number;
   paydayDay: number;
   isActive: boolean;
@@ -46,7 +48,7 @@ type OutletForm = { id?: string } & Record<
   | 'code' | 'name' | 'brand' | 'city' | 'address' | 'managerId'
   | 'weekdayWorkStart' | 'weekdayWorkEnd' | 'weekendWorkStart' | 'weekendWorkEnd' | 'holidayWorkStart' | 'holidayWorkEnd'
   | 'weekdayOpen' | 'weekdayClose' | 'weekendOpen' | 'weekendClose' | 'holidayOpen' | 'holidayClose'
-  | 'breakLimitMins' | 'latitude' | 'longitude' | 'geofenceRadius' | 'wifiBssid' | 'payrollCutoffDay' | 'paydayDay',
+  | 'attendanceMode' | 'breakLimitMins' | 'latitude' | 'longitude' | 'geofenceRadius' | 'wifiBssid' | 'payrollCutoffDay' | 'paydayDay',
   string
 >;
 
@@ -77,7 +79,7 @@ const EMPTY_FORM: OutletForm = {
   weekdayOpen: '10:00', weekdayClose: '22:00',
   weekendOpen: '10:00', weekendClose: '23:00',
   holidayOpen: '10:00', holidayClose: '23:00',
-  breakLimitMins: '60', latitude: '', longitude: '', geofenceRadius: '50', wifiBssid: '',
+  attendanceMode: 'MOBILE', breakLimitMins: '60', latitude: '', longitude: '', geofenceRadius: '50', wifiBssid: '',
   payrollCutoffDay: '31', paydayDay: '1',
 };
 
@@ -91,7 +93,7 @@ function toForm(o: Outlet): OutletForm {
     weekdayOpen: s(o.weekdayOpen), weekdayClose: s(o.weekdayClose),
     weekendOpen: s(o.weekendOpen), weekendClose: s(o.weekendClose),
     holidayOpen: s(o.holidayOpen), holidayClose: s(o.holidayClose),
-    breakLimitMins: s(o.breakLimitMins), latitude: s(o.latitude), longitude: s(o.longitude),
+    attendanceMode: o.attendanceMode ?? 'MOBILE', breakLimitMins: s(o.breakLimitMins), latitude: s(o.latitude), longitude: s(o.longitude),
     geofenceRadius: s(o.geofenceRadius), wifiBssid: s(o.wifiBssid),
     payrollCutoffDay: s(o.payrollCutoffDay), paydayDay: s(o.paydayDay),
   };
@@ -290,6 +292,7 @@ export default function OutletMasterModule() {
                       >
                         {o.isActive ? 'Aktif' : 'Nonaktif'}
                       </span>
+                      <p className="mt-1 text-xs text-slate-600">Absen: {o.attendanceMode === 'TABLET' ? 'Tablet' : 'HP'}</p>
                     </td>
                     {canEdit && (
                       <td className="px-4 py-3">
@@ -367,6 +370,8 @@ function OutletFormDialog({
   const [saving, setSaving] = useState(false);
   const [managers, setManagers] = useState<ManagerOption[]>([]);
   const isEdit = Boolean(initial.id);
+  // Pasang dan cabut tablet hanya untuk HR dan Super Admin (sama dengan backend devices.controller.ts)
+  const canManageDevices = STATUS_CHANGERS.includes(getSessionUser()?.role ?? '');
   const set = (key: keyof OutletForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setData({ ...data, [key]: e.target.value });
 
@@ -532,6 +537,30 @@ function OutletFormDialog({
             </label>
             <p className="text-xs text-slate-500">Jam kerja dipakai menghitung terlambat. Jam buka tamu hanya informasi dan boleh dikosongkan.</p>
           </div>
+
+          <div className={section}>
+            <p className={heading}>Mode absen</p>
+            <div className="segmented" role="group" aria-label="Mode absen">
+              {([['MOBILE', 'HP'], ['TABLET', 'Tablet']] as const).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={data.attendanceMode === value}
+                  onClick={() => setData({ ...data, attendanceMode: value })}
+                  className="segmented-item"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-slate-500">
+              {data.attendanceMode === 'TABLET'
+                ? 'Kru absen lewat tablet di cabang ini. Absen dari HP kru ditutup untuk cabang ini.'
+                : 'Kru absen lewat aplikasi di HP masing-masing.'}
+            </p>
+          </div>
+
+          {isEdit && canManageDevices && initial.id && <OutletDevicesPanel outletId={initial.id} canManage />}
 
           <div className={section}>
             <p className={heading}>Gaji</p>
