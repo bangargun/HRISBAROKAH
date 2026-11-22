@@ -94,12 +94,12 @@ model Outlet {
   manager   EmployeeProfile? @relation("OutletManager", fields: [managerId], references: [id], onDelete: SetNull)
 
   // Jam kerja kru per jenis hari (HH:mm); dipakai menghitung terlambat
-  weekdayWorkStart String  @default("09:00")
-  weekdayWorkEnd   String  @default("17:00")
-  weekendWorkStart String  @default("09:00")
-  weekendWorkEnd   String  @default("17:00")
-  holidayWorkStart String  @default("09:00")
-  holidayWorkEnd   String  @default("17:00")
+  weekdayWorkStart String         @default("09:00")
+  weekdayWorkEnd   String         @default("17:00")
+  weekendWorkStart String         @default("09:00")
+  weekendWorkEnd   String         @default("17:00")
+  holidayWorkStart String         @default("09:00")
+  holidayWorkEnd   String         @default("17:00")
   // Jam buka-tutup untuk tamu per jenis hari (informasi saja)
   weekdayOpen      String?
   weekdayClose     String?
@@ -107,7 +107,9 @@ model Outlet {
   weekendClose     String?
   holidayOpen      String?
   holidayClose     String?
-  breakLimitMins   Int     @default(60)
+  breakLimitMins   Int            @default(60)
+  // Cara absen kru di cabang ini: HP masing-masing atau tablet bersama
+  attendanceMode   AttendanceMode @default(MOBILE)
 
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -119,6 +121,10 @@ model Outlet {
   dailyReportPhotos  DailyReportPhoto[]
   survey360Responses Survey360Response[]
   inspections        OutletInspection[]
+  shiftSchedules     ShiftSchedule[]
+  attendanceDevices  AttendanceDevice[]
+  devicePairings     AttendanceDevicePairing[]
+  attendanceEvents   AttendanceEvent[]
 }
 
 model Department {
@@ -155,15 +161,18 @@ model User {
 
   profile EmployeeProfile?
 
-  sanctionsIssued      Sanction[]             @relation("SanctionIssuedBy")
-  correctionsCreated   AttendanceCorrection[] @relation("CorrectionCreatedBy")
-  correctionsDecided   AttendanceCorrection[] @relation("CorrectionDecidedBy")
-  exitsCreated         EmployeeExit[]         @relation("ExitCreatedBy")
-  exitsClosed          EmployeeExit[]         @relation("ExitClosedBy")
+  sanctionsIssued      Sanction[]                @relation("SanctionIssuedBy")
+  correctionsCreated   AttendanceCorrection[]    @relation("CorrectionCreatedBy")
+  correctionsDecided   AttendanceCorrection[]    @relation("CorrectionDecidedBy")
+  exitsCreated         EmployeeExit[]            @relation("ExitCreatedBy")
+  exitsClosed          EmployeeExit[]            @relation("ExitClosedBy")
   dailyReportPhotos    DailyReportPhoto[]
-  inspectionsCreated   OutletInspection[]     @relation("InspectionCreatedBy")
-  inspectionsConducted OutletInspection[]     @relation("InspectionConductedBy")
+  inspectionsCreated   OutletInspection[]        @relation("InspectionCreatedBy")
+  inspectionsConducted OutletInspection[]        @relation("InspectionConductedBy")
   documentsUploaded    EmployeeDocument[]
+  devicesCreated       AttendanceDevice[]        @relation("DeviceCreatedBy")
+  pairingsCreated      AttendanceDevicePairing[] @relation("PairingCreatedBy")
+  eventsReviewed       AttendanceEvent[]         @relation("EventReviewedBy")
 }
 
 model EmployeeProfile {
@@ -193,6 +202,9 @@ model EmployeeProfile {
   // Persetujuan karyawan atas pemakaian data wajah (UU PDP)
   faceConsentAt DateTime?
 
+  // PIN absen tablet (hash bcrypt), cadangan bila wajah gagal dikenali
+  attendancePinHash String?
+
   // Rekening Penggajian
   bankName          String?
   bankAccountNumber String?
@@ -215,6 +227,7 @@ model EmployeeProfile {
   sopSignatures    SopSignature[]
   faceEnrollments  FaceEnrollment[]
   faceChecks       FaceCheckLog[]
+  attendanceEvents AttendanceEvent[]
 }
 
 // -------------------------------------------------------------
@@ -226,6 +239,10 @@ model ShiftSchedule {
   employee    EmployeeProfile @relation(fields: [employeeId], references: [id])
   date        DateTime        @db.Date
   attendances Attendance[]
+
+  // Cabang tempat jadwal berlaku (opsional; dipakai absen tablet)
+  outletId String?
+  outlet   Outlet? @relation(fields: [outletId], references: [id], onDelete: SetNull)
 
   // Ada baris = karyawan dijadwalkan masuk; jamnya dari jam kerja cabang sesuai jenis hari.
   // Tanggal tanpa baris berarti libur.
@@ -266,6 +283,14 @@ model Attendance {
   lateMinutes     Int              @default(0)
   overtimeMinutes Int              @default(0)
   notes           String?
+
+  // Asal catatan: HP kru atau tablet cabang
+  source   AttendanceSource  @default(MOBILE)
+  deviceId String?
+  device   AttendanceDevice? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  isGuest  Boolean           @default(false)
+  flags    String[]          @default([])
+  events   AttendanceEvent[]
 
   breaks AttendanceBreak[]
 }
@@ -804,4 +829,97 @@ model EmployeeDocument {
   createdAt    DateTime             @default(now())
 
   @@index([employeeId])
+}
+
+// -------------------------------------------------------------
+// ABSEN TABLET (KIOSK)
+// -------------------------------------------------------------
+enum AttendanceMode {
+  MOBILE
+  TABLET
+}
+
+enum AttendanceSource {
+  MOBILE
+  TABLET
+}
+
+enum KioskEventType {
+  CLOCK_IN
+  BREAK_START
+  BREAK_END
+  CLOCK_OUT
+}
+
+enum KioskMethod {
+  FACE_LOCAL
+  FACE_SERVER
+  PIN
+}
+
+enum AttendanceEventStatus {
+  APPLIED
+  NEEDS_REVIEW
+  REJECTED
+}
+
+// Tablet yang sudah dipasangkan ke cabang
+model AttendanceDevice {
+  id          String    @id @default(uuid())
+  outletId    String
+  outlet      Outlet    @relation(fields: [outletId], references: [id])
+  name        String
+  tokenHash   String    @unique
+  pairedAt    DateTime  @default(now())
+  lastSeenAt  DateTime?
+  revokedAt   DateTime?
+  createdById String
+  createdBy   User      @relation("DeviceCreatedBy", fields: [createdById], references: [id])
+
+  attendances Attendance[]
+  events      AttendanceEvent[]
+}
+
+// Kode sekali pakai untuk memasangkan tablet baru
+model AttendanceDevicePairing {
+  code        String    @id
+  outletId    String
+  outlet      Outlet    @relation(fields: [outletId], references: [id])
+  deviceName  String
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdById String
+  createdBy   User      @relation("PairingCreatedBy", fields: [createdById], references: [id])
+}
+
+// Kejadian absen dari tablet (id dibuat tablet, jadi aman dikirim ulang)
+model AttendanceEvent {
+  id              String                @id
+  deviceId        String
+  device          AttendanceDevice      @relation(fields: [deviceId], references: [id])
+  employeeId      String
+  employee        EmployeeProfile       @relation(fields: [employeeId], references: [id])
+  outletId        String
+  outlet          Outlet                @relation(fields: [outletId], references: [id])
+  type            KioskEventType
+  method          KioskMethod
+  deviceTime      DateTime
+  offsetAtEventMs Int
+  effectiveTime   DateTime
+  localScore      Float?
+  serverScore     Float?
+  photoPath       String?
+  status          AttendanceEventStatus
+  applied         Boolean
+  reason          String?
+  flags           String[]
+  attendanceId    String?
+  attendance      Attendance?           @relation(fields: [attendanceId], references: [id], onDelete: SetNull)
+  reviewedById    String?
+  reviewedBy      User?                 @relation("EventReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt      DateTime?
+  receivedAt      DateTime              @default(now())
+
+  @@index([status, outletId])
+  @@index([employeeId, effectiveTime])
 }
