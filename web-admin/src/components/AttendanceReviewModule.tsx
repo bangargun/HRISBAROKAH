@@ -196,7 +196,7 @@ export default function AttendanceReviewModule({ onChanged }: { onChanged?: () =
       {notice && (
         <p
           role={notice.ok ? 'status' : 'alert'}
-          className={`rounded-md border px-3 py-2 ${notice.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-rose-200 bg-rose-50 text-rose-800'}`}
+          className={notice.ok ? 'rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-emerald-800' : 'alert-error'}
         >
           {notice.text}
         </p>
@@ -204,7 +204,7 @@ export default function AttendanceReviewModule({ onChanged }: { onChanged?: () =
 
       <div className="card overflow-hidden">
         {error ? (
-          <div role="alert" className="bg-rose-50 p-8 text-center text-rose-800">
+          <div role="alert" className="alert-error rounded-none border-0 p-8 text-center">
             <p>Gagal memuat daftar: {error}</p>
             <button type="button" onClick={load} className="btn btn-secondary mt-3">Coba lagi</button>
           </div>

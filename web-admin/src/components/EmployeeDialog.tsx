@@ -411,7 +411,7 @@ function AttendancePin({ employeeId, name, initiallySet }: { employeeId: string;
         </div>
       )}
       {notice && (
-        <p role={notice.ok ? 'status' : 'alert'} className={`rounded-md border px-3 py-2 ${notice.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-rose-200 bg-rose-50 text-rose-800'}`}>
+        <p role={notice.ok ? 'status' : 'alert'} className={notice.ok ? 'rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-emerald-800' : 'alert-error'}>
           {notice.text}
         </p>
       )}

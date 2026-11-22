@@ -51,6 +51,7 @@ export default function OutletDevicesPanel({ outletId, canManage }: { outletId: 
   const [revoking, setRevoking] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const knownIds = useRef<Set<string>>(new Set());
+  const knownLoaded = useRef(false);
 
   const load = useCallback(async () => {
     try {
@@ -66,7 +67,10 @@ export default function OutletDevicesPanel({ outletId, canManage }: { outletId: 
 
   useEffect(() => {
     load().then((list) => {
-      if (list) knownIds.current = new Set(list.map((d) => d.id));
+      if (list) {
+        knownIds.current = new Set(list.map((d) => d.id));
+        knownLoaded.current = true;
+      }
     });
   }, [load]);
 
@@ -77,7 +81,8 @@ export default function OutletDevicesPanel({ outletId, canManage }: { outletId: 
     const tick = setInterval(() => setNow(Date.now()), 1000);
     const poll = setInterval(async () => {
       const list = await load();
-      if (list?.some((d) => !knownIds.current.has(d.id))) {
+      // Hanya bila daftar awal berhasil dimuat; kalau tidak, semua tablet lama tampak "baru"
+      if (list && knownLoaded.current && list.some((d) => !knownIds.current.has(d.id))) {
         knownIds.current = new Set(list.map((d) => d.id));
         setPairing(null);
         setNotice('Tablet terpasang.');

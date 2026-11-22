@@ -39,8 +39,11 @@ interface OutletOption {
 
 type Status = 'LATE' | 'ABSENT' | 'NOT_YET' | 'PRESENT' | 'LEAVE' | 'OFF';
 
+/** Kru di tabel: dari daftar karyawan cabang (punya akun) atau kru tamu dari baris absen (tanpa akun). */
+type RowEmployee = Pick<EmployeeRecord, 'id' | 'nik' | 'fullName' | 'position' | 'outlet'> & { user?: EmployeeRecord['user'] };
+
 interface Row {
-  employee: EmployeeRecord;
+  employee: RowEmployee;
   schedule: ScheduleRow | undefined;
   attendance: AttendanceRow | undefined;
   leave: AdminRequest | undefined;
@@ -146,12 +149,12 @@ export default function DailyAttendanceModule({ requests }: { requests: AdminReq
     );
     // Kru tamu: absen tercatat di cabang ini, tetapi karyawannya terdaftar di cabang lain
     const known = new Set(data.employees.map((e) => e.id));
-    const guests = data.attendance
+    const guests: RowEmployee[] = data.attendance
       .filter((a) => a.employee && !known.has(a.employeeId))
-      .map((a) => a.employee as EmployeeRecord);
+      .map((a) => a.employee!);
     return [...data.employees, ...guests]
       // Karyawan nonaktif tetap tampil bila hari itu tercatat absen
-      .filter((e) => e.user.isActive || attendanceOf.has(e.id))
+      .filter((e) => attendanceOf.has(e.id) || e.user?.isActive)
       .map((employee) => {
         const attendance = attendanceOf.get(employee.id);
         const schedule = scheduleOf.get(employee.id);
