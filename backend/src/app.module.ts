@@ -16,6 +16,7 @@ import { ExitsModule } from './modules/exits/exits.module';
 import { DailyReportsModule } from './modules/daily-reports/daily-reports.module';
 import { Survey360Module } from './modules/survey360/survey360.module';
 import { InspectionsModule } from './modules/inspections/inspections.module';
+import { KioskModule } from './modules/kiosk/kiosk.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { InspectionsModule } from './modules/inspections/inspections.module';
     DailyReportsModule,
     Survey360Module,
     InspectionsModule,
+    KioskModule,
   ],
   controllers: [],
   providers: [],

@@ -1,6 +1,7 @@
 import { Transform } from 'class-transformer';
 import {
   IsBoolean,
+  IsEnum,
   IsInt,
   IsLatitude,
   IsLongitude,
@@ -14,6 +15,7 @@ import {
   Min,
   ValidateIf,
 } from 'class-validator';
+import { AttendanceMode } from '@prisma/client';
 
 const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
 // String kosong berarti "kosongkan" (null)
@@ -68,6 +70,10 @@ class OutletFieldsDto {
   @Transform(emptyToNull) @ValidateIf((_, v) => v !== null && v !== undefined) @Matches(HH_MM, { message: HH_MM_MESSAGE }) @IsOptional() weekendClose?: string | null;
   @Transform(emptyToNull) @ValidateIf((_, v) => v !== null && v !== undefined) @Matches(HH_MM, { message: HH_MM_MESSAGE }) @IsOptional() holidayOpen?: string | null;
   @Transform(emptyToNull) @ValidateIf((_, v) => v !== null && v !== undefined) @Matches(HH_MM, { message: HH_MM_MESSAGE }) @IsOptional() holidayClose?: string | null;
+
+  @IsEnum(AttendanceMode, { message: 'Mode absensi harus MOBILE atau TABLET' })
+  @IsOptional()
+  attendanceMode?: AttendanceMode;
 
   @IsInt()
   @Min(0)
