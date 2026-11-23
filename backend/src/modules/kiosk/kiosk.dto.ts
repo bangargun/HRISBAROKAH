@@ -3,6 +3,7 @@ import {
   ArrayMaxSize,
   ArrayMinSize,
   IsArray,
+  IsBoolean,
   IsEnum,
   IsISO8601,
   IsInt,
@@ -73,11 +74,22 @@ export class KioskEventDto {
   @IsOptional()
   @Matches(/^\d{6}$/, { message: 'PIN harus 6 digit angka' })
   pin?: string;
+
+  // Tablet melihat jamnya mundur / tidak cocok dengan jam monoton saat event dibuat
+  @IsOptional()
+  @IsBoolean({ message: 'clockSuspect harus boolean' })
+  clockSuspect?: boolean;
 }
 
 export class KioskEventsDto {
   @IsISO8601({ strict: true }, { message: 'deviceNow harus waktu ISO 8601' })
   deviceNow: string;
+
+  // Selisih jam server - jam tablet yang diukur tablet (GET /kiosk/time) tepat sebelum batch ini.
+  // Dipakai bila ada: deviceNow dicap sebelum unggahan yang bisa lama (Nginx menampung body).
+  @IsOptional()
+  @IsNumber({ allowNaN: false, allowInfinity: false }, { message: 'offsetNowMs harus angka' })
+  offsetNowMs?: number;
 
   @IsArray()
   @ArrayMinSize(1, { message: 'Minimal 1 event' })

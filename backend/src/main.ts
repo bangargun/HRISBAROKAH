@@ -3,6 +3,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { json } from 'express';
+import * as compression from 'compression';
 import { UPLOADS_ROOT } from './common/utils/attendance-photo.util';
 import { KIOSK_EVENTS_BODY_LIMIT } from './modules/kiosk/kiosk.dto';
 
@@ -13,6 +14,9 @@ async function bootstrap() {
   app.set('trust proxy', 'loopback');
   app.setGlobalPrefix('api/v1');
   app.enableCors();
+  // Paket bootstrap tablet (wajah seluruh roster) diunduh tiap 5 menit: dikompres gzip di sini
+  // agar tidak bergantung pada konfigurasi Nginx VPS bersama
+  app.use(compression());
   // Batch event tablet membawa banyak foto; parser ini dipasang lebih dulu sehingga
   // parser umum di bawah melewati body yang sudah terbaca
   app.use('/api/v1/kiosk/events', json({ limit: KIOSK_EVENTS_BODY_LIMIT }));

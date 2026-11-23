@@ -2,7 +2,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const {
-  effectiveTime, clockChanged, wasOffline, isOpen, checkTransition, OPEN_ATTENDANCE_MAX_MS,
+  effectiveTime, clockChanged, wasOffline, inFuture, isOpen, checkTransition, OPEN_ATTENDANCE_MAX_MS,
 } = require('../dist/modules/kiosk/kiosk.rules');
 
 const d = (s) => new Date(s);
@@ -84,4 +84,11 @@ test('clockChanged tepat di toleransi belum berubah (batas ketat >)', () => {
 test('CLOCK_OUT pada absen yang sudah pulang ditolak', () => {
   const s = state('2026-11-22T01:00:00Z', { clockOut: d('2026-11-22T09:00:00Z') });
   assert.deepEqual(checkTransition(s, 'CLOCK_OUT', d('2026-11-22T10:00:00Z')), { ok: false, reason: 'Belum absen masuk' });
+});
+
+test('inFuture: waktu efektif lebih dari 2 menit di depan waktu terima', () => {
+  const recv = d('2026-11-22T01:00:00Z');
+  assert.equal(inFuture(d('2026-11-22T01:02:00Z'), recv), false);
+  assert.equal(inFuture(d('2026-11-22T01:02:00.001Z'), recv), true);
+  assert.equal(inFuture(d('2026-11-22T00:30:00Z'), recv), false);
 });

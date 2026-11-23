@@ -873,6 +873,9 @@ model AttendanceDevice {
   pairedAt    DateTime  @default(now())
   lastSeenAt  DateTime?
   revokedAt   DateTime?
+  // Jumlah absen yang belum terkirim menurut laporan tablet pada bootstrap terakhir
+  pendingCount      Int?
+  pendingReportedAt DateTime?
   createdById String
   createdBy   User      @relation("DeviceCreatedBy", fields: [createdById], references: [id])
 
@@ -915,6 +918,8 @@ model AttendanceEvent {
   flags           String[]              @default([])
   attendanceId    String?
   attendance      Attendance?           @relation(fields: [attendanceId], references: [id], onDelete: SetNull)
+  // CLOCK_IN: true bila event ini membuat baris Attendance, false bila melengkapi baris yang sudah ada
+  createdAttendance Boolean?
   reviewedById    String?
   reviewedBy      User?                 @relation("EventReviewedBy", fields: [reviewedById], references: [id])
   reviewedAt      DateTime?

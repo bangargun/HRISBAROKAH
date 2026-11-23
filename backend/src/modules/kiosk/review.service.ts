@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { AttendanceEventStatus, AttendanceSource, KioskEventType, Prisma } from '@prisma/client';
+import { AttendanceEventStatus, AttendanceSource, AttendanceStatus, KioskEventType, Prisma } from '@prisma/client';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -8,6 +8,7 @@ import { AuthUser, assertOutletAccess, scopedOutletId } from '../../common/utils
 import { FLAG_BREAK_AUTO_CLOSED, FLAG_PENDING_REVIEW } from './kiosk.rules';
 
 export const REASON_CLOCK_IN_REJECTED = 'Absen masuk ditolak';
+export const REASON_BREAK_START_REJECTED = 'Mulai istirahat ditolak';
 const ALREADY_REVIEWED = 'Sudah ditinjau';
 const LIST_LIMIT = 300;
 const YMD = /^\d{4}-\d{2}-\d{2}$/;
@@ -115,14 +116,53 @@ export class ReviewService {
           data: { status: AttendanceEventStatus.REJECTED, reason: REASON_CLOCK_IN_REJECTED, ...stamp },
         });
         await tx.attendanceEvent.update({ where: { id: event.id }, data: { reason: REASON_CLOCK_IN_REJECTED } });
-        if (att.source === AttendanceSource.TABLET) {
+        // Baris yang sudah ada sebelum event ini (mis. dibuat koreksi) hanya dikosongkan;
+        // baris yang dibuat event ini dihapus. Event lama tanpa catatan: perilaku semula (TABLET -> hapus).
+        const created = event.createdAttendance ?? att.source === AttendanceSource.TABLET;
+        if (created) {
           // Istirahat ikut terhapus (cascade); event menjadi tanpa absen (SetNull)
           await tx.attendance.delete({ where: { id: attendanceId } });
+        } else {
+          await tx.attendanceBreak.deleteMany({ where: { attendanceId } });
+          await tx.attendance.update({
+            where: { id: attendanceId },
+            data: {
+              clockInTime: null,
+              clockInLat: null,
+              clockInLng: null,
+              clockInPhotoUrl: null,
+              clockInDistanceM: null,
+              clockInFaceScore: null,
+              clockOutTime: null,
+              clockOutLat: null,
+              clockOutLng: null,
+              clockOutPhotoUrl: null,
+              clockOutDistanceM: null,
+              clockOutFaceScore: null,
+              lateMinutes: 0,
+              status: AttendanceStatus.ABSENT,
+            },
+          });
+          await this.recomputePending(tx, attendanceId);
         }
         return;
       }
 
       if (event.type === KioskEventType.BREAK_START) {
+        // Selesai istirahat dari tablet untuk istirahat ini kehilangan pasangannya: ikut ditolak
+        const brk = await tx.attendanceBreak.findFirst({ where: { attendanceId, startBreak: event.effectiveTime } });
+        if (brk?.endBreak) {
+          await tx.attendanceEvent.updateMany({
+            where: {
+              attendanceId,
+              type: KioskEventType.BREAK_END,
+              applied: true,
+              effectiveTime: brk.endBreak,
+              status: { not: AttendanceEventStatus.REJECTED },
+            },
+            data: { status: AttendanceEventStatus.REJECTED, reason: REASON_BREAK_START_REJECTED, ...stamp },
+          });
+        }
         await tx.attendanceBreak.deleteMany({ where: { attendanceId, startBreak: event.effectiveTime } });
       } else if (event.type === KioskEventType.BREAK_END) {
         // Istirahat yang akhirnya tak terverifikasi tidak dihitung: seluruh barisnya dihapus
@@ -154,7 +194,11 @@ export class ReviewService {
   private async review(
     actor: AuthUser,
     id: string,
-    apply: (tx: Tx, event: { type: KioskEventType; applied: boolean; attendanceId: string | null; effectiveTime: Date; flags: string[]; id: string }, at: Date) => Promise<void>,
+    apply: (
+      tx: Tx,
+      event: { type: KioskEventType; applied: boolean; attendanceId: string | null; effectiveTime: Date; flags: string[]; id: string; createdAttendance: boolean | null },
+      at: Date,
+    ) => Promise<void>,
     to: AttendanceEventStatus = AttendanceEventStatus.APPLIED,
   ) {
     const found = await this.prisma.attendanceEvent.findUnique({ where: { id }, select: { employeeId: true, outletId: true } });
@@ -173,7 +217,7 @@ export class ReviewService {
       if (won.count === 0) throw new BadRequestException(ALREADY_REVIEWED);
       const event = await tx.attendanceEvent.findUniqueOrThrow({
         where: { id },
-        select: { id: true, type: true, applied: true, attendanceId: true, effectiveTime: true, flags: true },
+        select: { id: true, type: true, applied: true, attendanceId: true, effectiveTime: true, flags: true, createdAttendance: true },
       });
       await apply(tx, event, at);
       return { id, status: to };

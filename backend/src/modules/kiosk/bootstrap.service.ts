@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UserRole } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { FaceRecognitionService } from '../face/face-recognition.service';
 import { businessDateString, monthDateRange, toDateOnly } from '../../common/utils/business-date.util';
@@ -15,6 +15,17 @@ const HOLIDAY_WINDOW_DAYS = 7;
 const ymd = (d: Date) => d.toISOString().slice(0, 10);
 const addDays = (date: string, n: number) => ymd(new Date(toDateOnly(date).getTime() + n * 86_400_000));
 const diffMinutes = (a: Date, b: Date) => Math.max(0, Math.round((b.getTime() - a.getTime()) / 60_000));
+// 5 desimal cukup untuk kemiripan kosinus dan memangkas ukuran paket ~3x
+const round5 = (v: number) => Math.round(v * 1e5) / 1e5;
+
+export interface BootstrapTodayRow {
+  employeeId: string;
+  clockIn: string | null;
+  clockOut: string | null;
+  openBreakStart: string | null;
+  lateMinutes: number;
+  here: boolean;
+}
 
 export interface BootstrapPayload {
   serverTime: string;
@@ -35,13 +46,10 @@ export interface BootstrapPayload {
     shifts: { date: string; here: boolean }[];
   }[];
   directory: { employeeId: string; fullName: string; homeOutletName: string }[];
-  today: {
-    employeeId: string;
-    clockIn: string | null;
-    clockOut: string | null;
-    openBreakStart: string | null;
-    lateMinutes: number;
-  }[];
+  // Absen hari ini di cabang ini + absen hari ini / masih terbuka (aturan 16 jam) kru roster di
+  // cabang mana pun, agar kru yang pindah cabang di tengah shift bisa istirahat / pulang di sini.
+  // here = absen tercatat di cabang tablet ini (papan hanya memakai yang here).
+  today: BootstrapTodayRow[];
   recap: {
     employeeId: string;
     days: {
@@ -111,7 +119,7 @@ export class BootstrapService {
 
     const homeIds = rosterRows.filter((r) => r.outletId === outletId).map((r) => r.id);
     const [todayRows, recapRows, rosterSchedules] = await Promise.all([
-      this.todayRows(outletId, today, now),
+      this.todayRows(outletId, rosterRows.map((r) => r.id), { now }),
       this.recapRows(homeIds, today),
       this.prisma.shiftSchedule.findMany({
         where: { employeeId: { in: rosterRows.map((r) => r.id) }, date: { gte: toDateOnly(today), lte: toDateOnly(guestTo) } },
@@ -154,7 +162,7 @@ export class BootstrapService {
           homeOutletName: r.outlet.name,
           isGuest,
           guestDates: isGuest ? (guestDatesByEmployee.get(r.id) ?? []).sort() : [],
-          embeddings: r.faceEnrollments.map((f) => f.embedding),
+          embeddings: r.faceEnrollments.map((f) => f.embedding.map(round5)),
           hasPin: !!r.attendancePinHash,
           shifts: shiftsByEmployee.get(r.id) ?? [],
         };
@@ -165,16 +173,34 @@ export class BootstrapService {
     };
   }
 
-  /** Absen di cabang ini hari ini, ditambah absen kemarin yang masih terbuka (aturan 16 jam). */
-  private async todayRows(outletId: string, today: string, now: Date): Promise<BootstrapPayload['today']> {
+  /**
+   * Absen hari ini di cabang ini (dan absen kemarin yang masih terbuka, aturan 16 jam), ditambah
+   * absen hari ini / masih terbuka milik `employeeIds` di cabang mana pun.
+   * includeOutlet=false: hanya milik `employeeIds` (dipakai identify untuk satu kru).
+   */
+  async todayRows(
+    outletId: string,
+    employeeIds: string[],
+    { now = new Date(), includeOutlet = true }: { now?: Date; includeOutlet?: boolean } = {},
+  ): Promise<BootstrapTodayRow[]> {
+    const today = businessDateString(now);
+    const openSince = new Date(now.getTime() - OPEN_ATTENDANCE_MAX_MS);
+    const or: Prisma.AttendanceWhereInput[] = [];
+    if (includeOutlet) {
+      or.push(
+        { outletId, date: toDateOnly(today) },
+        { outletId, date: toDateOnly(addDays(today, -1)), clockOutTime: null, clockInTime: { gte: openSince } },
+      );
+    }
+    if (employeeIds.length > 0) {
+      or.push(
+        { employeeId: { in: employeeIds }, date: toDateOnly(today) },
+        { employeeId: { in: employeeIds }, clockOutTime: null, clockInTime: { gte: openSince } },
+      );
+    }
+    if (or.length === 0) return [];
     const rows = await this.prisma.attendance.findMany({
-      where: {
-        outletId,
-        OR: [
-          { date: toDateOnly(today) },
-          { date: toDateOnly(addDays(today, -1)), clockOutTime: null, clockInTime: { gte: new Date(now.getTime() - OPEN_ATTENDANCE_MAX_MS) } },
-        ],
-      },
+      where: { OR: or },
       include: { breaks: { where: { endBreak: null }, select: { startBreak: true } } },
       orderBy: { clockInTime: 'asc' },
     });
@@ -186,6 +212,7 @@ export class BootstrapService {
         clockOut: r.clockOutTime?.toISOString() ?? null,
         openBreakStart: r.breaks[0]?.startBreak.toISOString() ?? null,
         lateMinutes: r.lateMinutes,
+        here: r.outletId === outletId,
       }));
   }
 

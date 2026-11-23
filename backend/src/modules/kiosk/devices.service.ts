@@ -49,7 +49,7 @@ export class DevicesService {
     assertOutletAccess(actor, outletId, 'Anda tidak bisa melihat tablet cabang lain');
     return this.prisma.attendanceDevice.findMany({
       where: { outletId },
-      select: { id: true, name: true, pairedAt: true, lastSeenAt: true, revokedAt: true },
+      select: { id: true, name: true, pairedAt: true, lastSeenAt: true, revokedAt: true, pendingCount: true, pendingReportedAt: true },
       orderBy: { pairedAt: 'desc' },
     });
   }
@@ -62,6 +62,14 @@ export class DevicesService {
       await this.prisma.attendanceDevice.update({ where: { id: deviceId }, data: { revokedAt: new Date() } });
     }
     return { ok: true };
+  }
+
+  /** Laporan tablet: jumlah absen di antreannya yang belum terkirim. */
+  async reportPending(deviceId: string, count: number) {
+    await this.prisma.attendanceDevice.update({
+      where: { id: deviceId },
+      data: { pendingCount: count, pendingReportedAt: new Date() },
+    });
   }
 
   /** Tukar kode pairing dengan token perangkat (sekali pakai). */

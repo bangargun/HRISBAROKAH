@@ -47,6 +47,11 @@ export function wasOffline(effective: Date, receivedAt: Date): boolean {
   return receivedAt.getTime() - effective.getTime() > 120_000;
 }
 
+// Waktu efektif lebih dari 2 menit di depan waktu terima server: jam tablet dimajukan
+export function inFuture(effective: Date, receivedAt: Date): boolean {
+  return effective.getTime() - receivedAt.getTime() > 120_000;
+}
+
 export function isOpen(state: DayState | null, at: Date): boolean {
   if (!state || state.clockOut) return false;
   return at.getTime() - state.clockIn.getTime() <= OPEN_ATTENDANCE_MAX_MS;

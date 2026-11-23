@@ -26,12 +26,14 @@ import {
   checkTransition,
   clockChanged,
   effectiveTime,
+  inFuture,
   wasOffline,
 } from './kiosk.rules';
 
 export const REASON_WRONG_PIN = 'PIN salah';
 const REASON_EMPLOYEE_NOT_FOUND = 'Karyawan tidak ditemukan';
 const REASON_BAD_PHOTO = 'Foto absen tidak valid';
+export const REASON_INACTIVE = 'Karyawan nonaktif';
 
 // Tanda yang membuat event tetap diterapkan tetapi menunggu tinjauan HR
 const REVIEW_FLAGS: Record<string, string> = {
@@ -86,7 +88,10 @@ export class EventsService {
    */
   async ingest(device: DeviceContext, dto: KioskEventsDto): Promise<{ results: EventResult[] }> {
     const receivedAt = new Date();
-    const offsetNowMs = receivedAt.getTime() - new Date(dto.deviceNow).getTime();
+    // Selisih jam sekarang: yang diukur tablet tepat sebelum batch (GET /kiosk/time) bila ada.
+    // deviceNow dicap sebelum unggahan; unggahan lambat (foto, Nginx menampung body) membuat
+    // receivedAt - deviceNow membengkak dan menandai CLOCK_CHANGED palsu. Bentuk lama tetap diterima.
+    const offsetNowMs = dto.offsetNowMs ?? receivedAt.getTime() - new Date(dto.deviceNow).getTime();
     const ordered = dto.events
       .map((e, index) => ({ e, index, effective: effectiveTime(new Date(e.deviceTime), e.offsetAtEventMs) }))
       .sort((a, b) => a.effective.getTime() - b.effective.getTime() || a.index - b.index);
@@ -139,14 +144,16 @@ export class EventsService {
 
     const employee = await this.prisma.employeeProfile.findUnique({
       where: { id: e.employeeId },
-      select: { outletId: true, attendancePinHash: true },
+      select: { outletId: true, attendancePinHash: true, user: { select: { isActive: true } } },
     });
     // Tidak bisa disimpan (FK); tetap dijawab agar tidak terkirim ulang terus
     if (!employee) return { id: e.id, status: AttendanceEventStatus.REJECTED, reason: REASON_EMPLOYEE_NOT_FOUND };
 
     // 2. Tanda
     const flags = new Set<string>();
-    if (clockChanged(e.offsetAtEventMs, offsetNowMs)) flags.add(FLAG_CLOCK_CHANGED);
+    if (clockChanged(e.offsetAtEventMs, offsetNowMs) || e.clockSuspect || inFuture(effective, receivedAt)) {
+      flags.add(FLAG_CLOCK_CHANGED);
+    }
     if (wasOffline(effective, receivedAt)) flags.add(FLAG_OFFLINE);
     const isGuest = employee.outletId !== device.outletId;
     if (isGuest) flags.add(FLAG_GUEST);
@@ -165,6 +172,11 @@ export class EventsService {
       localScore: e.localScore ?? null,
       receivedAt,
     };
+
+    // Akun nonaktif: tidak diterapkan, disimpan agar HR melihatnya
+    if (!employee.user.isActive) {
+      return this.storeNotApplied(base, flags, AttendanceEventStatus.NEEDS_REVIEW, REASON_INACTIVE);
+    }
 
     // 3. PIN diperiksa server; salah -> ditolak, tidak diterapkan.
     //    Jatah PIN salah tablet ini habis -> tidak dijawab (diulang tablet setelah jendela lewat)
@@ -293,6 +305,7 @@ export class EventsService {
 
     // 6. Terapkan ke Attendance / AttendanceBreak
     let attendanceId: string;
+    let createdAttendance: boolean | null = null;
     if (isClockIn) {
       const { date, punctuality } = clockIn!;
       const data = {
@@ -310,6 +323,7 @@ export class EventsService {
         ? await tx.attendance.update({ where: { id: row.id }, data: { ...data, flags: mergedFlags(row.flags) } })
         : await tx.attendance.create({ data: { ...data, employeeId: e.employeeId, date, flags: mergedFlags() } });
       attendanceId = saved.id;
+      createdAttendance = !row;
     } else {
       // checkTransition ok untuk selain CLOCK_IN berarti ada absen terbuka
       const open = row!;
@@ -336,7 +350,7 @@ export class EventsService {
     const status = review.length ? AttendanceEventStatus.NEEDS_REVIEW : AttendanceEventStatus.APPLIED;
     const reason = review.length ? review.map((f) => REVIEW_FLAGS[f]).join(', ') : null;
     await tx.attendanceEvent.create({
-      data: { ...base, photoPath, serverScore, status, applied: true, reason, flags: [...flags], attendanceId },
+      data: { ...base, photoPath, serverScore, status, applied: true, reason, flags: [...flags], attendanceId, createdAttendance },
     });
     return { id: e.id, status, reason };
   }

@@ -20,7 +20,7 @@ function makeService({ txError, photo = FACE_A } = {}) {
       findUnique: async () => null,
       create: async ({ data }) => { created.push(data); return data; },
     },
-    employeeProfile: { findUnique: async () => ({ outletId: 'out-1', attendancePinHash: null }) },
+    employeeProfile: { findUnique: async () => ({ outletId: 'out-1', attendancePinHash: null, user: { isActive: true } }) },
     outlet: { findUniqueOrThrow: async () => ({ id: 'out-1' }) },
     $transaction: async () => { throw txError; },
   };
