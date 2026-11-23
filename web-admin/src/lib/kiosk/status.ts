@@ -6,6 +6,9 @@ import type { BootstrapTodayRow, KioskEventType, QueuedEvent } from './types';
 
 export type DayStatus = 'OUT' | 'IN' | 'ON_BREAK' | 'DONE';
 
+/** Bagian event antre yang dipakai status (tanpa foto). */
+export type StatusEvent = Pick<QueuedEvent, 'employeeId' | 'type' | 'deviceTime' | 'offsetAtEventMs'>;
+
 // Absen yang belum pulang dianggap tidak lagi terbuka setelah 16 jam
 export const OPEN_ATTENDANCE_MAX_MS = 16 * 3600_000;
 
@@ -68,7 +71,7 @@ function rowFor(rows: DayState[], type: KioskEventType, at: Date): DayState | nu
   return open.sort((a, b) => b.clockIn.getTime() - a.clockIn.getTime())[0] ?? null;
 }
 
-function apply(rows: DayState[], e: QueuedEvent): void {
+function apply(rows: DayState[], e: StatusEvent): void {
   // Waktu efektif = jam tablet + selisih jam saat kejadian (effectiveTime di backend)
   const at = new Date(Date.parse(e.deviceTime) + e.offsetAtEventMs);
   const row = rowFor(rows, e.type, at);
@@ -85,16 +88,7 @@ function apply(rows: DayState[], e: QueuedEvent): void {
   }
 }
 
-/**
- * Status kru pada `now` (jam server: jam tablet + offsetMs).
- * OUT = boleh absen masuk; IN = sedang bekerja; ON_BREAK = istirahat; DONE = sudah pulang hari ini.
- */
-export function dayStatus(
-  bootstrapToday: BootstrapTodayRow[],
-  queued: QueuedEvent[],
-  employeeId: string,
-  now: Date,
-): DayStatus {
+function rowsFor(bootstrapToday: BootstrapTodayRow[], queued: StatusEvent[], employeeId: string): DayState[] {
   const rows: DayState[] = bootstrapToday
     .filter((r) => r.employeeId === employeeId && r.clockIn)
     .map((r) => {
@@ -105,12 +99,45 @@ export function dayStatus(
     .filter((e) => e.employeeId === employeeId)
     .sort((a, b) => Date.parse(a.deviceTime) + a.offsetAtEventMs - (Date.parse(b.deviceTime) + b.offsetAtEventMs));
   for (const e of mine) apply(rows, e);
+  return rows;
+}
 
+export interface CurrentDay {
+  status: DayStatus;
+  // Absen yang sedang terbuka, atau absen hari ini yang sudah pulang; null bila belum ada
+  clockIn: Date | null;
+  clockOut: Date | null;
+  openBreakStart: Date | null;
+}
+
+/**
+ * Status kru pada `now` (jam server: jam tablet + offsetMs) beserta jam absennya.
+ * OUT = boleh absen masuk; IN = sedang bekerja; ON_BREAK = istirahat; DONE = sudah pulang hari ini.
+ */
+export function currentDay(
+  bootstrapToday: BootstrapTodayRow[],
+  queued: StatusEvent[],
+  employeeId: string,
+  now: Date,
+): CurrentDay {
+  const rows = rowsFor(bootstrapToday, queued, employeeId);
   const open = rowFor(rows, 'CLOCK_OUT', now);
-  if (open && isOpen(open, now)) return open.openBreakStart ? 'ON_BREAK' : 'IN';
+  if (open && isOpen(open, now)) {
+    return { status: open.openBreakStart ? 'ON_BREAK' : 'IN', clockIn: open.clockIn, clockOut: null, openBreakStart: open.openBreakStart };
+  }
   // Sudah ada absen pada tanggal ini: server menolak absen masuk kedua
-  if (rows.some((r) => r.date === businessDate(now))) return 'DONE';
-  return 'OUT';
+  const todayRow = rows.find((r) => r.date === businessDate(now));
+  if (todayRow) return { status: 'DONE', clockIn: todayRow.clockIn, clockOut: todayRow.clockOut, openBreakStart: null };
+  return { status: 'OUT', clockIn: null, clockOut: null, openBreakStart: null };
+}
+
+export function dayStatus(
+  bootstrapToday: BootstrapTodayRow[],
+  queued: StatusEvent[],
+  employeeId: string,
+  now: Date,
+): DayStatus {
+  return currentDay(bootstrapToday, queued, employeeId, now).status;
 }
 
 /** Tombol aksi yang berlaku untuk status (spec §4: Masuk / Mulai istirahat, Pulang / Selesai istirahat). */

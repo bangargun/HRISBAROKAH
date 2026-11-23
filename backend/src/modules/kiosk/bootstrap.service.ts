@@ -30,6 +30,9 @@ export interface BootstrapPayload {
     guestDates: string[];
     embeddings: number[][];
     hasPin: boolean;
+    // Jadwal shift hari ini .. +3 (cabang mana pun). here = bertugas di cabang tablet ini.
+    // Tablet memakainya untuk "Belum datang" dan menghitung terlambat seperti punctuality().
+    shifts: { date: string; here: boolean }[];
   }[];
   directory: { employeeId: string; fullName: string; homeOutletName: string }[];
   today: {
@@ -107,10 +110,23 @@ export class BootstrapService {
     });
 
     const homeIds = rosterRows.filter((r) => r.outletId === outletId).map((r) => r.id);
-    const [todayRows, recapRows] = await Promise.all([
+    const [todayRows, recapRows, rosterSchedules] = await Promise.all([
       this.todayRows(outletId, today, now),
       this.recapRows(homeIds, today),
+      this.prisma.shiftSchedule.findMany({
+        where: { employeeId: { in: rosterRows.map((r) => r.id) }, date: { gte: toDateOnly(today), lte: toDateOnly(guestTo) } },
+        select: { employeeId: true, date: true, outletId: true },
+        orderBy: { date: 'asc' },
+      }),
     ]);
+    const homeOutletOf = new Map(rosterRows.map((r) => [r.id, r.outletId]));
+    const shiftsByEmployee = new Map<string, { date: string; here: boolean }[]>();
+    for (const s of rosterSchedules) {
+      const list = shiftsByEmployee.get(s.employeeId) ?? [];
+      // Jadwal tanpa cabang berarti bertugas di cabang asal
+      list.push({ date: ymd(s.date), here: (s.outletId ?? homeOutletOf.get(s.employeeId)) === outletId });
+      shiftsByEmployee.set(s.employeeId, list);
+    }
 
     return {
       serverTime: now.toISOString(),
@@ -140,6 +156,7 @@ export class BootstrapService {
           guestDates: isGuest ? (guestDatesByEmployee.get(r.id) ?? []).sort() : [],
           embeddings: r.faceEnrollments.map((f) => f.embedding),
           hasPin: !!r.attendancePinHash,
+          shifts: shiftsByEmployee.get(r.id) ?? [],
         };
       }),
       directory: directoryRows.map((r) => ({ employeeId: r.id, fullName: r.fullName, homeOutletName: r.outlet.name })),

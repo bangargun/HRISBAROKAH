@@ -130,6 +130,15 @@ export async function markUnanswered(ids: string[], at: string): Promise<void> {
   await done(tx);
 }
 
+/** Event antre sejak `sinceIso` (jam tablet) tanpa foto dan PIN, untuk status papan. */
+export type QueuedSummary = Omit<QueuedEvent, 'photoBase64' | 'pin'>;
+export async function recentEvents(sinceIso: string): Promise<QueuedSummary[]> {
+  const db = await openDb();
+  const index = db.transaction(QUEUE, 'readonly').objectStore(QUEUE).index(BY_TIME);
+  const rows = (await result(index.getAll(IDBKeyRange.lowerBound(sinceIso)))) as QueuedEvent[];
+  return rows.map(({ photoBase64: _photo, pin: _pin, ...rest }) => rest);
+}
+
 export async function removeEvents(ids: string[]): Promise<void> {
   if (ids.length === 0) return;
   const db = await openDb();

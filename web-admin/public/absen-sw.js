@@ -19,7 +19,10 @@ const SHELL_FILES = ['/absen.webmanifest', '/icons/absen-192.png', '/icons/absen
 const MODEL_FILES = ['blazeface', 'facemesh', 'faceres', 'antispoof', 'liveness'].flatMap((m) => [
   `/models/human/${m}.json`,
   `/models/human/${m}.bin`,
-]);
+]).concat(
+  // Cadangan backend WASM (tfjs 4.22.0) bila WebGL tidak ada; versi threaded butuh isolasi COOP/COEP
+  ['/models/human/wasm/tfjs-backend-wasm.wasm', '/models/human/wasm/tfjs-backend-wasm-simd.wasm'],
+);
 
 const isStatic = (path) =>
   path.startsWith('/_next/static/') ||

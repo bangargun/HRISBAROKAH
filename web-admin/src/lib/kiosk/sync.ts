@@ -8,6 +8,7 @@ export interface SyncState {
   online: boolean;
   pending: number;
   stuck: number; // dikirim tetapi tidak dijawab server lebih dari 24 jam
+  oldest: string | null; // deviceTime event antre tertua (batas antrean di papan)
   lastSync: string | null; // ISO, bootstrap terakhir yang berhasil
 }
 
@@ -122,11 +123,12 @@ export function startSync(onState: (s: SyncState) => void): () => void {
   let rerun = false;
   let failures = 0;
   let timer: ReturnType<typeof setTimeout> | undefined;
-  const state: SyncState = { online: navigator.onLine, pending: 0, stuck: 0, lastSync: null };
+  const state: SyncState = { online: navigator.onLine, pending: 0, stuck: 0, oldest: null, lastSync: null };
   const refreshQueue = async () => {
     const stats = await queueStats();
     state.pending = stats.count;
     state.stuck = stats.stuck;
+    state.oldest = stats.oldest;
   };
 
   const emit = () => {

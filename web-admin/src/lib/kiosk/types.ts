@@ -28,6 +28,8 @@ export interface BootstrapRosterEntry {
   guestDates: string[];
   embeddings: number[][];
   hasPin: boolean;
+  // Jadwal hari ini .. +3 di cabang mana pun; here = bertugas di cabang tablet ini
+  shifts: { date: string; here: boolean }[];
 }
 
 export interface BootstrapTodayRow {

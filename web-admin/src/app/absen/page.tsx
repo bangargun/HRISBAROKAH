@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
-import Board from '@/components/absen/Board';
-import PairScreen from '@/components/absen/PairScreen';
+import Kiosk from '@/components/kiosk/Kiosk';
+import PairScreen from '@/components/kiosk/PairScreen';
 import { getBootstrap, getConfig } from '@/lib/kiosk/db';
 import { checkForUpdate, listenForShellUpdate, registerServiceWorker, reportLoadedAssets, useKioskScreen } from '@/lib/kiosk/device';
 import { startSync, type SyncState } from '@/lib/kiosk/sync';
@@ -72,5 +72,5 @@ export default function AbsenPage() {
   if (view.kind === 'unpaired') {
     return <PairScreen onPaired={(config) => setView({ kind: 'paired', config })} />;
   }
-  return <Board config={view.config} sync={sync} bootstrap={bootstrap} />;
+  return <Kiosk config={view.config} sync={sync} bootstrap={bootstrap} />;
 }
