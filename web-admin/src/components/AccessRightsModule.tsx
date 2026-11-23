@@ -26,6 +26,7 @@ const COLUMNS: { key: Role | 'TABLET'; label: string }[] = [
 const MODULE_LABEL: Record<string, string> = {
   access: 'Hak akses',
   attendance: 'Absen & presensi',
+  coaching: 'Pendampingan',
   'attendance-corrections': 'Koreksi absen',
   'attendance-review': 'Tinjauan absen tablet',
   auth: 'Akun & login',

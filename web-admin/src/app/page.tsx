@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { BACKEND_API, clearSession, getSessionUser, getToken } from '@/lib/auth';
 import { apiFetch } from '@/lib/api';
 import AccessRightsModule from '@/components/AccessRightsModule';
+import CoachingModule from '@/components/CoachingModule';
 import { LEAVE_TYPES, actionFor, isPending, useAdminRequests } from '@/lib/requests';
 import AppShell from '@/components/AppShell';
 import DashboardHome from '@/components/DashboardHome';
@@ -140,10 +141,7 @@ import {
   GeneratedSopDocument,
 } from '@/components/AiSopGenerator';
 import {
-  PendampinganView,
   CareerPathView,
-  INITIAL_COACHING_TASKS,
-  CoachingTaskItem,
 } from '@/components/BerlianModules';
 
 type MainMenuId =
@@ -184,7 +182,6 @@ export default function AdminDashboard() {
   }, [refreshReviewCount]);
 
   // Berlian People Management States
-  const [coachingTasks, setCoachingTasks] = useState<CoachingTaskItem[]>(INITIAL_COACHING_TASKS);
   const [expandedHcAccordion, setExpandedHcAccordion] = useState<boolean>(true);
   const [globalSearchKeyword, setGlobalSearchKeyword] = useState<string>('');
 
@@ -6214,26 +6211,7 @@ LANGKAH PENANGANAN DENGAN METODE LAST+:
           {/* ========================================================= */}
           {/* BERLIAN MODULE 4: PENDAMPINGAN (SHARING EXCELLENT COACH) */}
           {/* ========================================================= */}
-          {activeMenu === 'coaching' && (
-            <PendampinganView
-              tasks={coachingTasks}
-              onUpdateStatus={(id, status) => {
-                setCoachingTasks((prev) =>
-                  prev.map((t) =>
-                    t.id === id
-                      ? {
-                          ...t,
-                          status,
-                          progress: status === 'Selesai' ? 100 : status === 'Sedang Berjalan' ? 50 : 0,
-                        }
-                      : t
-                  )
-                );
-                showToast(`Status pendampingan ${id} diperbarui menjadi: ${status}`);
-              }}
-              showToast={showToast}
-            />
-          )}
+          {activeMenu === 'coaching' && <CoachingModule />}
 
           {/* ========================================================= */}
           {/* TAB 1: KEHADIRAN & FLOOR OPS                             */}

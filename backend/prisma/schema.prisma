@@ -125,6 +125,7 @@ model Outlet {
   attendanceDevices  AttendanceDevice[]
   devicePairings     AttendanceDevicePairing[]
   attendanceEvents   AttendanceEvent[]
+  coachingSessions   CoachingSession[]
 }
 
 model Department {
@@ -173,6 +174,8 @@ model User {
   devicesCreated       AttendanceDevice[]        @relation("DeviceCreatedBy")
   pairingsCreated      AttendanceDevicePairing[] @relation("PairingCreatedBy")
   eventsReviewed       AttendanceEvent[]         @relation("EventReviewedBy")
+  coachingAsCoach      CoachingSession[]         @relation("CoachingCoach")
+  coachingCreated      CoachingSession[]         @relation("CoachingCreatedBy")
 }
 
 model EmployeeProfile {
@@ -228,6 +231,7 @@ model EmployeeProfile {
   faceEnrollments  FaceEnrollment[]
   faceChecks       FaceCheckLog[]
   attendanceEvents AttendanceEvent[]
+  coachingSessions CoachingSession[]
 }
 
 // -------------------------------------------------------------
@@ -865,19 +869,19 @@ enum AttendanceEventStatus {
 
 // Tablet yang sudah dipasangkan ke cabang
 model AttendanceDevice {
-  id          String    @id @default(uuid())
-  outletId    String
-  outlet      Outlet    @relation(fields: [outletId], references: [id])
-  name        String
-  tokenHash   String    @unique
-  pairedAt    DateTime  @default(now())
-  lastSeenAt  DateTime?
-  revokedAt   DateTime?
+  id                String    @id @default(uuid())
+  outletId          String
+  outlet            Outlet    @relation(fields: [outletId], references: [id])
+  name              String
+  tokenHash         String    @unique
+  pairedAt          DateTime  @default(now())
+  lastSeenAt        DateTime?
+  revokedAt         DateTime?
   // Jumlah absen yang belum terkirim menurut laporan tablet pada bootstrap terakhir
   pendingCount      Int?
   pendingReportedAt DateTime?
-  createdById String
-  createdBy   User      @relation("DeviceCreatedBy", fields: [createdById], references: [id])
+  createdById       String
+  createdBy         User      @relation("DeviceCreatedBy", fields: [createdById], references: [id])
 
   attendances Attendance[]
   events      AttendanceEvent[]
@@ -897,34 +901,73 @@ model AttendanceDevicePairing {
 
 // Kejadian absen dari tablet (id dibuat tablet, jadi aman dikirim ulang)
 model AttendanceEvent {
-  id              String                @id
-  deviceId        String
-  device          AttendanceDevice      @relation(fields: [deviceId], references: [id])
-  employeeId      String
-  employee        EmployeeProfile       @relation(fields: [employeeId], references: [id])
-  outletId        String
-  outlet          Outlet                @relation(fields: [outletId], references: [id])
-  type            KioskEventType
-  method          KioskMethod
-  deviceTime      DateTime
-  offsetAtEventMs Float
-  effectiveTime   DateTime
-  localScore      Float?
-  serverScore     Float?
-  photoPath       String?
-  status          AttendanceEventStatus
-  applied         Boolean
-  reason          String?
-  flags           String[]              @default([])
-  attendanceId    String?
-  attendance      Attendance?           @relation(fields: [attendanceId], references: [id], onDelete: SetNull)
+  id                String                @id
+  deviceId          String
+  device            AttendanceDevice      @relation(fields: [deviceId], references: [id])
+  employeeId        String
+  employee          EmployeeProfile       @relation(fields: [employeeId], references: [id])
+  outletId          String
+  outlet            Outlet                @relation(fields: [outletId], references: [id])
+  type              KioskEventType
+  method            KioskMethod
+  deviceTime        DateTime
+  offsetAtEventMs   Float
+  effectiveTime     DateTime
+  localScore        Float?
+  serverScore       Float?
+  photoPath         String?
+  status            AttendanceEventStatus
+  applied           Boolean
+  reason            String?
+  flags             String[]              @default([])
+  attendanceId      String?
+  attendance        Attendance?           @relation(fields: [attendanceId], references: [id], onDelete: SetNull)
   // CLOCK_IN: true bila event ini membuat baris Attendance, false bila melengkapi baris yang sudah ada
   createdAttendance Boolean?
-  reviewedById    String?
-  reviewedBy      User?                 @relation("EventReviewedBy", fields: [reviewedById], references: [id])
-  reviewedAt      DateTime?
-  receivedAt      DateTime              @default(now())
+  reviewedById      String?
+  reviewedBy        User?                 @relation("EventReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt        DateTime?
+  receivedAt        DateTime              @default(now())
 
   @@index([status, outletId])
   @@index([employeeId, effectiveTime])
+}
+
+// Pendampingan (coaching) satu-lawan-satu: dijadwalkan admin/kepala cabang, ditutup dengan catatan hasil
+enum CoachingStatus {
+  PLANNED
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+enum CoachingPriority {
+  HIGH
+  MEDIUM
+  NORMAL
+}
+
+model CoachingSession {
+  id            String           @id @default(uuid())
+  employeeId    String
+  employee      EmployeeProfile  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  // Cabang karyawan saat sesi dibuat (dasar pembatasan Kepala Cabang)
+  outletId      String
+  outlet        Outlet           @relation(fields: [outletId], references: [id])
+  coachId       String
+  coach         User             @relation("CoachingCoach", fields: [coachId], references: [id])
+  createdById   String
+  createdBy     User             @relation("CoachingCreatedBy", fields: [createdById], references: [id])
+  topic         String
+  scheduledDate DateTime         @db.Date
+  priority      CoachingPriority @default(NORMAL)
+  status        CoachingStatus   @default(PLANNED)
+  resultNote    String?
+  startedAt     DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@index([outletId, scheduledDate])
+  @@index([employeeId])
 }
