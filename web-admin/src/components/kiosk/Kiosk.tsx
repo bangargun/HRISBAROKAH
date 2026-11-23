@@ -3,13 +3,14 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { DeviceRevokedError, KioskNetworkError, kioskFetch } from '@/lib/kiosk/api';
+import { clockSuspectNow, startClockWatch } from '@/lib/kiosk/clock';
 import { enqueue, recentEvents, type QueuedSummary } from '@/lib/kiosk/db';
 import { setIdleCheck } from '@/lib/kiosk/device';
 import { bestMatch, loadFace, type FaceCapture } from '@/lib/kiosk/face';
 import { allowedActions, currentDay, type CurrentDay } from '@/lib/kiosk/status';
 import { syncNow, type SyncState } from '@/lib/kiosk/sync';
 import { lateMinutesAt, personFor, recapFor, type Person } from '@/lib/kiosk/today';
-import type { BootstrapPayload, DeviceConfig, KioskEventType, KioskMethod, QueuedEvent } from '@/lib/kiosk/types';
+import type { BootstrapPayload, BootstrapTodayRow, DeviceConfig, IdentifyResponse, KioskEventType, KioskMethod, QueuedEvent } from '@/lib/kiosk/types';
 import Board from './Board';
 import Capture, { NotRecognized } from './Capture';
 import Greeting, { Recorded } from './Greeting';
@@ -115,6 +116,9 @@ export default function Kiosk({ config, sync, bootstrap }: KioskProps) {
     refreshQueue().catch(() => undefined);
   }, [refreshQueue, sync?.pending, sync?.lastSync, bootstrap]);
 
+  // Jam tablet tertinggi dicatat tiap menit (deteksi jam dimundurkan, lihat clock.ts)
+  useEffect(() => startClockWatch(), []);
+
   // Deploy baru hanya dimuat ulang saat papan diam (tidak ada kamera, sapaan, PIN, rekap)
   useEffect(() => setIdleCheck(() => stepRef.current.kind === 'board' && !inFlight.current), []);
 
@@ -145,12 +149,18 @@ export default function Kiosk({ config, sync, bootstrap }: KioskProps) {
 
   // `from` = langkah yang memulai sapaan; bila layar sudah berpindah (Batal, kembali ke papan)
   // selama antrean dibaca, sapaan tidak ditampilkan
+  // `serverToday` = absen kru itu dari server saat identify (lebih baru dari bootstrap; memuat absen
+  // terbuka di cabang lain untuk kru di luar roster tablet ini)
   const greet = useCallback(
-    async (g: Omit<Greet, 'day' | 'error'>, from: Step['kind']) => {
+    async (g: Omit<Greet, 'day' | 'error'>, from: Step['kind'], serverToday?: BootstrapTodayRow[]) => {
       if (!bootstrap) return;
       const rows = await refreshQueue().catch(() => queued);
       if (stepRef.current.kind !== from) return;
-      const day = currentDay(bootstrap.today, rows, g.person.employeeId, serverNow());
+      const id = g.person.employeeId;
+      const todayRows = serverToday
+        ? [...bootstrap.today.filter((t) => t.employeeId !== id), ...serverToday.filter((t) => t.employeeId === id)]
+        : bootstrap.today;
+      const day = currentDay(todayRows, rows, id, serverNow());
       setStep({ kind: 'greeting', ...g, day, error: null });
     },
     [bootstrap, queued, refreshQueue, serverNow],
@@ -177,11 +187,11 @@ export default function Kiosk({ config, sync, bootstrap }: KioskProps) {
         });
         if (stepRef.current.kind !== 'identifying') return; // dibatalkan
         if (res.ok) {
-          const body = (await res.json()) as { employeeId: string; fullName: string; homeOutletName: string; score: number };
+          const body = (await res.json()) as IdentifyResponse;
           clearTimeout(timer);
           if (stepRef.current.kind !== 'identifying') return;
           const person = personFor(bootstrap, body.employeeId, body);
-          await greet({ person, method: 'FACE_SERVER', photoBase64: c.jpegBase64 }, 'identifying');
+          await greet({ person, method: 'FACE_SERVER', photoBase64: c.jpegBase64 }, 'identifying', Array.isArray(body.today) ? body.today : undefined);
           return;
         }
         const reason =
@@ -224,6 +234,7 @@ export default function Kiosk({ config, sync, bootstrap }: KioskProps) {
       if (!bootstrap || inFlight.current) return;
       inFlight.current = true;
       setBusy(true);
+      const clockSuspect = await clockSuspectNow();
       const deviceNow = new Date();
       const event: QueuedEvent = {
         id: newId(),
@@ -235,6 +246,7 @@ export default function Kiosk({ config, sync, bootstrap }: KioskProps) {
         ...(g.localScore !== undefined ? { localScore: Number(g.localScore.toFixed(4)) } : {}),
         photoBase64: g.photoBase64,
         ...(g.pin ? { pin: g.pin } : {}),
+        ...(clockSuspect ? { clockSuspect: true } : {}),
       };
       try {
         await enqueue(event);

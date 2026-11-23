@@ -1,5 +1,5 @@
 // Penyimpanan lokal tablet absen (IndexedDB "hris-absen"):
-//   config    -> satu baris "device": token perangkat, nama cabang, selisih jam
+//   config    -> "device": token perangkat, nama cabang, selisih jam; "clockMark": jam tablet tertinggi
 //   bootstrap -> satu baris "current": paket data terakhir dari server
 //   queue     -> event absen yang belum dijawab server (kunci: id event; indeks waktu+id untuk
 //                halaman kiriman, dan firstSentAt untuk event yang lama tidak dijawab)
@@ -84,6 +84,16 @@ export function getConfig(): Promise<DeviceConfig | null> {
 
 export function saveConfig(c: DeviceConfig): Promise<void> {
   return putOne(CONFIG, 'device', c);
+}
+
+/** Jam tablet (Date.now) tertinggi yang pernah terlihat; lihat clock.ts. Kunci terpisah dari "device". */
+export async function getClockMark(): Promise<number | null> {
+  const v = await getOne<number>(CONFIG, 'clockMark');
+  return typeof v === 'number' ? v : null;
+}
+
+export function saveClockMark(ms: number): Promise<void> {
+  return putOne(CONFIG, 'clockMark', ms);
 }
 
 export function getBootstrap(): Promise<BootstrapPayload | null> {

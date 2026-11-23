@@ -1,6 +1,7 @@
 // Sinkron tablet absen: kirim antrean (naik), lalu ambil bootstrap (turun) dan
 // catat selisih jam tablet-server. Jalan saat mulai, tiap 5 menit, dan saat koneksi pulih.
 import { DeviceRevokedError, KioskNetworkError, kioskFetch } from './api';
+import { aheadOfNow, resetClockBaseline } from './clock';
 import { getConfig, markUnanswered, pendingEvents, queueStats, removeEvents, saveBootstrap, saveConfig } from './db';
 import type { BootstrapPayload, EventsResponse, QueuedEvent } from './types';
 
@@ -13,7 +14,8 @@ export interface SyncState {
 }
 
 const INTERVAL_MS = 5 * 60_000;
-const BATCH_SIZE = 50; // sama dengan MAX_KIOSK_EVENTS_PER_BATCH di backend
+// Batas backend 50 (MAX_KIOSK_EVENTS_PER_BATCH); 20 agar satu unggahan (foto) tetap singkat di jaringan lambat
+const BATCH_SIZE = 20;
 // Event yang belum dijawab server dikirim ulang dengan jeda bertambah: 30 dtk, 1, 2, 4, lalu 5 menit
 const BACKOFF_BASE_MS = 30_000;
 const BACKOFF_MAX_MS = 5 * 60_000;
@@ -37,19 +39,43 @@ function toDto(e: QueuedEvent) {
     ...(e.localScore !== undefined ? { localScore: e.localScore } : {}),
     photoBase64: e.photoBase64,
     ...(e.pin ? { pin: e.pin } : {}),
+    // Jam tablet saat event di depan jam sekarang: dibuat ketika jam dimajukan lalu dikembalikan
+    ...(e.clockSuspect || aheadOfNow(e.deviceTime) ? { clockSuspect: true } : {}),
   };
 }
 
-async function postEvents(events: QueuedEvent[]): Promise<Response> {
+/**
+ * Selisih jam server - jam tablet, diukur tepat sebelum mengirim batch (titik tengah permintaan
+ * ringan GET /kiosk/time). deviceNow saja tidak cukup: dicap sebelum unggahan foto yang bisa lama.
+ * null bila server belum punya rute ini (deploy lama): server memakai deviceNow.
+ */
+async function measureOffset(): Promise<number | null> {
+  const t0 = Date.now();
+  const res = await kioskFetch('/kiosk/time');
+  const t1 = Date.now();
+  if (!res.ok) {
+    if (res.status === 404) return null;
+    throw new SyncHttpError(res.status);
+  }
+  const { serverTime } = (await res.json()) as { serverTime: string };
+  const server = Date.parse(serverTime);
+  return Number.isFinite(server) ? Math.round(server - (t0 + t1) / 2) : null;
+}
+
+async function postEvents(events: QueuedEvent[], offsetNowMs: number | null): Promise<Response> {
   return kioskFetch('/kiosk/events', {
     method: 'POST',
-    body: JSON.stringify({ deviceNow: new Date().toISOString(), events: events.map(toDto) }),
+    body: JSON.stringify({
+      deviceNow: new Date().toISOString(),
+      ...(offsetNowMs !== null ? { offsetNowMs } : {}),
+      events: events.map(toDto),
+    }),
   });
 }
 
 /** Kirim satu batch; kembalikan id event yang sudah dijawab server. */
-async function sendBatch(batch: QueuedEvent[]): Promise<string[]> {
-  const res = await postEvents(batch);
+async function sendBatch(batch: QueuedEvent[], offsetNowMs: number | null): Promise<string[]> {
+  const res = await postEvents(batch, offsetNowMs);
   if (res.ok) {
     const body = (await res.json()) as EventsResponse;
     const sent = new Set(batch.map((e) => e.id));
@@ -59,7 +85,7 @@ async function sendBatch(batch: QueuedEvent[]): Promise<string[]> {
   // satu event rusak tidak menahan yang lain. Event rusak tetap di antrean.
   if ((res.status === 400 || res.status === 413) && batch.length > 1) {
     const answered: string[] = [];
-    for (const e of batch) answered.push(...(await sendBatch([e]).catch(rethrowUnlessHttp)));
+    for (const e of batch) answered.push(...(await sendBatch([e], offsetNowMs).catch(rethrowUnlessHttp)));
     return answered;
   }
   if (res.status === 400 || res.status === 413) return [];
@@ -84,7 +110,7 @@ async function uploadQueue(isStopped: () => boolean): Promise<boolean | null> {
     const batch = await pendingEvents(BATCH_SIZE, after);
     if (batch.length === 0) return allAnswered;
     after = batch[batch.length - 1];
-    const answered = await sendBatch(batch);
+    const answered = await sendBatch(batch, await measureOffset());
     if (isStopped()) return null; // dijawab server tapi belum dihapus: kiriman ulang aman (idempoten)
     await removeEvents(answered);
     const answeredSet = new Set(answered);
@@ -97,9 +123,10 @@ async function uploadQueue(isStopped: () => boolean): Promise<boolean | null> {
   }
 }
 
-async function pullBootstrap(): Promise<void> {
+/** `pending` = absen yang belum terkirim; disimpan server agar admin tahu sebelum mencabut tablet. */
+async function pullBootstrap(pending: number): Promise<void> {
   const t0 = Date.now();
-  const res = await kioskFetch('/kiosk/bootstrap');
+  const res = await kioskFetch(`/kiosk/bootstrap?pending=${pending}`);
   const t1 = Date.now(); // header diterima; serverTime dibuat sebelum isi paket disusun
   if (!res.ok) throw new SyncHttpError(res.status);
   const payload = (await res.json()) as BootstrapPayload;
@@ -107,6 +134,7 @@ async function pullBootstrap(): Promise<void> {
   await saveBootstrap(payload);
   const config = await getConfig();
   if (config) await saveConfig({ ...config, offsetMs, lastSyncAt: new Date().toISOString() });
+  await resetClockBaseline().catch(() => undefined);
 }
 
 let activeTrigger: (() => void) | null = null;
@@ -166,7 +194,7 @@ export function startSync(onState: (s: SyncState) => void): () => void {
       } else {
         const drained = await uploadQueue(() => stopped);
         if (drained === null) return;
-        await pullBootstrap();
+        await pullBootstrap((await queueStats()).count);
         state.online = true;
         state.lastSync = (await getConfig())?.lastSyncAt ?? state.lastSync;
         healthy = drained;

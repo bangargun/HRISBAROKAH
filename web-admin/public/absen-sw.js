@@ -40,19 +40,10 @@ function assetsIn(html) {
   return [...found].sort();
 }
 
-// buildId Next ada di data RSC; cadangan: sidik daftar aset (berubah bila aset berubah)
-function buildIdOf(html, assets) {
+// buildId Next ada di data RSC. Tanpa buildId: bukan halaman build kita (mis. portal Wi-Fi) -> null
+function buildIdOf(html) {
   const m = /buildId\\?":\\?"([\w-]+)/.exec(html);
-  if (m) return m[1];
-  let h = 0;
-  for (const c of assets.join('|')) h = (Math.imul(h, 31) + c.charCodeAt(0)) | 0;
-  return `assets-${(h >>> 0).toString(36)}`;
-}
-
-// Respons hasil redirect tidak boleh dipakai untuk navigasi
-async function storable(res) {
-  if (!res.redirected) return res;
-  return new Response(await res.blob(), { status: res.status, statusText: res.statusText, headers: res.headers });
+  return m ? m[1] : null;
 }
 
 async function cacheMissing(cache, urls) {
@@ -90,14 +81,22 @@ function checkUpdate() {
     checking = (async () => {
       const res = await fetch(SHELL_PAGE, { cache: 'no-store' });
       if (!res.ok) throw new Error(`${SHELL_PAGE}: ${res.status}`);
+      const prev = await currentBuild();
+      // Portal Wi-Fi (captive portal) / proxy bisa menjawab 200 dengan halamannya sendiri: build
+      // baru hanya diterima bila jelas halaman /absen kita (origin sama, tanpa redirect, ada buildId
+      // Next dan aset). Selain itu build yang tersimpan dipertahankan.
+      const url = new URL(res.url || SHELL_PAGE, self.location.origin);
+      if (res.redirected || res.type !== 'basic' || url.origin !== self.location.origin || url.pathname !== SHELL_PAGE) {
+        return { updated: false, id: prev, ignored: 'not-shell' };
+      }
       const html = await res.clone().text();
       const assets = assetsIn(html);
-      const id = buildIdOf(html, assets);
-      const prev = await currentBuild();
+      const id = buildIdOf(html);
+      if (!id || assets.length === 0) return { updated: false, id: prev, ignored: 'no-build' };
       if (prev === id && (await (await caches.open(BUILD_PREFIX + id)).match(SHELL_PAGE))) return { updated: false, id };
       const cache = await caches.open(BUILD_PREFIX + id);
       await cacheMissing(cache, [...assets, ...SHELL_FILES]);
-      await cache.put(SHELL_PAGE, await storable(res));
+      await cache.put(SHELL_PAGE, res);
       await setCurrentBuild(id);
       // Pemasangan pertama bukan "pembaruan": halaman yang terbuka sudah build ini
       if (prev && prev !== id) await notifyClients({ type: 'shell-updated', buildId: id });

@@ -87,14 +87,15 @@ function lateFor(b: BootstrapPayload, employeeId: string, clockIn: Date): number
 
 export function boardSummary(b: BootstrapPayload, queued: StatusEvent[], now: Date): BoardSummary {
   const today = businessDate(now);
-  const ids = new Set<string>([
-    ...b.roster.map((r) => r.employeeId),
-    ...b.today.map((t) => t.employeeId),
-    ...queued.map((e) => e.employeeId),
-  ]);
+  // Baris here=false = absen kru roster di cabang lain: dipakai untuk status, tetapi kru itu hanya
+  // tampil di papan ini bila ada absennya di sini (baris here atau event antre tablet ini)
+  const hereRows = b.today.filter((t) => t.here !== false);
+  const presentHere = new Set<string>([...hereRows.map((t) => t.employeeId), ...queued.map((e) => e.employeeId)]);
+  const ids = new Set<string>([...b.roster.map((r) => r.employeeId), ...Array.from(presentHere)]);
   const out: BoardSummary = { working: [], onBreak: [], done: [], notYet: [], late: [] };
   for (const id of Array.from(ids)) {
     const day = currentDay(b.today, queued, id, now);
+    if (day.status !== 'OUT' && !presentHere.has(id)) continue; // sedang / sudah absen di cabang lain
     const name = personFor(b, id).fullName;
     const lateMinutes = day.clockIn && businessDate(day.clockIn) === today ? (lateFor(b, id, day.clockIn) ?? 0) : 0;
     const row = (at: Date | null): BoardRow => ({ employeeId: id, fullName: name, at, lateMinutes });

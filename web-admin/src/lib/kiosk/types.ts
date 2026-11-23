@@ -38,6 +38,9 @@ export interface BootstrapTodayRow {
   clockOut: string | null;
   openBreakStart: string | null;
   lateMinutes: number;
+  // Absen tercatat di cabang tablet ini. false = absen kru roster di cabang lain (hari ini / masih
+  // terbuka) agar kru yang pindah cabang bisa istirahat / pulang di sini. Tidak ada di paket lama = true.
+  here?: boolean;
 }
 
 export interface BootstrapRecapDay {
@@ -78,8 +81,18 @@ export interface QueuedEvent {
   localScore?: number;
   photoBase64: string;
   pin?: string; // hanya metode PIN; hilang bersama event setelah dijawab server
+  clockSuspect?: boolean; // jam tablet terlihat mundur saat event dibuat (lihat clock.ts)
   // Diisi tablet: kiriman pertama yang diterima server tetapi tidak dijawab. Tidak dikirim.
   firstSentAt?: string;
+}
+
+/** Jawaban POST /kiosk/identify. today = absen hari ini / masih terbuka kru itu di cabang mana pun. */
+export interface IdentifyResponse {
+  employeeId: string;
+  fullName: string;
+  homeOutletName: string;
+  score: number;
+  today?: BootstrapTodayRow[];
 }
 
 export interface EventResult {
