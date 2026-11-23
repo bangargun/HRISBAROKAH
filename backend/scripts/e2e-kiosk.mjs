@@ -277,6 +277,36 @@ checks.push(['bootstrap: roster rumah + tamu terjadwal (hari ini..+3), direktori
   assert.ok(!rc.includes(guest.id), 'recap hanya kru rumah');
 }]);
 
+// Task 9: roster[].shifts = jadwal hari ini..+3 di cabang mana pun (untuk terlambat seperti
+// punctuality) dengan here = bertugas di cabang tablet (outletId jadwal, kosong = cabang asal).
+checks.push(['bootstrap: roster shifts (here: jadwal tanpa cabang = cabang asal; cabang lain = false)', async (ctx) => {
+  const out1 = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}S1`);
+  const out2 = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}S2`);
+  const dev = await pairDevice(ctx.admin, out1.id, 'Tablet Shift');
+  const homeHere = await createCrew(ctx.admin, out1.id, 'EMPLOYEE', 'Rumah Sini');
+  const homeAway = await createCrew(ctx.admin, out1.id, 'EMPLOYEE', 'Rumah Dipinjam');
+  const homeOff = await createCrew(ctx.admin, out1.id, 'EMPLOYEE', 'Rumah Libur');
+  const guest = await createCrew(ctx.admin, out2.id, 'EMPLOYEE', 'Tamu Sini');
+  const today = jakartaYmd(0);
+  const s = await schedule(ctx.admin, [
+    { employeeId: homeHere.id, date: today, working: true }, // outletId kosong -> cabang asal
+    { employeeId: homeHere.id, date: jakartaYmd(2), working: true, outletId: out1.id },
+    { employeeId: homeAway.id, date: today, working: true, outletId: out2.id },
+    { employeeId: guest.id, date: today, working: true, outletId: out1.id },
+    { employeeId: homeOff.id, date: jakartaYmd(5), working: true }, // di luar jendela +3
+  ]);
+  assert.equal(s.status, 200, JSON.stringify(s.body));
+  assert.equal(sql(`select coalesce("outletId"::text,'null') from "ShiftSchedule" where "employeeId"='${homeHere.id}' and date='${today}'`), 'null');
+
+  const p = (await http('GET', '/kiosk/bootstrap', { token: dev.token })).body;
+  const r = Object.fromEntries(p.roster.map((x) => [x.employeeId, x]));
+  assert.deepEqual(r[homeHere.id].shifts, [{ date: today, here: true }, { date: jakartaYmd(2), here: true }]);
+  assert.deepEqual(r[homeAway.id].shifts, [{ date: today, here: false }], 'kru rumah dijadwalkan di cabang lain');
+  assert.deepEqual(r[homeOff.id].shifts, [], 'jadwal +5 hari di luar jendela');
+  assert.deepEqual(r[guest.id].shifts, [{ date: today, here: true }]);
+  assert.deepEqual(r[guest.id].guestDates, [today]);
+}]);
+
 checks.push(['bootstrap: today (absen hari ini + terbuka kemarin) dan recap bulan ini', async (ctx) => {
   const out = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}B3`);
   const dev = await pairDevice(ctx.admin, out.id, 'Tablet Today');

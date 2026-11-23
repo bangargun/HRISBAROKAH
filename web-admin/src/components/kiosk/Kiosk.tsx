@@ -47,12 +47,18 @@ const IDLE_MS: Partial<Record<Step['kind'], number>> = {
   picker: 60_000,
   pin: 45_000,
   greeting: 20_000,
+  // Cadangan bila permintaan identify tetap menggantung (batas fetch IDENTIFY_TIMEOUT_MS lebih dulu)
+  identifying: 20_000,
   recorded: 10_000,
 };
 // Event antre yang dibaca untuk status papan (aturan absen terbuka 16 jam + cadangan)
 const RECENT_WINDOW_MS = 48 * 3600_000;
 
+// Server lambat / tidak terjangkau saat identify: hentikan dan tawarkan nama + PIN
+const IDENTIFY_TIMEOUT_MS = 9_000;
+
 const OFFLINE_REASON = 'Tablet sedang offline. Pakai nama dan PIN; absen tetap tersimpan dan terkirim saat online.';
+const SLOW_REASON = 'Server belum menjawab. Pakai nama dan PIN; absen tetap tersimpan dan terkirim saat online.';
 
 function newId(): string {
   if (typeof crypto.randomUUID === 'function') return crypto.randomUUID();
@@ -92,7 +98,11 @@ export default function Kiosk({ config, sync, bootstrap }: KioskProps) {
   stepRef.current = step;
   const inFlight = useRef(false);
   const serverNow = useCallback(() => new Date(Date.now() + config.offsetMs), [config.offsetMs]);
-  const toBoard = useCallback(() => setStep({ kind: 'board' }), []);
+  const identifyAbort = useRef<AbortController | null>(null);
+  const toBoard = useCallback(() => {
+    identifyAbort.current?.abort();
+    setStep({ kind: 'board' });
+  }, []);
 
   const refreshQueue = useCallback(async () => {
     const rows = await recentEvents(new Date(Date.now() - RECENT_WINDOW_MS).toISOString());
@@ -133,10 +143,13 @@ export default function Kiosk({ config, sync, bootstrap }: KioskProps) {
     };
   }, []);
 
+  // `from` = langkah yang memulai sapaan; bila layar sudah berpindah (Batal, kembali ke papan)
+  // selama antrean dibaca, sapaan tidak ditampilkan
   const greet = useCallback(
-    async (g: Omit<Greet, 'day' | 'error'>) => {
+    async (g: Omit<Greet, 'day' | 'error'>, from: Step['kind']) => {
       if (!bootstrap) return;
       const rows = await refreshQueue().catch(() => queued);
+      if (stepRef.current.kind !== from) return;
       const day = currentDay(bootstrap.today, rows, g.person.employeeId, serverNow());
       setStep({ kind: 'greeting', ...g, day, error: null });
     },
@@ -151,13 +164,24 @@ export default function Kiosk({ config, sync, bootstrap }: KioskProps) {
         return;
       }
       setStep({ kind: 'identifying' });
+      // AbortController + setTimeout, bukan AbortSignal.timeout (belum ada di Chrome Android lama).
+      // Batas juga mencakup pembacaan isi respons.
+      const controller = new AbortController();
+      identifyAbort.current = controller;
+      const timer = setTimeout(() => controller.abort(), IDENTIFY_TIMEOUT_MS);
       try {
-        const res = await kioskFetch('/kiosk/identify', { method: 'POST', body: JSON.stringify({ photoBase64: c.jpegBase64 }) });
+        const res = await kioskFetch('/kiosk/identify', {
+          method: 'POST',
+          body: JSON.stringify({ photoBase64: c.jpegBase64 }),
+          signal: controller.signal,
+        });
         if (stepRef.current.kind !== 'identifying') return; // dibatalkan
         if (res.ok) {
           const body = (await res.json()) as { employeeId: string; fullName: string; homeOutletName: string; score: number };
+          clearTimeout(timer);
+          if (stepRef.current.kind !== 'identifying') return;
           const person = personFor(bootstrap, body.employeeId, body);
-          await greet({ person, method: 'FACE_SERVER', photoBase64: c.jpegBase64 });
+          await greet({ person, method: 'FACE_SERVER', photoBase64: c.jpegBase64 }, 'identifying');
           return;
         }
         const reason =
@@ -168,7 +192,15 @@ export default function Kiosk({ config, sync, bootstrap }: KioskProps) {
       } catch (err) {
         if (err instanceof DeviceRevokedError) return; // halaman kembali ke layar pasangan
         if (stepRef.current.kind !== 'identifying') return;
-        setStep({ kind: 'not-recognized', reason: err instanceof KioskNetworkError ? OFFLINE_REASON : 'Pengenalan wajah gagal. Pakai nama dan PIN.' });
+        // Batas waktu (abort) diperlakukan seperti offline: fetch yang dibatalkan juga KioskNetworkError
+        const timedOut = controller.signal.aborted;
+        setStep({
+          kind: 'not-recognized',
+          reason: timedOut ? SLOW_REASON : err instanceof KioskNetworkError ? OFFLINE_REASON : 'Pengenalan wajah gagal. Pakai nama dan PIN.',
+        });
+      } finally {
+        clearTimeout(timer);
+        if (identifyAbort.current === controller) identifyAbort.current = null;
       }
     },
     [bootstrap, greet],
@@ -179,7 +211,7 @@ export default function Kiosk({ config, sync, bootstrap }: KioskProps) {
       if (!bootstrap) return;
       const match = bestMatch(c.embedding, bootstrap.roster, bootstrap.matchThreshold);
       if (match) {
-        void greet({ person: personFor(bootstrap, match.employeeId), method: 'FACE_LOCAL', localScore: match.score, photoBase64: c.jpegBase64 });
+        void greet({ person: personFor(bootstrap, match.employeeId), method: 'FACE_LOCAL', localScore: match.score, photoBase64: c.jpegBase64 }, 'capture-face');
       } else {
         void identifyOnline(c);
       }
@@ -286,7 +318,7 @@ export default function Kiosk({ config, sync, bootstrap }: KioskProps) {
         <Capture
           title="Foto untuk absen PIN"
           requireLive={false}
-          onCaptured={(c) => void greet({ person: step.person, method: 'PIN', photoBase64: c.jpegBase64, pin: step.pin })}
+          onCaptured={(c) => void greet({ person: step.person, method: 'PIN', photoBase64: c.jpegBase64, pin: step.pin }, 'capture-pin')}
           onCancel={toBoard}
         />
       );

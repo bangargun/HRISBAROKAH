@@ -110,7 +110,8 @@ function drawFrame(video: HTMLVideoElement, maxSide: number): HTMLCanvasElement 
   return canvas;
 }
 
-function jpegOf(source: HTMLCanvasElement): string {
+/** JPEG base64 di bawah batas, atau null bila tetap terlalu besar pada kualitas terendah. */
+function jpegOf(source: HTMLCanvasElement): string | null {
   const scale = Math.min(1, PHOTO_MAX_SIDE / Math.max(source.width, source.height));
   const canvas = document.createElement('canvas');
   canvas.width = Math.round(source.width * scale);
@@ -119,9 +120,9 @@ function jpegOf(source: HTMLCanvasElement): string {
   let data = '';
   for (const q of JPEG_QUALITIES) {
     data = canvas.toDataURL('image/jpeg', q).split(',')[1] ?? '';
-    if (data.length <= PHOTO_MAX_BASE64) break;
+    if (data.length <= PHOTO_MAX_BASE64) return data;
   }
-  return data;
+  return null;
 }
 
 /**
@@ -135,6 +136,7 @@ export async function captureAndDescribe(video: HTMLVideoElement): Promise<FaceC
 
   let best: FaceCapture | null = null;
   let sawMany = false;
+  let tooBig = false;
   for (let i = 0; i < FRAMES_PER_CAPTURE; i++) {
     if (i > 0) await sleep(FRAME_GAP_MS);
     const frame = drawFrame(video, DETECT_MAX_SIDE);
@@ -149,11 +151,18 @@ export async function captureAndDescribe(video: HTMLVideoElement): Promise<FaceC
     const liveScore = face.live ?? 0;
     const live = real >= REAL_MIN && liveScore >= LIVE_MIN;
     if (!best || live || real + liveScore > best.real + best.liveScore) {
-      best = { embedding: Array.from(face.embedding), jpegBase64: jpegOf(frame), live, real, liveScore };
+      const jpegBase64 = jpegOf(frame);
+      if (jpegBase64 === null) {
+        // Server menolak foto di atas batas; jangan pernah mengantre foto yang pasti ditolak
+        tooBig = true;
+        continue;
+      }
+      best = { embedding: Array.from(face.embedding), jpegBase64, live, real, liveScore };
     }
     if (live) break;
   }
   if (best) return best;
+  if (tooBig) return { error: 'Foto gagal disiapkan. Coba lagi.' };
   if (sawMany) return { error: 'Terlihat lebih dari satu wajah. Hanya satu orang di depan kamera.' };
   return { error: 'Wajah belum terlihat. Hadapkan wajah ke kamera dengan cahaya cukup.' };
 }
