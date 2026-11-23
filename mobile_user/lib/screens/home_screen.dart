@@ -9,6 +9,7 @@ import 'payslip_screen.dart';
 import 'daily_report_screen.dart';
 import 'survey360_screen.dart';
 import 'change_password_dialog.dart';
+import 'attendance_pin_dialog.dart';
 import 'login_screen.dart';
 import 'face_camera_screen.dart';
 import 'face_enrollment_screen.dart';
@@ -224,11 +225,36 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Widget _tabletNotice(String outletName) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.blue.shade200),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.tablet_mac, color: Colors.blue.shade800),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Absen di tablet cabang $outletName',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final outlet = _attendanceData?['outlet'];
     final att = _attendanceData?['attendance'];
     final isOnBreak = _attendanceData?['isOnBreak'] == true;
+    final isTablet = _attendanceData?['attendanceMode'] == 'TABLET';
+    final outletName = (_attendanceData?['workingOutletName'] ?? outlet?['name'] ?? '').toString();
 
     final hasClockedIn = att != null && att['clockInTime'] != null;
     final hasClockedOut = att != null && att['clockOutTime'] != null;
@@ -253,6 +279,11 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.key),
             tooltip: 'Ganti password',
             onPressed: () => showDialog(context: context, builder: (_) => const ChangePasswordDialog()),
+          ),
+          IconButton(
+            icon: const Icon(Icons.pin_outlined),
+            tooltip: 'PIN absen tablet',
+            onPressed: () => showDialog(context: context, builder: (_) => const AttendancePinDialog()),
           ),
           IconButton(
             icon: const Icon(Icons.logout),
@@ -382,6 +413,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 16),
 
+                    if (isTablet)
+                      _tabletNotice(outletName)
+                    else ...[
                     // Tombol Presensi
                     Row(
                       children: [
@@ -495,6 +529,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
+                    ],
                     const SizedBox(height: 20),
 
                     // Quick Action Menu F&B

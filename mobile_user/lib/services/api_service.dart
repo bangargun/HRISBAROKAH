@@ -289,6 +289,18 @@ class ApiService {
     await saveToken(data['accessToken'] as String);
   }
 
+  // PIN absen tablet (6 digit); wajib konfirmasi password akun
+  static Future<void> setAttendancePin(String pin, String password) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/me/attendance-pin'),
+      headers: await _headers(),
+      body: jsonEncode({'pin': pin, 'password': password}),
+    );
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(_errorMessage(jsonDecode(response.body), 'Gagal menyimpan PIN absen'));
+    }
+  }
+
   // Data user yang login (disimpan saat login)
   static Future<Map<String, dynamic>?> getCurrentUser() async {
     final prefs = await SharedPreferences.getInstance();
