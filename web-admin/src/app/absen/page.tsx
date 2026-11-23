@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 import Board from '@/components/absen/Board';
 import PairScreen from '@/components/absen/PairScreen';
 import { getBootstrap, getConfig } from '@/lib/kiosk/db';
-import { registerServiceWorker, reportLoadedAssets, useKioskScreen } from '@/lib/kiosk/device';
+import { checkForUpdate, listenForShellUpdate, registerServiceWorker, reportLoadedAssets, useKioskScreen } from '@/lib/kiosk/device';
 import { startSync, type SyncState } from '@/lib/kiosk/sync';
 import type { BootstrapPayload, DeviceConfig } from '@/lib/kiosk/types';
 
@@ -17,6 +17,9 @@ export default function AbsenPage() {
   const [sync, setSync] = useState<SyncState | null>(null);
   const [bootstrap, setBootstrap] = useState<BootstrapPayload | null>(null);
   useKioskScreen();
+
+  // Deploy baru: SW menyimpan build baru lalu halaman dimuat ulang saat papan diam
+  useEffect(() => listenForShellUpdate(), []);
 
   useEffect(() => {
     registerServiceWorker();
@@ -41,7 +44,10 @@ export default function AbsenPage() {
         .then(([config, b]) => {
           if (config) setView({ kind: 'paired', config });
           setBootstrap(b);
-          if (s.online) reportLoadedAssets();
+          if (s.online && s.lastSync) {
+            reportLoadedAssets();
+            checkForUpdate();
+          }
         })
         .catch(() => undefined);
     });

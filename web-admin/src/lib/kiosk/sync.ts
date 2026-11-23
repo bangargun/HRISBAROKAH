@@ -1,12 +1,13 @@
 // Sinkron tablet absen: kirim antrean (naik), lalu ambil bootstrap (turun) dan
 // catat selisih jam tablet-server. Jalan saat mulai, tiap 5 menit, dan saat koneksi pulih.
-import { DeviceRevokedError, kioskFetch } from './api';
-import { getConfig, pendingEvents, queueStats, removeEvents, saveBootstrap, saveConfig } from './db';
+import { DeviceRevokedError, KioskNetworkError, kioskFetch } from './api';
+import { getConfig, markUnanswered, pendingEvents, queueStats, removeEvents, saveBootstrap, saveConfig } from './db';
 import type { BootstrapPayload, EventsResponse, QueuedEvent } from './types';
 
 export interface SyncState {
   online: boolean;
   pending: number;
+  stuck: number; // dikirim tetapi tidak dijawab server lebih dari 24 jam
   lastSync: string | null; // ISO, bootstrap terakhir yang berhasil
 }
 
@@ -69,15 +70,29 @@ function rethrowUnlessHttp(err: unknown): string[] {
   throw err;
 }
 
-/** true bila antrean habis terkirim dan semuanya dijawab. */
-async function uploadQueue(): Promise<boolean> {
+/**
+ * Kirim seluruh antrean sekali jalan, halaman demi halaman (kursor setelah event terakhir yang
+ * dicoba), sehingga event yang tidak dijawab di depan tidak menghalangi event sesudahnya.
+ * true bila semua event dijawab; null bila dihentikan.
+ */
+async function uploadQueue(isStopped: () => boolean): Promise<boolean | null> {
+  let allAnswered = true;
+  let after: QueuedEvent | undefined;
   for (;;) {
-    const batch = await pendingEvents(BATCH_SIZE);
-    if (batch.length === 0) return true;
+    if (isStopped()) return null;
+    const batch = await pendingEvents(BATCH_SIZE, after);
+    if (batch.length === 0) return allAnswered;
+    after = batch[batch.length - 1];
     const answered = await sendBatch(batch);
+    if (isStopped()) return null; // dijawab server tapi belum dihapus: kiriman ulang aman (idempoten)
     await removeEvents(answered);
-    // Server belum bisa memproses sebagian: sisanya dicoba lagi nanti
-    if (answered.length < batch.length) return false;
+    const answeredSet = new Set(answered);
+    const unanswered = batch.filter((e) => !answeredSet.has(e.id)).map((e) => e.id);
+    if (unanswered.length > 0) {
+      // Server belum bisa memproses sebagian: dicoba lagi pada jalan berikutnya (dengan jeda)
+      allAnswered = false;
+      await markUnanswered(unanswered, new Date().toISOString());
+    }
   }
 }
 
@@ -107,7 +122,12 @@ export function startSync(onState: (s: SyncState) => void): () => void {
   let rerun = false;
   let failures = 0;
   let timer: ReturnType<typeof setTimeout> | undefined;
-  const state: SyncState = { online: navigator.onLine, pending: 0, lastSync: null };
+  const state: SyncState = { online: navigator.onLine, pending: 0, stuck: 0, lastSync: null };
+  const refreshQueue = async () => {
+    const stats = await queueStats();
+    state.pending = stats.count;
+    state.stuck = stats.stuck;
+  };
 
   const emit = () => {
     if (!stopped) onState({ ...state });
@@ -137,12 +157,13 @@ export function startSync(onState: (s: SyncState) => void): () => void {
         return;
       }
       state.lastSync = config.lastSyncAt ?? null;
-      state.pending = (await queueStats()).count;
+      await refreshQueue();
       emit();
       if (!navigator.onLine) {
         state.online = false;
       } else {
-        const drained = await uploadQueue();
+        const drained = await uploadQueue(() => stopped);
+        if (drained === null) return;
         await pullBootstrap();
         state.online = true;
         state.lastSync = (await getConfig())?.lastSyncAt ?? state.lastSync;
@@ -154,14 +175,14 @@ export function startSync(onState: (s: SyncState) => void): () => void {
         stopped = true;
         return;
       }
-      // fetch gagal = tidak ada jaringan; galat HTTP = server terjangkau tapi bermasalah
-      state.online = err instanceof SyncHttpError;
+      // Hanya fetch yang gagal berarti offline; galat HTTP = server terjangkau tapi bermasalah;
+      // galat lain (IndexedDB, JSON) tidak mengubah status koneksi
+      if (err instanceof KioskNetworkError) state.online = false;
+      else if (err instanceof SyncHttpError) state.online = true;
     } finally {
       running = false;
       if (!stopped) {
-        state.pending = await queueStats()
-          .then((s) => s.count)
-          .catch(() => state.pending);
+        await refreshQueue().catch(() => undefined);
         emit();
         schedule(healthy);
         if (rerun) {

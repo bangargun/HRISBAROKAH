@@ -76,6 +76,8 @@ export interface QueuedEvent {
   localScore?: number;
   photoBase64: string;
   pin?: string; // hanya metode PIN; hilang bersama event setelah dijawab server
+  // Diisi tablet: kiriman pertama yang diterima server tetapi tidak dijawab. Tidak dikirim.
+  firstSentAt?: string;
 }
 
 export interface EventResult {

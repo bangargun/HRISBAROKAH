@@ -1,15 +1,20 @@
 // Penyimpanan lokal tablet absen (IndexedDB "hris-absen"):
 //   config    -> satu baris "device": token perangkat, nama cabang, selisih jam
 //   bootstrap -> satu baris "current": paket data terakhir dari server
-//   queue     -> event absen yang belum dijawab server (kunci: id event)
+//   queue     -> event absen yang belum dijawab server (kunci: id event; indeks waktu+id untuk
+//                halaman kiriman, dan firstSentAt untuk event yang lama tidak dijawab)
 import type { BootstrapPayload, DeviceConfig, QueuedEvent } from './types';
 
 const DB_NAME = 'hris-absen';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const CONFIG = 'config';
 const BOOTSTRAP = 'bootstrap';
 const QUEUE = 'queue';
 const BY_TIME = 'byDeviceTime';
+const BY_TIME_ID = 'byDeviceTimeId';
+const BY_FIRST_SENT = 'byFirstSentAt';
+// Event yang sudah dikirim tetapi tetap tidak dijawab server selama ini dihitung "macet"
+export const STUCK_AFTER_MS = 24 * 3600_000;
 
 let dbPromise: Promise<IDBDatabase> | null = null;
 
@@ -21,9 +26,12 @@ function openDb(): Promise<IDBDatabase> {
       const db = req.result;
       if (!db.objectStoreNames.contains(CONFIG)) db.createObjectStore(CONFIG);
       if (!db.objectStoreNames.contains(BOOTSTRAP)) db.createObjectStore(BOOTSTRAP);
-      if (!db.objectStoreNames.contains(QUEUE)) {
-        db.createObjectStore(QUEUE, { keyPath: 'id' }).createIndex(BY_TIME, 'deviceTime');
-      }
+      const queue = db.objectStoreNames.contains(QUEUE)
+        ? req.transaction!.objectStore(QUEUE)
+        : db.createObjectStore(QUEUE, { keyPath: 'id' });
+      if (!queue.indexNames.contains(BY_TIME)) queue.createIndex(BY_TIME, 'deviceTime');
+      if (!queue.indexNames.contains(BY_TIME_ID)) queue.createIndex(BY_TIME_ID, ['deviceTime', 'id']);
+      if (!queue.indexNames.contains(BY_FIRST_SENT)) queue.createIndex(BY_FIRST_SENT, 'firstSentAt');
     };
     req.onsuccess = () => {
       const db = req.result;
@@ -89,16 +97,37 @@ export function saveBootstrap(b: BootstrapPayload): Promise<void> {
 /** Disimpan sebelum layar menampilkan "Tercatat". */
 export async function enqueue(e: QueuedEvent): Promise<void> {
   const db = await openDb();
-  const tx = db.transaction(QUEUE, 'readwrite');
+  // strict: tulisan sudah di disk sebelum layar menampilkan "Tercatat"
+  const tx = db.transaction(QUEUE, 'readwrite', { durability: 'strict' });
   tx.objectStore(QUEUE).put(e);
   await done(tx);
 }
 
-/** Event tertua lebih dulu (urutan waktu tablet). */
-export async function pendingEvents(limit: number): Promise<QueuedEvent[]> {
+/**
+ * Event tertua lebih dulu (urutan waktu tablet, lalu id). `after` = event terakhir halaman
+ * sebelumnya, agar event yang belum dijawab tidak menghalangi event sesudahnya.
+ */
+export async function pendingEvents(limit: number, after?: Pick<QueuedEvent, 'deviceTime' | 'id'>): Promise<QueuedEvent[]> {
   const db = await openDb();
-  const index = db.transaction(QUEUE, 'readonly').objectStore(QUEUE).index(BY_TIME);
-  return result(index.getAll(null, limit)) as Promise<QueuedEvent[]>;
+  const index = db.transaction(QUEUE, 'readonly').objectStore(QUEUE).index(BY_TIME_ID);
+  const range = after ? IDBKeyRange.lowerBound([after.deviceTime, after.id], true) : null;
+  return result(index.getAll(range, limit)) as Promise<QueuedEvent[]>;
+}
+
+/** Catat kiriman pertama yang tidak dijawab server (untuk hitungan event macet). */
+export async function markUnanswered(ids: string[], at: string): Promise<void> {
+  if (ids.length === 0) return;
+  const db = await openDb();
+  const tx = db.transaction(QUEUE, 'readwrite');
+  const store = tx.objectStore(QUEUE);
+  for (const id of ids) {
+    const req = store.get(id);
+    req.onsuccess = () => {
+      const e = req.result as QueuedEvent | undefined;
+      if (e && !e.firstSentAt) store.put({ ...e, firstSentAt: at });
+    };
+  }
+  await done(tx);
 }
 
 export async function removeEvents(ids: string[]): Promise<void> {
@@ -110,11 +139,17 @@ export async function removeEvents(ids: string[]): Promise<void> {
   await done(tx);
 }
 
-export async function queueStats(): Promise<{ count: number; oldest: string | null }> {
+/** count = semua event antre; stuck = sudah dikirim tetapi tidak dijawab server lebih dari 24 jam. */
+export async function queueStats(now: Date = new Date()): Promise<{ count: number; oldest: string | null; stuck: number }> {
   const db = await openDb();
   const store = db.transaction(QUEUE, 'readonly').objectStore(QUEUE);
-  const [count, cursor] = await Promise.all([result(store.count()), result(store.index(BY_TIME).openCursor())]);
-  return { count, oldest: cursor ? (cursor.value as QueuedEvent).deviceTime : null };
+  const cutoff = new Date(now.getTime() - STUCK_AFTER_MS).toISOString();
+  const [count, cursor, stuck] = await Promise.all([
+    result(store.count()),
+    result(store.index(BY_TIME).openKeyCursor()),
+    result(store.index(BY_FIRST_SENT).count(IDBKeyRange.upperBound(cutoff))),
+  ]);
+  return { count, oldest: cursor ? (cursor.key as string) : null, stuck };
 }
 
 /** Token dicabut: hapus seluruh data lokal (token, roster, wajah, antrean). */

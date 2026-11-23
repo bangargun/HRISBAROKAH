@@ -13,6 +13,15 @@ export class DeviceRevokedError extends Error {
   }
 }
 
+/** Permintaan tidak sampai ke server (tidak ada jaringan / server tidak terjangkau). */
+export class KioskNetworkError extends Error {
+  constructor(cause: unknown) {
+    super('Tidak ada koneksi ke server');
+    this.name = 'KioskNetworkError';
+    this.cause = cause;
+  }
+}
+
 /** Server menolak permintaan dengan pesan yang bisa ditampilkan. */
 export class KioskApiError extends Error {
   constructor(
@@ -36,7 +45,7 @@ async function errorMessage(res: Response, fallback: string): Promise<string> {
 
 /**
  * fetch ke backend dengan token perangkat. 401 berarti token dicabut: seluruh data lokal
- * dihapus lalu halaman kembali ke layar kode pasangan. Galat jaringan diteruskan apa adanya.
+ * dihapus lalu halaman kembali ke layar kode pasangan. Galat jaringan menjadi KioskNetworkError.
  */
 export async function kioskFetch(path: string, init: RequestInit = {}): Promise<Response> {
   const config = await getConfig();
@@ -44,7 +53,12 @@ export async function kioskFetch(path: string, init: RequestInit = {}): Promise<
   const headers = new Headers(init.headers);
   headers.set('Authorization', `Bearer ${config.token}`);
   if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
-  const res = await fetch(`${BACKEND_API}${path}`, { ...init, headers, cache: 'no-store' });
+  let res: Response;
+  try {
+    res = await fetch(`${BACKEND_API}${path}`, { ...init, headers, cache: 'no-store' });
+  } catch (err) {
+    throw new KioskNetworkError(err);
+  }
   if (res.status === 401) {
     await wipeAll();
     window.location.replace(ABSEN_PATH);
