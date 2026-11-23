@@ -40,6 +40,7 @@ const MODULE_LABEL: Record<string, string> = {
   inspections: 'Sidak SPV',
   kiosk: 'Tablet absen',
   kpi: 'KPI kru',
+  'legal-docs': 'Surat & kontrak',
   me: 'PIN absen (akun sendiri)',
   outlets: 'Cabang',
   'outlets/:id/devices': 'Perangkat tablet',
