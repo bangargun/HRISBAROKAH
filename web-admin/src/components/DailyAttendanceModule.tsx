@@ -28,6 +28,8 @@ interface AttendanceRow {
 
 interface ScheduleRow {
   employeeId: string;
+  // Cabang penugasan hari itu; null = cabang asal
+  outletId: string | null;
   startTime: string;
   endTime: string;
 }
@@ -37,7 +39,8 @@ interface OutletOption {
   name: string;
 }
 
-type Status = 'LATE' | 'ABSENT' | 'NOT_YET' | 'PRESENT' | 'LEAVE' | 'OFF';
+// AWAY = kru cabang ini yang hari itu dijadwalkan bertugas di cabang lain
+type Status = 'LATE' | 'ABSENT' | 'NOT_YET' | 'PRESENT' | 'LEAVE' | 'AWAY' | 'OFF';
 
 /** Kru di tabel: dari daftar karyawan cabang (punya akun) atau kru tamu dari baris absen (tanpa akun). */
 type RowEmployee = Pick<EmployeeRecord, 'id' | 'nik' | 'fullName' | 'position' | 'outlet'> & { user?: EmployeeRecord['user'] };
@@ -51,17 +54,19 @@ interface Row {
   breakMins: number;
   breakOpen: boolean;
   breakOver: boolean;
+  awayOutletName?: string;
 }
 
 // Cuti, izin dan sakit yang disetujui menutup kewajiban hadir hari itu
 const ABSENCE_TYPES: RequestType[] = ['CUTI_TAHUNAN', 'CUTI_KHUSUS', 'IZIN', 'SAKIT'];
-const STATUS_ORDER: Status[] = ['ABSENT', 'LATE', 'NOT_YET', 'PRESENT', 'LEAVE', 'OFF'];
+const STATUS_ORDER: Status[] = ['ABSENT', 'LATE', 'NOT_YET', 'PRESENT', 'LEAVE', 'AWAY', 'OFF'];
 const STATUS_STYLE: Record<Status, string> = {
   ABSENT: 'bg-rose-50 text-rose-800 border-rose-200',
   LATE: 'bg-amber-50 text-amber-800 border-amber-200',
   NOT_YET: 'bg-slate-50 text-slate-700 border-slate-200',
   PRESENT: 'bg-emerald-50 text-emerald-800 border-emerald-200',
   LEAVE: 'bg-sky-50 text-sky-800 border-sky-200',
+  AWAY: 'bg-indigo-50 text-indigo-800 border-indigo-200',
   OFF: 'bg-slate-50 text-slate-500 border-slate-200',
 };
 
@@ -87,6 +92,8 @@ function statusLabel(r: Row) {
       return 'Hadir';
     case 'LEAVE':
       return REQUEST_TYPE_LABEL[r.leave!.type];
+    case 'AWAY':
+      return `Bertugas di ${r.awayOutletName ?? 'cabang lain'}`;
     case 'OFF':
       return 'Libur';
   }
@@ -135,6 +142,7 @@ export default function DailyAttendanceModule({ requests }: { requests: AdminReq
     if (!data) return null;
     const attendanceOf = new Map(data.attendance.map((a) => [a.employeeId, a]));
     const scheduleOf = new Map(data.schedules.map((s) => [s.employeeId, s]));
+    const outletNameOf = new Map(outlets.map((o) => [o.id, o.name]));
     const leaveOf = new Map(
       requests
         .filter(
@@ -160,13 +168,17 @@ export default function DailyAttendanceModule({ requests }: { requests: AdminReq
         const schedule = scheduleOf.get(employee.id);
         const leave = leaveOf.get(employee.id);
         const clockedIn = !!attendance?.clockInTime;
+        // Dilihat per cabang: kru yang hari itu ditugaskan ke cabang lain absen di sana, bukan di sini
+        const away = !!outletId && !!schedule?.outletId && schedule.outletId !== outletId;
         const status: Status = clockedIn
           ? attendance!.status === 'LATE'
             ? 'LATE'
             : 'PRESENT'
           : leave
             ? 'LEAVE'
-            : schedule
+            : away
+              ? 'AWAY'
+              : schedule
               ? date < today
                 ? 'ABSENT'
                 : 'NOT_YET'
@@ -183,6 +195,7 @@ export default function DailyAttendanceModule({ requests }: { requests: AdminReq
           breakMins,
           breakOpen: breaks.some((b) => !b.endBreak),
           breakOver: breaks.some((b) => b.isOverLimit) || breakMins > limit,
+          awayOutletName: away ? outletNameOf.get(schedule!.outletId!) : undefined,
         };
       })
       .sort(
@@ -190,11 +203,12 @@ export default function DailyAttendanceModule({ requests }: { requests: AdminReq
           STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status) ||
           a.employee.fullName.localeCompare(b.employee.fullName),
       );
-  }, [data, requests, date, today]);
+  }, [data, requests, date, today, outletId, outlets]);
 
   const count = (...s: Status[]) => rows?.filter((r) => s.includes(r.status)).length ?? 0;
   // Yang wajib hadir: dijadwalkan dan tidak cuti
-  const expected = rows?.filter((r) => r.schedule && r.status !== 'LEAVE') ?? [];
+  // Kru yang ditugaskan ke cabang lain hari itu tidak wajib hadir di cabang ini
+  const expected = rows?.filter((r) => r.schedule && r.status !== 'LEAVE' && r.status !== 'AWAY') ?? [];
   const attended = expected.filter((r) => r.status === 'PRESENT' || r.status === 'LATE').length;
   const rate = expected.length ? Math.round((attended / expected.length) * 1000) / 10 : null;
   const unscheduledIn = rows?.filter((r) => !r.schedule && !r.attendance?.scheduleId && (r.status === 'PRESENT' || r.status === 'LATE')).length ?? 0;

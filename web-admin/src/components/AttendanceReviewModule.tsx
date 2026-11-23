@@ -35,7 +35,14 @@ const whenFmt = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short
 
 /** Dampak keputusan, ditampilkan sebelum HR mengonfirmasi. */
 function effectOf(row: ReviewRow, decision: Decision): string {
-  if (decision === 'accept') return 'Absen ini dianggap sah dan hilang dari daftar tinjauan.';
+  if (decision === 'accept') {
+    // Event yang tidak diterapkan (urutan tidak sah, PIN/foto bermasalah, akun nonaktif) tidak
+    // pernah masuk absen: "Terima" hanya menandai sudah dilihat
+    if (!row.applied) {
+      return 'Hanya ditandai sudah dilihat. Absen ini tidak dicatat ke presensi; bila perlu dicatat, perbaiki lewat Koreksi Absen.';
+    }
+    return 'Absen ini dianggap sah dan hilang dari daftar tinjauan.';
+  }
   if (!row.applied) return 'Absen ini tidak dicatat dan dipindah ke daftar Ditolak.';
   switch (row.type) {
     case 'CLOCK_IN':

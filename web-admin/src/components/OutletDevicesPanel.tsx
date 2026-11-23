@@ -10,6 +10,9 @@ interface Device {
   pairedAt: string;
   lastSeenAt: string | null;
   revokedAt: string | null;
+  // Laporan tablet pada sinkron terakhir: absen yang belum terkirim (null = belum pernah melapor)
+  pendingCount?: number | null;
+  pendingReportedAt?: string | null;
 }
 
 interface Pairing {
@@ -28,6 +31,16 @@ function relative(iso: string | null, now: number) {
   const hours = Math.floor(mins / 60);
   if (hours < 24) return `${hours} jam lalu`;
   return `${Math.floor(hours / 24)} hari lalu`;
+}
+
+/** Peringatan sebelum mencabut: absen yang masih di tablet tidak akan pernah terkirim. */
+function revokeWarning(d: Device, now: number) {
+  const online = d.lastSeenAt ? `Terakhir online ${relative(d.lastSeenAt, now).toLowerCase()}.` : 'Tablet belum pernah online.';
+  if (typeof d.pendingCount !== 'number') {
+    return `${online} Absen yang belum terkirim dari tablet ini akan hilang. Pastikan tablet sudah online dan tersinkron sebelum dicabut.`;
+  }
+  if (d.pendingCount === 0) return `${online} Saat terakhir online tidak ada absen yang belum terkirim.`;
+  return `${online} ${d.pendingCount} absen belum terkirim saat terakhir online akan hilang.`;
 }
 
 const clock = (ms: number) => {
@@ -234,7 +247,9 @@ export default function OutletDevicesPanel({ outletId, canManage }: { outletId: 
                   {canManage && !d.revokedAt && (
                     revoking === d.id ? (
                       <>
-                        <span className="text-xs text-slate-600">Tablet ini tidak bisa absen lagi sampai dipasangkan ulang.</span>
+                        <span className="text-xs text-slate-600" role="alert">
+                          Tablet ini tidak bisa absen lagi sampai dipasangkan ulang. {revokeWarning(d, now)}
+                        </span>
                         <button type="button" disabled={busy} onClick={() => revoke(d.id)} className="btn btn-danger btn-sm">
                           Ya, cabut
                         </button>

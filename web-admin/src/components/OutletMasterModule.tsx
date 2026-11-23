@@ -546,6 +546,7 @@ function OutletFormDialog({
                   key={value}
                   type="button"
                   aria-pressed={data.attendanceMode === value}
+                  disabled={!canManageDevices}
                   onClick={() => setData({ ...data, attendanceMode: value })}
                   className="segmented-item"
                 >
@@ -557,6 +558,7 @@ function OutletFormDialog({
               {data.attendanceMode === 'TABLET'
                 ? 'Kru absen lewat tablet di cabang ini. Absen dari HP kru ditutup untuk cabang ini.'
                 : 'Kru absen lewat aplikasi di HP masing-masing.'}
+              {!canManageDevices && ' Hanya Super Admin atau HR yang bisa mengubah mode absen.'}
             </p>
           </div>
 
