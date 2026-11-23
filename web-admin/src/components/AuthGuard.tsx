@@ -6,12 +6,14 @@ import { Loader2 } from 'lucide-react';
 import { verifySession } from '@/lib/auth';
 
 const PUBLIC_PATHS = ['/login'];
+// Tablet absen memakai token perangkat sendiri, bukan sesi admin
+const isTabletPath = (path: string) => path === '/absen' || path.startsWith('/absen/');
 
 /** Halaman admin hanya tampil setelah token dicek ke backend. */
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const isPublic = PUBLIC_PATHS.includes(pathname);
+  const isPublic = PUBLIC_PATHS.includes(pathname) || isTabletPath(pathname);
   const [state, setState] = useState<'checking' | 'ok' | 'offline'>('checking');
 
   const check = useCallback(async () => {
