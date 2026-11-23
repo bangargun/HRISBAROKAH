@@ -17,6 +17,7 @@ import { DailyReportsModule } from './modules/daily-reports/daily-reports.module
 import { Survey360Module } from './modules/survey360/survey360.module';
 import { InspectionsModule } from './modules/inspections/inspections.module';
 import { KioskModule } from './modules/kiosk/kiosk.module';
+import { AccessModule } from './modules/access/access.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { StripSecretsInterceptor } from './common/interceptors/strip-secrets.interceptor';
 
@@ -40,6 +41,7 @@ import { StripSecretsInterceptor } from './common/interceptors/strip-secrets.int
     Survey360Module,
     InspectionsModule,
     KioskModule,
+    AccessModule,
   ],
   controllers: [],
   providers: [{ provide: APP_INTERCEPTOR, useClass: StripSecretsInterceptor }],
