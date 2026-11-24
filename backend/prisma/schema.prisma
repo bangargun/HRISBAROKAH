@@ -165,23 +165,26 @@ model User {
 
   profile EmployeeProfile?
 
-  sanctionsIssued      Sanction[]                @relation("SanctionIssuedBy")
-  correctionsCreated   AttendanceCorrection[]    @relation("CorrectionCreatedBy")
-  correctionsDecided   AttendanceCorrection[]    @relation("CorrectionDecidedBy")
-  exitsCreated         EmployeeExit[]            @relation("ExitCreatedBy")
-  exitsClosed          EmployeeExit[]            @relation("ExitClosedBy")
-  dailyReportPhotos    DailyReportPhoto[]
-  inspectionsCreated   OutletInspection[]        @relation("InspectionCreatedBy")
-  inspectionsConducted OutletInspection[]        @relation("InspectionConductedBy")
-  documentsUploaded    EmployeeDocument[]
-  devicesCreated       AttendanceDevice[]        @relation("DeviceCreatedBy")
-  pairingsCreated      AttendanceDevicePairing[] @relation("PairingCreatedBy")
-  eventsReviewed       AttendanceEvent[]         @relation("EventReviewedBy")
-  coachingAsCoach      CoachingSession[]         @relation("CoachingCoach")
-  coachingCreated      CoachingSession[]         @relation("CoachingCreatedBy")
-  legalDocsCreated     LegalDocument[]           @relation("LegalDocCreatedBy")
-  legalDocsCancelled   LegalDocument[]           @relation("LegalDocCancelledBy")
-  legalDocsApplied     LegalDocument[]           @relation("LegalDocAppliedBy")
+  sanctionsIssued         Sanction[]                @relation("SanctionIssuedBy")
+  correctionsCreated      AttendanceCorrection[]    @relation("CorrectionCreatedBy")
+  correctionsDecided      AttendanceCorrection[]    @relation("CorrectionDecidedBy")
+  exitsCreated            EmployeeExit[]            @relation("ExitCreatedBy")
+  exitsClosed             EmployeeExit[]            @relation("ExitClosedBy")
+  dailyReportPhotos       DailyReportPhoto[]
+  inspectionsCreated      OutletInspection[]        @relation("InspectionCreatedBy")
+  inspectionsConducted    OutletInspection[]        @relation("InspectionConductedBy")
+  documentsUploaded       EmployeeDocument[]
+  devicesCreated          AttendanceDevice[]        @relation("DeviceCreatedBy")
+  pairingsCreated         AttendanceDevicePairing[] @relation("PairingCreatedBy")
+  eventsReviewed          AttendanceEvent[]         @relation("EventReviewedBy")
+  coachingAsCoach         CoachingSession[]         @relation("CoachingCoach")
+  coachingCreated         CoachingSession[]         @relation("CoachingCreatedBy")
+  legalDocsCreated        LegalDocument[]           @relation("LegalDocCreatedBy")
+  legalDocsCancelled      LegalDocument[]           @relation("LegalDocCancelledBy")
+  legalDocsApplied        LegalDocument[]           @relation("LegalDocAppliedBy")
+  trainingModulesCreated  TrainingModule[]          @relation("TrainingModuleCreatedBy")
+  weeklyQuizzesCreated    WeeklyQuiz[]              @relation("WeeklyQuizCreatedBy")
+  trainingSessionsCreated TrainingSession[]         @relation("TrainingSessionCreatedBy")
 }
 
 model EmployeeProfile {
@@ -220,25 +223,28 @@ model EmployeeProfile {
   bankAccountHolder String?
 
   // Relasi Modul
-  shiftSchedules   ShiftSchedule[]
-  attendances      Attendance[]
-  requests         EmployeeRequest[]
-  kasbonLoans      KasbonLoan[]
-  payrolls         Payroll[]
-  sanctions        Sanction[]
-  corrections      AttendanceCorrection[]
-  exits            EmployeeExit[]
-  documents        EmployeeDocument[]
-  surveysReceived  Survey360Response[]    @relation("Survey360Target")
-  surveysGiven     Survey360Response[]    @relation("Survey360Respondent")
-  discResults      DiscResult[]
-  trainingProgress TrainingProgress[]
-  sopSignatures    SopSignature[]
-  faceEnrollments  FaceEnrollment[]
-  faceChecks       FaceCheckLog[]
-  attendanceEvents AttendanceEvent[]
-  coachingSessions CoachingSession[]
-  legalDocuments   LegalDocument[]
+  shiftSchedules     ShiftSchedule[]
+  attendances        Attendance[]
+  requests           EmployeeRequest[]
+  kasbonLoans        KasbonLoan[]
+  payrolls           Payroll[]
+  sanctions          Sanction[]
+  corrections        AttendanceCorrection[]
+  exits              EmployeeExit[]
+  documents          EmployeeDocument[]
+  surveysReceived    Survey360Response[]          @relation("Survey360Target")
+  surveysGiven       Survey360Response[]          @relation("Survey360Respondent")
+  discResults        DiscResult[]
+  trainingProgress   TrainingProgress[]
+  sopSignatures      SopSignature[]
+  faceEnrollments    FaceEnrollment[]
+  faceChecks         FaceCheckLog[]
+  attendanceEvents   AttendanceEvent[]
+  coachingSessions   CoachingSession[]
+  legalDocuments     LegalDocument[]
+  trainingResults    TrainingResult[]
+  weeklyQuizAttempts WeeklyQuizAttempt[]
+  trainingSessions   TrainingSessionParticipant[]
 }
 
 // -------------------------------------------------------------
@@ -1056,4 +1062,146 @@ model LegalDocumentCounter {
   last Int    @default(0)
 
   @@id([code, year])
+}
+
+// ===================== Pelatihan (2026-11) =====================
+// Model lama TrainingCourse/TrainingProgress tidak dipakai (kosong); dibiarkan agar deploy tidak mengubah tabel lama.
+
+enum TrainingCategory {
+  ONBOARDING
+  RESEP_BOH
+  SERVICE_FOH
+  HYGIENE_HACCP
+  LEADERSHIP
+}
+
+enum TrainingSessionMode {
+  OFFLINE
+  ONLINE
+}
+
+enum TrainingSessionStatus {
+  PLANNED
+  DONE
+  CANCELLED
+}
+
+// Materi + kuis modul yang dibaca dan dikerjakan kru di aplikasi HP
+model TrainingModule {
+  id                String             @id @default(uuid())
+  code              String             @unique
+  title             String
+  category          TrainingCategory
+  description       String             @default("")
+  content           String
+  videoUrl          String?
+  passingScore      Int                @default(80)
+  isOnboarding      Boolean            @default(false)
+  // Kosong = semua jabatan
+  targetPositionIds String[]           @default([])
+  isPublished       Boolean            @default(false)
+  createdById       String
+  createdBy         User               @relation("TrainingModuleCreatedBy", fields: [createdById], references: [id])
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  questions         TrainingQuestion[]
+  results           TrainingResult[]
+  sessions          TrainingSession[]
+}
+
+// Hasil modul per kru; sertifikat = passedAt + certificateNo
+model TrainingResult {
+  id            String          @id @default(uuid())
+  moduleId      String
+  module        TrainingModule  @relation(fields: [moduleId], references: [id])
+  employeeId    String
+  employee      EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  attempts      Int             @default(0)
+  bestScore     Int             @default(0)
+  lastScore     Int             @default(0)
+  passedAt      DateTime?
+  // {kode modul}-{urut 4 digit}, disimpan saat lulus
+  certificateNo String?         @unique
+  updatedAt     DateTime        @updatedAt
+
+  @@unique([moduleId, employeeId])
+}
+
+// Soal pilihan ganda untuk modul atau kuis mingguan; kunci jawaban tidak pernah dikirim ke kru
+model TrainingQuestion {
+  id           String          @id @default(uuid())
+  moduleId     String?
+  module       TrainingModule? @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  weeklyQuizId String?
+  weeklyQuiz   WeeklyQuiz?     @relation(fields: [weeklyQuizId], references: [id], onDelete: Cascade)
+  prompt       String
+  options      String[]
+  correctIndex Int
+  order        Int
+
+  @@index([moduleId])
+  @@index([weeklyQuizId])
+}
+
+model WeeklyQuiz {
+  id                String              @id @default(uuid())
+  title             String
+  weekStart         DateTime            @db.Date
+  deadline          DateTime            @db.Date
+  passingScore      Int                 @default(80)
+  targetPositionIds String[]            @default([])
+  isPublished       Boolean             @default(false)
+  createdById       String
+  createdBy         User                @relation("WeeklyQuizCreatedBy", fields: [createdById], references: [id])
+  createdAt         DateTime            @default(now())
+  questions         TrainingQuestion[]
+  attempts          WeeklyQuizAttempt[]
+}
+
+model WeeklyQuizAttempt {
+  id          String          @id @default(uuid())
+  quizId      String
+  quiz        WeeklyQuiz      @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  employeeId  String
+  employee    EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  answers     Int[]
+  score       Int
+  passed      Boolean
+  submittedAt DateTime        @default(now())
+
+  @@unique([quizId, employeeId])
+}
+
+model TrainingSession {
+  id           String                       @id @default(uuid())
+  title        String
+  moduleId     String?
+  module       TrainingModule?              @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  date         DateTime                     @db.Date
+  startTime    String
+  endTime      String
+  mode         TrainingSessionMode          @default(OFFLINE)
+  location     String?
+  meetingUrl   String?
+  trainerName  String
+  notes        String?
+  status       TrainingSessionStatus        @default(PLANNED)
+  createdById  String
+  createdBy    User                         @relation("TrainingSessionCreatedBy", fields: [createdById], references: [id])
+  createdAt    DateTime                     @default(now())
+  participants TrainingSessionParticipant[]
+
+  @@index([date])
+}
+
+model TrainingSessionParticipant {
+  id         String          @id @default(uuid())
+  sessionId  String
+  session    TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  employeeId String
+  employee   EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  // null = kehadiran belum dicatat
+  attended   Boolean?
+
+  @@unique([sessionId, employeeId])
 }

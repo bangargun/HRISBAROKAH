@@ -20,6 +20,7 @@ import { KioskModule } from './modules/kiosk/kiosk.module';
 import { AccessModule } from './modules/access/access.module';
 import { CoachingModule } from './modules/coaching/coaching.module';
 import { LegalDocsModule } from './modules/legal-docs/legal-docs.module';
+import { TrainingModule } from './modules/training/training.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { StripSecretsInterceptor } from './common/interceptors/strip-secrets.interceptor';
 
@@ -46,6 +47,7 @@ import { StripSecretsInterceptor } from './common/interceptors/strip-secrets.int
     AccessModule,
     CoachingModule,
     LegalDocsModule,
+    TrainingModule,
   ],
   controllers: [],
   providers: [{ provide: APP_INTERCEPTOR, useClass: StripSecretsInterceptor }],
