@@ -50,6 +50,8 @@ const MODULE_LABEL: Record<string, string> = {
   sanctions: 'Surat peringatan',
   schedules: 'Jadwal shift',
   survey360: 'Survei 360°',
+  training: 'Pelatihan (admin)',
+  'training/my': 'Pelatihan saya (aplikasi HP)',
 };
 
 const METHOD_LABEL: Record<string, string> = { GET: 'Lihat', POST: 'Tambah/aksi', PUT: 'Ubah', PATCH: 'Ubah', DELETE: 'Hapus' };
