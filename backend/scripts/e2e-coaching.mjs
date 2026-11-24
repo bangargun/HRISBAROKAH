@@ -96,7 +96,8 @@ checks.push(['dua pengubah status serentak: hanya satu yang berhasil', async ({ 
     body: { employeeId: crew.profileId, topic: 'Kecepatan saji', scheduledDate: '2026-12-04', priority: 'NORMAL' },
   })).body;
   const results = await Promise.all([
-    http('PATCH', `/coaching/${s.id}/status`, { token: admin, body: { status: 'CANCELLED' } }),
+    // Perubahan yang sama dua kali: berurutan atau bersamaan, hanya satu yang boleh berhasil
+    http('PATCH', `/coaching/${s.id}/status`, { token: admin, body: { status: 'IN_PROGRESS' } }),
     http('PATCH', `/coaching/${s.id}/status`, { token: admin, body: { status: 'IN_PROGRESS' } }),
   ]);
   assert.deepEqual(results.map((r) => r.status).sort(), [200, 400]);
