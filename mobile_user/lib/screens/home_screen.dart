@@ -5,6 +5,7 @@ import '../services/api_service.dart';
 import 'kasbon_screen.dart';
 import 'requests_screen.dart';
 import 'payslip_screen.dart';
+import 'training_screen.dart';
 import 'daily_report_screen.dart';
 import 'survey360_screen.dart';
 import 'change_password_dialog.dart';
@@ -299,6 +300,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const PayslipScreen()),
+                          ),
+                        ),
+                        _quickMenuCard(
+                          icon: Icons.school_rounded,
+                          title: 'Pelatihan',
+                          color: Colors.teal,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const TrainingScreen()),
                           ),
                         ),
                         _quickMenuCard(

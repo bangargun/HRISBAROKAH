@@ -186,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'Pastikan Anda berada di area outlet saat melakukan presensi',
+                  'Absen dilakukan di tablet cabang. Aplikasi ini untuk rekap, slip gaji, pengajuan dan pelatihan.',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),

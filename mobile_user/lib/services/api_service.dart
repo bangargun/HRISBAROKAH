@@ -146,6 +146,32 @@ class ApiService {
     throw Exception(_errorMessage(data, 'Gagal memuat slip gaji'));
   }
 
+  // Pelatihan (milik kru sendiri): modul, kuis mingguan, jadwal sesi
+  static Future<List<dynamic>> getTrainingList(String kind) async {
+    final response = await http.get(Uri.parse('$baseUrl/training/my/$kind'), headers: await _headers());
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200) return data as List<dynamic>;
+    throw Exception(_errorMessage(data, 'Gagal memuat pelatihan'));
+  }
+
+  static Future<Map<String, dynamic>> getTrainingItem(String kind, String id) async {
+    final response = await http.get(Uri.parse('$baseUrl/training/my/$kind/$id'), headers: await _headers());
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200) return data as Map<String, dynamic>;
+    throw Exception(_errorMessage(data, 'Gagal memuat pelatihan'));
+  }
+
+  static Future<Map<String, dynamic>> submitTrainingAnswers(String kind, String id, List<int> answers) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/training/my/$kind/$id/attempts'),
+      headers: await _headers(),
+      body: jsonEncode({'answers': answers}),
+    );
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200 || response.statusCode == 201) return data as Map<String, dynamic>;
+    throw Exception(_errorMessage(data, 'Jawaban gagal dikirim'));
+  }
+
   // Laporan harian cabang: daftar item checklist
   static Future<Map<String, dynamic>> getDailyChecklist() async {
     final response = await http.get(Uri.parse('$baseUrl/daily-reports/checklist'), headers: await _headers());
