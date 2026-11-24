@@ -18,7 +18,7 @@ set -a
 set +a
 
 APP_ENV="$APP_DIR/backend/.env"
-app_env_get() { grep "^$1=" "$APP_ENV" 2>/dev/null | head -1 | cut -d= -f2- | tr -d '"'; }
+app_env_get() { { grep "^$1=" "$APP_ENV" 2>/dev/null || true; } | head -1 | cut -d= -f2- | tr -d '"'; }
 app_env_set() {
   grep -v "^$1=" "$APP_ENV" > "$APP_ENV.tmp" || true
   echo "$1=\"$2\"" >> "$APP_ENV.tmp"
@@ -27,7 +27,7 @@ app_env_set() {
 }
 # Token lama (versi pertama skrip menyimpannya di file ops) tetap dipakai sampai dipindahkan
 HRIS_TG_BOT_TOKEN="$(app_env_get TELEGRAM_BOT_TOKEN)"
-HRIS_TG_BOT_TOKEN="${HRIS_TG_BOT_TOKEN:-$(grep '^HRIS_TG_BOT_TOKEN=' "$OPS_ENV" | cut -d= -f2-)}"
+HRIS_TG_BOT_TOKEN="${HRIS_TG_BOT_TOKEN:-$({ grep '^HRIS_TG_BOT_TOKEN=' "$OPS_ENV" || true; } | cut -d= -f2-)}"
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG_FILE"; }
 
