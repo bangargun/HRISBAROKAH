@@ -1,6 +1,8 @@
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayMaxSize,
+  IsEmail,
+  IsIn,
   ArrayMinSize,
   IsArray,
   IsBoolean,
@@ -17,9 +19,18 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
-const DATE_PREFIX = /^\d{4}-\d{2}-\d{2}(T.*)?$/;
 import { EmployeeDocumentType, EmploymentStatus, UserRole } from '@prisma/client';
+
+const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
+/** Teks kosong dari form = hapus isian (null), bukan simpan string kosong. */
+const emptyToNull = ({ value }: { value: unknown }) => {
+  if (typeof value !== 'string') return value;
+  const t = value.trim();
+  return t === '' ? null : t;
+};
+const DATE_PREFIX = /^\d{4}-\d{2}-\d{2}(T.*)?$/;
+/** Nilai jenis kelamin yang disimpan (sama dengan tampilan lama di web). */
+export const GENDERS = ['Laki-laki', 'Perempuan'] as const;
 
 export class CreateEmployeeDto {
   // Akun User
@@ -32,9 +43,10 @@ export class CreateEmployeeDto {
   @MaxLength(72)
   password: string;
 
-  @IsString()
+  @Transform(emptyToNull)
+  @IsEmail({}, { message: 'Format email tidak valid' })
   @IsOptional()
-  email?: string;
+  email?: string | null;
 
   @IsEnum(UserRole)
   @IsOptional()
@@ -72,29 +84,38 @@ export class CreateEmployeeDto {
   @Matches(DATE_PREFIX, { message: 'Tanggal masuk harus berformat YYYY-MM-DD' })
   joinDate: string;
 
+  @Transform(emptyToNull)
   @Matches(DATE_PREFIX, { message: 'Tanggal lahir harus berformat YYYY-MM-DD' })
   @IsOptional()
-  birthDate?: string;
+  birthDate?: string | null;
 
-  @IsString()
+  @Transform(emptyToNull)
+  @IsIn(GENDERS, { message: 'Jenis kelamin: Laki-laki atau Perempuan' })
   @IsOptional()
-  gender?: string;
+  gender?: string | null;
 
+  @Transform(emptyToNull)
   @IsString()
+  @MaxLength(300)
   @IsOptional()
-  address?: string;
+  address?: string | null;
 
+  @Transform(emptyToNull)
   @IsString()
+  @MaxLength(60)
   @IsOptional()
-  bankName?: string;
+  bankName?: string | null;
 
-  @IsString()
+  @Transform(emptyToNull)
+  @Matches(/^\d{5,30}$/, { message: 'Nomor rekening 5-30 digit angka' })
   @IsOptional()
-  bankAccountNumber?: string;
+  bankAccountNumber?: string | null;
 
+  @Transform(emptyToNull)
   @IsString()
+  @MaxLength(100)
   @IsOptional()
-  bankAccountHolder?: string;
+  bankAccountHolder?: string | null;
 }
 
 export class UpdateEmployeeDto {
@@ -139,20 +160,44 @@ export class UpdateEmployeeDto {
   @IsOptional()
   role?: UserRole;
 
+  // Data pribadi; teks kosong = dikosongkan
+  @Transform(emptyToNull)
+  @Matches(DATE_PREFIX, { message: 'Tanggal lahir harus berformat YYYY-MM-DD' })
+  @IsOptional()
+  birthDate?: string | null;
+
+  @Transform(emptyToNull)
+  @IsIn(GENDERS, { message: 'Jenis kelamin: Laki-laki atau Perempuan' })
+  @IsOptional()
+  gender?: string | null;
+
+  @Transform(emptyToNull)
+  @IsString()
+  @MaxLength(300)
+  @IsOptional()
+  address?: string | null;
+
+  @Transform(emptyToNull)
+  @IsEmail({}, { message: 'Format email tidak valid' })
+  @IsOptional()
+  email?: string | null;
+
+  @Transform(emptyToNull)
   @IsString()
   @MaxLength(60)
   @IsOptional()
-  bankName?: string;
+  bankName?: string | null;
 
-  @IsString()
-  @MaxLength(40)
+  @Transform(emptyToNull)
+  @Matches(/^\d{5,30}$/, { message: 'Nomor rekening 5-30 digit angka' })
   @IsOptional()
-  bankAccountNumber?: string;
+  bankAccountNumber?: string | null;
 
+  @Transform(emptyToNull)
   @IsString()
   @MaxLength(100)
   @IsOptional()
-  bankAccountHolder?: string;
+  bankAccountHolder?: string | null;
 }
 
 /** Satu baris Excel impor karyawan; semua teks, diperiksa di service. */
@@ -167,6 +212,13 @@ export class ImportEmployeeRow {
   @IsString() @IsOptional() status?: string;
   @IsString() @IsOptional() username?: string;
   @IsString() @IsOptional() password?: string;
+  @IsString() @IsOptional() birthDate?: string;
+  @IsString() @IsOptional() gender?: string;
+  @IsString() @IsOptional() address?: string;
+  @IsString() @IsOptional() email?: string;
+  @IsString() @IsOptional() bankName?: string;
+  @IsString() @IsOptional() bankAccountNumber?: string;
+  @IsString() @IsOptional() bankAccountHolder?: string;
   /** Nomor baris di Excel, agar laporan kesalahan menunjuk baris yang benar */
   @IsInt() @Min(2) @IsOptional() excelRow?: number;
 }

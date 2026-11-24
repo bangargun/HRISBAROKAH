@@ -28,8 +28,14 @@ export interface EmployeeRecord {
   joinDate: string;
   outletId: string;
   positionId: string;
+  birthDate: string | null;
+  gender: string | null;
+  address: string | null;
+  bankName: string | null;
+  bankAccountNumber: string | null;
+  bankAccountHolder: string | null;
   hasAttendancePin?: boolean;
-  user: { id: string; username: string; role: string; isActive: boolean };
+  user: { id: string; username: string; email: string | null; role: string; isActive: boolean };
   outlet: { id: string; name: string };
   position: { id: string; title: string; department: { name: string } };
 }
@@ -84,6 +90,13 @@ export default function EmployeeDialog({
     role: employee?.user.role ?? 'EMPLOYEE',
     status: employee?.status ?? 'PROBATION',
     joinDate: employee ? employee.joinDate.slice(0, 10) : localToday(),
+    birthDate: employee?.birthDate?.slice(0, 10) ?? '',
+    gender: employee?.gender ?? '',
+    address: employee?.address ?? '',
+    email: employee?.user.email ?? '',
+    bankName: employee?.bankName ?? '',
+    bankAccountNumber: employee?.bankAccountNumber ?? '',
+    bankAccountHolder: employee?.bankAccountHolder ?? '',
     username: '',
     password: '',
   });
@@ -107,7 +120,7 @@ export default function EmployeeDialog({
       });
   }, [employee]);
 
-  const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+  const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm({ ...form, [key]: e.target.value });
 
   async function submit(e: React.FormEvent) {
@@ -170,6 +183,51 @@ export default function EmployeeDialog({
               <label className="block space-y-1">
                 <span className="font-medium text-slate-700">Nomor HP</span>
                 <input required maxLength={20} inputMode="tel" value={form.phone} onChange={set('phone')} placeholder="0812…" className={field} />
+              </label>
+            </div>
+          </div>
+
+          <div className="space-y-3 border-t border-slate-100 pt-4">
+            <p className={heading}>Data pribadi</p>
+            <p className="text-xs text-slate-500">Boleh dikosongkan; kru bisa melengkapinya sendiri dari aplikasi HP.</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block space-y-1">
+                <span className="font-medium text-slate-700">Tanggal lahir</span>
+                <input type="date" value={form.birthDate} onChange={set('birthDate')} className={field} />
+              </label>
+              <label className="block space-y-1">
+                <span className="font-medium text-slate-700">Jenis kelamin</span>
+                <select value={form.gender} onChange={set('gender')} className={field}>
+                  <option value="">Belum diisi</option>
+                  <option value="Laki-laki">Laki-laki</option>
+                  <option value="Perempuan">Perempuan</option>
+                </select>
+              </label>
+              <label className="block space-y-1 sm:col-span-2">
+                <span className="font-medium text-slate-700">Alamat</span>
+                <textarea rows={2} maxLength={300} value={form.address} onChange={set('address')} className={field} />
+              </label>
+              <label className="block space-y-1 sm:col-span-2">
+                <span className="font-medium text-slate-700">Email</span>
+                <input type="email" value={form.email} onChange={set('email')} autoComplete="off" className={field} />
+              </label>
+            </div>
+          </div>
+
+          <div className="space-y-3 border-t border-slate-100 pt-4">
+            <p className={heading}>Rekening gaji</p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <label className="block space-y-1">
+                <span className="font-medium text-slate-700">Nama bank</span>
+                <input maxLength={60} value={form.bankName} onChange={set('bankName')} placeholder="BCA, BRI, Mandiri…" className={field} />
+              </label>
+              <label className="block space-y-1">
+                <span className="font-medium text-slate-700">Nomor rekening</span>
+                <input inputMode="numeric" pattern="[0-9]{5,30}" title="5-30 digit angka" value={form.bankAccountNumber} onChange={set('bankAccountNumber')} className={`${field} font-mono`} />
+              </label>
+              <label className="block space-y-1">
+                <span className="font-medium text-slate-700">Nama pemilik</span>
+                <input maxLength={100} value={form.bankAccountHolder} onChange={set('bankAccountHolder')} className={field} />
               </label>
             </div>
           </div>
