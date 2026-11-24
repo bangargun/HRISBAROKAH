@@ -253,6 +253,28 @@ class ApiService {
     }
   }
 
+  // Data diri sendiri: data pribadi langsung tersimpan, rekening baru menunggu HR
+  static Future<Map<String, dynamic>> _profileCall(String method, String path, [Map<String, dynamic>? body]) async {
+    final url = Uri.parse('$baseUrl/me/profile$path');
+    final headers = await _headers();
+    final encoded = body == null ? null : jsonEncode(body);
+    final response = switch (method) {
+      'PUT' => await http.put(url, headers: headers, body: encoded),
+      'POST' => await http.post(url, headers: headers, body: encoded),
+      'DELETE' => await http.delete(url, headers: headers),
+      _ => await http.get(url, headers: headers),
+    };
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200 || response.statusCode == 201) return data as Map<String, dynamic>;
+    throw Exception(_errorMessage(data, method == 'GET' ? 'Gagal memuat data diri' : 'Gagal menyimpan'));
+  }
+
+  static Future<Map<String, dynamic>> getMyProfile() => _profileCall('GET', '');
+  static Future<Map<String, dynamic>> updateMyProfile(Map<String, dynamic> body) => _profileCall('PUT', '', body);
+  static Future<Map<String, dynamic>> requestBankChange(Map<String, dynamic> body) =>
+      _profileCall('POST', '/bank-change', body);
+  static Future<Map<String, dynamic>> cancelBankChange() => _profileCall('DELETE', '/bank-change');
+
   // Data user yang login (disimpan saat login)
   static Future<Map<String, dynamic>?> getCurrentUser() async {
     final prefs = await SharedPreferences.getInstance();

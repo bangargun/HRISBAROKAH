@@ -12,6 +12,7 @@ import 'change_password_dialog.dart';
 import 'attendance_pin_dialog.dart';
 import 'login_screen.dart';
 import 'face_enrollment_screen.dart';
+import 'profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -35,6 +36,21 @@ class _HomeScreenState extends State<HomeScreen> {
     ApiService.getCurrentUser().then((user) {
       if (mounted) setState(() => _role = user?['role'] as String?);
     });
+    _askForMissingProfile();
+  }
+
+  /// Data diri belum lengkap (tanggal lahir, jenis kelamin, alamat): minta dilengkapi dulu.
+  Future<void> _askForMissingProfile() async {
+    try {
+      final profile = await ApiService.getMyProfile();
+      if (!mounted || profile['needsCompletion'] != true) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(fullscreenDialog: true, builder: (_) => const ProfileScreen(firstTime: true)),
+      );
+    } catch (_) {
+      // Akun tanpa data karyawan atau sedang offline: tidak menghalangi beranda
+    }
   }
 
   @override
@@ -318,6 +334,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const RequestsScreen(initialTab: 1)),
+                          ),
+                        ),
+                        _quickMenuCard(
+                          icon: Icons.badge_rounded,
+                          title: 'Data Diri',
+                          color: Colors.blueGrey,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const ProfileScreen()),
                           ),
                         ),
                         _quickMenuCard(

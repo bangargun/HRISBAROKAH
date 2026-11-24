@@ -13,6 +13,7 @@ import AppShell from '@/components/AppShell';
 import DashboardHome from '@/components/DashboardHome';
 import EmployeeDialog from '@/components/EmployeeDialog';
 import EmployeeListModule from '@/components/EmployeeListModule';
+import BankChangesModule from '@/components/BankChangesModule';
 import CorrectionsModule from '@/components/CorrectionsModule';
 import DailyAttendanceModule from '@/components/DailyAttendanceModule';
 import AttendanceReviewModule from '@/components/AttendanceReviewModule';
@@ -181,6 +182,19 @@ export default function AdminDashboard() {
   useEffect(() => {
     refreshReviewCount();
   }, [refreshReviewCount]);
+
+  // Pengajuan rekening gaji dari aplikasi kru yang menunggu HR
+  const canReviewBank = ['SUPER_ADMIN', 'HR_ADMIN'].includes(getSessionUser()?.role ?? '');
+  const [bankChangeCount, setBankChangeCount] = useState(0);
+  const refreshBankChangeCount = useCallback(() => {
+    if (!['SUPER_ADMIN', 'HR_ADMIN'].includes(getSessionUser()?.role ?? '')) return;
+    apiFetch<unknown[]>('/bank-changes?status=PENDING')
+      .then((list) => setBankChangeCount(Array.isArray(list) ? list.length : 0))
+      .catch(() => setBankChangeCount(0));
+  }, []);
+  useEffect(() => {
+    refreshBankChangeCount();
+  }, [refreshBankChangeCount]);
 
   // States: Artikel Kepemimpinan (Leader Hub) & Kuis 10 Soal
 
@@ -1329,6 +1343,7 @@ export default function AdminDashboard() {
       icon: Users,
       subTabs: [
         { id: 'employee-list', label: 'Daftar Karyawan' },
+        ...(canReviewBank ? [{ id: 'bank-changes', label: 'Perubahan Rekening', badge: bankChangeCount }] : []),
         { id: 'resignation-exit', label: 'Karyawan Keluar' },
       ],
     },
@@ -2320,7 +2335,15 @@ export default function AdminDashboard() {
           {/* TAB: DATA KARYAWAN RESTO (MASTER SDM BAROKAH GRUP)        */}
           {/* ========================================================= */}
           {activeMenu === 'employees' && (
-            activeSubTab === 'resignation-exit' ? (
+            activeSubTab === 'bank-changes' && canReviewBank ? (
+              <BankChangesModule
+                showToast={showToast}
+                onChanged={() => {
+                  refreshBankChangeCount();
+                  setEmployeeListKey((k) => k + 1);
+                }}
+              />
+            ) : activeSubTab === 'resignation-exit' ? (
               <ExitsModule
                 showToast={showToast}
                 onChanged={() => {

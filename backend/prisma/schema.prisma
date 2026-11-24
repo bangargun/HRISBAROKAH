@@ -185,6 +185,7 @@ model User {
   trainingModulesCreated  TrainingModule[]          @relation("TrainingModuleCreatedBy")
   weeklyQuizzesCreated    WeeklyQuiz[]              @relation("WeeklyQuizCreatedBy")
   trainingSessionsCreated TrainingSession[]         @relation("TrainingSessionCreatedBy")
+  bankChangesReviewed     BankAccountChange[]       @relation("BankChangeReviewedBy")
 }
 
 model EmployeeProfile {
@@ -245,6 +246,7 @@ model EmployeeProfile {
   trainingResults    TrainingResult[]
   weeklyQuizAttempts WeeklyQuizAttempt[]
   trainingSessions   TrainingSessionParticipant[]
+  bankChanges        BankAccountChange[]
 }
 
 // -------------------------------------------------------------
@@ -1204,4 +1206,38 @@ model TrainingSessionParticipant {
   attended   Boolean?
 
   @@unique([sessionId, employeeId])
+}
+
+// ==========================================
+// PERUBAHAN REKENING GAJI DARI APLIKASI KRU
+// ==========================================
+
+enum BankChangeStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+/// Kru mengajukan rekening baru dari HP; rekening lama tetap dipakai sampai HR menyetujui.
+model BankAccountChange {
+  id         String          @id @default(uuid())
+  employeeId String
+  employee   EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  bankName          String
+  bankAccountNumber String
+  bankAccountHolder String
+
+  status       BankChangeStatus @default(PENDING)
+  // Alasan penolakan dari HR
+  note         String?
+  reviewedById String?
+  reviewedBy   User?            @relation("BankChangeReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([employeeId])
 }
