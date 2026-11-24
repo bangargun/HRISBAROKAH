@@ -107,7 +107,7 @@ export default function LoginPage() {
           </form>
 
           <p className="mt-6 text-center text-xs text-slate-400">
-            Kru outlet absen dan mengajukan izin lewat aplikasi HP.
+            Kru absen dan mengajukan libur lewat tablet cabang; rekap dan slip gaji ada di aplikasi HP.
             <br />
             Lupa password? Hubungi HR pusat.
           </p>

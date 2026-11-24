@@ -134,17 +134,10 @@ checks.push(['endpoint admin butuh login', async (ctx) => {
   assert.equal((await http('GET', `/outlets/${ctx.outlet.id}/devices`)).status, 401);
 }]);
 
-checks.push(['attendanceMode bisa diubah lewat update outlet', async (ctx) => {
-  const bad = await http('PUT', `/outlets/${ctx.outlet.id}`, { token: ctx.admin, body: { attendanceMode: 'FAX' } });
-  assert.equal(bad.status, 400);
-  const ok = await http('PUT', `/outlets/${ctx.outlet.id}`, { token: ctx.admin, body: { attendanceMode: 'TABLET' } });
-  assert.equal(ok.status, 200);
-  assert.equal(ok.body.attendanceMode, 'TABLET');
-  assert.equal(sql(`select "attendanceMode" from "Outlet" where id='${ctx.outlet.id}'`), 'TABLET', 'tersimpan di DB');
-  const back = await http('GET', `/outlets/${ctx.outlet.id}`, { token: ctx.admin });
-  assert.equal(back.body.attendanceMode, 'TABLET');
+checks.push(['outlet: mode absen tidak bisa diatur lagi (field tidak dikenal ditolak)', async (ctx) => {
+  const r = await http('PUT', `/outlets/${ctx.outlet.id}`, { token: ctx.admin, body: { attendanceMode: 'MOBILE' } });
+  assert.equal(r.status, 400);
 }]);
-
 checks.push(['dua POST /kiosk/pair serentak dengan kode sama -> tepat satu berhasil', async (ctx) => {
   const p = await http('POST', `/outlets/${ctx.outlet.id}/devices/pairing`, { token: ctx.admin, body: { deviceName: 'Tablet Balap' } });
   const rs = await Promise.all([1, 2, 3].map(() => http('POST', '/kiosk/pair', { body: { code: p.body.code }, headers: freshIp() })));
@@ -653,27 +646,20 @@ checks.push(['events: foto tidak bisa dibaca (kesalahan event, deterministik) ->
   assert.deepEqual((await postEvents(dev.token, [e])).body, r.body);
 }]);
 
-checks.push(['regresi: absen HP (clock-in mobile) tetap berjalan', async (ctx) => {
-  const out = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}MB`);
-  const crew = await enrolledCrew(ctx.admin, out.id, 'Wajah HP');
+checks.push(['HP: semua rute absen HP ditutup (410), status hari ini tetap bisa dibaca', async (ctx) => {
+  const crew = await createCrew(ctx.admin, ctx.outlet.id);
   const token = await login(crew.username, crew.password);
-  const r = await http('POST', '/attendance/clock-in', { token, body: { photoBase64: FACE_A } });
-  assert.equal(r.status, 201, JSON.stringify(r.body));
-  assert.equal(r.body.source, 'MOBILE');
-  assert.ok(r.body.clockInFaceScore >= 0.5);
-  const again = await http('POST', '/attendance/clock-in', { token, body: { photoBase64: FACE_A } });
-  assert.equal(again.status, 400);
-  const other = await createCrew(ctx.admin, out.id, 'EMPLOYEE', 'Belum Daftar');
-  const r2 = await http('POST', '/attendance/clock-in', { token: await login(other.username, other.password), body: { photoBase64: FACE_A } });
-  assert.equal(r2.status, 400);
-  assert.match(r2.body.message, /belum didaftarkan/);
-  const wrong = await enrolledCrew(ctx.admin, out.id, 'Wajah HP2');
-  const r3 = await http('POST', '/attendance/clock-in', { token: await login(wrong.username, wrong.password), body: { photoBase64: FACE_B } });
-  assert.equal(r3.status, 400);
-  assert.match(r3.body.message, /Absen ditolak: Wajah tidak cocok/);
-  assert.equal(sql(`select accepted from "FaceCheckLog" where "employeeId"='${wrong.id}'`), 'f');
+  for (const path of ['/attendance/clock-in', '/attendance/clock-out', '/attendance/break/start', '/attendance/break/end']) {
+    const r = await http('POST', path, { token, body: { photoBase64: FACE_A } });
+    assert.equal(r.status, 410, path);
+    assert.equal(r.body.message, 'Absen hanya lewat tablet cabang');
+  }
+  assert.equal(sql(`select count(*) from "Attendance" where "employeeId"='${crew.id}'`), '0');
+  const today = await http('GET', '/attendance/today', { token });
+  assert.equal(today.status, 200);
+  assert.equal(today.body.attendanceMode, undefined);
+  assert.ok(today.body.workingOutletName);
 }]);
-
 // ---------- tinjauan absen meragukan ----------
 async function smOf(ctx, outletId) {
   const sm = await createCrew(ctx.admin, outletId, 'STORE_MANAGER', 'SM Tinjau');
@@ -818,54 +804,6 @@ checks.push(['tinjau: reject BREAK_END -> istirahat dihapus; reject CLOCK_OUT ->
 }]);
 
 // ---------- Task 6: blokir absen HP di cabang tablet, PIN absen ----------
-const setMode = (outletId, mode) => sql(`update "Outlet" set "attendanceMode"='${mode}' where id='${outletId}'`);
-
-checks.push(['HP: cabang tablet -> clock-in/out/istirahat 400 "Absen di tablet cabang"; today memuat mode; ditugaskan ke cabang HP -> boleh', async (ctx) => {
-  const sfx = Date.now().toString(36).toUpperCase();
-  const out1 = await createOutlet(ctx.admin, `${sfx}P1`);
-  const out2 = await createOutlet(ctx.admin, `${sfx}P2`);
-  setMode(out1.id, 'TABLET');
-  setMode(out2.id, 'MOBILE');
-  try {
-    const crew = await enrolledCrew(ctx.admin, out1.id, 'Wajah Blokir HP');
-    const token = await login(crew.username, crew.password);
-    const today = await http('GET', '/attendance/today', { token });
-    assert.equal(today.status, 200);
-    assert.equal(today.body.attendanceMode, 'TABLET');
-    assert.equal(today.body.workingOutletName, out1.name);
-    for (const [path, body] of [
-      ['/attendance/clock-in', { photoBase64: FACE_A }],
-      ['/attendance/clock-out', { photoBase64: FACE_A }],
-      ['/attendance/break/start', undefined],
-      ['/attendance/break/end', undefined],
-    ]) {
-      const r = await http('POST', path, { token, body });
-      assert.equal(r.status, 400, `${path}: ${JSON.stringify(r.body)}`);
-      assert.equal(r.body.message, 'Absen di tablet cabang', path);
-    }
-    assert.equal(sql(`select count(*) from "Attendance" where "employeeId"='${crew.id}'`), '0');
-
-    // ditugaskan hari ini ke cabang mode HP -> absen HP jalan
-    const sc = await schedule(ctx.admin, [{ employeeId: crew.id, date: jakartaYmd(0), working: true, outletId: out2.id }]);
-    assert.equal(sc.status, 200, JSON.stringify(sc.body));
-    const t2 = await http('GET', '/attendance/today', { token });
-    assert.equal(t2.body.attendanceMode, 'MOBILE');
-    assert.equal(t2.body.workingOutletName, out2.name);
-    const ok = await http('POST', '/attendance/clock-in', { token, body: { photoBase64: FACE_A } });
-    assert.equal(ok.status, 201, JSON.stringify(ok.body));
-    assert.equal(ok.body.source, 'MOBILE');
-
-    // kebalikan: kru cabang HP ditugaskan ke cabang tablet -> diblokir
-    const crew2 = await enrolledCrew(ctx.admin, out2.id, 'Wajah Tugas Tablet');
-    const token2 = await login(crew2.username, crew2.password);
-    await schedule(ctx.admin, [{ employeeId: crew2.id, date: jakartaYmd(0), working: true, outletId: out1.id }]);
-    const blocked = await http('POST', '/attendance/clock-in', { token: token2, body: { photoBase64: FACE_A } });
-    assert.equal(blocked.status, 400);
-    assert.equal(blocked.body.message, 'Absen di tablet cabang');
-  } finally {
-    setMode(out1.id, 'MOBILE');
-  }
-}]);
 
 checks.push(['PIN absen: kru atur sendiri (password salah 400, benar 200, format 6 digit); HR atur; hash tak bocor; PIN dipakai di tablet', async (ctx) => {
   const { out, dev } = await tabletOutlet(ctx, 'N1');
@@ -996,23 +934,6 @@ checks.push(['jam: clockSuspect dari tablet dan waktu efektif > 2 menit di depan
   const near = ev(crew.id, 'BREAK_END', { at: Date.now() + 60_000 });
   await postEvents(dev.token, [near]);
   assert.ok(!hasFlag(near.id, 'CLOCK_CHANGED'), '1 menit di depan masih wajar');
-}]);
-
-checks.push(['outlet: hanya Super Admin / HR boleh mengubah attendanceMode; Area Manager 403, field lain tetap boleh', async (ctx) => {
-  const out = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}AM`);
-  const am = await createCrew(ctx.admin, out.id, 'AREA_MANAGER', 'AM Mode');
-  const amToken = await login(am.username, am.password);
-  const denied = await http('PUT', `/outlets/${out.id}`, { token: amToken, body: { attendanceMode: 'TABLET' } });
-  assert.equal(denied.status, 403, JSON.stringify(denied.body));
-  assert.equal(denied.body.message, 'Hanya Super Admin atau HR yang bisa mengubah mode absen cabang');
-  assert.equal(sql(`select "attendanceMode" from "Outlet" where id='${out.id}'`), 'MOBILE');
-  // formulir mengirim ulang mode yang sama: bukan perubahan
-  const same = await http('PUT', `/outlets/${out.id}`, { token: amToken, body: { attendanceMode: 'MOBILE', breakLimitMins: 45 } });
-  assert.equal(same.status, 200, JSON.stringify(same.body));
-  const hr = await createCrew(ctx.admin, out.id, 'HR_ADMIN', 'HR Mode');
-  const ok = await http('PUT', `/outlets/${out.id}`, { token: await login(hr.username, hr.password), body: { attendanceMode: 'TABLET' } });
-  assert.equal(ok.status, 200);
-  assert.equal(sql(`select "attendanceMode" from "Outlet" where id='${out.id}'`), 'TABLET');
 }]);
 
 checks.push(['bootstrap ?pending=N tersimpan di perangkat (pendingCount + waktu) dan tampil di daftar tablet; nilai ngawur diabaikan', async (ctx) => {

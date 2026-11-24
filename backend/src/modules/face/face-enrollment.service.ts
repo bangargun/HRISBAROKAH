@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { FaceCheckKind, UserRole } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 import { AuthUser, assertOutletAccess, scopedOutletId } from '../../common/utils/outlet-scope.util';
 import { businessDateString, businessDayRange, parseDateParam } from '../../common/utils/business-date.util';
 import { rm } from 'fs/promises';
@@ -8,7 +8,6 @@ import { PrismaService } from '../../prisma/prisma.service';
 import {
   PRIVATE_STORAGE_ROOT,
   decodePhoto,
-  saveAttendancePhoto,
   saveFaceReferencePhoto,
 } from '../../common/utils/attendance-photo.util';
 import { FaceRecognitionService } from './face-recognition.service';
@@ -16,11 +15,6 @@ import { EnrollFaceDto } from './face.dto';
 
 // Peran admin bukan kru lapangan (sama dengan roster tablet)
 const ADMIN_ROLES: UserRole[] = [UserRole.SUPER_ADMIN, UserRole.HR_ADMIN, UserRole.FINANCE_ADMIN];
-
-export interface FaceVerification {
-  photoUrl: string;
-  score: number;
-}
 
 @Injectable()
 export class FaceEnrollmentService {
@@ -189,37 +183,6 @@ export class FaceEnrollmentService {
       }
     }
     return best;
-  }
-
-  /**
-   * Cocokkan selfie absen dengan wajah terdaftar. Setiap percobaan dicatat di FaceCheckLog,
-   * termasuk yang ditolak, agar HR bisa memeriksa dugaan titip absen.
-   */
-  async verifyForAttendance(employeeId: string, photoBase64: string, kind: FaceCheckKind): Promise<FaceVerification> {
-    const photo = decodePhoto(photoBase64);
-    const { score, enrolled, reason } = await this.scoreAgainst(employeeId, photo.buffer);
-    if (!enrolled) {
-      throw new BadRequestException(
-        'Wajah Anda belum didaftarkan. Minta HR atau Store Manager mendaftarkan wajah Anda.',
-      );
-    }
-    const photoUrl = await saveAttendancePhoto(photo);
-
-    await this.prisma.faceCheckLog.create({
-      data: {
-        employeeId,
-        kind,
-        score,
-        accepted: reason === null,
-        reason,
-        photoUrl,
-      },
-    });
-
-    if (reason !== null) {
-      throw new BadRequestException(`Absen ditolak: ${reason}.`);
-    }
-    return { photoUrl, score: score! };
   }
 
   async getCheckLogs(actor: AuthUser, outletId?: string, dateStr?: string, onlyRejected?: boolean) {

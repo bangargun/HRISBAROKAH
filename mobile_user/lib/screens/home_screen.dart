@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import '../services/api_service.dart';
 import 'kasbon_screen.dart';
@@ -11,7 +10,6 @@ import 'survey360_screen.dart';
 import 'change_password_dialog.dart';
 import 'attendance_pin_dialog.dart';
 import 'login_screen.dart';
-import 'face_camera_screen.dart';
 import 'face_enrollment_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -74,157 +72,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Lokasi hanya dicatat sebagai info, absen tetap jalan tanpa GPS
-  Future<Position?> _tryGetPosition() async {
-    try {
-      if (!await Geolocator.isLocationServiceEnabled()) return null;
-      var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        return null;
-      }
-      return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      ).timeout(const Duration(seconds: 10));
-    } catch (_) {
-      return null;
-    }
-  }
-
-  Future<void> _handleClockIn() async {
-    try {
-      setState(() => _isLoading = true);
-      final photo = await FaceCameraScreen.capture(context, title: 'Selfie Absen Masuk');
-      if (photo == null) return;
-      final pos = await _tryGetPosition();
-
-      await ApiService.clockIn(
-        lat: pos?.latitude,
-        lng: pos?.longitude,
-        photoBase64: photo,
-      );
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Berhasil Clock In!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        _loadTodayAttendance();
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _handleClockOut() async {
-    try {
-      setState(() => _isLoading = true);
-      final photo = await FaceCameraScreen.capture(context, title: 'Selfie Absen Pulang');
-      if (photo == null) return;
-      final pos = await _tryGetPosition();
-
-      await ApiService.clockOut(
-        lat: pos?.latitude,
-        lng: pos?.longitude,
-        photoBase64: photo,
-      );
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Berhasil Clock Out! Terima kasih!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        _loadTodayAttendance();
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _handleStartBreak() async {
-    try {
-      setState(() => _isLoading = true);
-      await ApiService.startBreak();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Sesi istirahat dimulai. Maksimal 60 menit!'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-        _loadTodayAttendance();
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _handleEndBreak() async {
-    try {
-      setState(() => _isLoading = true);
-      final res = await ApiService.endBreak();
-      if (mounted) {
-        final isOver = res['isOverLimit'] == true;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              isOver
-                ? 'Istirahat selesai! Peringatan: Melebihi batas (${res['totalMinutes']} menit)'
-                : 'Istirahat selesai (${res['totalMinutes']} menit). Selamat kembali bertugas!',
-            ),
-            backgroundColor: isOver ? Colors.deepOrange : Colors.green,
-          ),
-        );
-        _loadTodayAttendance();
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
   Widget _tabletNotice(String outletName) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -252,8 +99,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final outlet = _attendanceData?['outlet'];
     final att = _attendanceData?['attendance'];
-    final isOnBreak = _attendanceData?['isOnBreak'] == true;
-    final isTablet = _attendanceData?['attendanceMode'] == 'TABLET';
     final outletName = (_attendanceData?['workingOutletName'] ?? outlet?['name'] ?? '').toString();
 
     final hasClockedIn = att != null && att['clockInTime'] != null;
@@ -413,123 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    if (isTablet)
-                      _tabletNotice(outletName)
-                    else ...[
-                    // Tombol Presensi
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            icon: const Icon(Icons.login),
-                            label: const Text('Clock In'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.teal,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                            onPressed: (hasClockedIn || _isLoading) ? null : _handleClockIn,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            icon: const Icon(Icons.logout),
-                            label: const Text('Clock Out'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepOrange,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                            onPressed: (!hasClockedIn || hasClockedOut || _isLoading) ? null : _handleClockOut,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Modul Istirahat (Break Tracker) Card
-                    Card(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      color: isOnBreak ? Colors.amber.shade50 : Colors.white,
-                      elevation: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.coffee_rounded,
-                                  color: isOnBreak ? Colors.amber.shade900 : Colors.brown,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Jadwal Istirahat Kerja',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: isOnBreak ? Colors.amber.shade900 : Colors.black87,
-                                  ),
-                                ),
-                                const Spacer(),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: isOnBreak ? Colors.amber.shade200 : Colors.grey.shade100,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    isOnBreak ? 'Sedang Istirahat' : 'Aktif Bekerja',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: isOnBreak ? Colors.amber.shade900 : Colors.grey.shade700,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              isOnBreak
-                                  ? 'Harap kembali bekerja sebelum 60 menit berakhir agar tidak tercatat over-break.'
-                                  : 'Gunakan fitur ini saat pergantian shift makan siang atau jeda sore.',
-                              style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
-                            ),
-                            const SizedBox(height: 14),
-                            SizedBox(
-                              width: double.infinity,
-                              child: isOnBreak
-                                  ? ElevatedButton.icon(
-                                      icon: const Icon(Icons.check_circle_outline),
-                                      label: const Text('Selesai Istirahat & Kembali Bekerja'),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.amber.shade800,
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(vertical: 12),
-                                      ),
-                                      onPressed: _isLoading ? null : _handleEndBreak,
-                                    )
-                                  : OutlinedButton.icon(
-                                      icon: const Icon(Icons.coffee),
-                                      label: const Text('Mulai Waktu Istirahat'),
-                                      style: OutlinedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(vertical: 12),
-                                      ),
-                                      onPressed: (!hasClockedIn || hasClockedOut || _isLoading)
-                                          ? null
-                                          : _handleStartBreak,
-                                    ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    ],
+                    _tabletNotice(outletName),
                     const SizedBox(height: 20),
 
                     // Quick Action Menu F&B

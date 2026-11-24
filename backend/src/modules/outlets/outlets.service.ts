@@ -76,15 +76,6 @@ export class OutletsService {
     if (dto.isActive !== undefined && actor.role !== UserRole.SUPER_ADMIN && actor.role !== UserRole.HR_ADMIN) {
       throw new ForbiddenException('Hanya Super Admin atau HR yang bisa mengaktifkan atau menonaktifkan cabang');
     }
-    // Mode absen (HP / tablet) menentukan cara seluruh kru cabang absen: hanya Super Admin dan HR
-    if (
-      dto.attendanceMode !== undefined &&
-      dto.attendanceMode !== current.attendanceMode &&
-      actor.role !== UserRole.SUPER_ADMIN &&
-      actor.role !== UserRole.HR_ADMIN
-    ) {
-      throw new ForbiddenException('Hanya Super Admin atau HR yang bisa mengubah mode absen cabang');
-    }
     if (dto.isActive === false) await this.assertNoActiveStaff(id);
     return this.prisma.outlet.update({
       where: { id },

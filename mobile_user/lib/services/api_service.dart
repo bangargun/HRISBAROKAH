@@ -71,83 +71,9 @@ class ApiService {
   }
 
   // Attendance: Clock-In
-  static Future<Map<String, dynamic>> clockIn({
-    double? lat,
-    double? lng,
-    required String photoBase64,
-    String? notes,
-  }) async {
-    final url = Uri.parse('$baseUrl/attendance/clock-in');
-    final response = await http.post(
-      url,
-      headers: await _headers(),
-      body: jsonEncode({
-        'latitude': ?lat,
-        'longitude': ?lng,
-        'photoBase64': photoBase64,
-        'notes': ?notes,
-      }),
-    );
-
-    final data = jsonDecode(response.body);
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return data;
-    } else {
-      throw Exception(_errorMessage(data, 'Gagal Clock-In'));
-    }
-  }
-
   // Attendance: Clock-Out
-  static Future<Map<String, dynamic>> clockOut({
-    double? lat,
-    double? lng,
-    required String photoBase64,
-    String? notes,
-  }) async {
-    final url = Uri.parse('$baseUrl/attendance/clock-out');
-    final response = await http.post(
-      url,
-      headers: await _headers(),
-      body: jsonEncode({
-        'latitude': ?lat,
-        'longitude': ?lng,
-        'photoBase64': photoBase64,
-        'notes': ?notes,
-      }),
-    );
-
-    final data = jsonDecode(response.body);
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return data;
-    } else {
-      throw Exception(_errorMessage(data, 'Gagal Clock-Out'));
-    }
-  }
-
   // Attendance Break: Mulai Istirahat
-  static Future<Map<String, dynamic>> startBreak() async {
-    final url = Uri.parse('$baseUrl/attendance/break/start');
-    final response = await http.post(url, headers: await _headers());
-    final data = jsonDecode(response.body);
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return data;
-    } else {
-      throw Exception(data['message'] ?? 'Gagal memulai istirahat');
-    }
-  }
-
   // Attendance Break: Selesai Istirahat
-  static Future<Map<String, dynamic>> endBreak() async {
-    final url = Uri.parse('$baseUrl/attendance/break/end');
-    final response = await http.post(url, headers: await _headers());
-    final data = jsonDecode(response.body);
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return data;
-    } else {
-      throw Exception(data['message'] ?? 'Gagal mengakhiri istirahat');
-    }
-  }
-
   // Requests: Ajukan Kasbon
   static Future<Map<String, dynamic>> submitKasbon({
     required double amount,

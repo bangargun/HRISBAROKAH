@@ -109,6 +109,7 @@ model Outlet {
   holidayClose     String?
   breakLimitMins   Int            @default(60)
   // Cara absen kru di cabang ini: HP masing-masing atau tablet bersama
+  // Tidak dipakai lagi sejak absen HP ditutup (semua cabang absen lewat tablet); dibiarkan agar data lama aman
   attendanceMode   AttendanceMode @default(MOBILE)
 
   isActive  Boolean  @default(true)

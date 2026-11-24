@@ -1,6 +1,5 @@
-import { Controller, Post, Get, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, GoneException, Query, UseGuards } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
-import { ClockInDto, ClockOutDto } from './attendance.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -18,24 +17,13 @@ export class AttendanceController {
     return this.attendanceService.getTodayStatus(userId);
   }
 
-  @Post('clock-in')
-  async clockIn(@CurrentUser('id') userId: string, @Body() dto: ClockInDto) {
-    return this.attendanceService.clockIn(userId, dto);
-  }
-
-  @Post('clock-out')
-  async clockOut(@CurrentUser('id') userId: string, @Body() dto: ClockOutDto) {
-    return this.attendanceService.clockOut(userId, dto);
-  }
-
-  @Post('break/start')
-  async startBreak(@CurrentUser('id') userId: string) {
-    return this.attendanceService.startBreak(userId);
-  }
-
-  @Post('break/end')
-  async endBreak(@CurrentUser('id') userId: string) {
-    return this.attendanceService.endBreak(userId);
+  /**
+   * Absen dari HP sudah ditutup: absen hanya lewat tablet cabang. Rute lama tetap menjawab
+   * dengan pesan jelas supaya aplikasi HP versi lama tidak menampilkan galat yang membingungkan.
+   */
+  @Post(['clock-in', 'clock-out', 'break/start', 'break/end'])
+  phoneAttendanceClosed() {
+    throw new GoneException('Absen hanya lewat tablet cabang');
   }
 
   @Get('history')

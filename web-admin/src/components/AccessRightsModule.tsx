@@ -205,9 +205,8 @@ export default function AccessRightsModule({ tab }: { tab: 'matrix-roles' | 'use
         <ul className="list-disc space-y-1 pl-5">
           <li>Kepala Cabang hanya melihat dan mengubah data cabangnya sendiri.</li>
           <li>Hanya Super Admin yang boleh mengubah, menonaktifkan, atau mereset password akun admin lain.</li>
-          <li>Hanya Super Admin dan HR yang boleh mengganti mode absen cabang (HP atau tablet).</li>
           <li>Kru hanya melihat data miliknya sendiri: absen, slip gaji, pengajuan dan survei.</li>
-          <li>Di cabang yang memakai tablet, absen dari HP ditolak; absen hanya lewat tablet cabang.</li>
+          <li>Absen dari HP ditutup: absen masuk, istirahat dan pulang hanya lewat tablet cabang.</li>
           <li>Tablet cabang hanya bisa dipakai di cabang tempat ia dipasangkan, dan berhenti bekerja begitu dicabut.</li>
         </ul>
       </section>

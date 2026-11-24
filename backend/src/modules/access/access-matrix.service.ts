@@ -48,7 +48,7 @@ export class AccessMatrixService implements OnModuleInit {
     for (const wrapper of this.discovery.getControllers()) {
       const { instance, metatype } = wrapper;
       if (!instance || !metatype) continue;
-      const base = trimSlashes(this.reflector.get<string>(PATH_METADATA, metatype) ?? '');
+      const base = paths(this.reflector.get<string | string[]>(PATH_METADATA, metatype))[0];
       const classGuards: unknown[] = this.reflector.get(GUARDS_METADATA, metatype) ?? [];
       const proto = Object.getPrototypeOf(instance);
       const actions = byKey.get(base) ?? [];
@@ -56,16 +56,18 @@ export class AccessMatrixService implements OnModuleInit {
         const handler = proto[name];
         const methodCode = this.reflector.get<RequestMethod>(METHOD_METADATA, handler);
         if (methodCode === undefined) continue;
-        const sub = trimSlashes(this.reflector.get<string>(PATH_METADATA, handler) ?? '');
         const method = RequestMethod[methodCode];
         const guards = [...classGuards, ...(this.reflector.get<unknown[]>(GUARDS_METADATA, handler) ?? [])];
         const roles = this.reflector.getAllAndOverride<UserRole[]>(ROLES_KEY, [handler, metatype]);
-        actions.push({
-          method,
-          path: '/' + [base, sub].filter(Boolean).join('/'),
-          write: WRITE_METHODS.has(method),
-          rule: ruleFor(guards, roles),
-        });
+        // Satu handler bisa melayani beberapa path (@Post(['a', 'b']))
+        for (const sub of paths(this.reflector.get<string | string[]>(PATH_METADATA, handler))) {
+          actions.push({
+            method,
+            path: '/' + [base, sub].filter(Boolean).join('/'),
+            write: WRITE_METHODS.has(method),
+            rule: ruleFor(guards, roles),
+          });
+        }
       }
       byKey.set(base, actions);
     }
@@ -87,6 +89,8 @@ function ruleFor(guards: unknown[], roles: UserRole[] | undefined): AccessRule {
   return { kind: 'ROLES', roles: [...new Set([UserRole.SUPER_ADMIN, ...roles])] };
 }
 
-function trimSlashes(p: string) {
-  return p.replace(/^\/+|\/+$/g, '');
+/** Path metadata Nest bisa berupa string atau daftar string; hasilnya tanpa garis miring di tepi. */
+function paths(meta: string | string[] | undefined): string[] {
+  const list = Array.isArray(meta) ? meta : [meta ?? ''];
+  return list.map((p) => p.replace(/^\/+|\/+$/g, ''));
 }

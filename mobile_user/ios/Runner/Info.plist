@@ -6,8 +6,6 @@
 	<string>Kamera dipakai untuk foto selfie saat absen dan foto laporan harian cabang.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Galeri dipakai untuk memilih foto laporan harian cabang.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Lokasi dicatat saat absen sebagai informasi untuk HR.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
