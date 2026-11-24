@@ -23,7 +23,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       if (user) {
         setState('ok');
       } else {
-        router.replace('/login');
+        // Tautan dari notifikasi (/?menu=...) dibuka lagi setelah masuk
+        const next = window.location.pathname + window.location.search;
+        router.replace(next === '/' ? '/login' : `/login?next=${encodeURIComponent(next)}`);
       }
     } catch {
       setState('offline');

@@ -1463,11 +1463,14 @@ export default function AdminDashboard() {
     setActiveSubTab(menuConfig[menuId].subTabs[0].id);
   };
 
-  // Menu samping di halaman lain membuka /?menu=<id>
+  // Menu samping di halaman lain dan tautan notifikasi membuka /?menu=<id>[&tab=<sub-tab>]
   useEffect(() => {
-    const menu = new URLSearchParams(window.location.search).get('menu');
+    const params = new URLSearchParams(window.location.search);
+    const menu = params.get('menu');
     if (menu && menu in menuConfig) {
       handleMenuChange(menu as MainMenuId);
+      const tab = params.get('tab');
+      if (tab && menuConfig[menu as MainMenuId].subTabs.some((t) => t.id === tab)) setActiveSubTab(tab);
       window.history.replaceState(null, '', '/');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

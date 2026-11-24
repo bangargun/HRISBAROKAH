@@ -186,6 +186,8 @@ model User {
   weeklyQuizzesCreated    WeeklyQuiz[]              @relation("WeeklyQuizCreatedBy")
   trainingSessionsCreated TrainingSession[]         @relation("TrainingSessionCreatedBy")
   bankChangesReviewed     BankAccountChange[]       @relation("BankChangeReviewedBy")
+  telegramLink            TelegramLink?
+  telegramLinkCodes       TelegramLinkCode[]
 }
 
 model EmployeeProfile {
@@ -1240,4 +1242,34 @@ model BankAccountChange {
 
   @@index([status])
   @@index([employeeId])
+}
+
+// ==========================================
+// NOTIFIKASI TELEGRAM
+// ==========================================
+
+/// Chat Telegram yang menerima notifikasi untuk satu akun (dihubungkan lewat /start <kode>).
+model TelegramLink {
+  userId           String   @id
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chatId           String   @unique
+  telegramUsername String?
+  linkedAt         DateTime @default(now())
+}
+
+/// Kode sekali pakai di tautan t.me/<bot>?start=<kode>, berlaku 15 menit.
+model TelegramLinkCode {
+  code      String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+
+  @@index([userId])
+}
+
+/// Nilai kecil milik sistem, mis. tanggal ringkasan pagi terakhir dikirim.
+model AppState {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
 }

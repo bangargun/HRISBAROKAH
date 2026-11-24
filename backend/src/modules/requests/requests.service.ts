@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { CreateKasbonDto, CreateGeneralRequestDto, ApprovalActionDto } from './requests.dto';
 import { Prisma, RequestStatus, RequestType } from '@prisma/client';
 import { AuthUser, assertOutletAccess, scopedOutletId } from '../../common/utils/outlet-scope.util';
@@ -23,7 +24,10 @@ export const LEAVE_TYPES: RequestType[] = [RequestType.CUTI_TAHUNAN, RequestType
 
 @Injectable()
 export class RequestsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notifications: NotificationsService,
+  ) {}
 
   async createKasbon(userId: string, dto: CreateKasbonDto) {
     const profile = await this.prisma.employeeProfile.findUnique({
@@ -48,7 +52,7 @@ export class RequestsService {
     const tenor = dto.tenorMonths || 1;
     const monthly = dto.amount / tenor;
 
-    return this.prisma.$transaction(async (tx) => {
+    const created = await this.prisma.$transaction(async (tx) => {
       const request = await tx.employeeRequest.create({
         data: {
           employeeId: profile.id,
@@ -72,6 +76,8 @@ export class RequestsService {
 
       return { request, kasbon };
     });
+    this.notifications.fire(() => this.notifications.requestCreated(created.request.id));
+    return created;
   }
 
   async createGeneralRequest(userId: string, dto: CreateGeneralRequestDto) {
@@ -110,7 +116,7 @@ export class RequestsService {
       }
     }
 
-    return this.prisma.employeeRequest.create({
+    const request = await this.prisma.employeeRequest.create({
       data: {
         employeeId: profile.id,
         type: dto.type,
@@ -123,6 +129,8 @@ export class RequestsService {
         targetEmployeeId: dto.targetEmployeeId,
       },
     });
+    this.notifications.fire(() => this.notifications.requestCreated(request.id));
+    return request;
   }
 
   async getMyRequests(userId: string) {
@@ -174,12 +182,14 @@ export class RequestsService {
     this.requireRejectNote(dto);
 
     // Disetujui Store Manager -> lanjut ke HR/Finance
-    return this.transition(this.prisma, requestId, RequestStatus.PENDING_STORE_MANAGER, {
+    const updated = await this.transition(this.prisma, requestId, RequestStatus.PENDING_STORE_MANAGER, {
       status: dto.action === 'REJECT' ? RequestStatus.REJECTED : RequestStatus.PENDING_HR,
       managerNotes: dto.notes,
       approvedBySmId: reviewer.id,
       approvedAtSm: new Date(),
     });
+    this.notifications.fire(() => this.notifications.requestReviewed(requestId));
+    return updated;
   }
 
   async approveOrRejectByHr(requestId: string, hrUserId: string, dto: ApprovalActionDto) {
@@ -198,13 +208,15 @@ export class RequestsService {
     };
 
     if (dto.action === 'REJECT') {
-      return this.transition(this.prisma, requestId, RequestStatus.PENDING_HR, {
+      const rejected = await this.transition(this.prisma, requestId, RequestStatus.PENDING_HR, {
         status: RequestStatus.REJECTED,
         ...review,
       });
+      this.notifications.fire(() => this.notifications.requestReviewed(requestId));
+      return rejected;
     }
 
-    return this.prisma.$transaction(async (tx) => {
+    const approved = await this.prisma.$transaction(async (tx) => {
       // Status dikunci lebih dulu agar persetujuan ganda tidak memotong cuti dua kali
       const updated = await this.transition(tx, requestId, RequestStatus.PENDING_HR, {
         status: RequestStatus.APPROVED,
@@ -233,6 +245,8 @@ export class RequestsService {
 
       return updated;
     });
+    this.notifications.fire(() => this.notifications.requestReviewed(requestId));
+    return approved;
   }
 
   async disburseKasbon(requestId: string) {
@@ -254,6 +268,7 @@ export class RequestsService {
       });
     });
 
+    this.notifications.fire(() => this.notifications.requestReviewed(requestId));
     return { message: 'Dana kasbon berhasil dicairkan', disbursedAt: now };
   }
 

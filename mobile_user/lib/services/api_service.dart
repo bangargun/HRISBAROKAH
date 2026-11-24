@@ -275,6 +275,24 @@ class ApiService {
       _profileCall('POST', '/bank-change', body);
   static Future<Map<String, dynamic>> cancelBankChange() => _profileCall('DELETE', '/bank-change');
 
+  // Notifikasi Telegram akun sendiri
+  static Future<Map<String, dynamic>> _telegramCall(String method, [String path = '']) async {
+    final url = Uri.parse('$baseUrl/me/telegram$path');
+    final headers = await _headers();
+    final response = switch (method) {
+      'POST' => await http.post(url, headers: headers),
+      'DELETE' => await http.delete(url, headers: headers),
+      _ => await http.get(url, headers: headers),
+    };
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200 || response.statusCode == 201) return data as Map<String, dynamic>;
+    throw Exception(_errorMessage(data, 'Gagal menghubungi server'));
+  }
+
+  static Future<Map<String, dynamic>> getTelegramStatus() => _telegramCall('GET');
+  static Future<String?> createTelegramLink() async => (await _telegramCall('POST', '/link'))['url'] as String?;
+  static Future<Map<String, dynamic>> unlinkTelegram() => _telegramCall('DELETE');
+
   // Data user yang login (disimpan saat login)
   static Future<Map<String, dynamic>?> getCurrentUser() async {
     final prefs = await SharedPreferences.getInstance();

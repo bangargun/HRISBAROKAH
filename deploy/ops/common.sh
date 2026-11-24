@@ -1,7 +1,7 @@
 # Dipakai skrip ops HRIS (backup.sh, monitor.sh, telegram-setup.sh). Jalan sebagai root di VPS.
-# Rahasia ops ada di /root/.hris-ops.env (chmod 600), bukan di repo:
-#   HRIS_TG_BOT_TOKEN   token bot Telegram HRIS (dari BotFather)
-#   HRIS_TG_CHAT_ID     chat penerima backup & peringatan (diisi telegram-setup.sh)
+# Bot Telegram HRIS dipakai aplikasi (notifikasi) dan ops (backup & peringatan). Tokennya di
+# backend/.env (TELEGRAM_BOT_TOKEN). Rahasia khusus ops di /root/.hris-ops.env (chmod 600):
+#   HRIS_TG_CHAT_ID         chat penerima backup & peringatan (diisi telegram-setup.sh)
 #   HRIS_BACKUP_PASSPHRASE  kata sandi enkripsi backup (dibuat backup.sh pada jalan pertama)
 APP_DIR=/var/www/hris-app
 DOMAIN=hris.barokahgroupindonesia.tech
@@ -17,7 +17,34 @@ set -a
 . "$OPS_ENV"
 set +a
 
+APP_ENV="$APP_DIR/backend/.env"
+app_env_get() { grep "^$1=" "$APP_ENV" 2>/dev/null | head -1 | cut -d= -f2- | tr -d '"'; }
+app_env_set() {
+  grep -v "^$1=" "$APP_ENV" > "$APP_ENV.tmp" || true
+  echo "$1=\"$2\"" >> "$APP_ENV.tmp"
+  cat "$APP_ENV.tmp" > "$APP_ENV"
+  rm -f "$APP_ENV.tmp"
+}
+# Token lama (versi pertama skrip menyimpannya di file ops) tetap dipakai sampai dipindahkan
+HRIS_TG_BOT_TOKEN="$(app_env_get TELEGRAM_BOT_TOKEN)"
+HRIS_TG_BOT_TOKEN="${HRIS_TG_BOT_TOKEN:-$(grep '^HRIS_TG_BOT_TOKEN=' "$OPS_ENV" | cut -d= -f2-)}"
+
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG_FILE"; }
+
+# Pasang bot di aplikasi: token, secret webhook dan alamat publik di backend/.env.
+# Mengembalikan 0 bila ada yang berubah (API perlu di-restart).
+ensure_app_bot_env() {
+  local changed=1
+  [ -n "${HRIS_TG_BOT_TOKEN:-}" ] || return 1
+  if [ "$(app_env_get TELEGRAM_BOT_TOKEN)" != "$HRIS_TG_BOT_TOKEN" ]; then app_env_set TELEGRAM_BOT_TOKEN "$HRIS_TG_BOT_TOKEN"; changed=0; fi
+  if [ -z "$(app_env_get TELEGRAM_WEBHOOK_SECRET)" ]; then app_env_set TELEGRAM_WEBHOOK_SECRET "$(openssl rand -hex 32)"; changed=0; fi
+  if [ -z "$(app_env_get APP_PUBLIC_URL)" ]; then app_env_set APP_PUBLIC_URL "https://$DOMAIN"; changed=0; fi
+  if grep -q '^HRIS_TG_BOT_TOKEN=' "$OPS_ENV"; then
+    grep -v '^HRIS_TG_BOT_TOKEN=' "$OPS_ENV" > "$OPS_ENV.tmp" || true
+    mv "$OPS_ENV.tmp" "$OPS_ENV"; chmod 600 "$OPS_ENV"
+  fi
+  return $changed
+}
 
 # Simpan / ganti satu nilai di file rahasia ops
 ops_set() {

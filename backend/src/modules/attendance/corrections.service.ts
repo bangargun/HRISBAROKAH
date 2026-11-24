@@ -1,5 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CorrectionStatus, CorrectionType, PayrollStatus, Prisma } from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuthUser, assertOutletAccess, scopedOutletId } from '../../common/utils/outlet-scope.util';
 import { businessDateTime, businessToday, monthDateRange, parseDateParam, toDateOnly } from '../../common/utils/business-date.util';
@@ -20,6 +21,7 @@ export class CorrectionsService {
   constructor(
     private prisma: PrismaService,
     private attendance: AttendanceService,
+    private notifications: NotificationsService,
   ) {}
 
   /** Koreksi per bulan (default bulan ini), terbaru dulu, dengan urutan ke-N koreksi karyawan di bulan itu. */
@@ -58,7 +60,7 @@ export class CorrectionsService {
     if (duplicate) throw new ConflictException('Sudah ada koreksi untuk karyawan ini di tanggal tersebut');
 
     await this.assertApplicable(employee.id, date, dto.type);
-    return this.prisma.attendanceCorrection.create({
+    const created = await this.prisma.attendanceCorrection.create({
       data: {
         employeeId: employee.id,
         date,
@@ -71,6 +73,8 @@ export class CorrectionsService {
       },
       include: INCLUDE,
     });
+    this.notifications.fire(() => this.notifications.correctionCreated(created.id));
+    return created;
   }
 
   /** Setujui (absen hari itu dilengkapi) atau tolak. Hanya koreksi yang masih menunggu. */

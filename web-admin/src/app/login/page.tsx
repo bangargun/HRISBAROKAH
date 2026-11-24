@@ -13,12 +13,18 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Hanya alamat di aplikasi ini (diawali satu "/"), bukan situs lain
+  const nextPath = () => {
+    const next = new URLSearchParams(window.location.search).get('next') ?? '/';
+    return next.startsWith('/') && !next.startsWith('//') ? next : '/';
+  };
+
   // Sudah login dengan sesi yang masih berlaku: langsung ke dashboard
   useEffect(() => {
     if (!getToken()) return;
     verifySession()
       .then((user) => {
-        if (user) router.replace('/');
+        if (user) router.replace(nextPath());
       })
       .catch(() => {});
   }, [router]);
@@ -34,7 +40,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(username.trim(), password);
-      router.replace('/');
+      router.replace(nextPath());
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login gagal');
       setLoading(false);

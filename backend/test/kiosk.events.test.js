@@ -26,7 +26,7 @@ function makeService({ txError, photo = FACE_A } = {}) {
   };
   const attendance = { punctuality: async () => ({ scheduleId: null, lateMinutes: 0, status: 'PRESENT' }) };
   const face = { scoreAgainst: async () => ({ score: 0.9, enrolled: true, reason: null }) };
-  const service = new EventsService(prisma, attendance, face);
+  const service = new EventsService(prisma, attendance, face, { fire() {} });
   const dto = {
     deviceNow: new Date().toISOString(),
     events: [{

@@ -4,6 +4,13 @@
 set -euo pipefail
 OPS=/var/www/hris-app/deploy/ops
 chmod 700 "$OPS"/*.sh
+. "$OPS/common.sh"
 LINES="30 4 * * * /bin/bash $OPS/backup.sh >/dev/null 2>&1 # hris-app-ops
 */5 * * * * /bin/bash $OPS/monitor.sh >/dev/null 2>&1 # hris-app-ops"
 { crontab -l 2>/dev/null | grep -v '# hris-app-ops' || true; echo "$LINES"; } | crontab -
+
+# Token bot yang dipasang dengan skrip versi lama dipindahkan ke aplikasi
+if ensure_app_bot_env; then
+  pm2 restart hris-app-api --update-env > /dev/null
+  log "Bot Telegram dipasang di aplikasi"
+fi

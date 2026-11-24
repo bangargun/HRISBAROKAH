@@ -3,6 +3,7 @@ import { BankChangeStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { businessDateString, parseDateParam, toDateOnly } from '../../common/utils/business-date.util';
 import { BankChangeDto, UpdateMyProfileDto } from './profile.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 const EMPLOYEE_SUMMARY = {
   select: {
@@ -23,7 +24,10 @@ const EMPLOYEE_SUMMARY = {
  */
 @Injectable()
 export class ProfileService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notifications: NotificationsService,
+  ) {}
 
   private async profileOf(userId: string) {
     const profile = await this.prisma.employeeProfile.findUnique({ where: { userId }, select: { id: true } });
@@ -104,14 +108,15 @@ export class ProfileService {
   async requestBankChange(userId: string, dto: BankChangeDto) {
     const employeeId = await this.profileOf(userId);
     const data = { bankName: dto.bankName, bankAccountNumber: dto.bankAccountNumber, bankAccountHolder: dto.bankAccountHolder };
-    await this.prisma.$transaction(async (tx) => {
+    const changeId = await this.prisma.$transaction(async (tx) => {
       const pending = await tx.bankAccountChange.findFirst({ where: { employeeId, status: BankChangeStatus.PENDING } });
       if (pending) {
         await tx.bankAccountChange.update({ where: { id: pending.id }, data: { ...data, createdAt: new Date() } });
-      } else {
-        await tx.bankAccountChange.create({ data: { employeeId, ...data } });
+        return pending.id;
       }
+      return (await tx.bankAccountChange.create({ data: { employeeId, ...data } })).id;
     });
+    this.notifications.fire(() => this.notifications.bankChangeCreated(changeId));
     return this.myProfile(userId);
   }
 
@@ -133,7 +138,7 @@ export class ProfileService {
 
   /** Setujui: rekening karyawan diganti. Klaim bersyarat agar dua HR tidak memproses bersamaan. */
   async approve(reviewerId: string, id: string) {
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       const change = await tx.bankAccountChange.findUnique({ where: { id } });
       if (!change) throw new NotFoundException('Pengajuan tidak ditemukan');
       const claimed = await tx.bankAccountChange.updateMany({
@@ -147,6 +152,8 @@ export class ProfileService {
       });
       return tx.bankAccountChange.findUniqueOrThrow({ where: { id }, include: { employee: EMPLOYEE_SUMMARY } });
     });
+    this.notifications.fire(() => this.notifications.bankChangeDecided(id));
+    return result;
   }
 
   async reject(reviewerId: string, id: string, note: string) {
@@ -157,6 +164,7 @@ export class ProfileService {
       data: { status: BankChangeStatus.REJECTED, note, reviewedById: reviewerId, reviewedAt: new Date() },
     });
     if (!claimed.count) throw new ConflictException('Pengajuan ini sudah diproses');
+    this.notifications.fire(() => this.notifications.bankChangeDecided(id));
     return this.prisma.bankAccountChange.findUniqueOrThrow({ where: { id }, include: { employee: EMPLOYEE_SUMMARY } });
   }
 }

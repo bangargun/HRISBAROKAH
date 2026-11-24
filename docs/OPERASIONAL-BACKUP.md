@@ -22,12 +22,20 @@ sandi itu, salinan di Telegram tidak bisa dibuka.
 
 ## Menghubungkan bot Telegram (sekali)
 
-1. Di Telegram buka **@BotFather** → `/newbot` → beri nama, misalnya `HRIS Barokah Backup`. Salin tokennya.
+Bot yang sama mengirim notifikasi aplikasi (pengajuan, rekening, ringkasan pagi) dan backup/peringatan server.
+
+1. Di Telegram buka **@BotFather** → `/newbot` → beri nama, misalnya `HRIS Barokah`. Salin tokennya.
 2. Di Mac: `ssh -t root@187.77.122.142 bash /var/www/hris-app/deploy/ops/telegram-setup.sh`
-   lalu tempel token (tidak tampil di layar).
-3. Buka bot baru itu di Telegram dan kirim `/start`. Skrip mencatat chat ini dan mengirim pesan uji.
+   lalu tempel token (tidak tampil di layar). Skrip menyimpan token, secret webhook dan alamat publik di
+   `backend/.env`, lalu me-restart API.
+3. Masuk web admin sebagai Super Admin → **Akun saya → Telegram → Hubungkan Telegram** → tekan **Start**
+   di bot. Skrip mendeteksinya dan menjadikan chat itu penerima backup & peringatan server.
 4. Coba backup sekarang: `ssh root@187.77.122.142 bash /var/www/hris-app/deploy/ops/backup.sh`
    → di Telegram masuk kata sandi backup lalu file `hris-db-*.dump.enc`.
+
+Mengganti penerima peringatan: jalankan skrip dengan `--ganti-penerima`.
+Pengguna lain (HR, Kepala Cabang, kru) menghubungkan Telegram sendiri dari Akun saya (web) atau
+Data Diri (aplikasi kru).
 
 ## Peringatan yang dikirim bot
 

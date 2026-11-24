@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../services/api_service.dart';
 
 const _ink = Color(0xFF0F172A);
@@ -242,6 +244,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ]),
                     if (!widget.firstTime) _bankSection(p),
+                    if (!widget.firstTime) const TelegramSection(),
                   ],
                 ),
               ),
@@ -427,6 +430,121 @@ class _BankFormState extends State<_BankForm> {
           ),
         ]),
       ),
+    );
+  }
+}
+
+/// Hubungkan Telegram: notifikasi hasil pengajuan (dan pengajuan yang menunggu, untuk Kepala Cabang).
+class TelegramSection extends StatefulWidget {
+  const TelegramSection({super.key});
+
+  @override
+  State<TelegramSection> createState() => _TelegramSectionState();
+}
+
+class _TelegramSectionState extends State<TelegramSection> {
+  Map<String, dynamic>? _status;
+  bool _busy = false;
+  bool _waiting = false;
+  Timer? _poll;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void dispose() {
+    _poll?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    try {
+      final s = await ApiService.getTelegramStatus();
+      if (mounted) setState(() => _status = s);
+    } catch (_) {
+      // Status Telegram tidak penting untuk sisa layar
+    }
+  }
+
+  Future<void> _connect() async {
+    setState(() => _busy = true);
+    try {
+      final url = await ApiService.createTelegramLink();
+      if (url == null) throw Exception('Bot Telegram belum siap. Coba lagi sebentar.');
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      _startPolling();
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_err(e))));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  void _startPolling() {
+    _poll?.cancel();
+    final started = DateTime.now();
+    setState(() => _waiting = true);
+    _poll = Timer.periodic(const Duration(seconds: 3), (t) async {
+      await _load();
+      final done = _status?['linked'] == true || DateTime.now().difference(started).inMinutes >= 2;
+      if (done) {
+        t.cancel();
+        if (mounted) setState(() => _waiting = false);
+      }
+    });
+  }
+
+  Future<void> _disconnect() async {
+    setState(() => _busy = true);
+    try {
+      final s = await ApiService.unlinkTelegram();
+      if (mounted) setState(() => _status = s);
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_err(e))));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = _status;
+    if (s == null || s['available'] != true) return const SizedBox.shrink();
+    final linked = s['linked'] == true;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text('Notifikasi Telegram', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+        const SizedBox(height: 6),
+        Text(
+          linked
+              ? 'Terhubung${s['telegramUsername'] != null ? ' ke @${s['telegramUsername']}' : ''}. Hasil pengajuanmu dikirim ke Telegram.'
+              : _waiting
+                  ? 'Di Telegram, tekan Start pada bot HRIS. Status di sini berubah otomatis.'
+                  : 'Dapatkan pemberitahuan di Telegram saat pengajuanmu disetujui atau ditolak.',
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: linked
+              ? OutlinedButton(onPressed: _busy ? null : _disconnect, child: const Text('Putuskan'))
+              : FilledButton.icon(
+                  onPressed: _busy ? null : _connect,
+                  style: FilledButton.styleFrom(backgroundColor: _ink),
+                  icon: const Icon(Icons.send),
+                  label: Text(_waiting ? 'Menunggu Telegram…' : 'Hubungkan Telegram'),
+                ),
+        ),
+      ]),
     );
   }
 }

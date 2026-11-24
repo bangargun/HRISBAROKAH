@@ -3,6 +3,7 @@ import { AttendanceEventStatus, AttendanceSource, KioskEventType, KioskMethod, P
 import * as bcrypt from 'bcrypt';
 import { rm } from 'fs/promises';
 import { join } from 'path';
+import { NotificationsService } from '../notifications/notifications.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AttendanceService } from '../attendance/attendance.service';
 import { FaceEnrollmentService } from '../face/face-enrollment.service';
@@ -77,6 +78,7 @@ export class EventsService {
     private prisma: PrismaService,
     private attendance: AttendanceService,
     private faceEnrollment: FaceEnrollmentService,
+    private notifications: NotificationsService,
   ) {}
 
   /**
@@ -106,7 +108,11 @@ export class EventsService {
         results[index] = null;
       }
     }
-    return { results: results.filter((r): r is EventResult => r !== null) };
+    const done = results.filter((r): r is EventResult => r !== null);
+    if (done.some((r) => r.status === AttendanceEventStatus.NEEDS_REVIEW)) {
+      this.notifications.fire(() => this.notifications.reviewNeeded(device.outletId));
+    }
+    return { results: done };
   }
 
   async identify(device: DeviceContext, photoBase64: string) {

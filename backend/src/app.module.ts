@@ -22,6 +22,7 @@ import { CoachingModule } from './modules/coaching/coaching.module';
 import { LegalDocsModule } from './modules/legal-docs/legal-docs.module';
 import { TrainingModule } from './modules/training/training.module';
 import { HealthModule } from './modules/health/health.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { StripSecretsInterceptor } from './common/interceptors/strip-secrets.interceptor';
 
@@ -50,6 +51,7 @@ import { StripSecretsInterceptor } from './common/interceptors/strip-secrets.int
     LegalDocsModule,
     TrainingModule,
     HealthModule,
+    NotificationsModule,
   ],
   controllers: [],
   providers: [{ provide: APP_INTERCEPTOR, useClass: StripSecretsInterceptor }],

@@ -55,6 +55,9 @@ const MODULE_LABEL: Record<string, string> = {
   'me/profile': 'Data diri & rekening (aplikasi HP)',
   'bank-changes': 'Persetujuan perubahan rekening',
   health: 'Cek kesehatan server (pemantauan)',
+  telegram: 'Webhook bot Telegram',
+  'me/telegram': 'Hubungkan Telegram (akun sendiri)',
+  notifications: 'Kirim ringkasan pagi',
 };
 
 const METHOD_LABEL: Record<string, string> = { GET: 'Lihat', POST: 'Tambah/aksi', PUT: 'Ubah', PATCH: 'Ubah', DELETE: 'Hapus' };
