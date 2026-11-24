@@ -2,7 +2,8 @@ import { Body, Controller, Get, Ip, Post, Query, UseGuards } from '@nestjs/commo
 import { CurrentDevice, DeviceAuthGuard, DeviceContext } from './device-auth.guard';
 import { DevicesService } from './devices.service';
 import { BootstrapService } from './bootstrap.service';
-import { IdentifyDto, KioskEventsDto, PairDeviceDto } from './kiosk.dto';
+import { IdentifyDto, KioskEventsDto, KioskRequestDto, PairDeviceDto } from './kiosk.dto';
+import { KioskRequestsService } from './requests.service';
 import { EventsService } from './events.service';
 
 /** Rute tablet: tanpa JWT, memakai kode pairing / token perangkat. */
@@ -12,6 +13,7 @@ export class KioskController {
     private devices: DevicesService,
     private bootstrapService: BootstrapService,
     private eventsService: EventsService,
+    private requestsService: KioskRequestsService,
   ) {}
 
   @Post('pair')
@@ -55,5 +57,12 @@ export class KioskController {
     // cabang mana pun, agar tablet menawarkan Istirahat / Pulang, bukan Masuk
     const today = await this.bootstrapService.todayRows(device.outletId, [match.employeeId], { includeOutlet: false });
     return { ...match, today };
+  }
+
+  /** Pengajuan cuti / izin / sakit dari tablet (butuh internet; tidak diantrekan seperti absen). */
+  @UseGuards(DeviceAuthGuard)
+  @Post('requests')
+  createRequest(@CurrentDevice() device: DeviceContext, @Body() dto: KioskRequestDto) {
+    return this.requestsService.create(device, dto);
   }
 }

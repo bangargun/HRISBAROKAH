@@ -5,6 +5,7 @@ import { FaceRecognitionService } from '../face/face-recognition.service';
 import { businessDateString, monthDateRange, toDateOnly } from '../../common/utils/business-date.util';
 import { OutletHours, holidaysBetween } from '../../common/utils/work-hours.util';
 import { OPEN_ATTENDANCE_MAX_MS, isOpen } from './kiosk.rules';
+import { LEAVE_TYPES } from '../requests/requests.service';
 
 // Sama dengan employees.service: peran admin bukan kru lapangan
 const ADMIN_ROLES: UserRole[] = [UserRole.SUPER_ADMIN, UserRole.HR_ADMIN, UserRole.FINANCE_ADMIN];
@@ -61,6 +62,8 @@ export interface BootstrapPayload {
       // 0 selama belum absen pulang
       workMinutes: number;
     }[];
+    // Pengajuan cuti / izin / sakit terakhir (maks 10), untuk "Rekap saya" di tablet
+    requests: { type: string; status: string; startDate: string | null; endDate: string | null; totalDays: number | null }[];
   }[];
 }
 
@@ -225,6 +228,11 @@ export class BootstrapService {
       include: { breaks: { select: { endBreak: true, totalMinutes: true, startBreak: true } } },
       orderBy: { date: 'asc' },
     });
+    const requests = await this.prisma.employeeRequest.findMany({
+      where: { employeeId: { in: employeeIds }, type: { in: LEAVE_TYPES } },
+      select: { employeeId: true, type: true, status: true, startDate: true, endDate: true, totalDays: true },
+      orderBy: { createdAt: 'desc' },
+    });
     const byEmployee = new Map<string, BootstrapPayload['recap'][number]['days']>(employeeIds.map((id) => [id, []]));
     for (const r of rows) {
       const breakMinutes = r.breaks.reduce(
@@ -242,6 +250,19 @@ export class BootstrapService {
         workMinutes,
       });
     }
-    return [...byEmployee].map(([employeeId, days]) => ({ employeeId, days }));
+    return [...byEmployee].map(([employeeId, days]) => ({
+      employeeId,
+      days,
+      requests: requests
+        .filter((q) => q.employeeId === employeeId)
+        .slice(0, 10)
+        .map((q) => ({
+          type: q.type,
+          status: q.status,
+          startDate: q.startDate ? businessDateString(q.startDate) : null,
+          endDate: q.endDate ? businessDateString(q.endDate) : null,
+          totalDays: q.totalDays,
+        })),
+    }));
   }
 }

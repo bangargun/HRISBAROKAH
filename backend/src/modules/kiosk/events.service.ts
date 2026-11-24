@@ -366,7 +366,8 @@ export class EventsService {
   }
 
   /** Null bila PIN benar. Setiap percobaan memesan jatah lebih dulu; yang benar dikembalikan. */
-  private async checkPin(deviceId: string, pinHash: string | null, pin?: string): Promise<'budget' | 'wrong' | null> {
+  /** Periksa PIN dengan jatah percobaan per tablet (dipakai event absen dan pengajuan dari tablet). */
+  async checkPin(deviceId: string, pinHash: string | null, pin?: string): Promise<'budget' | 'wrong' | null> {
     const key = `pin:${deviceId}`;
     if (!this.limiter.tryAcquire(key)) return 'budget';
     let ok = false;

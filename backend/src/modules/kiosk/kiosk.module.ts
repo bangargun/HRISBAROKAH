@@ -8,11 +8,13 @@ import { EventsService } from './events.service';
 import { ReviewController } from './review.controller';
 import { ReviewService } from './review.service';
 import { AttendanceModule } from '../attendance/attendance.module';
+import { RequestsModule } from '../requests/requests.module';
+import { KioskRequestsService } from './requests.service';
 
 @Module({
-  imports: [AttendanceModule],
+  imports: [AttendanceModule, RequestsModule],
   controllers: [DevicesController, KioskController, ReviewController],
-  providers: [DevicesService, DeviceAuthGuard, BootstrapService, EventsService, ReviewService],
+  providers: [DevicesService, DeviceAuthGuard, BootstrapService, EventsService, ReviewService, KioskRequestsService],
   exports: [DevicesService, DeviceAuthGuard],
 })
 export class KioskModule {}

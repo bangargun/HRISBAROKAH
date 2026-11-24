@@ -5,6 +5,7 @@ import {
   IsArray,
   IsBoolean,
   IsEnum,
+  IsIn,
   IsISO8601,
   IsInt,
   IsNotEmpty,
@@ -16,7 +17,7 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator';
-import { KioskEventType, KioskMethod } from '@prisma/client';
+import { KioskEventType, KioskMethod, RequestType } from '@prisma/client';
 
 const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
 
@@ -104,4 +105,40 @@ export class IdentifyDto {
   @IsNotEmpty({ message: 'Foto wajib disertakan' })
   @MaxLength(MAX_KIOSK_PHOTO_BASE64_LENGTH, { message: 'Ukuran foto terlalu besar' })
   photoBase64: string;
+}
+
+/** Pengajuan cuti / izin / sakit dari tablet, atas nama kru yang baru dikenali wajah atau PIN-nya. */
+export class KioskRequestDto {
+  @IsUUID('4', { message: 'Karyawan tidak valid' })
+  employeeId: string;
+
+  @IsIn([RequestType.CUTI_TAHUNAN, RequestType.CUTI_KHUSUS, RequestType.IZIN, RequestType.SAKIT], {
+    message: 'Jenis pengajuan tidak valid',
+  })
+  type: RequestType;
+
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'Tanggal mulai harus berformat YYYY-MM-DD' })
+  startDate: string;
+
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'Tanggal selesai harus berformat YYYY-MM-DD' })
+  @IsOptional()
+  endDate?: string;
+
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @IsString()
+  @IsNotEmpty({ message: 'Alasan wajib diisi' })
+  @MaxLength(1000)
+  reason: string;
+
+  @IsIn([KioskMethod.FACE_LOCAL, KioskMethod.FACE_SERVER, KioskMethod.PIN], { message: 'Metode tidak valid' })
+  method: KioskMethod;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Foto wajib disertakan' })
+  @MaxLength(MAX_KIOSK_PHOTO_BASE64_LENGTH, { message: 'Ukuran foto terlalu besar' })
+  photoBase64: string;
+
+  @Matches(/^\d{6}$/, { message: 'PIN harus 6 digit' })
+  @IsOptional()
+  pin?: string;
 }

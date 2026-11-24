@@ -61,7 +61,8 @@ export interface BootstrapPayload {
   roster: BootstrapRosterEntry[];
   directory: { employeeId: string; fullName: string; homeOutletName: string }[];
   today: BootstrapTodayRow[];
-  recap: { employeeId: string; days: BootstrapRecapDay[] }[];
+  // requests: pengajuan cuti / izin / sakit terakhir (tablet lama tanpa field ini dianggap kosong)
+  recap: { employeeId: string; days: BootstrapRecapDay[]; requests?: RecapRequest[] }[];
 }
 
 export interface PairResponse {
@@ -113,4 +114,12 @@ export interface DeviceConfig {
   outletName: string;
   offsetMs: number; // jam server - jam tablet, dari bootstrap terakhir
   lastSyncAt?: string | null; // ISO jam tablet saat bootstrap terakhir berhasil
+}
+
+export interface RecapRequest {
+  type: string;
+  status: string;
+  startDate: string | null;
+  endDate: string | null;
+  totalDays: number | null;
 }

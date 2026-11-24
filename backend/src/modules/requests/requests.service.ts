@@ -8,9 +8,18 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateKasbonDto, CreateGeneralRequestDto, ApprovalActionDto } from './requests.dto';
 import { Prisma, RequestStatus, RequestType } from '@prisma/client';
 import { AuthUser, assertOutletAccess, scopedOutletId } from '../../common/utils/outlet-scope.util';
-import { businessDateTime, daysBetween, parseDateParam } from '../../common/utils/business-date.util';
+import {
+  businessDateString,
+  businessDateTime,
+  daysBetween,
+  parseDateParam,
+  toDateOnly,
+} from '../../common/utils/business-date.util';
 
 const MAX_REQUEST_DAYS = 366;
+
+/** Jenis pengajuan yang berarti kru tidak bekerja di tanggal itu (juga yang boleh diajukan dari tablet). */
+export const LEAVE_TYPES: RequestType[] = [RequestType.CUTI_TAHUNAN, RequestType.CUTI_KHUSUS, RequestType.IZIN, RequestType.SAKIT];
 
 @Injectable()
 export class RequestsService {
@@ -68,7 +77,11 @@ export class RequestsService {
   async createGeneralRequest(userId: string, dto: CreateGeneralRequestDto) {
     const profile = await this.prisma.employeeProfile.findUnique({ where: { userId } });
     if (!profile) throw new NotFoundException('Profil karyawan tidak ditemukan');
+    return this.createForProfile(profile, dto);
+  }
 
+  /** Buat pengajuan untuk karyawan tertentu; dipakai aplikasi HP dan tablet cabang. */
+  async createForProfile(profile: { id: string; leaveBalance: number }, dto: CreateGeneralRequestDto) {
     let totalDays = 1;
     let startDate: Date;
     let endDate: Date;
@@ -197,6 +210,16 @@ export class RequestsService {
         status: RequestStatus.APPROVED,
         ...review,
       });
+
+      // Cuti, izin dan sakit yang disetujui menjadikan hari itu libur di jadwal (tidak dihitung bolos);
+      // hari yang sudah ada absennya tidak diubah
+      if (LEAVE_TYPES.includes(request.type) && request.startDate && request.endDate) {
+        const first = toDateOnly(businessDateString(request.startDate));
+        const last = toDateOnly(businessDateString(request.endDate));
+        await tx.shiftSchedule.deleteMany({
+          where: { employeeId: request.employeeId, date: { gte: first, lte: last }, attendances: { none: {} } },
+        });
+      }
 
       if (request.type === RequestType.CUTI_TAHUNAN && request.totalDays) {
         const deducted = await tx.employeeProfile.updateMany({

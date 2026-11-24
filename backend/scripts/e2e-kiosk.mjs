@@ -1054,6 +1054,41 @@ checks.push(['tinjau: reject CLOCK_IN pada baris yang sudah ada sebelum tablet -
   assert.equal(sql(`select count(*) from "Attendance" where "employeeId"='${crew2.id}'`), '0');
 }]);
 
+checks.push(['tablet: pengajuan cuti/izin diverifikasi wajah atau PIN; disetujui HR mengosongkan jadwal tanpa absen', async (ctx) => {
+  const out = await createOutlet(ctx.admin, `${Date.now().toString(36).toUpperCase()}RQ`);
+  const dev = await pairDevice(ctx.admin, out.id, 'Tablet Pengajuan');
+  const crew = await enrolledCrew(ctx.admin, out.id, 'Wajah Cuti');
+  const plain = await createCrew(ctx.admin, out.id, 'EMPLOYEE', 'Tanpa Wajah');
+  const d1 = jakartaYmd(3), d2 = jakartaYmd(4), d3 = jakartaYmd(5);
+  const ask = (body) => http('POST', '/kiosk/requests', { token: dev.token, body: { type: 'IZIN', startDate: d1, endDate: d3, reason: 'Acara keluarga', method: 'FACE_LOCAL', photoBase64: FACE_A, ...body } });
+
+  assert.equal((await ask({ employeeId: crew.id, type: 'LEMBUR' })).status, 400, 'jenis di luar cuti/izin/sakit ditolak');
+  assert.equal((await ask({ employeeId: crew.id, photoBase64: FACE_B })).status, 403, 'wajah lain ditolak');
+  assert.equal((await ask({ employeeId: plain.id })).status, 400, 'belum daftar wajah -> pakai PIN');
+  assert.equal((await ask({ employeeId: plain.id, method: 'PIN', pin: '000000' })).status, 403, 'tanpa PIN terdaftar ditolak');
+  setPin(plain.id, '246810');
+  const byPin = await ask({ employeeId: plain.id, method: 'PIN', pin: '246810', type: 'SAKIT', startDate: d1, endDate: d1 });
+  assert.equal(byPin.status, 201, JSON.stringify(byPin.body));
+  assert.equal(byPin.body.status, 'PENDING_STORE_MANAGER');
+
+  const sched = await schedule(ctx.admin, [d1, d2, d3].map((date) => ({ employeeId: crew.id, date, working: true })));
+  assert.equal(sched.status, 200, JSON.stringify(sched.body));
+  // hari kedua sudah ada absen: jadwalnya tidak boleh hilang
+  const s2 = sql(`select id from "ShiftSchedule" where "employeeId"='${crew.id}' and date='${d2}'`);
+  sql(`insert into "Attendance"(id,"employeeId","outletId","scheduleId",date,status) values (gen_random_uuid(),'${crew.id}','${out.id}','${s2}','${d2}','PRESENT')`);
+  const req = await ask({ employeeId: crew.id });
+  assert.equal(req.status, 201, JSON.stringify(req.body));
+  assert.equal((await http('PATCH', `/requests/${req.body.id}/store-manager-review`, { token: ctx.admin, body: { action: 'APPROVE' } })).status, 200);
+  assert.equal(sql(`select count(*) from "ShiftSchedule" where "employeeId"='${crew.id}'`), '3', 'belum berubah sebelum HR');
+  assert.equal((await http('PATCH', `/requests/${req.body.id}/hr-review`, { token: ctx.admin, body: { action: 'APPROVE' } })).status, 200);
+  assert.equal(sql(`select string_agg(to_char(date,'YYYY-MM-DD'),',') from "ShiftSchedule" where "employeeId"='${crew.id}'`), d2);
+
+  const boot = await http('GET', '/kiosk/bootstrap', { token: dev.token });
+  const recap = boot.body.recap.find((r) => r.employeeId === crew.id);
+  assert.equal(recap.requests[0].status, 'APPROVED');
+  assert.equal(recap.requests[0].startDate, d1);
+}]);
+
 // ---------- runner ----------
 const isMain = import.meta.url === pathToFileURL(process.argv[1]).href;
 if (isMain) {

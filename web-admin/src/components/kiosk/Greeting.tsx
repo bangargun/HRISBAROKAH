@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { AlertCircle, CalendarDays, Loader2 } from 'lucide-react';
+import { AlertCircle, CalendarDays, FileText, Loader2 } from 'lucide-react';
 import type { CurrentDay } from '@/lib/kiosk/status';
 import type { Person } from '@/lib/kiosk/today';
 import type { KioskEventType } from '@/lib/kiosk/types';
@@ -34,10 +34,11 @@ export interface GreetingProps {
   onAction: (type: KioskEventType) => void;
   onNotMe: () => void;
   onRecap: () => void;
+  onRequest: () => void;
 }
 
 /** "Halo {nama}" dengan tombol aksi yang berlaku untuk status kru saat ini. */
-export default function Greeting({ person, day, actions, viaPin, busy, error, onAction, onNotMe, onRecap }: GreetingProps) {
+export default function Greeting({ person, day, actions, viaPin, busy, error, onAction, onNotMe, onRecap, onRequest }: GreetingProps) {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 py-6 text-center">
       <div>
@@ -77,6 +78,10 @@ export default function Greeting({ person, day, actions, viaPin, busy, error, on
             Rekap saya
           </button>
         )}
+        <button type="button" disabled={busy} onClick={onRequest} className={btnSecondary}>
+          <FileText className="h-5 w-5" aria-hidden />
+          Ajukan cuti / izin
+        </button>
         <button type="button" disabled={busy} onClick={onNotMe} className={btnQuiet}>
           Bukan saya
         </button>

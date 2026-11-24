@@ -16,6 +16,7 @@ import Capture, { NotRecognized } from './Capture';
 import Greeting, { Recorded } from './Greeting';
 import GuestPicker, { type PickerTab } from './GuestPicker';
 import MyRecap from './MyRecap';
+import RequestForm from './RequestForm';
 import PinPad from './PinPad';
 
 type Greet = {
@@ -38,7 +39,8 @@ type Step =
   | { kind: 'capture-pin'; person: Person; pin: string }
   | ({ kind: 'greeting' } & Greet)
   | { kind: 'recorded'; person: Person; type: KioskEventType; at: Date; lateMinutes: number | null; canRecap: boolean }
-  | { kind: 'recap'; person: Person };
+  | { kind: 'recap'; person: Person }
+  | ({ kind: 'request' } & Greet);
 
 // Layar kembali ke papan bila tidak disentuh selama ini (privasi: nama dan rekap tidak tertinggal)
 const IDLE_MS: Partial<Record<Step['kind'], number>> = {
@@ -51,6 +53,7 @@ const IDLE_MS: Partial<Record<Step['kind'], number>> = {
   // Cadangan bila permintaan identify tetap menggantung (batas fetch IDENTIFY_TIMEOUT_MS lebih dulu)
   identifying: 20_000,
   recorded: 10_000,
+  request: 120_000,
 };
 // Event antre yang dibaca untuk status papan (aturan absen terbuka 16 jam + cadangan)
 const RECENT_WINDOW_MS = 48 * 3600_000;
@@ -346,8 +349,11 @@ export default function Kiosk({ config, sync, bootstrap }: KioskProps) {
           onAction={(type) => void record(step, type)}
           onNotMe={toBoard}
           onRecap={() => setStep({ kind: 'recap', person: step.person })}
+          onRequest={() => setStep({ ...step, kind: 'request' })}
         />
       );
+    case 'request':
+      return <RequestForm person={step.person} method={step.method} photoBase64={step.photoBase64} pin={step.pin} onDone={toBoard} />;
     case 'recorded':
       return (
         <Recorded
@@ -360,6 +366,13 @@ export default function Kiosk({ config, sync, bootstrap }: KioskProps) {
         />
       );
     case 'recap':
-      return <MyRecap person={step.person} rows={recapFor(bootstrap, queued, step.person, serverNow())} onClose={toBoard} />;
+      return (
+        <MyRecap
+          person={step.person}
+          rows={recapFor(bootstrap, queued, step.person, serverNow())}
+          requests={step.person.isHome ? (bootstrap.recap.find((r) => r.employeeId === step.person.employeeId)?.requests ?? []) : []}
+          onClose={toBoard}
+        />
+      );
   }
 }

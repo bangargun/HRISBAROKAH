@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import type { Person, RecapRow } from '@/lib/kiosk/today';
+import type { RecapRequest } from '@/lib/kiosk/types';
+import { REQUEST_LABEL } from './RequestForm';
 import { btnPrimary, hhmm, panel } from './ui';
 
 export const RECAP_SECONDS = 30;
@@ -20,7 +22,24 @@ function minutes(m: number | null): string {
  * Rekap pribadi kru yang baru dikenali: bulan berjalan (kru cabang ini) atau hari ini (kru tamu).
  * Tutup sendiri setelah 30 detik.
  */
-export default function MyRecap({ person, rows, onClose }: { person: Person; rows: RecapRow[]; onClose: () => void }) {
+const STATUS_LABEL: Record<string, string> = {
+  PENDING_STORE_MANAGER: 'Menunggu Kepala Cabang',
+  PENDING_HR: 'Menunggu HR',
+  APPROVED: 'Disetujui',
+  REJECTED: 'Ditolak',
+};
+
+export default function MyRecap({
+  person,
+  rows,
+  requests,
+  onClose,
+}: {
+  person: Person;
+  rows: RecapRow[];
+  requests: RecapRequest[];
+  onClose: () => void;
+}) {
   const [left, setLeft] = useState(RECAP_SECONDS);
   useEffect(() => {
     const id = setInterval(() => setLeft((s) => s - 1), 1000);
@@ -71,6 +90,28 @@ export default function MyRecap({ person, rows, onClose }: { person: Person; row
             </tbody>
           </table>
         </div>
+      )}
+      {requests.length > 0 && (
+        <section className={`${panel} p-4`} aria-labelledby="recap-requests">
+          <h2 id="recap-requests" className="mb-2 text-base font-semibold text-white">Pengajuan cuti / izin</h2>
+          <ul className="divide-y divide-ink-700/60 text-base text-slate-200">
+            {requests.map((q, i) => (
+              <li key={i} className="flex flex-wrap items-center justify-between gap-2 py-2">
+                <span>
+                  {REQUEST_LABEL[q.type] ?? q.type}
+                  {q.startDate && (
+                    <span className="text-slate-400">
+                      {' '}· {day(q.startDate)}{q.endDate && q.endDate !== q.startDate ? ` – ${day(q.endDate)}` : ''}
+                    </span>
+                  )}
+                </span>
+                <span className={q.status === 'APPROVED' ? 'text-emerald-300' : q.status === 'REJECTED' ? 'text-rose-300' : 'text-brand-200'}>
+                  {STATUS_LABEL[q.status] ?? q.status}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
       <p className="text-sm text-slate-400">Angka hari ini diperbarui setelah absen terkirim ke server.</p>
     </main>
